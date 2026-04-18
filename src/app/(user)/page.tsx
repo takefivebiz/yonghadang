@@ -1,6 +1,5 @@
 import { type Metadata } from 'next';
 import { HeroSection } from './_components/hero-section';
-import { BentoFeatureSection } from './_components/bento-feature-section';
 import { ContentSection } from './_components/content-section';
 
 export const metadata: Metadata = {
@@ -16,13 +15,10 @@ export const metadata: Metadata = {
 const HomePage = () => {
   return (
     <>
-      {/* 1. 히어로 — 메인 CTA */}
+      {/* 1. 히어로 — 미니 히어로 */}
       <HeroSection />
 
-      {/* 2. 핵심 기능 소개 — Bento Grid */}
-      <BentoFeatureSection />
-
-      {/* 3. 콘텐츠 그리드 — 카테고리 탭 + 카드 */}
+      {/* 2. 콘텐츠 탐색 — 카테고리 탭 + 카드 그리드 */}
       <ContentSection />
     </>
   );

@@ -4,7 +4,7 @@ import { Content } from '@/types/content';
 export const DUMMY_CONTENTS: Content[] = [
   {
     id: '1',
-    slug: '/mbti/basic',
+    slug: 'mbti-basic',
     category: 'mbti',
     title: 'MBTI 기본 유형 해석',
     description: '나의 MBTI 유형이 가진 깊은 심리적 특성을 AI가 분석합니다.',
@@ -16,7 +16,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: '2',
-    slug: '/saju/deep',
+    slug: 'saju-deep',
     category: 'saju',
     title: '심층 사주 분석',
     description: '생년월일시로 읽는 나만의 사주팔자 — AI 심층 분석 보고서.',
@@ -28,7 +28,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: '3',
-    slug: '/tarot/today',
+    slug: 'tarot-today',
     category: 'tarot',
     title: '오늘의 타로 리딩',
     description: '지금 이 순간, 타로 카드가 전하는 메시지를 확인하세요.',
@@ -40,7 +40,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: '4',
-    slug: '/astrology/natal',
+    slug: 'astrology-natal',
     category: 'astrology',
     title: '별자리 출생 차트',
     description: '태어난 순간의 별자리 배치로 읽는 나의 운명 지도.',
@@ -51,7 +51,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: '5',
-    slug: '/mbti/compatibility',
+    slug: 'mbti-compatibility',
     category: 'mbti',
     title: 'MBTI 궁합 분석',
     description: '두 유형의 관계 역학과 갈등 해소 방법을 AI가 분석합니다.',
@@ -63,7 +63,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: '6',
-    slug: '/saju/yearly',
+    slug: 'saju-yearly',
     category: 'saju',
     title: '신년 운세 사주',
     description: '올해 나에게 찾아오는 운의 흐름 — 월별 상세 분석 포함.',
@@ -75,7 +75,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: '7',
-    slug: '/tarot/love',
+    slug: 'tarot-love',
     category: 'tarot',
     title: '연애 타로 리딩',
     description: '지금 나의 연애 운과 상대의 마음을 타로로 읽어드립니다.',
@@ -86,7 +86,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: '8',
-    slug: '/astrology/compatibility',
+    slug: 'astrology-compatibility',
     category: 'astrology',
     title: '별자리 궁합',
     description: '두 별자리의 천체적 연결을 분석해 관계의 가능성을 봅니다.',

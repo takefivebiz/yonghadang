@@ -1,38 +1,42 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { ContentCard } from '@/components/common/content-card';
-import { DUMMY_CONTENTS } from '@/lib/dummy-contents';
-import { CategoryFilter } from '@/types/content';
+import { useState } from "react";
+import { ContentCard } from "@/components/common/content-card";
+import { DUMMY_CONTENTS } from "@/lib/dummy-contents";
+import { CategoryFilter } from "@/types/content";
 
 /** 카테고리 탭 목록 */
 const CATEGORY_TABS: { value: CategoryFilter; label: string }[] = [
-  { value: 'all',       label: '전체' },
-  { value: 'mbti',      label: 'MBTI' },
-  { value: 'saju',      label: '사주' },
-  { value: 'tarot',     label: '타로' },
-  { value: 'astrology', label: '점성술' },
+  { value: "all", label: "전체" },
+  { value: "mbti", label: "MBTI" },
+  { value: "saju", label: "사주" },
+  { value: "tarot", label: "타로" },
+  { value: "astrology", label: "점성술" },
 ];
 
 export const ContentSection = () => {
-  const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
 
   // TODO: [백엔드 연동] 카테고리 필터를 쿼리 파라미터로 /api/contents에 전달
   const filteredContents =
-    activeCategory === 'all'
+    activeCategory === "all"
       ? DUMMY_CONTENTS
       : DUMMY_CONTENTS.filter((c) => c.category === activeCategory);
 
   return (
-    <section id="content" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-24 pt-4">
+    <section
+      id="content"
+      className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-24 pt-10"
+    >
       {/* 섹션 헤더 */}
       <div className="mb-8 text-center">
-        <p className="font-display mb-3 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Services
-        </p>
-        <h2 className="font-display text-3xl font-bold text-deep-purple md:text-4xl">
+        <h2 className="font-display mb-3 text-3xl font-bold text-deep-purple md:text-4xl">
           지금 바로 시작하세요
         </h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          수백만 건의 데이터로 학습한 AI가 <br />
+          당신만의 패턴과 운명의 흐름을 정밀하게 읽어냅니다.
+        </p>
       </div>
 
       {/* 카테고리 탭 필터 */}
@@ -46,15 +50,15 @@ export const ContentSection = () => {
             style={
               activeCategory === tab.value
                 ? {
-                    backgroundColor: '#F5D7E8',
-                    color: '#4A3B5C',
-                    boxShadow: '0 2px 12px rgba(245, 215, 232, 0.8)',
-                    border: '1.5px solid rgba(74, 59, 92, 0.15)',
+                    backgroundColor: "#F5D7E8",
+                    color: "#4A3B5C",
+                    boxShadow: "0 2px 12px rgba(245, 215, 232, 0.8)",
+                    border: "1.5px solid rgba(74, 59, 92, 0.15)",
                   }
                 : {
-                    backgroundColor: 'transparent',
-                    color: '#9B88AC',
-                    border: '1.5px solid #DDD3E8',
+                    backgroundColor: "transparent",
+                    color: "#9B88AC",
+                    border: "1.5px solid #DDD3E8",
                   }
             }
           >

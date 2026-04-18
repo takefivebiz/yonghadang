@@ -4,7 +4,7 @@ export type ContentBadge = 'popular' | 'new';
 
 export interface Content {
   id: string;
-  /** 상세 페이지 경로 */
+  /** DB 콘텐츠 식별자 (예: 'mbti-basic', 'saju-deep') — /start?preselect= 쿼리로 사용 */
   slug: string;
   category: ContentCategory;
   title: string;
