@@ -253,15 +253,29 @@
 
 ---
 
-### 6-5. 결제 페이지 (/payments)
+### 6-5. 결제 페이지 (/payments) ✅ 구현 완료 (2026-04-18)
 
 - 선택한 리포트 요약 (제목, 가격)
 - 입력 정보 요약
-- 토스페이먼츠 위젯
+- 토스페이먼츠 위젯 (테스트 키: `test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm`)
 - 회원/비회원 결제 모두 지원
 - 비회원 결제 시 전화번호 + 비밀번호 입력 폼 표시
-- 결제 성공 시: 회원 → 마이페이지, 비회원 → 비회원 주문 조회
-- 결제 실패 시: 입력 정보 유지, 결제 페이지 머무름
+- 결제 성공 시: `/payments/success` 이동 후 결제 확인 안내
+- 결제 실패 시: `/payments/fail` 이동, 실패 사유 표시 + 재시도 링크
+
+#### 구현 세부사항
+
+- **데이터 전달**: `/start` → `/payments` 는 sessionStorage(`yonghadang:pending_order`) 사용, 30분 만료 정책 적용
+- **위젯 초기화**: React Strict Mode 이중 마운트 방지를 위해 단일 `useEffect` + `useRef` 기반 cleanup 패턴 적용
+- **파일 구조**:
+  - `src/app/(user)/payments/page.tsx` — Server Component, content 유효성 검증
+  - `src/app/(user)/payments/_components/payment-client.tsx` — 토스 위젯 초기화 및 결제 요청
+  - `src/app/(user)/payments/_components/order-summary.tsx` — 주문 요약 UI
+  - `src/app/(user)/payments/_components/guest-info-form.tsx` — 비회원 전화번호/비밀번호 입력
+  - `src/app/(user)/payments/success/page.tsx` + `_components/payment-success-client.tsx` — 결제 성공 페이지
+  - `src/app/(user)/payments/fail/page.tsx` — 결제 실패 페이지
+  - `src/lib/payment.ts` — sessionStorage 유틸 (savePendingOrder / readPendingOrder / clearPendingOrder)
+  - `src/types/payment.ts` — PendingOrderInput, GuestCheckoutInfo 등 타입 정의
 
 ---
 
