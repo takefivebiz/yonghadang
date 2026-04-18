@@ -86,9 +86,10 @@ export const HeroSection = () => {
           AI Fortune · 용하당
         </p>
 
-        {/* 서비스 한 줄 소개 */}
+        {/* 서비스 한 줄 소개 — PRD 6-1.1: "흐릿했던"으로 공감 → "선명해지는"으로 가치 약속 → "순간"으로 즉시성 */}
         <h1 className="font-display mb-4 text-3xl font-bold leading-tight tracking-tight text-deep-purple md:text-5xl">
-          당신의 운명을{" "}
+          흐릿했던 나의 흐름이,
+          <br />
           <span
             className="bg-clip-text text-transparent"
             style={{
@@ -96,21 +97,21 @@ export const HeroSection = () => {
                 "linear-gradient(90deg, #4A3B5C 0%, #9B68B8 55%, #D4A5A5 100%)",
             }}
           >
-            AI가 읽다
+            선명해지는 순간
           </span>
         </h1>
 
-        {/* 부제 */}
+        {/* 부제 — PRD 6-1.1: 고민 상황 공감 → 4가지 도구를 기능이 아닌 "이야기를 꺼내는 수단"으로 포지셔닝 */}
         <p className="mb-7 max-w-sm text-base leading-relaxed text-foreground/65 md:text-lg">
-          사주 · MBTI · 타로 · 점성술
+          마음이 흔들릴 때, 선택 앞에서 멈출 때
           <span className="mt-1 block text-sm text-muted-foreground">
-            깊고 정확한 AI 해석으로 나를 이해하는 시간
+            사주 · MBTI · 타로 · 점성술, 당신만의 이야기를 꺼내드립니다
           </span>
         </p>
 
-        {/* 신뢰 지표 */}
+        {/* 신뢰 지표 — PRD 6-1.1: "무료로 시작"을 맨 앞에 배치해 진입 장벽 최소화 */}
         <p className="text-xs" style={{ color: "rgba(155, 136, 172, 0.65)" }}>
-          ✓ 3분 내 결과 · ✓ 데이터 기반 분석 · ✓ 10페이지 이상 상세 보고서
+          ✦ 무료로 시작 · ✦ 3분 안에 완성 · ✦ 수천 명이 선택한 리포트
         </p>
       </div>
     </section>

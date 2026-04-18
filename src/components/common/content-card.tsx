@@ -72,7 +72,10 @@ export const ContentCard = ({ content }: ContentCardProps) => {
         <div className="p-4">
           <span
             className="mb-2 inline-block rounded-full px-2.5 py-0.5 text-xs"
-            style={{ backgroundColor: "rgba(74, 59, 92, 0.06)", color: "#9B88AC" }}
+            style={{
+              backgroundColor: "rgba(74, 59, 92, 0.06)",
+              color: "#9B88AC",
+            }}
           >
             {CATEGORY_LABELS[content.category]}
           </span>
@@ -81,12 +84,16 @@ export const ContentCard = ({ content }: ContentCardProps) => {
             {content.title}
           </h3>
 
-          <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+          <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {content.description}
           </p>
 
-          <p className="text-sm font-bold text-deep-purple">
-            {content.price.toLocaleString("ko-KR")}원
+          {/* PRD 6-1.1: 무료 진입점 강조 — 클릭 전환율 향상 */}
+          <p className="text-xs" style={{ color: "#9B88AC" }}>
+            무료 체험 후{" "}
+            <span className="font-semibold text-deep-purple">
+              ₩{content.price.toLocaleString("ko-KR")}
+            </span>
           </p>
         </div>
       </article>
