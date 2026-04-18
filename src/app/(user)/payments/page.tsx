@@ -60,7 +60,7 @@ const PaymentsPage = async ({ searchParams }: PaymentsPageProps) => {
         {/* 뒤로 가기 */}
         <div className="mx-auto mb-6 max-w-lg">
           <Link
-            href={`/start?preselect=${content.slug}`}
+            href={`/report/demo-${content.slug}`}
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <svg

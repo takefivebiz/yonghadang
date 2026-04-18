@@ -14,6 +14,7 @@ import {
   TOSS_CLIENT_KEY,
   generateOrderId,
   readPendingOrder,
+  savePendingOrder,
 } from "@/lib/payment";
 import { OrderSummary } from "./order-summary";
 import { GuestInfoForm } from "./guest-info-form";
@@ -153,15 +154,23 @@ export const PaymentClient = ({ content }: PaymentClientProps) => {
       //       서버 orders 레코드(status=pending)를 생성하고, 서버가 반환한 orderId 사용.
       const origin = window.location.origin;
 
+      // 결제 성공 후 Order 레코드 생성을 위해 orderId + 비회원 인증 정보를 저장
+      const phoneDigits = guestInfo.phoneNumber.replace(/\D/g, "");
+      savePendingOrder({
+        contentSlug: content.slug,
+        category: content.category,
+        summary: pendingInput?.summary ?? [],
+        orderId: orderIdRef.current,
+        guestPhone: mode === "guest" ? phoneDigits : undefined,
+        guestPassword: mode === "guest" ? guestInfo.password : undefined,
+      });
+
       await widgetsRef.current.requestPayment({
         orderId: orderIdRef.current,
         orderName: content.title,
         successUrl: `${origin}/payments/success?content=${content.slug}`,
         failUrl: `${origin}/payments/fail?content=${content.slug}`,
-        customerMobilePhone:
-          mode === "guest"
-            ? guestInfo.phoneNumber.replace(/\D/g, "")
-            : undefined,
+        customerMobilePhone: mode === "guest" ? phoneDigits : undefined,
       });
     } catch (err) {
       // 사용자가 결제창을 닫거나 네트워크 오류 — 버튼 재활성화

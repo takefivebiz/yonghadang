@@ -279,10 +279,11 @@
 
 ---
 
-### 6-6. 보고서 확인 페이지 (/report/[order-id])
+### 6-6. 보고서 확인 페이지 (/report/[order-id]) ✅ 구현 완료 (2026-04-19)
 
 - AI가 생성한 풀이 및 해석 보고서
 - 회원/비회원 모두 접근 가능 (주문번호 기반)
+- 기본 풀이, 심화 풀이 전체 보여져야 함
 - 보안: Server Component에서 세션과 데이터 소유자 수동 매칭
 - **AI 생성 중 상태 처리**
   - `reports.status = 'pending'` 또는 `'generating'`: 프로그레스 바 UI
@@ -293,18 +294,74 @@
 - 섹션 분리 (카테고리별 해석 그룹핑)
 - 하단: 링크 카피, 소셜 공유 버튼
 
+#### 구현 세부사항
+
+- **라우팅 분기** (`page.tsx`)
+  - `demo-{slug}` 접두사 → `ReportPreview` (결제 전 무료 프리뷰, 6-4 연장)
+  - 일반 주문 ID → `ReportLoader` → `ReportClient` (전체 공개 뷰)
+- **인증 플로우** (`ReportClient` orchestrator)
+  - 회원 주문: `localStorage:yonghadang:member_session` 체크 → 미로그인 시 /auth 안내
+  - 비회원 주문: `sessionStorage:yonghadang:report_access:{orderId}` 체크 → 미인증 시 `GuestAuthForm`
+  - 비회원 인증: 결제 시 입력한 휴대폰번호 + 비밀번호 일치 검증 (`verifyGuestOrder`)
+- **AI 생성 상태** (`ReportStatus`): 3초 폴링 + 프로그레스 바 + 단계 체크리스트, 10분 타임아웃 시 에러 전환
+- **리포트 뷰** (`ReportView`): 헤드라인 강조 카드 + 기본/심화 전 섹션 번호 뱃지와 함께 공개
+- **공유 UI** (`ReportShare`): 링크 복사, 카카오톡(폴백), X(트위터), 페이스북 아이콘 버튼
+- **데이터 저장소 (프론트엔드 데모)**
+  - `DUMMY_ORDERS` (고정) — 샘플 주문 5건 (done/generating/error, 회원/비회원 혼합)
+  - `localStorage:yonghadang:local_orders` — 결제 성공 후 생성되는 신규 주문 (최대 30건)
+  - 결제 성공 시 4초 후 `status: done` 으로 자동 전환하여 AI 생성 시뮬레이션
+- **파일 구조**
+  - `src/app/(user)/report/[order-id]/page.tsx` — Server Component, demo/real 분기
+  - `src/app/(user)/report/[order-id]/_components/report-preview.tsx` — 무료 프리뷰 (6-4)
+  - `src/app/(user)/report/[order-id]/_components/report-loader.tsx` — 클라이언트 주문 조회
+  - `src/app/(user)/report/[order-id]/_components/report-client.tsx` — 인증/상태 오케스트레이터
+  - `src/app/(user)/report/[order-id]/_components/guest-auth-form.tsx` — 비회원 본인 확인 폼
+  - `src/app/(user)/report/[order-id]/_components/report-status.tsx` — 생성 중/실패 UI
+  - `src/app/(user)/report/[order-id]/_components/report-view.tsx` — 전체 공개 리포트 뷰
+  - `src/app/(user)/report/[order-id]/_components/report-share.tsx` — 링크 복사 + 소셜 공유
+  - `src/types/order.ts` — Order/OrderStatus 타입
+  - `src/lib/dummy-orders.ts` — 주문 더미 데이터 + CRUD 헬퍼 (getOrder / saveLocalOrder / verifyGuestOrder)
+  - `src/lib/report-access.ts` — 회원 세션 / 비회원 열람 토큰 sessionStorage 유틸
+
 ---
 
-### 6-7. 마이페이지 (/my-page)
+### 6-7. 마이페이지 (/my-page) ✅ 구현 완료 (2026-04-19)
 
 - 회원가입된 유저만 접근 가능
 - 닉네임 (수정 가능), 로그인 소셜 로고, 이메일, 로그아웃 버튼
 - 구매 내역 리스트 (최신순)
 - 각 항목 클릭 시 보고서 확인 페이지로 이동
 
+**구현 내역**
+
+- 파일
+  - `src/app/(user)/my-page/page.tsx` — 서버 컴포넌트, metadata(noindex) + `MyPageClient` 렌더
+  - `src/app/(user)/my-page/_components/my-page-client.tsx` — 세션 확인 · 주문 조회 · 레이아웃 오케스트레이션
+  - `src/app/(user)/my-page/_components/profile-card.tsx` — 아바타, 닉네임 인라인 수정(trim·16자 제한), 이메일, 소셜 뱃지, 로그아웃
+  - `src/app/(user)/my-page/_components/order-history-list.tsx` — 최신순 주문 카드, 상태 뱃지, `/report/[id]` 링크, 빈 상태 UI
+  - `src/app/(user)/my-page/_components/social-badge.tsx` — Kakao(💬·#FEE500) / Google(컬러휠) 로고 뱃지
+  - `src/lib/report-access.ts` — `getMemberProfile`, `loginAsMember`, `updateMemberProfile`, `logoutMember` 헬퍼 추가
+  - `src/lib/dummy-member.ts` — 데모 회원 프로필 (`memberId: "user_demo"` 와 매칭)
+  - `src/types/member.ts` — `MemberProfile`, `SocialProvider` 타입
+- 디자인 가이드 4 적용: Deep Purple(#4A3B5C) + Pastel Pink(#F5D7E8) + Cream(#F5F0E8) 그라디언트, ✦/🌙 신비 심볼, 부드러운 호버/페이드인 애니메이션
+- 구매 내역: `listAllOrders()` 에서 `ownerType === "member" && memberId === profile.memberId` 필터, `createdAt` 내림차순 정렬, 상태(결제대기/분석중/완료/오류) 뱃지
+- 접근 제어(데모): 세션 없으면 `DUMMY_MEMBER` 로 자동 로그인 → 프론트엔드 개발 단계에서 체험 가능. `TODO: [백엔드 연동]` 주석으로 실제 연동 시 `redirect("/auth")` 전환 명시
+- TODO 플래그
+  - [백엔드 연동] `page.tsx` Server Component 전환 + `getMyOrders()` 서버 액션 호출
+  - [백엔드 연동] 닉네임 수정 → `PATCH /api/me` (공백/중복 서버 검증)
+  - [백엔드 연동] 로그아웃 → `POST /api/auth/logout` (Supabase 세션 종료)
+  - [백엔드 연동] `MyPageClient` 의 자동 로그인 블록 제거
+
 ---
 
-### 6-8. 비회원 주문 조회 로그인 (/guest-login)
+### 6-8. 회원 로그인/회원가입 (/auth)
+
+- 구글 및 카카오 소셜 로그인만 지원
+- 로그인 성공 후 메인 랜딩페이지(/) 또는 이전 페이지로 리다이렉트
+
+---
+
+### 6-9. 비회원 주문 조회 로그인 (/guest-login)
 
 - 페이지 소개
 - 전화번호 + 비밀번호 입력 폼
@@ -312,18 +369,11 @@
 
 ---
 
-### 6-9. 비회원 주문 조회 페이지 (/guest-check)
+### 6-10. 비회원 주문 조회 페이지 (/guest-check)
 
 - 비회원이 자신의 구매 내역을 조회하는 페이지
 - 구매 내역 리스트 배치
 - 각 항목 클릭 시 보고서 확인 페이지로 이동
-
----
-
-### 6-10. 회원 로그인/회원가입 (/auth)
-
-- 구글 및 카카오 소셜 로그인만 지원
-- 로그인 성공 후 메인 랜딩페이지(/) 또는 이전 페이지로 리다이렉트
 
 ---
 

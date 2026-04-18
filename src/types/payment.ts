@@ -9,6 +9,11 @@ export interface PendingOrderInput {
   category: ContentCategory;
   /** 입력 정보 요약 표시용 (라벨 + 값 페어) */
   summary: Array<{ label: string; value: string }>;
+  /** 결제 전 결정된 orderId — 결제 성공 후 Order 레코드 생성에 사용 */
+  orderId?: string;
+  /** 비회원 체크아웃 — 결제 완료 후 리포트 열람 검증용 */
+  guestPhone?: string;
+  guestPassword?: string;
   /** 저장 시각 — 만료 체크용 (PRD 3.1 pending 30분 만료 정책) */
   savedAt: number;
 }

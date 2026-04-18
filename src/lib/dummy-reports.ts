@@ -11,6 +11,7 @@ export interface DummyReport {
   sections: ReportSection[];
 }
 
+/** slug(contentSlug) → DummyReport 매핑. 프론트엔드 데모 전용. */
 export const DUMMY_REPORTS: Record<string, DummyReport> = {
   'mbti-basic': {
     headline: '당신은 조용한 열정과 깊은 공감 능력을 동시에 품은 사람입니다.',

@@ -587,8 +587,9 @@ export const StartForm = ({ content }: StartFormProps) => {
       summary: buildInputSummary(type),
     });
 
-    // TODO: [백엔드 연동] createOrder Server Action 호출 후 서버 order-id 를 /payments 로 전달
-    router.push(`/payments?content=${content.slug}`);
+    // PRD 6-4: 정보 입력 완료 → 기본 분석 리포트 표시(무료) → 결제 CTA
+    // TODO: [백엔드 연동] createOrder Server Action 호출 후 실제 order-id 로 /report/{id} 이동
+    router.push(`/report/demo-${content.slug}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -602,8 +603,9 @@ export const StartForm = ({ content }: StartFormProps) => {
       summary: buildInputSummary(),
     });
 
-    // TODO: [백엔드 연동] createOrder Server Action 호출 후 서버 order-id 를 /payments 로 전달
-    router.push(`/payments?content=${content.slug}`);
+    // PRD 6-4: 정보 입력 완료 → 기본 분석 리포트 표시(무료) → 결제 CTA
+    // TODO: [백엔드 연동] createOrder Server Action 호출 후 실제 order-id 로 /report/{id} 이동
+    router.push(`/report/demo-${content.slug}`);
   };
 
   const isMbti = content.category === "mbti";
