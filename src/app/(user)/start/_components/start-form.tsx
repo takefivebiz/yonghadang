@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Content } from "@/types/content";
+import { savePendingOrder } from "@/lib/payment";
 
 // ── 타입 정의 ─────────────────────────────────────────────────────────
 
@@ -539,14 +540,55 @@ export const StartForm = ({ content }: StartFormProps) => {
     return false;
   };
 
+  /** 입력값을 결제 페이지에서 요약 표시할 수 있도록 sessionStorage 에 저장 */
+  const buildInputSummary = (
+    overrideMbti?: string,
+  ): Array<{ label: string; value: string }> => {
+    if (content.category === "saju" || content.category === "astrology") {
+      const summary: Array<{ label: string; value: string }> = [
+        { label: "생년월일", value: dateGenderData.birthDate },
+        { label: "성별", value: dateGenderData.gender === "남" ? "남성" : "여성" },
+      ];
+      if (dateGenderData.birthTime) {
+        summary.push({ label: "태어난 시간", value: dateGenderData.birthTime });
+      }
+      return summary;
+    }
+    if (content.category === "tarot") {
+      return [
+        { label: "질문", value: tarotData.question },
+        ...(tarotData.spread
+          ? [
+              {
+                label: "스프레드",
+                value:
+                  SPREAD_OPTIONS.find((o) => o.value === tarotData.spread)
+                    ?.label ?? tarotData.spread,
+              },
+            ]
+          : []),
+      ];
+    }
+    if (content.category === "mbti") {
+      return [{ label: "MBTI 유형", value: overrideMbti ?? mbtiResult }];
+    }
+    return [];
+  };
+
   const handleMbtiComplete = async (type: string) => {
     setMbtiResult(type);
     setMbtiCompleted(true);
     setIsSubmitting(true);
 
-    // TODO: [백엔드 연동] createOrder Server Action 호출 후 실제 order-id로 이동
-    await new Promise((r) => setTimeout(r, 800));
-    router.push(`/report/demo-${content.slug}`);
+    // 결제 페이지에서 입력 정보 요약 렌더링을 위한 sessionStorage 저장
+    savePendingOrder({
+      contentSlug: content.slug,
+      category: content.category,
+      summary: buildInputSummary(type),
+    });
+
+    // TODO: [백엔드 연동] createOrder Server Action 호출 후 서버 order-id 를 /payments 로 전달
+    router.push(`/payments?content=${content.slug}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -554,9 +596,14 @@ export const StartForm = ({ content }: StartFormProps) => {
     if (!isValid() || isSubmitting) return;
     setIsSubmitting(true);
 
-    // TODO: [백엔드 연동] createOrder Server Action 호출 후 실제 order-id로 이동
-    await new Promise((r) => setTimeout(r, 800));
-    router.push(`/report/demo-${content.slug}`);
+    savePendingOrder({
+      contentSlug: content.slug,
+      category: content.category,
+      summary: buildInputSummary(),
+    });
+
+    // TODO: [백엔드 연동] createOrder Server Action 호출 후 서버 order-id 를 /payments 로 전달
+    router.push(`/payments?content=${content.slug}`);
   };
 
   const isMbti = content.category === "mbti";

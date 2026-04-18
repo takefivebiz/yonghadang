@@ -40,12 +40,12 @@ export const ContentCard = ({ content }: ContentCardProps) => {
   return (
     <Link href={href} className="group block">
       <article
-        className="overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_28px_rgba(74,59,92,0.12)]"
+        className="overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_28px_rgba(74,59,92,0.12)] min-h-80 flex flex-col"
         style={{ borderColor: "rgba(74, 59, 92, 0.12)" }}
       >
         {/* 썸네일 */}
         <div
-          className="relative flex h-40 items-center justify-center"
+          className="relative flex h-40 items-center justify-center flex-shrink-0"
           style={{
             background: `linear-gradient(135deg, ${content.gradientFrom}, ${content.gradientTo})`,
           }}
@@ -69,9 +69,10 @@ export const ContentCard = ({ content }: ContentCardProps) => {
         </div>
 
         {/* 콘텐츠 정보 */}
-        <div className="p-4">
+        <div className="p-4 flex flex-col flex-1">
+          {/* 카테고리 뱃지 */}
           <span
-            className="mb-2 inline-block rounded-full px-2.5 py-0.5 text-xs"
+            className="mb-2 inline-block rounded-full px-2.5 py-0.5 text-xs w-fit"
             style={{
               backgroundColor: "rgba(74, 59, 92, 0.06)",
               color: "#9B88AC",
@@ -80,21 +81,26 @@ export const ContentCard = ({ content }: ContentCardProps) => {
             {CATEGORY_LABELS[content.category]}
           </span>
 
-          <h3 className="mb-1.5 text-base font-semibold leading-snug text-deep-purple">
-            {content.title}
-          </h3>
+          {/* 내용 영역 */}
+          <div className="flex flex-col flex-1">
+            <h3 className="mb-1.5 text-lg font-semibold leading-snug text-deep-purple lg:text-base">
+              {content.title}
+            </h3>
 
-          <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-            {content.description}
-          </p>
+            <p className="mb-3 line-clamp-2 text-base leading-relaxed text-muted-foreground lg:text-sm">
+              {content.description}
+            </p>
 
-          {/* PRD 6-1.1: 무료 진입점 강조 — 클릭 전환율 향상 */}
-          <p className="text-xs" style={{ color: "#9B88AC" }}>
-            무료 체험 후{" "}
-            <span className="font-semibold text-deep-purple">
-              ₩{content.price.toLocaleString("ko-KR")}
-            </span>
-          </p>
+            {/* PRD 6-1.1: 무료 진입점 강조 — 클릭 전환율 향상 */}
+            <div className="mt-auto">
+              <p className="text-xs" style={{ color: "#9B88AC" }}>
+                무료 체험 후{" "}
+                <span className="font-semibold text-deep-purple">
+                  ₩{content.price.toLocaleString("ko-KR")}
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
       </article>
     </Link>
