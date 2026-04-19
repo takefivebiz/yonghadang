@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { type Metadata } from 'next';
 import { HeroSection } from './_components/hero-section';
 import { ContentSection } from './_components/content-section';
@@ -18,8 +19,10 @@ const HomePage = () => {
       {/* 1. 히어로 — 미니 히어로 */}
       <HeroSection />
 
-      {/* 2. 콘텐츠 탐색 — 카테고리 탭 + 카드 그리드 */}
-      <ContentSection />
+      {/* 2. 콘텐츠 탐색 — 카테고리 탭 + 카드 그리드 (useSearchParams는 Suspense 필요) */}
+      <Suspense>
+        <ContentSection />
+      </Suspense>
     </>
   );
 };

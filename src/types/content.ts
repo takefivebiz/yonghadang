@@ -15,4 +15,6 @@ export interface Content {
   /** 썸네일 배경에 쓰이는 Tailwind 그라디언트 클래스 */
   gradientFrom: string;
   gradientTo: string;
+  /** false이면 비공개 콘텐츠 — 상세 페이지 접근 시 404 처리 */
+  is_active?: boolean;
 }

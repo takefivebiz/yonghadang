@@ -21,7 +21,8 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 const MbtiDetailPage = async ({ params }: Props) => {
   const { slug } = await params;
   const detail = getContentDetail(`mbti-${slug}`);
-  if (!detail) notFound();
+  // is_active === false이면 비공개 콘텐츠 — 404 처리
+  if (!detail || detail.is_active === false) notFound();
   return <ContentDetailPage detail={detail} />;
 };
 

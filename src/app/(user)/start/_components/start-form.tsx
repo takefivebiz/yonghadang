@@ -174,9 +174,11 @@ const SPREAD_OPTIONS = [
 const DateGenderFormFields = ({
   data,
   onChange,
+  showErrors,
 }: {
   data: DateGenderForm;
   onChange: (d: DateGenderForm) => void;
+  showErrors: boolean;
 }) => (
   <div className="space-y-5">
     <div>
@@ -192,6 +194,9 @@ const DateGenderFormFields = ({
         style={inputStyle}
         required
       />
+      {showErrors && !data.birthDate && (
+        <p className="mt-1.5 text-xs text-rose-400">생년월일을 입력해주세요.</p>
+      )}
     </div>
 
     <div>
@@ -224,6 +229,9 @@ const DateGenderFormFields = ({
           </button>
         ))}
       </div>
+      {showErrors && !data.gender && (
+        <p className="mt-1.5 text-xs text-rose-400">성별을 선택해주세요.</p>
+      )}
     </div>
 
     <div>
@@ -247,9 +255,11 @@ const DateGenderFormFields = ({
 const TarotFormFields = ({
   data,
   onChange,
+  showErrors,
 }: {
   data: TarotForm;
   onChange: (d: TarotForm) => void;
+  showErrors: boolean;
 }) => (
   <div className="space-y-5">
     <div>
@@ -267,9 +277,16 @@ const TarotFormFields = ({
         style={inputStyle}
         required
       />
-      <p className="mt-1.5 text-right text-xs text-muted-foreground">
-        {data.question.length} / 200
-      </p>
+      <div className="mt-1.5 flex items-center justify-between">
+        {showErrors && !data.question.trim() ? (
+          <p className="text-xs text-rose-400">질문을 입력해주세요.</p>
+        ) : (
+          <span />
+        )}
+        <p className="ml-auto text-xs text-muted-foreground">
+          {data.question.length} / 200
+        </p>
+      </div>
     </div>
 
     <div>
@@ -516,6 +533,8 @@ export const StartForm = ({ content }: StartFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mbtiCompleted, setMbtiCompleted] = useState(false);
   const [mbtiResult, setMbtiResult] = useState("");
+  /** 제출 시도 여부 — true이면 인라인 에러 메시지 표시 */
+  const [hasAttempted, setHasAttempted] = useState(false);
 
   const [dateGenderData, setDateGenderData] = useState<DateGenderForm>({
     birthDate: "",
@@ -594,7 +613,12 @@ export const StartForm = ({ content }: StartFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValid() || isSubmitting) return;
+    if (!isValid()) {
+      // 유효성 검사 실패 시 에러 메시지 표시
+      setHasAttempted(true);
+      return;
+    }
+    if (isSubmitting) return;
     setIsSubmitting(true);
 
     savePendingOrder({
@@ -687,16 +711,21 @@ export const StartForm = ({ content }: StartFormProps) => {
               <DateGenderFormFields
                 data={dateGenderData}
                 onChange={setDateGenderData}
+                showErrors={hasAttempted}
               />
             )}
             {content.category === "tarot" && (
-              <TarotFormFields data={tarotData} onChange={setTarotData} />
+              <TarotFormFields
+                data={tarotData}
+                onChange={setTarotData}
+                showErrors={hasAttempted}
+              />
             )}
           </div>
 
           <button
             type="submit"
-            disabled={!isValid() || isSubmitting}
+            disabled={isSubmitting}
             className="w-full rounded-full py-4 text-sm font-semibold transition-all duration-300"
             style={
               isValid() && !isSubmitting
@@ -709,7 +738,7 @@ export const StartForm = ({ content }: StartFormProps) => {
                 : {
                     backgroundColor: "rgba(74, 59, 92, 0.08)",
                     color: "#9B88AC",
-                    cursor: "not-allowed",
+                    cursor: isSubmitting ? "not-allowed" : "pointer",
                   }
             }
           >

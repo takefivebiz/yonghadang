@@ -14,6 +14,7 @@ export const DUMMY_CONTENTS: Content[] = [
     thumbnailEmoji: '🧠',
     gradientFrom: '#4A3B5C',
     gradientTo: '#F5D7E8',
+    is_active: true,
   },
   {
     id: '2',
@@ -26,6 +27,7 @@ export const DUMMY_CONTENTS: Content[] = [
     thumbnailEmoji: '☯️',
     gradientFrom: '#F5D7E8',
     gradientTo: '#F5E8D7',
+    is_active: true,
   },
   {
     id: '3',
@@ -38,6 +40,7 @@ export const DUMMY_CONTENTS: Content[] = [
     thumbnailEmoji: '🃏',
     gradientFrom: '#E8D4F0',
     gradientTo: '#F5D7E8',
+    is_active: true,
   },
   {
     id: '4',
@@ -49,6 +52,7 @@ export const DUMMY_CONTENTS: Content[] = [
     thumbnailEmoji: '⭐',
     gradientFrom: '#4A3B5C',
     gradientTo: '#E8D4F0',
+    is_active: true,
   },
   {
     id: '5',
@@ -61,6 +65,7 @@ export const DUMMY_CONTENTS: Content[] = [
     thumbnailEmoji: '💕',
     gradientFrom: '#4A3B5C',
     gradientTo: '#F5D7E8',
+    is_active: true,
   },
   {
     id: '6',
@@ -73,6 +78,7 @@ export const DUMMY_CONTENTS: Content[] = [
     thumbnailEmoji: '🔮',
     gradientFrom: '#F5D7E8',
     gradientTo: '#E8D4F0',
+    is_active: true,
   },
   {
     id: '7',
@@ -84,6 +90,7 @@ export const DUMMY_CONTENTS: Content[] = [
     thumbnailEmoji: '♥️',
     gradientFrom: '#E8D4F0',
     gradientTo: '#F5D7E8',
+    is_active: true,
   },
   {
     id: '8',
@@ -95,5 +102,6 @@ export const DUMMY_CONTENTS: Content[] = [
     thumbnailEmoji: '🌟',
     gradientFrom: '#4A3B5C',
     gradientTo: '#E8D4F0',
+    is_active: true,
   },
 ];

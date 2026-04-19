@@ -21,6 +21,7 @@ const POLL_INTERVAL_MS = 3000;
  * PRD 6-6. AI 생성 상태 UI.
  * - pending / generating: 프로그레스 바 + 폴링
  * - error: 실패 안내 + 재시도/고객센터 링크
+ * - timeout: 10분 초과 안내 (에러와 별도 분기)
  */
 export const ReportStatus = ({
   orderId,
@@ -31,6 +32,8 @@ export const ReportStatus = ({
   const [status, setStatus] = useState<OrderStatus>(initialStatus);
   const [progress, setProgress] = useState(8);
   const [elapsedMs, setElapsedMs] = useState(0);
+  /** 폴링 타임아웃(10분) 초과 여부 — 에러 UI 메시지 분기용 */
+  const [isTimeout, setIsTimeout] = useState(false);
 
   // 3초 간격 폴링 — 서버에서 status=done 으로 전환되면 상위에 알림
   useEffect(() => {
@@ -55,8 +58,9 @@ export const ReportStatus = ({
         return;
       }
 
-      // 타임아웃 도달 — 에러로 전환
+      // 타임아웃 도달 — 에러로 전환하고 타임아웃 플래그 설정
       if (Date.now() - start > MAX_POLL_MS) {
+        setIsTimeout(true);
         setStatus("error");
       }
     }, POLL_INTERVAL_MS);
@@ -104,11 +108,12 @@ export const ReportStatus = ({
         </div>
 
         <h2 className="font-display mb-2 text-xl font-bold text-deep-purple">
-          리포트 생성에 실패했어요
+          {isTimeout ? "리포트 생성 시간이 초과됐어요" : "리포트 생성에 실패했어요"}
         </h2>
         <p className="mb-8 text-sm leading-relaxed text-muted-foreground">
-          {errorMessage ??
-            "AI 분석 중 일시적인 오류가 발생했어요.\n다시 시도하시거나 고객센터로 문의해주세요."}
+          {isTimeout
+            ? "10분이 지나도 리포트가 완성되지 않았어요.\n잠시 후 다시 시도하시거나 고객센터로 문의해주세요."
+            : (errorMessage ?? "AI 분석 중 일시적인 오류가 발생했어요.\n다시 시도하시거나 고객센터로 문의해주세요.")}
         </p>
 
         <div className="space-y-3">

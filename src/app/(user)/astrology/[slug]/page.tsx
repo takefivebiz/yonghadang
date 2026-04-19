@@ -21,7 +21,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 const AstrologyDetailPage = async ({ params }: Props) => {
   const { slug } = await params;
   const detail = getContentDetail(`astrology-${slug}`);
-  if (!detail) notFound();
+  if (!detail || detail.is_active === false) notFound();
   return <ContentDetailPage detail={detail} />;
 };
 

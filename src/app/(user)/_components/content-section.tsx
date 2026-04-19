@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ContentCard } from "@/components/common/content-card";
 import { DUMMY_CONTENTS } from "@/lib/dummy-contents";
 import { CategoryFilter } from "@/types/content";
@@ -38,8 +38,29 @@ const CATEGORY_TABS: {
   },
 ];
 
+const VALID_CATEGORIES: CategoryFilter[] = ["all", "mbti", "saju", "tarot", "astrology"];
+
 export const ContentSection = () => {
-  const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // URL ?category= 파라미터에서 활성 탭 읽기 — 유효하지 않은 값이면 "all" 폴백
+  const rawCategory = searchParams.get("category");
+  const activeCategory: CategoryFilter =
+    VALID_CATEGORIES.includes(rawCategory as CategoryFilter)
+      ? (rawCategory as CategoryFilter)
+      : "all";
+
+  /** 탭 클릭 시 URL 쿼리 파라미터 업데이트 (히스토리 스택 보존 → 뒤로가기 복원 가능) */
+  const handleCategoryChange = (category: CategoryFilter) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (category === "all") {
+      params.delete("category");
+    } else {
+      params.set("category", category);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   // TODO: [백엔드 연동] 카테고리 필터를 쿼리 파라미터로 /api/contents에 전달
   const filteredContents =
@@ -76,7 +97,7 @@ export const ContentSection = () => {
           <button
             key={tab.value}
             type="button"
-            onClick={() => setActiveCategory(tab.value)}
+            onClick={() => handleCategoryChange(tab.value)}
             className="rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 md:px-5 md:py-2 md:text-base"
             style={
               activeCategory === tab.value

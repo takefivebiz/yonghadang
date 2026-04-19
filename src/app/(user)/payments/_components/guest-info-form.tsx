@@ -5,7 +5,9 @@ import { GuestCheckoutInfo } from "@/types/payment";
 interface GuestInfoFormProps {
   value: GuestCheckoutInfo;
   onChange: (next: GuestCheckoutInfo) => void;
-  error: string | null;
+  /** 필드별 에러 메시지 — null이면 정상 */
+  phoneError: string | null;
+  passwordError: string | null;
 }
 
 /** 한국 휴대폰 번호 포맷터 (010-1234-5678) */
@@ -21,7 +23,7 @@ const formatPhone = (raw: string): string => {
  * PRD 6-11: 결제 완료 시 이 정보로 guests 레코드가 생성되어
  * 추후 비회원 주문 조회(/guest-login)에 사용된다.
  */
-export const GuestInfoForm = ({ value, onChange, error }: GuestInfoFormProps) => {
+export const GuestInfoForm = ({ value, onChange, phoneError, passwordError }: GuestInfoFormProps) => {
   return (
     <div
       className="rounded-2xl p-5"
@@ -56,15 +58,27 @@ export const GuestInfoForm = ({ value, onChange, error }: GuestInfoFormProps) =>
             autoComplete="tel"
             placeholder="010-0000-0000"
             value={value.phoneNumber}
+            aria-invalid={phoneError !== null}
+            aria-describedby={phoneError ? "guest-phone-error" : undefined}
             onChange={(e) =>
               onChange({ ...value, phoneNumber: formatPhone(e.target.value) })
             }
             className="w-full rounded-xl border px-4 py-3 text-sm text-foreground outline-none transition-colors duration-200 focus:border-[#C4AED8]"
             style={{
-              borderColor: "rgba(74, 59, 92, 0.2)",
+              borderColor: phoneError ? "#C04040" : "rgba(74, 59, 92, 0.2)",
               backgroundColor: "rgba(255, 255, 255, 0.9)",
             }}
           />
+          {phoneError && (
+            <p
+              id="guest-phone-error"
+              className="mt-1.5 rounded-lg px-3 py-2 text-xs font-medium"
+              style={{ backgroundColor: "#FEE", color: "#C04040" }}
+              role="alert"
+            >
+              {phoneError}
+            </p>
+          )}
         </div>
 
         {/* 비밀번호 */}
@@ -81,25 +95,26 @@ export const GuestInfoForm = ({ value, onChange, error }: GuestInfoFormProps) =>
             autoComplete="new-password"
             placeholder="4자 이상 입력"
             value={value.password}
+            aria-invalid={passwordError !== null}
+            aria-describedby={passwordError ? "guest-password-error" : undefined}
             onChange={(e) => onChange({ ...value, password: e.target.value })}
             className="w-full rounded-xl border px-4 py-3 text-sm text-foreground outline-none transition-colors duration-200 focus:border-[#C4AED8]"
             style={{
-              borderColor: "rgba(74, 59, 92, 0.2)",
+              borderColor: passwordError ? "#C04040" : "rgba(74, 59, 92, 0.2)",
               backgroundColor: "rgba(255, 255, 255, 0.9)",
             }}
           />
+          {passwordError && (
+            <p
+              id="guest-password-error"
+              className="mt-1.5 rounded-lg px-3 py-2 text-xs font-medium"
+              style={{ backgroundColor: "#FEE", color: "#C04040" }}
+              role="alert"
+            >
+              {passwordError}
+            </p>
+          )}
         </div>
-
-        {/* 에러 메시지 */}
-        {error && (
-          <p
-            className="rounded-lg px-3 py-2 text-xs font-medium"
-            style={{ backgroundColor: "#FEE", color: "#C04040" }}
-            role="alert"
-          >
-            {error}
-          </p>
-        )}
       </div>
     </div>
   );

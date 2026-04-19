@@ -40,8 +40,11 @@ export const PaymentClient = ({ content }: PaymentClientProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [mode, setMode] = useState<CheckoutMode>("guest");
   const [pendingInput, setPendingInput] = useState<PendingOrderInput | null>(null);
+  const [isRestored, setIsRestored] = useState(false);
   const [guestInfo, setGuestInfo] = useState({ phoneNumber: "", password: "" });
-  const [guestError, setGuestError] = useState<string | null>(null);
+  /** 필드별 에러 메시지 분리 (Test 7: 빈 필드 vs 형식 오류 구분) */
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // 위젯 인스턴스 ref — cleanup 에서 destroy() 호출용
   const widgetsRef = useRef<TossPaymentsWidgets | null>(null);
@@ -53,10 +56,16 @@ export const PaymentClient = ({ content }: PaymentClientProps) => {
   if (!orderIdRef.current) orderIdRef.current = generateOrderId();
 
   // /start 에서 sessionStorage 로 전달된 입력 정보 복원
+  // Test 8: orderId 도 함께 복원하여 새로고침 시 중복 주문 방지
   useEffect(() => {
     const saved = readPendingOrder();
     if (saved && saved.contentSlug === content.slug) {
       setPendingInput(saved);
+      // 이미 결제 시도가 있었던 경우(orderId 저장됨) — 동일 orderId 재사용
+      if (saved.orderId) {
+        orderIdRef.current = saved.orderId;
+        setIsRestored(true);
+      }
     }
   }, [content.slug]);
 
@@ -127,21 +136,37 @@ export const PaymentClient = ({ content }: PaymentClientProps) => {
   // content.price 변경 시 금액 재설정이 필요하므로 의존성에 포함
   }, [content.price]);
 
-  /** 비회원 폼 검증 — 전화번호(한국 휴대폰) + 비밀번호(4자 이상) */
+  /**
+   * 비회원 폼 검증 — 필드별 에러 분리 (Test 7)
+   * - 빈 필드: "입력해주세요" / 형식 오류: "올바른 형식으로 입력해주세요"
+   */
   const validateGuest = (): boolean => {
     if (mode !== "guest") return true;
 
+    let valid = true;
+
     const phoneDigits = guestInfo.phoneNumber.replace(/\D/g, "");
-    if (!/^01[016789]\d{7,8}$/.test(phoneDigits)) {
-      setGuestError("올바른 전화번호를 입력해주세요");
-      return false;
+    if (phoneDigits.length === 0) {
+      setPhoneError("전화번호를 입력해주세요");
+      valid = false;
+    } else if (!/^01[016789]\d{7,8}$/.test(phoneDigits)) {
+      setPhoneError("올바른 전화번호 형식으로 입력해주세요 (예: 010-1234-5678)");
+      valid = false;
+    } else {
+      setPhoneError(null);
     }
-    if (guestInfo.password.length < 4) {
-      setGuestError("비밀번호는 4자 이상이어야 합니다");
-      return false;
+
+    if (guestInfo.password.length === 0) {
+      setPasswordError("비밀번호를 입력해주세요");
+      valid = false;
+    } else if (guestInfo.password.length < 4) {
+      setPasswordError("비밀번호는 4자 이상이어야 합니다");
+      valid = false;
+    } else {
+      setPasswordError(null);
     }
-    setGuestError(null);
-    return true;
+
+    return valid;
   };
 
   const handleRequestPayment = async () => {
@@ -155,6 +180,7 @@ export const PaymentClient = ({ content }: PaymentClientProps) => {
       const origin = window.location.origin;
 
       // 결제 성공 후 Order 레코드 생성을 위해 orderId + 비회원 인증 정보를 저장
+      // orderId를 sessionStorage에 함께 저장하여 새로고침 시 재사용 가능하게 함 (Test 8)
       const phoneDigits = guestInfo.phoneNumber.replace(/\D/g, "");
       savePendingOrder({
         contentSlug: content.slug,
@@ -181,6 +207,25 @@ export const PaymentClient = ({ content }: PaymentClientProps) => {
 
   return (
     <div className="mx-auto w-full max-w-lg space-y-5">
+      {/* ── 새로고침 복원 안내 배너 (Test 8) ── */}
+      {isRestored && (
+        <div
+          className="flex items-start gap-2.5 rounded-2xl px-4 py-3 text-xs leading-relaxed"
+          style={{
+            backgroundColor: "rgba(232, 212, 240, 0.4)",
+            border: "1px solid rgba(196, 174, 216, 0.5)",
+            color: "#4A3B5C",
+          }}
+          role="status"
+          aria-live="polite"
+        >
+          <span aria-hidden="true">🔄</span>
+          <span>
+            이전 입력 정보가 복원되었습니다. 결제를 이어서 진행하거나 처음부터 다시 시작하세요.
+          </span>
+        </div>
+      )}
+
       {/* ── 리포트 요약 + 입력 정보 요약 ── */}
       <OrderSummary content={content} pendingInput={pendingInput} />
 
@@ -224,9 +269,12 @@ export const PaymentClient = ({ content }: PaymentClientProps) => {
           value={guestInfo}
           onChange={(next) => {
             setGuestInfo(next);
-            if (guestError) setGuestError(null);
+            // 입력 시 해당 필드 에러 즉시 초기화
+            if (next.phoneNumber !== guestInfo.phoneNumber) setPhoneError(null);
+            if (next.password !== guestInfo.password) setPasswordError(null);
           }}
-          error={guestError}
+          phoneError={phoneError}
+          passwordError={passwordError}
         />
       )}
 
