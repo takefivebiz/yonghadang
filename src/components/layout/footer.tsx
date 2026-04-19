@@ -12,12 +12,9 @@ export const Footer = () => {
           <Link href="/privacy" className="font-medium transition-colors hover:text-foreground">
             개인정보처리방침
           </Link>
-          <a
-            href="mailto:contact@yonghadang.com"
-            className="transition-colors hover:text-foreground"
-          >
+          <Link href="/contact" className="transition-colors hover:text-foreground">
             문의하기
-          </a>
+          </Link>
         </nav>
 
         {/* 사업자 정보 */}

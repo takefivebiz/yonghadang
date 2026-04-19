@@ -11,6 +11,7 @@ import { MemberProfile } from "@/types/member";
 
 const GUEST_ACCESS_PREFIX = "yonghadang:report_access:";
 const MEMBER_SESSION_KEY = "yonghadang:member_session";
+const GUEST_LOGIN_KEY = "yonghadang:guest_login";
 
 /** 주문별 비회원 열람 허용 토큰 저장 (30분 유효) */
 const GUEST_ACCESS_TTL_MS = 30 * 60 * 1000;
@@ -86,6 +87,9 @@ export const getMemberProfile = (): MemberProfile | null => {
   }
 };
 
+/** 로그인/로그아웃 상태 변경을 헤더 등 구독자에게 알리는 커스텀 이벤트 */
+export const AUTH_CHANGE_EVENT = "yonghadang:auth-changed";
+
 /**
  * 회원 로그인 시뮬레이션 — 프로필을 localStorage 에 저장.
  * TODO: [백엔드 연동] OAuth 콜백 처리 후 서버 세션 쿠키 발급으로 교체
@@ -94,6 +98,7 @@ export const loginAsMember = (profile: MemberProfile): void => {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(MEMBER_SESSION_KEY, JSON.stringify(profile));
+    window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
   } catch {
     // 쿼터 초과 등 무시
   }
@@ -120,4 +125,44 @@ export const updateMemberProfile = (
 export const logoutMember = (): void => {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(MEMBER_SESSION_KEY);
+  window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+};
+
+/** 비회원 로그인 세션 저장 (전화번호만 저장, 패스워드는 저장하지 않음) */
+export const loginAsGuest = (phoneNumber: string): void => {
+  if (typeof window === "undefined") return;
+  try {
+    const normalize = (v: string): string => v.replace(/\D/g, "");
+    window.sessionStorage.setItem(
+      GUEST_LOGIN_KEY,
+      JSON.stringify({ phoneNumber: normalize(phoneNumber) }),
+    );
+  } catch {
+    // 쿼터 초과 등 무시
+  }
+};
+
+/** 비회원 로그인 여부 확인 */
+export const isGuestLoggedIn = (): boolean => {
+  if (typeof window === "undefined") return false;
+  return !!window.sessionStorage.getItem(GUEST_LOGIN_KEY);
+};
+
+/** 비회원 세션에서 전화번호 조회 */
+export const getGuestPhoneNumber = (): string | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(GUEST_LOGIN_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw) as { phoneNumber: string };
+    return data.phoneNumber;
+  } catch {
+    return null;
+  }
+};
+
+/** 비회원 로그아웃 */
+export const logoutGuest = (): void => {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.removeItem(GUEST_LOGIN_KEY);
 };

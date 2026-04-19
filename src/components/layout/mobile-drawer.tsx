@@ -3,12 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { MobileDrawerAuthNav } from "./mobile-drawer-auth-nav";
 
-interface MobileDrawerProps {
-  isLoggedIn: boolean;
-}
-
-export const MobileDrawer = ({ isLoggedIn }: MobileDrawerProps) => {
+export const MobileDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const close = () => setIsOpen(false);
@@ -58,32 +55,7 @@ export const MobileDrawer = ({ isLoggedIn }: MobileDrawerProps) => {
 
         {/* 메뉴 항목 */}
         <nav className="flex flex-col border-t border-border/40 px-4 py-4">
-          {isLoggedIn ? (
-            <Link
-              href="/my-page"
-              onClick={close}
-              className="rounded-md px-3 py-3 text-base text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
-            >
-              마이페이지
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/guest-login"
-                onClick={close}
-                className="rounded-md px-3 py-3 text-base text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
-              >
-                비회원 주문 조회
-              </Link>
-              <Link
-                href="/auth"
-                onClick={close}
-                className="mt-2 rounded-md bg-primary px-3 py-3 text-center text-base font-medium text-primary-foreground transition-opacity hover:opacity-90"
-              >
-                로그인
-              </Link>
-            </>
-          )}
+          <MobileDrawerAuthNav onClose={close} />
         </nav>
       </div>
     </>

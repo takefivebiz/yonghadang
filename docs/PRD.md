@@ -354,10 +354,32 @@
 
 ---
 
-### 6-8. 회원 로그인/회원가입 (/auth)
+### 6-8. 회원 로그인/회원가입 (/auth) ✅ 구현 완료 (2026-04-19)
 
 - 구글 및 카카오 소셜 로그인만 지원
 - 로그인 성공 후 메인 랜딩페이지(/) 또는 이전 페이지로 리다이렉트
+
+**구현 내역**
+
+- 파일
+  - `src/app/(user)/auth/page.tsx` — Server Component, metadata(noindex) + Suspense(AuthClient)
+  - `src/app/(user)/auth/_components/auth-client.tsx` — 소셜 로그인 오케스트레이터 (이미 로그인 시 즉시 리다이렉트, `?next=` 보존, 오픈 리다이렉트 방어)
+  - `src/app/(user)/auth/_components/kakao-login-button.tsx` — Kakao 공식 디자인(#FEE500, 말풍선 SVG, "카카오 로그인")
+  - `src/app/(user)/auth/_components/google-login-button.tsx` — Google 공식 디자인(흰 배경 + 1px 테두리, 4색 G 로고 SVG, "Google로 로그인")
+  - `src/lib/site-url.ts` — 환경별 사이트 오리진 해석(`getSiteOrigin`) + `redirectToSite` 유틸
+  - `src/lib/dummy-member.ts` — `DUMMY_MEMBERS_BY_PROVIDER` (kakao / google 데모 회원) 추가
+- 디자인 가이드 4 적용: Deep Purple(#4A3B5C) + Pastel Pink(#F5D7E8) + Cream(#F5F0E8) 그라디언트, ✦/🌙 신비 심볼, 아바타 그라디언트, 부드러운 페이드인 애니메이션
+- 공식 버튼 디자인
+  - Kakao: `#FEE500` 배경, `rgba(0,0,0,0.85)` 텍스트, 48px 높이, 라운드 12px, 공식 말풍선 벡터
+  - Google: 흰 배경 + `#747775` 테두리, `#1F1F1F` 텍스트, 4색 G 로고, 48px 높이
+- 환경별 도메인 라우팅: `process.env.NODE_ENV === "production"` 이면 `NEXT_PUBLIC_SITE_URL_PRODUCTION`, 그 외에는 `NEXT_PUBLIC_SITE_URL_DEVELOPMENT` 사용. 오리진이 현재 창과 같으면 `router.replace`, 다르면 `window.location.assign`
+- 보안: `?next=` 파라미터는 `/` 로 시작하고 `//` 로 시작하지 않는 내부 경로만 허용 (Open Redirect 차단)
+- 약관/개인정보 링크 노출, 비회원 주문 조회 진입점 링크 제공
+- 현재는 프론트엔드 데모: 버튼 클릭 시 0.8초 딜레이 후 `DUMMY_MEMBERS_BY_PROVIDER[provider]` 로 `loginAsMember` 호출 → `redirectToSite(nextPath)` 로 복귀
+- TODO 플래그
+  - [백엔드 연동] Kakao/Google 버튼 → `supabase.auth.signInWithOAuth({ provider, options: { redirectTo } })`
+  - [백엔드 연동] `/api/auth/callback` 에서 세션 교환 후 `next` 경로로 복귀
+  - [백엔드 연동] `auth-client.tsx` 의 `setTimeout` 시뮬레이션 블록 제거
 
 ---
 
@@ -393,6 +415,99 @@
 #### 안내 메시지
 
 - "나중에 로그인하면 구매 내역을 쉽게 관리할 수 있습니다"
+
+---
+
+### 6-12. 이용약관 · 개인정보처리방침 · 문의하기 (/terms, /privacy, /contact)
+
+#### 개요
+- 모든 사용자가 접근 가능한 정적 페이지 및 폼 페이지
+- Footer(5.1.3)에 노출되는 사업자 정보 및 약관 페이지
+
+#### 6-12.1 이용약관 페이지 (`/terms`)
+
+**구현 방식**
+- Server Component (정적 콘텐츠)
+- 마크다운 또는 HTML 형식의 약관 텍스트 렌더링
+- 모바일 반응형 레이아웃
+
+**요구사항**
+- 페이지 제목: "이용약관"
+- 약관 본문: 섹션별 구성
+- 마지막 수정일 표기
+- "홈으로" 네비게이션 링크
+
+**SEO**
+- `metadata`: title="이용약관 — 용하당", description 설정
+- `robots: { index: true }` (검색엔진 노출)
+
+#### 6-12.2 개인정보처리방침 페이지 (`/privacy`)
+
+**구현 방식**
+- Server Component (정적 콘텐츠)
+- 마크다운 또는 HTML 형식의 방침 텍스트 렌더링
+- 모바일 반응형 레이아웃
+
+**요구사항**
+- 페이지 제목: "개인정보처리방침"
+- 방침 본문: 섹션별 구성
+- 마지막 수정일 표기
+- "홈으로" 네비게이션 링크
+
+**SEO**
+- `metadata`: title="개인정보처리방침 — 용하당", description 설정
+- `robots: { index: true }` (검색엔진 노출)
+
+#### 6-12.3 문의하기 페이지 (`/contact`)
+
+**구현 방식**
+- 상단: 자주하는 질문 (FAQ) 아코디언
+- 하단: 문의 폼
+
+**자주하는 질문 (FAQ)**
+- 아코디언 형식으로 펼치고/접기 가능
+- 항목 예시:
+  - "결제는 어떻게 하나요?"
+  - "무료 리포트를 다시 볼 수 있나요?"
+  - "비회원으로 구매한 리포트는 어떻게 조회하나요?"
+  - "환불은 어떻게 받나요?"
+  - "개인정보는 안전하게 관리되나요?"
+
+**문의 폼**
+- 폼 항목
+  - 이름 (필수)
+  - 이메일 (필수)
+  - 카테고리 (선택): 결제, 기술, 기타
+  - 제목 (필수)
+  - 내용 (필수, textarea)
+- 제출 버튼: "문의 보내기"
+- 제출 후: 성공 메시지 + 이메일 안내
+
+**SEO**
+- `metadata`: title="문의하기 — 용하당", description 설정
+- `robots: { index: true }`
+
+#### 6-12.4 Footer 사업자 정보
+
+Footer에 표시될 정보:
+- **사업자 정보**
+  - 상호명: 용하당
+  - 대표자: [대표자명]
+  - 사업자등록번호: [번호]
+  - 주소: [주소]
+- **링크**
+  - 이용약관 (`/terms`)
+  - 개인정보처리방침 (`/privacy`)
+  - 문의하기 (`/contact`)
+
+#### 디자인 가이드 (4번 섹션 적용)
+
+- **배경**: Cream/Off-white (#F5F0E8)
+- **텍스트 색상**: Deep Purple (#4A3B5C), 본문 70% 불투명도
+- **강조**: Pastel Pink (#F5D7E8), Light Lavender (#E8D4F0)
+- **아코디언**: hover 시 미묘한 배경색 변화
+- **폼 입력**: 라운드 코너, 보더 #4A3B5C 20% 투명도
+- **버튼**: Deep Purple 배경, Cream 텍스트, 호버 시 스케일 1.02
 
 ---
 
