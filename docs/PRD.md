@@ -352,6 +352,18 @@
   - [백엔드 연동] 로그아웃 → `POST /api/auth/logout` (Supabase 세션 종료)
   - [백엔드 연동] `MyPageClient` 의 자동 로그인 블록 제거
 
+**백엔드 연동 후 개선 필요 사항 (2026-04-19 점검)**
+
+| 항목 | 파일 | 현재 (프론트 데모) | 연동 후 변경 내용 |
+| ---- | ---- | ---- | ---- |
+| 미들웨어 인증 | `src/middleware.ts` | `NextResponse.next()` 반환만 (세션 검증 없음) | Supabase Auth 쿠키 세션 검증 → 미인증 시 `redirect('/auth')`. E2E #12 통과 조건 |
+| 자동 로그인 제거 | `my-page-client.tsx` L40–43 | 세션 없으면 `DUMMY_MEMBER`로 자동 로그인 | 해당 블록 전체 삭제. `page.tsx`를 Server Component로 전환 후 세션 미인증 시 `redirect('/auth')` |
+| 주문 목록 조회 | `my-page-client.tsx` | `listAllOrders()` 더미 필터링 | `getMyOrders()` 서버 액션으로 교체. `page.tsx`에서 서버사이드 조회 후 `OrderHistoryList`에 props 전달 |
+| 닉네임 수정 | `profile-card.tsx` → `report-access.ts` | `localStorage` 직접 수정 | `updateNickname` 서버 액션 호출 (공백·중복 서버 검증 포함). 실패 시 에러 메시지 표시 |
+| 로그아웃 | `profile-card.tsx` → `report-access.ts` | `localStorage` 키 삭제 후 `/` 이동 | `POST /api/auth/logout` 호출 → Supabase Auth `signOut()` → 쿠키 세션 삭제 → `/` 이동 |
+| 세션 저장 방식 | `src/lib/report-access.ts` | `localStorage` (`yonghadang:member_session`) | Supabase Auth 쿠키 세션으로 완전 대체. `getMemberProfile`, `isMemberLoggedIn` 등 헬퍼 서버 액션으로 재작성 |
+| 더미 데이터 제거 | `src/lib/dummy-member.ts` | `DUMMY_MEMBER`, `DUMMY_MEMBERS_BY_PROVIDER` | 실제 Supabase `profiles` 테이블 조회로 교체 후 파일 삭제 |
+
 ---
 
 ### 6-8. 회원 로그인/회원가입 (/auth) ✅ 구현 완료 (2026-04-19)
@@ -1228,17 +1240,90 @@ src/
 | 9   | 보고서 확인 페이지 | `/report/[order-id]` | 타인의 order-id를 URL에 직접 입력하여 접근                  | 403 또는 접근 불가 안내 페이지 반환                                       | [ ]       | 현재 프론트엔드 더미 단계에서 알 수 없는 orderId 입력 시 "주문을 찾을 수 없어요" 페이지 표시(403 아닌 not-found 처리). 실제 주문 orderId가 있어도 `hasGuestAccess` / `isMemberLoggedIn` 인증 체크는 localStorage/sessionStorage만 확인 → 서버 소유권 검증 없음. 백엔드 연동 후 Server Component에서 세션+소유권 대조 및 실제 403 응답 처리 필요 |
 | 10  | 보고서 확인 페이지 | `/report/[order-id]` | `reports.status = 'error'` 상태에서 페이지 진입             | 생성 실패 안내 메시지 표시, 폴링 미실행                                   | [x]       | `DUMMY_ORDERS`에 `ord_demo_guest_astrology_natal`(`status: "error"`, phone: `01011112222`, pw: `1111`) 존재. `/report/ord_demo_guest_astrology_natal` 진입 → 비회원 인증 → `ReportStatus`의 폴링 `useEffect`가 `initialStatus === "error"` 시 즉시 return → 폴링 미실행 ✓. 에러 UI(붉은 아이콘 + "리포트 생성에 실패했어요" + 재시도 버튼) 정상 표시 ✓ |
 | 11  | 보고서 확인 페이지 | `/report/[order-id]` | 폴링 시작 후 10분 경과해도 `status = 'done'` 미전환         | 타임아웃 안내 메시지 표시, 폴링 중단                                      | [x]       | `isTimeout` 상태 플래그 추가. 타임아웃 시 `setIsTimeout(true)` + `setStatus("error")` → 폴링 중단 ✓. 에러 UI에서 `isTimeout` 분기로 제목 "리포트 생성 시간이 초과됐어요" + 메시지 "10분이 지나도 리포트가 완성되지 않았어요." 표시 ✓. 일반 에러(`errorMessage` 포함)와 타임아웃 에러 UI 완전 분리 |
-| 12  | 마이페이지         | `/my-page`           | 비로그인 상태에서 `/my-page` 직접 접근                      | `/auth`로 리다이렉트                                                      | [ ]       | 미들웨어 회원 세션 검증             |
-| 13  | 마이페이지         | `/my-page`           | 닉네임 수정 폼에 빈 문자열 또는 공백만 입력 후 저장         | 유효성 검사 에러 표시, DB 업데이트 미실행                                 | [ ]       | 공백 trim 후 빈값 처리              |
-| 14  | 마이페이지         | `/my-page`           | 구매 내역이 0건인 회원 접근                                 | 빈 주문 목록 + 안내 문구 표시, 에러 없음                                  | [ ]       | 빈 상태 UI                          |
-| 15  | 비회원 로그인      | `/guest-login`       | 가입된 적 없는 전화번호로 로그인 시도                       | "존재하지 않는 계정" 에러 메시지 반환, guest 레코드 미생성                | [ ]       | createOrder 외 생성 경로 차단 검증  |
-| 16  | 비회원 로그인      | `/guest-login`       | 올바른 전화번호 + 틀린 비밀번호 반복 입력                   | 인증 실패 에러 표시, 세션 미발급                                          | [ ]       | bcrypt 검증 실패 처리               |
-| 17  | 비회원 주문 조회   | `/guest-check`       | 비회원 세션 쿠키 없이 `/guest-check` 직접 접근              | `/guest-login`으로 리다이렉트                                             | [ ]       | 미들웨어 비회원 세션 쿠키 검증      |
-| 18  | 비회원 주문 조회   | `/guest-check`       | 주문 이력이 0건인 비회원 로그인 후 접근                     | 빈 주문 목록 + 안내 문구 표시, 에러 없음                                  | [ ]       | 빈 상태 UI                          |
+| 12  | 마이페이지         | `/my-page`           | 비로그인 상태에서 `/my-page` 직접 접근                      | `/auth`로 리다이렉트                                                      | [ ]       | **[점검 2026-04-19]** ❌ 미작동. `middleware.ts`가 `NextResponse.next()` 반환만 하여 세션 검증 없음. `MyPageClient`에서 세션 없어도 `DUMMY_MEMBER`로 자동 로그인하므로 리다이렉트 불발. 프론트 데모 단계 의도적 설계이나 E2E 기준 미통과. 백엔드 연동 시 미들웨어에서 Supabase 세션 검증 후 `redirect('/auth')` 구현 필요 |
+| 13  | 마이페이지         | `/my-page`           | 닉네임 수정 폼에 빈 문자열 또는 공백만 입력 후 저장         | 유효성 검사 에러 표시, DB 업데이트 미실행                                 | [x]       | **[점검 2026-04-19]** ✅ 통과. `profile-card.tsx`의 `handleSave`에서 `trim()` 후 빈값이면 "닉네임을 입력해주세요" 에러 메시지 표시 및 `updateMemberProfile` 호출 차단 확인. 16자 초과 체크(`trimmed.length > 16`)도 함께 구현됨. `maxLength=16` input 속성 적용 |
+| 14  | 마이페이지         | `/my-page`           | 구매 내역이 0건인 회원 접근                                 | 빈 주문 목록 + 안내 문구 표시, 에러 없음                                  | [x]       | **[점검 2026-04-19]** ✅ UI 구현 완료. `OrderHistoryList`에서 `orders.length === 0` 시 "아직 구매한 분석이 없어요" 안내 문구 + "분석 시작하기" CTA 버튼 표시. 더미 환경에서 0건 재현 시 `DUMMY_MEMBER`(`memberId: "user_demo"`)와 다른 memberId로 테스트 필요 |
+| 15  | 비회원 로그인      | `/guest-login`       | 가입된 적 없는 전화번호로 로그인 시도                       | "존재하지 않는 계정" 에러 메시지 반환, guest 레코드 미생성                | [ ]       | **[점검 2026-04-19]** ⚠️ 부분 통과. `matchingOrders.length === 0` 조건부로 에러 표시 + `loginAsGuest` 미호출(세션 미발급)은 정상. 단, 에러 메시지가 PRD 명세("존재하지 않는 계정")와 달리 "입력하신 정보와 일치하는 주문이 없어요"로 통합 처리됨. 더미 단계에서 "전화번호 없음" vs "비밀번호 오류" 케이스 분리 불가(`guest-login-client.tsx` L64–68). guest 레코드 미생성 확인: `loginAsGuest` 호출이 `matchingOrders.length > 0` 조건부이므로 OK. 백엔드 연동 시 `/api/guest/login`에서 phone 존재 여부를 먼저 조회 후 케이스별 에러 메시지 분기 필요 |
+| 16  | 비회원 로그인      | `/guest-login`       | 올바른 전화번호 + 틀린 비밀번호 반복 입력                   | 인증 실패 에러 표시, 세션 미발급                                          | [ ]       | **[점검 2026-04-19]** ⚠️ 부분 통과. 올바른 전화번호 + 틀린 비밀번호 입력 시 `order.password === password` 정확 일치 검증 실패 → 에러 표시 + `loginAsGuest` 미호출(세션 미발급) 정상 동작(`dummy-orders.ts` L138). 단, 반복 입력 제한(브루트포스 방어) 로직 없음 — 시도 횟수 카운트나 딜레이 증가 미구현. bcrypt 검증은 백엔드 연동 후 적용 필요. 백엔드 연동 시 `/api/guest/login`에서 bcrypt.compare + rate limiting(IP별 5회 초과 시 429) 구현 필요 |
+| 17  | 비회원 주문 조회   | `/guest-check`       | 비회원 세션 쿠키 없이 `/guest-check` 직접 접근              | `/guest-login`으로 리다이렉트                                             | [ ]       | **[점검 2026-04-19]** ⚠️ 부분 통과. `middleware.ts`는 `NextResponse.next()` 반환만 하여 서버 사이드 검증 없음. 단, `GuestCheckClient`의 `useEffect`에서 `getGuestPhoneNumber()`(sessionStorage 기반) 확인 후 없으면 `router.replace("/guest-login")` 처리 — 리다이렉트는 동작함. 그러나 클라이언트 렌더 후 리다이렉트이므로 로딩 스피너가 잠깐 노출됨. 세션이 쿠키가 아닌 **sessionStorage** 기반이라 미들웨어에서 서버 사이드 쿠키 검증 구조상 불가. 백엔드 연동 시 세션을 httpOnly 쿠키로 전환 후 미들웨어에서 쿠키 검증 → `NextResponse.redirect("/guest-login")` 구현 필요 |
+| 18  | 비회원 주문 조회   | `/guest-check`       | 주문 이력이 0건인 비회원 로그인 후 접근                     | 빈 주문 목록 + 안내 문구 표시, 에러 없음                                  | [x]       | **[점검 2026-04-19]** ✅ 통과. `GuestCheckClient` L155에서 `guestOrders.length === 0` 시 "주문 내역이 없어요" + "현재 조회된 주문 내역이 없습니다." 안내 문구 + "홈으로 돌아가기" CTA 버튼 표시. 에러 없음 확인. 단, 더미 환경에서 0건 재현은 devtools로 sessionStorage(`guestLoginSession` 키)에 더미 데이터에 없는 임의 전화번호 입력 후 페이지 진입으로 재현 가능 |
+| 19  | 회원 로그인        | `/auth`              | 이미 로그인된 회원이 `/auth` 직접 접근                      | 홈(`/`)으로 리다이렉트, 로그인 폼 미표시                                  | [x]       | **[구현 2026-04-19]** ✅ 통과. `AuthClient`에서 `useEffect` 진입 시 `isMemberLoggedIn()` 체크 → true면 리다이렉트, 그 전까지 `isRedirecting` 상태 표시(`auth-client.tsx` L48–68). 로딩 중에는 "로그인 상태 확인 중..." 스피너를 표시하므로 폼 flash 완전 제거 ✓. 리다이렉트 성공 시 홈 이동 확인 ✓. 단, `isMemberLoggedIn()`은 localStorage 기반이므로 백엔드 연동 후 쿠키 기반 세션으로 교체 필요. |
+| 19A | 회원 로그인        | `/auth`              | Google / Kakao 소셜 로그인 버튼 클릭 시 OAuth URL로 리다이렉트 | 각 provider의 OAuth 인가 페이지로 정상 이동, 세션 미발급 상태에서만 동작 | [ ]       | **[점검 2026-04-19]** ❌ 더미 단계 미구현. `handleSocialLogin`에서 `window.setTimeout` + `DUMMY_MEMBERS_BY_PROVIDER`로 0.8초 후 로컬 로그인 처리(`auth-client.tsx` L75–88) — 실제 OAuth URL 생성 및 리다이렉트 없음. Supabase `signInWithOAuth` 호출 코드는 TODO 주석으로만 존재. "세션 미발급 상태에서만 동작" 조건: 더미 단계에서 이미 로그인 상태라도 버튼 클릭이 막히지 않고 `phase === "authenticating"` 중복 방지만 있음. **개선 필요(백엔드 연동 시)**: `supabase.auth.signInWithOAuth({ provider, options: { redirectTo: getSiteOrigin() + '/api/auth/callback?next=...' } })` 호출로 교체. 로그인 상태 버튼 클릭 시 즉시 홈 이동 또는 버튼 비활성화 처리. |
+| 19B | 회원 로그인        | `/auth`              | OAuth 콜백에 `error` 파라미터 포함된 URL 접근 (`?error=access_denied`) | 에러 메시지 표시, 재시도 유도 UI 렌더링, 화면 크래시 없음 | [x]       | **[구현 2026-04-19]** ✅ 통과. `AuthClient`의 `useEffect`에서 `searchParams.get("error")` 읽은 후 매핑 테이블로 에러 메시지 설정 구현(`auth-client.tsx` L63–71). `/auth?error=access_denied` 접근 시 "로그인이 거부되었어요. 다시 시도해주세요." 메시지 표시 ✓. `access_denied`, `server_error`, `invalid_request` 케이스 모두 처리. 기존 에러 UI(붉은 배경 + alert role)에 통합되어 재시도 유도 정상 표시 ✓. 화면 크래시 없음 ✓. |
 
 ---
 
-### 10.2 백엔드 E2E 테스트
+### 10.2 관리자 프론트엔드 E2E 테스트
+
+| No  | 기능/페이지      | 대상                           | 테스트 케이스                                            | 예상 결과                                            | 완료 여부 | 특이사항                       |
+| --- | ---------------- | ------------------------------ | -------------------------------------------------------- | ---------------------------------------------------- | --------- | ------------------------------ |
+| 36  | 관리자 로그인    | `/admin/login`                 | 비로그인 상태에서 `/admin` 직접 접근                     | `/admin/login`으로 리다이렉트                        | [ ]       | 미들웨어 세션 검증 미구현 — POST /api/admin/auth/login 필요      |
+| 37  | 관리자 로그인    | `/admin/login`                 | 잘못된 비밀번호 반복 입력                                | 인증 실패 에러 메시지 표시, 세션 미발급              | [x]       | 프론트엔드 더미 인증으로 UI 동작 확인됨. 백엔드 연동 후 재검증 필요 |
+
+> ⚠️ **38~50번 테스트 수행 전 필수**: 36번 미들웨어 (`src/middleware.ts` 관리자 세션 검증) 구현 필수. 미들웨어 미구현 상태에서는 모든 `/admin/*` 접근이 미인증 상태로 진행되므로 테스트 불가능.
+
+| No  | 기능/페이지      | 대상                           | 테스트 케이스                                            | 예상 결과                                            | 완료 여부 | 특이사항                       |
+| --- | ---------------- | ------------------------------ | -------------------------------------------------------- | ---------------------------------------------------- | --------- | ------------------------------ |
+| 38  | 매출 대시보드    | `/admin`                       | 주문 데이터가 전혀 없는 기간으로 조회                    | 지표 0값 + 빈 차트 표시, 에러 없음                   | [ ]       | 빈 집계 결과 UI 처리 — 36번 미들웨어 필수           |
+| 39  | 매출 대시보드    | `/admin`                       | 기간 필터 `from > to` (역순) 입력 후 조회                | 에러 메시지 표시 또는 빈 결과 반환, 화면 크래시 없음 | [ ]       | 날짜 범위 유효성 검사 — 36번 미들웨어 필수          |
+| 40  | 주문 내역 리스트 | `/admin/order-list`            | 검색어에 SQL Injection 패턴(`' OR 1=1 --`) 입력          | 파라미터화 쿼리로 안전 처리, 정상 빈 결과 반환       | [ ]       | Supabase 쿼리 빌더 이스케이프 — 36번 미들웨어 필수  |
+| 41  | 주문 내역 리스트 | `/admin/order-list`            | 페이지네이션 마지막 페이지 이후 page 값 요청             | 빈 배열 + 200 반환, UI 에러 없음                     | [ ]       | 페이지 초과 엣지케이스 — 36번 미들웨어 필수         |
+| 42  | 상세 주문 내역   | `/admin/order-list/[order-id]` | 존재하지 않는 `order-id`로 직접 접근                     | 404 페이지 반환                                      | [ ]       | notFound() 처리 — 36번 미들웨어 필수                |
+| 43  | 상세 주문 내역   | `/admin/order-list/[order-id]` | `status = 'refunded'`인 주문 상세 진입 후 환불 버튼 클릭 | 환불 버튼 비활성화 또는 중복 환불 차단 에러 표시     | [ ]       | 이미 환불된 주문 보호 — 36번 미들웨어 필수          |
+| 44  | 유저 리스트      | `/admin/user-list`             | 주문 이력이 없는 신규 회원/비회원 목록 조회              | 누적 주문 건수 0 표시, 에러 없음                     | [ ]       | LEFT JOIN 집계 0건 처리 — 36번 미들웨어 필수        |
+| 45  | 유저 리스트      | `/admin/user-list`             | 검색 필터(닉네임)와 회원/비회원 타입 필터 동시 적용      | 두 조건 AND 필터링된 정확한 결과 반환                | [ ]       | 복합 필터 쿼리 검증 — 36번 미들웨어 필수            |
+| 46  | 관리자 로그인    | `/admin/login`                 | 올바른 자격증명 입력 후 로그인 성공               | `/admin` 대시보드로 리다이렉트, 관리자 세션 쿠키 발급               | [x]       | 더미 인증으로 /admin 리다이렉트 동작 확인. 세션 쿠키 미발급 — 백엔드 연동 후 재검증 필요   |
+| 47  | 유저 상세        | `/admin/user-list/[user-id]`   | 유저 상세 페이지 진입 후 주문 항목 클릭           | `/admin/order-list/[order-id]` 상세 주문 페이지로 이동              | [ ]       | 유저→주문 연계 네비게이션 검증 — 36번 미들웨어 필수 |
+| 48  | 유저 상세        | `/admin/user-list/[user-id]`   | 존재하지 않는 user-id로 직접 접근                 | 404 페이지 반환, 화면 크래시 없음                                    | [ ]       | notFound() 처리 — 36번 미들웨어 필수               |
+| 49  | 상세 주문 내역   | `/admin/order-list/[order-id]` | "LLM 해석 재생성" 버튼 클릭 시 알림 표시 후 진행 | 재생성 요청 확인 알림 표시, 이후 API 호출 진행                       | [ ]       | 클라이언트 액션 버튼 동작 확인 — 36번 미들웨어 필수 |
+| 50  | 관리자 공통      | `/admin/*` (모바일 환경)        | 모바일에서 드로어 메뉴 열기/닫기 및 메뉴 항목 클릭 | 드로어 열림·닫힘 애니메이션 정상, 메뉴 클릭 시 올바른 페이지 이동  | [ ]       | 반응형 드로어 네비게이션 검증 — 36번 미들웨어 필수  |
+
+---
+
+### 10.3 프론트엔드 백엔드 연동 후 재점검사항
+
+> **목적**: 백엔드 API 구축 후 프론트엔드에서 다시 검증해야 할 항목들. 현재 프론트엔드 더미 단계에서는 테스트 불가능하며, API 완성 후 재실행.
+
+| 우선순위 | 기능/페이지       | 10.1 No. | 재점검 항목                                    | 현재 상태                                                  | 필요 백엔드 작업                                       |
+| -------- | ----------------  | -------- | ---------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------- |
+| **P0**   | 보고서 접근 제어  | 9        | 타인 order-id 접근 시 403 반환 확인             | 클라이언트만 localStorage 검증 (서버 검증 없음)           | Server Component에서 세션 + DB 소유권 검증 후 401 응답 |
+| **P0**   | 회원 로그인       | 19A      | Google/Kakao OAuth 리다이렉트 동작             | Supabase 실제 OAuth URL 생성 미구현                       | `signInWithOAuth` 구현 + `/api/auth/callback` 라우트 |
+| **P1**   | 회원 접근 제어    | 12       | 비로그인 상태 `/my-page` 접근 시 `/auth` 리다이렉트 | 미들웨어 세션 검증 없음 (클라이언트 시뮬레이션)           | 미들웨어에서 Supabase 세션 검증 후 `redirect('/auth')` |
+| **P1**   | 비회원 접근 제어  | 17       | 비회원 세션 없이 `/guest-check` 접근 시 `/guest-login` 리다이렉트 | sessionStorage 기반 (미들웨어 검증 없음)                | httpOnly 쿠키 기반 세션 + 미들웨어 검증으로 전환 |
+| **P1**   | 에러 메시지 분기  | 15, 16   | 전화번호 없음 vs 비밀번호 오류 케이스 분리    | 더미 단계에서 "일치하는 주문 없음"으로 통합              | `/api/guest/login`에서 phone 존재 여부 먼저 검증 후 에러 분기 |
+| **P2**   | 네트워크 에러 UI  | 3        | 콘텐츠 목록 로드 실패 시 에러 표시              | fetch 자체가 없어 테스트 불가 (더미데이터만 사용)        | `error.tsx` 또는 try/catch 기반 에러 UI 구현 후 테스트 |
+| **P2**   | 콘텐츠 필터링     | 1, 6     | `is_active = false` 콘텐츠 필터링 + DB 값 자동 동작 | `is_active` 필터링 로직 미구현 (더미데이터 전부 true)    | DB 조회 시 `WHERE is_active = true` 필터 추가 후 재테스트 |
+| **P2**   | 구매 내역 0건     | 14       | 다른 회원 ID로 0건 시나리오 재현                | 현재 `DUMMY_MEMBER` 고정이라 다른 memberId 시나리오 불가 | 백엔드 연동 후 서로 다른 회원 계정으로 테스트          |
+| **P3**   | 비밀번호 보안     | 16       | 브루트포스 방어 (5회 초과 시 429)               | 반복 입력 제한 로직 없음                                   | `/api/guest/login`에서 IP별 rate limiting 구현 후 테스트 |
+
+---
+
+### 10.2 관리자 프론트엔드 백엔드 연동 필수항목
+
+> **현재 상태**: 관리자 API 미구현으로 인해 10.2의 모든 항목(36~50)이 테스트 불가능.
+> 백엔드 API 완성 후 우선순위에 따라 재점검.
+
+| API 엔드포인트              | 현재 상태          | 필요 구현 작업                                        |
+| --------------------------- | ------------------- | ----------------------------------------------------- |
+| `POST /api/admin/auth/login` | ❌ 미구현          | 관리자 이메일/비밀번호 로그인 → HttpOnly 세션 쿠키 발급 (P0) |
+| `POST /api/admin/auth/logout` | ❌ 미구현         | 관리자 세션 쿠키 파기 (P0)                              |
+| `src/middleware.ts` | ❌ 미구현          | `/admin/*` 라우트 관리자 세션 검증 미들웨어 구현 (P0) |
+| `GET /api/admin/stats`      | ❌ 미구현          | 매출 대시보드 지표 조회 API (P0)                      |
+| `GET /api/admin/orders`     | ❌ 미구현          | 주문 목록 조회 + 페이지네이션 API (P0)               |
+| `GET /api/admin/orders/[id]`| ❌ 미구현          | 주문 상세 조회 API (P0)                              |
+| `POST /api/admin/orders/[id]/regenerate` | ❌ 미구현 | AI 해석 재생성 API (P1)                              |
+| `GET /api/admin/users`      | ❌ 미구현          | 회원/비회원 목록 + 집계 조회 API (P1)               |
+| `GET /api/admin/users/[id]` | ❌ 미구현          | 유저 상세 조회 API (P2)                              |
+
+> **권장 구현 순서**:
+> 1. **P0**: `POST /api/admin/auth/login`, `/logout`, `src/middleware.ts` (관리자 인증 필수)
+> 2. **P0**: `GET /api/admin/stats`, `/orders`, `/orders/[id]` (대시보드·주문 관리 기본)
+> 3. **P1**: `POST /regenerate`, `GET /users` (AI 재생성·회원 검색)
+> 4. **P2**: `GET /users/[id]` (상세 조회)
+
+---
+
+### 10.4 백엔드 E2E 테스트
 
 | No  | 기능/Endpoint    | 대상                         | 테스트 케이스                                          | 예상 결과                                                            | 완료 여부 | 특이사항                           |
 | --- | ---------------- | ---------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------- | --------- | ---------------------------------- |
@@ -1261,39 +1346,22 @@ src/
 
 ---
 
-### 10.3 관리자 프론트엔드 E2E 테스트
-
-| No  | 기능/페이지      | 대상                           | 테스트 케이스                                            | 예상 결과                                            | 완료 여부 | 특이사항                       |
-| --- | ---------------- | ------------------------------ | -------------------------------------------------------- | ---------------------------------------------------- | --------- | ------------------------------ |
-| 36  | 관리자 로그인    | `/admin/login`                 | 비로그인 상태에서 `/admin` 직접 접근                     | `/admin/login`으로 리다이렉트                        | [ ]       | 미들웨어 관리자 세션 검증      |
-| 37  | 관리자 로그인    | `/admin/login`                 | 잘못된 비밀번호 반복 입력                                | 인증 실패 에러 메시지 표시, 세션 미발급              | [ ]       | 브루트포스 제한 여부 추후 검토 |
-| 38  | 매출 대시보드    | `/admin`                       | 주문 데이터가 전혀 없는 기간으로 조회                    | 지표 0값 + 빈 차트 표시, 에러 없음                   | [ ]       | 빈 집계 결과 UI 처리           |
-| 39  | 매출 대시보드    | `/admin`                       | 기간 필터 `from > to` (역순) 입력 후 조회                | 에러 메시지 표시 또는 빈 결과 반환, 화면 크래시 없음 | [ ]       | 날짜 범위 유효성 검사          |
-| 40  | 주문 내역 리스트 | `/admin/order-list`            | 검색어에 SQL Injection 패턴(`' OR 1=1 --`) 입력          | 파라미터화 쿼리로 안전 처리, 정상 빈 결과 반환       | [ ]       | Supabase 쿼리 빌더 이스케이프  |
-| 41  | 주문 내역 리스트 | `/admin/order-list`            | 페이지네이션 마지막 페이지 이후 page 값 요청             | 빈 배열 + 200 반환, UI 에러 없음                     | [ ]       | 페이지 초과 엣지케이스         |
-| 42  | 상세 주문 내역   | `/admin/order-list/[order-id]` | 존재하지 않는 `order-id`로 직접 접근                     | 404 페이지 반환                                      | [ ]       | notFound() 처리                |
-| 43  | 상세 주문 내역   | `/admin/order-list/[order-id]` | `status = 'refunded'`인 주문 상세 진입 후 환불 버튼 클릭 | 환불 버튼 비활성화 또는 중복 환불 차단 에러 표시     | [ ]       | 이미 환불된 주문 보호          |
-| 44  | 유저 리스트      | `/admin/user-list`             | 주문 이력이 없는 신규 회원/비회원 목록 조회              | 누적 주문 건수 0 표시, 에러 없음                     | [ ]       | LEFT JOIN 집계 0건 처리        |
-| 45  | 유저 리스트      | `/admin/user-list`             | 검색 필터(닉네임)와 회원/비회원 타입 필터 동시 적용      | 두 조건 AND 필터링된 정확한 결과 반환                | [ ]       | 복합 필터 쿼리 검증            |
-
----
-
-### 10.4 관리자 백엔드 E2E 테스트
+### 10.5 관리자 백엔드 E2E 테스트
 
 | No  | 기능/Endpoint        | 대상                                           | 테스트 케이스                                     | 예상 결과                                                            | 완료 여부 | 특이사항                    |
 | --- | -------------------- | ---------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------------- | --------- | --------------------------- |
-| 46  | 관리자 인증 미들웨어 | `src/middleware.ts`                            | 만료된 관리자 세션 쿠키로 `/api/admin/*` 요청     | 401 반환, 쿠키 파기 처리                                             | [ ]       | 세션 만료 시간 검증         |
-| 47  | 관리자 인증 미들웨어 | `src/middleware.ts`                            | 관리자 세션 쿠키 서명 값 임의 변조 후 요청        | 위변조 감지, 401 반환                                                | [ ]       | HttpOnly 쿠키 서명 검증     |
-| 48  | getAdminMetrics      | `GET /api/admin/stats`                         | `from > to` 역순 날짜 파라미터로 요청             | 400 에러 반환 또는 빈 결과 + 200 반환                                | [ ]       | 서버 측 날짜 유효성 검사    |
-| 49  | getAdminMetrics      | `GET /api/admin/stats`                         | 데이터가 전혀 없는 신규 서비스 상태에서 지표 조회 | 모든 지표 0, 증감률 null 또는 0% 반환, 에러 없음                     | [ ]       | 집계 쿼리 NULL 처리         |
-| 50  | getAdminOrders       | `GET /api/admin/orders`                        | 결과 없는 검색어로 조회                           | 빈 배열 + 200 반환                                                   | [ ]       | 빈 결과 정상 응답           |
-| 51  | getAdminOrders       | `GET /api/admin/orders`                        | `page` 값이 총 페이지 수 초과 시 요청             | 빈 배열 + 200 반환, 400 에러 미발생                                  | [ ]       | offset 초과 방어 처리       |
-| 52  | getAdminOrderDetail  | `GET /api/admin/orders/[order-id]`             | 존재하지 않는 `order-id`로 요청                   | 404 반환                                                             | [ ]       | notFound 처리               |
-| 53  | getAdminOrderDetail  | `GET /api/admin/orders/[order-id]`             | `reports` 레코드가 아직 없는 주문 상세 조회       | `report: null` 포함하여 200 반환, 에러 없음                          | [ ]       | LEFT JOIN null 필드 처리    |
-| 54  | regenerate API       | `POST /api/admin/orders/[order-id]/regenerate` | `reports.status = 'generating'` 중 재생성 요청    | 중복 실행 차단, 409 반환                                             | [ ]       | generating 선점 레코드 체크 |
-| 55  | regenerate API       | `POST /api/admin/orders/[order-id]/regenerate` | Anthropic API 키 만료 상태에서 재생성 요청        | `reports.status = 'error'`, `error_message` 기록, 텔레그램 알림 발송 | [ ]       | API 키 인증 실패 핸들링     |
-| 56  | getAdminUsers        | `GET /api/admin/users`                         | 주문 이력 없는 비회원 포함 전체 유저 조회         | 누적 주문 건수 0 포함 정상 반환                                      | [ ]       | LEFT JOIN 집계 0건          |
-| 57  | getAdminUsers        | `GET /api/admin/users`                         | 동일 닉네임을 가진 복수 유저 닉네임 검색          | 동명이인 모두 반환, 단일 결과로 누락 없음                            | [ ]       | LIKE 검색 중복 처리         |
+| 51  | 관리자 인증 미들웨어 | `src/middleware.ts`                            | 만료된 관리자 세션 쿠키로 `/api/admin/*` 요청     | 401 반환, 쿠키 파기 처리                                             | [ ]       | 세션 만료 시간 검증         |
+| 52  | 관리자 인증 미들웨어 | `src/middleware.ts`                            | 관리자 세션 쿠키 서명 값 임의 변조 후 요청        | 위변조 감지, 401 반환                                                | [ ]       | HttpOnly 쿠키 서명 검증     |
+| 53  | getAdminMetrics      | `GET /api/admin/stats`                         | `from > to` 역순 날짜 파라미터로 요청             | 400 에러 반환 또는 빈 결과 + 200 반환                                | [ ]       | 서버 측 날짜 유효성 검사    |
+| 54  | getAdminMetrics      | `GET /api/admin/stats`                         | 데이터가 전혀 없는 신규 서비스 상태에서 지표 조회 | 모든 지표 0, 증감률 null 또는 0% 반환, 에러 없음                     | [ ]       | 집계 쿼리 NULL 처리         |
+| 55  | getAdminOrders       | `GET /api/admin/orders`                        | 결과 없는 검색어로 조회                           | 빈 배열 + 200 반환                                                   | [ ]       | 빈 결과 정상 응답           |
+| 56  | getAdminOrders       | `GET /api/admin/orders`                        | `page` 값이 총 페이지 수 초과 시 요청             | 빈 배열 + 200 반환, 400 에러 미발생                                  | [ ]       | offset 초과 방어 처리       |
+| 57  | getAdminOrderDetail  | `GET /api/admin/orders/[order-id]`             | 존재하지 않는 `order-id`로 요청                   | 404 반환                                                             | [ ]       | notFound 처리               |
+| 58  | getAdminOrderDetail  | `GET /api/admin/orders/[order-id]`             | `reports` 레코드가 아직 없는 주문 상세 조회       | `report: null` 포함하여 200 반환, 에러 없음                          | [ ]       | LEFT JOIN null 필드 처리    |
+| 59  | regenerate API       | `POST /api/admin/orders/[order-id]/regenerate` | `reports.status = 'generating'` 중 재생성 요청    | 중복 실행 차단, 409 반환                                             | [ ]       | generating 선점 레코드 체크 |
+| 60  | regenerate API       | `POST /api/admin/orders/[order-id]/regenerate` | Anthropic API 키 만료 상태에서 재생성 요청        | `reports.status = 'error'`, `error_message` 기록, 텔레그램 알림 발송 | [ ]       | API 키 인증 실패 핸들링     |
+| 61  | getAdminUsers        | `GET /api/admin/users`                         | 주문 이력 없는 비회원 포함 전체 유저 조회         | 누적 주문 건수 0 포함 정상 반환                                      | [ ]       | LEFT JOIN 집계 0건          |
+| 62  | getAdminUsers        | `GET /api/admin/users`                         | 동일 닉네임을 가진 복수 유저 닉네임 검색          | 동명이인 모두 반환, 단일 결과로 누락 없음                            | [ ]       | LIKE 검색 중복 처리         |
 
 ---
 
@@ -1304,16 +1372,16 @@ src/
 
 | 분류                  | 점검 항목                    | 세부 검토 내용                                                                                                                                                                                | E2E 완료 여부 | 특이사항                                                                                                |
 | --------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------- |
-| **인증 및 인가**      | 관리자 권한 우회 방어        | `/api/admin/*` 전 엔드포인트에 미들웨어 관리자 세션 검증 적용 여부 확인. 관리자 세션 없는 요청 및 일반 회원 세션으로의 우회 시도 시 401/403 반환 확인                                         | [ ]           | E2E No.32–33, 36, 46–47                                                                                 |
+| **인증 및 인가**      | 관리자 권한 우회 방어        | `/api/admin/*` 전 엔드포인트에 미들웨어 관리자 세션 검증 적용 여부 확인. 관리자 세션 없는 요청 및 일반 회원 세션으로의 우회 시도 시 401/403 반환 확인                                         | [ ]           | E2E No.32–33, 36, 51–52                                                                                 |
 | **인증 및 인가**      | IDOR 방어 (보고서 무단 열람) | `/report/[order-id]` 접근 시 서버에서 `orders.user_id` 또는 `orders.guest_id`와 현재 세션을 수동 매칭. URL에 타인의 order-id 입력 시 접근 차단 확인                                           | [ ]           | E2E No.9. RLS 비활성화 환경이므로 서버 코드 레벨 소유권 검증이 유일한 방어선                            |
-| **인증 및 인가**      | 세션 탈취 및 위변조 방지     | 관리자·비회원 세션 쿠키 `HttpOnly + Secure + SameSite=Strict` 설정 확인. 쿠키 서명 값 임의 변조 요청 시 검증 실패 및 401 반환 확인                                                            | [ ]           | E2E No.47. 비회원 세션도 동일 쿠키 정책 적용                                                            |
+| **인증 및 인가**      | 세션 탈취 및 위변조 방지     | 관리자·비회원 세션 쿠키 `HttpOnly + Secure + SameSite=Strict` 설정 확인. 쿠키 서명 값 임의 변조 요청 시 검증 실패 및 401 반환 확인                                                            | [ ]           | E2E No.52. 비회원 세션도 동일 쿠키 정책 적용                                                            |
 | **입력값 검증**       | XSS 공격 방어                | AI 생성 보고서(`reports.content`) 렌더링 시 `dangerouslySetInnerHTML` 미사용 확인. 관리자 페이지 유저 입력 데이터 표시 시 React 자동 이스케이프 의존 여부 점검                                | [ ]           | 보고서 콘텐츠는 순수 텍스트로만 저장. Markdown 렌더링 도입 시 sanitize 라이브러리 추가 필요             |
 | **입력값 검증**       | DoS 방어 (AI 중복 호출 차단) | `reports.status = 'generating'` 레코드 선점으로 동일 주문에 대한 중복 AI 호출 차단 확인. 결제 미완료 주문으로 `/api/ai/generate` 직접 호출 시 차단 확인                                       | [ ]           | E2E No.28. `paid` 상태 검증 + `generating` 선점이 DoS의 1차·2차 방어선                                  |
 | **입력값 검증**       | SQL Injection 방어           | 관리자 검색 입력값(`?q=`), 필터 파라미터 전체를 Supabase 쿼리 빌더 파라미터화 쿼리로 처리하는지 확인. Raw SQL 직접 조합 코드 미존재 확인                                                      | [ ]           | E2E No.40. Supabase JS 클라이언트는 기본적으로 파라미터화 처리하나, `rpc()` 직접 호출 시 별도 점검 필요 |
 | **결제 및 비즈니스**  | 결제 금액 위변조 방어        | `createOrder` 실행 시 클라이언트 전달 `amount`와 DB `contents.price` 서버 대조 후 일치 시에만 `orders` 레코드 생성. `/api/payments/confirm`에서도 `orders.amount`와 요청 `amount` 재대조 확인 | [ ]           | E2E No.23, 34. 클라이언트→createOrder→confirm 3단계 모두 금액 검증                                      |
 | **결제 및 비즈니스**  | 중복 결제 방어               | `orders.toss_order_id` UNIQUE 제약으로 동일 주문 중복 생성 차단. `status = 'paid'` 주문에 대한 confirm 재요청 시 멱등 처리 확인                                                               | [ ]           | E2E No.22. DB 레벨 UNIQUE + 애플리케이션 레벨 상태 검증 이중 방어                                       |
 | **결제 및 비즈니스**  | 웹훅 위조 방지               | `POST /api/payments/webhook` 수신 시 `Authorization: Basic {Base64(secret:secret)}` 헤더 검증. 시크릿 불일치 요청 즉시 401 반환 및 DB 변경 없음 확인                                          | [ ]           | E2E No.26–27. 웹훅 시크릿은 환경 변수로 관리, 소스코드 하드코딩 금지                                    |
-| **인프라 및 통신**    | 외부 API 타임아웃 처리       | Anthropic SDK 호출 및 토스페이먼츠 API 호출에 명시적 타임아웃 설정 확인. 타임아웃 발생 시 `reports.status = 'error'` 전환 및 텔레그램 알림 발송 확인                                          | [ ]           | E2E No.29, 55. 타임아웃 미설정 시 Vercel Function 최대 실행 시간(300s) 소진 위험                        |
+| **인프라 및 통신**    | 외부 API 타임아웃 처리       | Anthropic SDK 호출 및 토스페이먼츠 API 호출에 명시적 타임아웃 설정 확인. 타임아웃 발생 시 `reports.status = 'error'` 전환 및 텔레그램 알림 발송 확인                                          | [ ]           | E2E No.29, 60. 타임아웃 미설정 시 Vercel Function 최대 실행 시간(300s) 소진 위험                        |
 | **인프라 및 통신**    | Supabase RLS 정책 검증       | `guests`, `admins`, `orders`, `reports` 테이블 RLS 비활성화 후 `service_role` 키로만 접근하는지 확인. `anon` 키로의 직접 접근 차단 여부 점검                                                  | [ ]           | `profiles`, `contents`는 RLS 활성화. 환경 변수에서 `SUPABASE_SERVICE_ROLE_KEY` 외부 노출 여부 점검 필수 |
 | **데이터 프라이버시** | 민감 정보 서버 로그 미출력   | `guests.password_hash`, `admins.password_hash`, 전화번호, 토스 `paymentKey` 등이 서버 로그(`console.log`)에 출력되지 않는지 확인. 에러 스택 트레이스에 민감 정보 포함 여부 점검               | [ ]           | 프로덕션 환경 로그 레벨 설정 및 Vercel 로그 보존 기간 확인 필요                                         |
 | **데이터 프라이버시** | 비회원 데이터 보호           | `guests.phone`, `guests.password_hash`는 `service_role` 접근만 허용 확인. 비회원 주문 조회 API(`/api/guest/orders`)에서 세션 검증 없이 타인 주문 열람 불가 여부 확인                          | [ ]           | E2E No.17. 비회원 세션 쿠키 만료 후 재인증 없이 조회 불가 확인                                          |

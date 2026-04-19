@@ -44,13 +44,28 @@ export const AuthClient = () => {
     null,
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState<boolean>(true);
 
   // 이미 로그인된 상태로 /auth 진입 시 즉시 목적지로 이동
   useEffect(() => {
     if (isMemberLoggedIn()) {
       redirectToSite(nextPath, (href) => router.replace(href));
+      return;
     }
-  }, [nextPath, router]);
+
+    // OAuth 콜백 에러 파라미터 처리
+    const error = searchParams.get("error");
+    if (error) {
+      const errorMap: Record<string, string> = {
+        access_denied: "로그인이 거부되었어요. 다시 시도해주세요.",
+        server_error: "서버 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
+        invalid_request: "요청이 올바르지 않아요. 다시 시도해주세요.",
+      };
+      setErrorMessage(errorMap[error] ?? "로그인에 실패했어요. 잠시 후 다시 시도해주세요.");
+    }
+
+    setIsRedirecting(false);
+  }, [nextPath, router, searchParams]);
 
   const handleSocialLogin = (provider: SocialProvider) => {
     if (phase === "authenticating") return;
@@ -161,50 +176,62 @@ export const AuthClient = () => {
             소셜 로그인
           </h2>
 
-          <div className="flex flex-col gap-3">
-            <KakaoLoginButton
-              onClick={() => handleSocialLogin("kakao")}
-              disabled={phase === "authenticating"}
-              loading={
-                phase === "authenticating" && activeProvider === "kakao"
-              }
-            />
-            <GoogleLoginButton
-              onClick={() => handleSocialLogin("google")}
-              disabled={phase === "authenticating"}
-              loading={
-                phase === "authenticating" && activeProvider === "google"
-              }
-            />
-          </div>
+          {isRedirecting ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-8">
+              <div
+                className="h-6 w-6 rounded-full border-2 border-[#E8D4F0] border-t-[#9B88AC]"
+                style={{ animation: "spin 1s linear infinite" }}
+              />
+              <p className="text-xs text-[#4A3B5C]/70">로그인 상태 확인 중...</p>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-col gap-3">
+                <KakaoLoginButton
+                  onClick={() => handleSocialLogin("kakao")}
+                  disabled={phase === "authenticating"}
+                  loading={
+                    phase === "authenticating" && activeProvider === "kakao"
+                  }
+                />
+                <GoogleLoginButton
+                  onClick={() => handleSocialLogin("google")}
+                  disabled={phase === "authenticating"}
+                  loading={
+                    phase === "authenticating" && activeProvider === "google"
+                  }
+                />
+              </div>
 
-          {errorMessage && (
-            <p
-              role="alert"
-              className="mt-4 rounded-lg bg-[#FBEAEA] px-3 py-2 text-center text-xs text-[#D4475A]"
-            >
-              {errorMessage}
-            </p>
+              {errorMessage && (
+                <p
+                  role="alert"
+                  className="mt-4 rounded-lg bg-[#FBEAEA] px-3 py-2 text-center text-xs text-[#D4475A]"
+                >
+                  {errorMessage}
+                </p>
+              )}
+
+              {/* 약관 안내 */}
+              <p className="mt-6 text-center text-[11px] leading-relaxed text-[#4A3B5C]/55">
+                로그인 시{" "}
+                <Link
+                  href="/terms"
+                  className="underline decoration-[#D4A5A5]/60 underline-offset-2 transition-colors hover:text-[#4A3B5C]"
+                >
+                  이용약관
+                </Link>
+                {" 및 "}
+                <Link
+                  href="/privacy"
+                  className="underline decoration-[#D4A5A5]/60 underline-offset-2 transition-colors hover:text-[#4A3B5C]"
+                >
+                  개인정보처리방침
+                </Link>
+                에 동의하게 됩니다
+              </p>
+            </>
           )}
-
-          {/* 약관 안내 */}
-          <p className="mt-6 text-center text-[11px] leading-relaxed text-[#4A3B5C]/55">
-            로그인 시{" "}
-            <Link
-              href="/terms"
-              className="underline decoration-[#D4A5A5]/60 underline-offset-2 transition-colors hover:text-[#4A3B5C]"
-            >
-              이용약관
-            </Link>
-            {" 및 "}
-            <Link
-              href="/privacy"
-              className="underline decoration-[#D4A5A5]/60 underline-offset-2 transition-colors hover:text-[#4A3B5C]"
-            >
-              개인정보처리방침
-            </Link>
-            에 동의하게 됩니다
-          </p>
         </section>
 
         {/* 비회원 주문 조회 링크 */}
@@ -230,6 +257,14 @@ export const AuthClient = () => {
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
           }
         }
       `}</style>
