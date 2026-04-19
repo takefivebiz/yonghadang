@@ -61,7 +61,9 @@ export const AuthClient = () => {
         server_error: "서버 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
         invalid_request: "요청이 올바르지 않아요. 다시 시도해주세요.",
       };
-      setErrorMessage(errorMap[error] ?? "로그인에 실패했어요. 잠시 후 다시 시도해주세요.");
+      setErrorMessage(
+        errorMap[error] ?? "로그인에 실패했어요. 잠시 후 다시 시도해주세요.",
+      );
     }
 
     setIsRedirecting(false);
@@ -97,31 +99,23 @@ export const AuthClient = () => {
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden">
-      {/* ── 배경 — 파스텔 라벤더 그라디언트 ── */}
+    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-gradient-to-b from-[#EDE0F8] via-[#F5F0E8] to-[#F5F0E8]">
+      {/* 배경 장식 블롭 */}
       <div
         aria-hidden="true"
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 90% 60% at 50% 0%, #EDE0F8 0%, #F5F0E8 55%, #F5F0E8 100%)",
-        }}
+        className="pointer-events-none absolute -right-32 top-20 h-80 w-80 rounded-full blur-3xl"
+        style={{ backgroundColor: "#E8D4F0", opacity: 0.4 }}
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 top-10 h-72 w-72 rounded-full blur-3xl"
-        style={{ backgroundColor: "#E8D4F0", opacity: 0.35 }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-20 top-72 h-64 w-64 rounded-full blur-3xl"
-        style={{ backgroundColor: "#F5D7E8", opacity: 0.3 }}
+        className="pointer-events-none absolute -left-24 top-1/3 h-72 w-72 rounded-full blur-3xl"
+        style={{ backgroundColor: "#F5D7E8", opacity: 0.35 }}
       />
 
-      {/* 신비로운 별/달 장식 */}
+      {/* 별/달 장식 */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[45vh]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
       >
         <span className="absolute left-[10%] top-[20%] text-2xl opacity-20">
           ✦
@@ -132,119 +126,113 @@ export const AuthClient = () => {
         <span className="absolute left-[78%] top-[10%] text-lg opacity-20">
           ✦
         </span>
-        <span className="absolute left-[22%] top-[58%] text-xl opacity-15">
+        <span className="absolute left-[22%] top-1/2 text-xl opacity-15">
           ✦
         </span>
       </div>
 
-      <div
-        className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md flex-col items-stretch justify-center px-4 py-12"
-        style={{ animation: "authFadeIn 0.6s ease-out" }}
-      >
-        {/* 헤더 */}
-        <header className="mb-8 text-center">
-          <p className="font-display mb-2 text-xs uppercase tracking-[0.3em] text-[#9B88AC]">
-            Sign in
-          </p>
-          <h1 className="font-display text-2xl font-bold text-[#4A3B5C] sm:text-3xl">
-            당신의 이야기를 이어가세요
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-[#4A3B5C]/70">
-            소셜 계정 하나면 충분해요.
-            <br />
-            별빛이 안내하는 자리로 모셔드릴게요.
-          </p>
-        </header>
-
-        {/* 로그인 카드 */}
-        <section
-          aria-labelledby="auth-card-heading"
-          className="relative overflow-hidden rounded-3xl border border-[#E8D4F0] bg-white px-6 py-8 shadow-sm sm:px-8"
-          style={{
-            background:
-              "linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 55%, #F9F2FB 100%)",
-          }}
+      {/* 메인 콘텐츠 */}
+      <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-12 sm:py-16">
+        <div
+          className="w-full max-w-sm"
+          style={{ animation: "authFadeIn 0.6s ease-out" }}
         >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-5 -top-5 text-5xl opacity-10"
+          {/* 헤더 */}
+          <header className="mb-8 text-center">
+            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[#9B88AC]">
+              Sign in
+            </p>
+            <h1 className="text-3xl font-bold text-[#4A3B5C] sm:text-3xl">
+              당신의 이야기를 이어가세요
+            </h1>
+            <p className="mt-4 text-sm leading-relaxed text-[#4A3B5C]/70">
+              소셜 계정 하나면 충분해요.
+              <br />
+              별빛이 안내하는 자리로 모셔드릴게요.
+            </p>
+          </header>
+
+          {/* 로그인 카드 */}
+          <section
+            aria-labelledby="auth-card-heading"
+            className="rounded-3xl border border-[#E8D4F0]/60 bg-white px-6 py-8 shadow-lg backdrop-blur-sm sm:px-8 sm:py-10"
           >
-            ✦
-          </span>
+            <h2 id="auth-card-heading" className="sr-only">
+              소셜 로그인
+            </h2>
 
-          <h2 id="auth-card-heading" className="sr-only">
-            소셜 로그인
-          </h2>
-
-          {isRedirecting ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-8">
-              <div
-                className="h-6 w-6 rounded-full border-2 border-[#E8D4F0] border-t-[#9B88AC]"
-                style={{ animation: "spin 1s linear infinite" }}
-              />
-              <p className="text-xs text-[#4A3B5C]/70">로그인 상태 확인 중...</p>
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-col gap-3">
-                <KakaoLoginButton
-                  onClick={() => handleSocialLogin("kakao")}
-                  disabled={phase === "authenticating"}
-                  loading={
-                    phase === "authenticating" && activeProvider === "kakao"
-                  }
+            {isRedirecting ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-8">
+                <div
+                  className="h-6 w-6 rounded-full border-2 border-[#E8D4F0] border-t-[#9B88AC]"
+                  style={{ animation: "spin 1s linear infinite" }}
                 />
-                <GoogleLoginButton
-                  onClick={() => handleSocialLogin("google")}
-                  disabled={phase === "authenticating"}
-                  loading={
-                    phase === "authenticating" && activeProvider === "google"
-                  }
-                />
-              </div>
-
-              {errorMessage && (
-                <p
-                  role="alert"
-                  className="mt-4 rounded-lg bg-[#FBEAEA] px-3 py-2 text-center text-xs text-[#D4475A]"
-                >
-                  {errorMessage}
+                <p className="text-xs text-[#4A3B5C]/70">
+                  로그인 상태 확인 중...
                 </p>
-              )}
+              </div>
+            ) : (
+              <>
+                <div className="flex flex-col gap-3">
+                  <KakaoLoginButton
+                    onClick={() => handleSocialLogin("kakao")}
+                    disabled={phase === "authenticating"}
+                    loading={
+                      phase === "authenticating" && activeProvider === "kakao"
+                    }
+                  />
+                  <GoogleLoginButton
+                    onClick={() => handleSocialLogin("google")}
+                    disabled={phase === "authenticating"}
+                    loading={
+                      phase === "authenticating" && activeProvider === "google"
+                    }
+                  />
+                </div>
 
-              {/* 약관 안내 */}
-              <p className="mt-6 text-center text-[11px] leading-relaxed text-[#4A3B5C]/55">
-                로그인 시{" "}
-                <Link
-                  href="/terms"
-                  className="underline decoration-[#D4A5A5]/60 underline-offset-2 transition-colors hover:text-[#4A3B5C]"
-                >
-                  이용약관
-                </Link>
-                {" 및 "}
-                <Link
-                  href="/privacy"
-                  className="underline decoration-[#D4A5A5]/60 underline-offset-2 transition-colors hover:text-[#4A3B5C]"
-                >
-                  개인정보처리방침
-                </Link>
-                에 동의하게 됩니다
-              </p>
-            </>
-          )}
-        </section>
+                {errorMessage && (
+                  <p
+                    role="alert"
+                    className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-center text-sm text-red-600"
+                  >
+                    {errorMessage}
+                  </p>
+                )}
 
-        {/* 비회원 주문 조회 링크 */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-[#4A3B5C]/60">
-            계정 없이 주문하셨나요?{" "}
-            <Link
-              href="/guest-login"
-              className="font-semibold text-[#4A3B5C] underline-offset-2 hover:underline"
-            >
-              비회원 주문 조회
-            </Link>
-          </p>
+                {/* 약관 안내 */}
+                <p className="mt-6 text-center text-xs leading-relaxed text-[#4A3B5C]/60">
+                  로그인 시{" "}
+                  <Link
+                    href="/terms"
+                    className="text-[#4A3B5C] underline hover:font-semibold"
+                  >
+                    이용약관
+                  </Link>
+                  {" 및 "}
+                  <Link
+                    href="/privacy"
+                    className="text-[#4A3B5C] underline hover:font-semibold"
+                  >
+                    개인정보처리방침
+                  </Link>
+                  에 동의하게 됩니다
+                </p>
+              </>
+            )}
+          </section>
+
+          {/* 비회원 주문 조회 */}
+          <div className="mt-6 text-center">
+            <p className="text-xs text-[#4A3B5C]/60">
+              계정 없이 주문하셨나요?{" "}
+              <Link
+                href="/guest-login"
+                className="font-medium text-[#4A3B5C] hover:underline"
+              >
+                비회원 주문 조회
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 
@@ -252,7 +240,7 @@ export const AuthClient = () => {
         @keyframes authFadeIn {
           from {
             opacity: 0;
-            transform: translateY(8px);
+            transform: translateY(12px);
           }
           to {
             opacity: 1;
