@@ -1,23 +1,23 @@
-# yonghadang 프로젝트 진행상황
+# corelog 프로젝트 진행상황
 
 ## 프로젝트 정보
 
-- **프로젝트명:** yonghadang (용하당)
+- **프로젝트명:** corelog (코어로그)
 - **위치:** `~/Desktop/yonghadang` (`/Users/suyeon/Desktop/yonghadang`)
 - **생성일:** 2026-04-15
 
 ## 기술 스택
 
-| 항목 | 버전/설정 |
-|------|-----------|
-| Next.js | 15 (App Router, Turbopack) |
-| React | 19 |
-| TypeScript | 5.7+ |
-| Tailwind CSS | v4 (`@tailwindcss/postcss`) |
-| shadcn/ui | new-york 스타일, lucide 아이콘 |
-| 경로 alias | `@/*` → `./src/*` |
-| 언어 설정 | `lang="ko"` |
-| 폰트 | Geist Sans / Geist Mono |
+| 항목         | 버전/설정                      |
+| ------------ | ------------------------------ |
+| Next.js      | 15 (App Router, Turbopack)     |
+| React        | 19                             |
+| TypeScript   | 5.7+                           |
+| Tailwind CSS | v4 (`@tailwindcss/postcss`)    |
+| shadcn/ui    | new-york 스타일, lucide 아이콘 |
+| 경로 alias   | `@/*` → `./src/*`              |
+| 언어 설정    | `lang="ko"`                    |
+| 폰트         | Geist Sans / Geist Mono        |
 
 ## 생성된 파일 구조
 
