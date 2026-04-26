@@ -69,9 +69,7 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
         if (!widgetRef.current) {
           isInitializing.current = true;
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const tossPayments = TossPayments(clientKey);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const widgets = tossPayments.widgets({
             customerKey: isLoggedIn ? `member_${Date.now()}` : `guest_${Date.now()}`,
           });

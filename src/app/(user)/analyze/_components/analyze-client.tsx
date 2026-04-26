@@ -44,7 +44,8 @@ const CATEGORY_INFO: Record<Category, { icon: string; description: string }> = {
 };
 
 /** 상대/관계 분석용 관계 유형 */
-const RELATIONSHIP_OPTIONS = ['썸', '연애 중', '이별', '재회', '친구', '가족', '직장 동료', '기타'];
+const RELATIONSHIP_OPTIONS = ['썸', '연애 중', '이별', '재회', '친구', '가족', '직장 동료', '기타'] as const;
+type Relationship = (typeof RELATIONSHIP_OPTIONS)[number];
 const RELATIONSHIP_ICONS: Record<string, string> = {
   '썸': '💫',
   '연애 중': '💑',

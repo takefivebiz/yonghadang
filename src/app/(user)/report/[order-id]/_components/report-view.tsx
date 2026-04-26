@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { FullReport } from '@/types/report';
-import { AnalysisSession } from '@/types/analysis';
 import { savePendingOrder } from '@/lib/payment';
 import { PendingOrderInput } from '@/types/payment';
 import { getPriceForQuantity, getSavingsAmount, isBestDeal } from '@/lib/pricing';
@@ -10,7 +9,6 @@ import { PaymentModal } from './payment-modal';
 
 interface ReportViewProps {
   report: FullReport;
-  analysisSession?: AnalysisSession | null;
 }
 
 /**
@@ -18,7 +16,7 @@ interface ReportViewProps {
  * - 무료 리포트 표시
  * - 유료 질문 선택 (할인 구조 포함)
  */
-export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
+export const ReportView = ({ report }: ReportViewProps) => {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [pendingOrder, setPendingOrder] = useState<PendingOrderInput | null>(null);
   const { freeReport, paidQuestions, category, createdAt } = report;
