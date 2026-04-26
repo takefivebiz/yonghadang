@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | 코어로그",
   },
   description:
-    "당신의 선택과 응답으로 현재 상태, 패턴, 선택 구조를 분석합니다. 코어로그에서 분석 리포트를 확인하세요.",
+    "선택과 응답으로 현재 상태, 패턴, 선택 구조를 분석합니다. 코어로그에서 분석 리포트를 확인하세요.",
   openGraph: {
     siteName: "코어로그",
     locale: "ko_KR",
