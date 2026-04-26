@@ -8,7 +8,7 @@ import {
   QuestionAnswer,
 } from '@/types/analysis';
 import { calculateTraits, inferUserType } from '@/lib/trait-inference';
-import { COLORS, getAnalysisTypeColor, getCategoryColor } from '@/lib/colors';
+import { COLORS, getAnalysisTypeColor, getCategoryColor, getRelationshipColor } from '@/lib/colors';
 
 type AnalysisType = 'self' | 'other' | 'relationship';
 
@@ -279,7 +279,7 @@ export const AnalyzeClient = () => {
 
   const handleRelationshipSelect = useCallback((rel: string) => {
     setSelectedRelationship(rel);
-    setStep('category');
+    setStep('questions');
   }, []);
 
   const handleSubcategorySelect = useCallback((sub: string) => {
@@ -369,7 +369,11 @@ export const AnalyzeClient = () => {
       setCurrentQuestion((n) => n - 1);
     } else if (step === 'questions' && hasSubcategory) {
       setStep('subcategory');
-    } else if (step === 'questions' || step === 'subcategory') {
+    } else if (step === 'questions' && queryType === 'self') {
+      setStep('category');
+    } else if (step === 'questions' && queryType !== 'self') {
+      setStep('relationship');
+    } else if (step === 'subcategory') {
       setStep('category');
     } else if (step === 'category' && queryType !== 'self') {
       setStep('relationship');
@@ -525,12 +529,6 @@ export const AnalyzeClient = () => {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  {/* 배경 장식 */}
-                  <div
-                    className="absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-25 transition-all duration-300 group-hover:opacity-40"
-                    style={{ backgroundColor: categoryColor }}
-                  />
-
                   <div className="relative z-10 space-y-3">
                     <div className="flex items-start justify-between">
                       <div className="text-6xl">{info.icon}</div>
@@ -591,49 +589,42 @@ export const AnalyzeClient = () => {
           <div className="grid gap-3 md:gap-4 grid-cols-2">
             {RELATIONSHIP_OPTIONS.map((rel) => {
               const icon = RELATIONSHIP_ICONS[rel] || '💫';
+              const relColor = getRelationshipColor(rel);
               return (
                 <button
                   key={rel}
                   onClick={() => handleRelationshipSelect(rel)}
-                  className="group relative overflow-hidden rounded-3xl p-6 text-left transition-all duration-300 active:scale-[0.95] md:p-8 hover:shadow-2xl"
+                  className="group relative overflow-hidden rounded-2xl p-3 text-left transition-all duration-300 active:scale-[0.95] md:p-4 hover:shadow-lg"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(163, 102, 255, 0.35) 0%, rgba(163, 102, 255, 0.15) 100%)',
-                    borderLeft: '5px solid #A366FF',
+                    background: `linear-gradient(135deg, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.35) 0%, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.15) 100%)`,
+                    borderLeft: `4px solid ${relColor}`,
                     backdropFilter: 'blur(15px)',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(163, 102, 255, 0.45) 0%, rgba(163, 102, 255, 0.25) 100%)';
-                    e.currentTarget.style.transform = 'translateY(-6px)';
+                    e.currentTarget.style.background = `linear-gradient(135deg, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.45) 0%, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.25) 100%)`;
+                    e.currentTarget.style.transform = 'translateY(-4px)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(163, 102, 255, 0.35) 0%, rgba(163, 102, 255, 0.15) 100%)';
+                    e.currentTarget.style.background = `linear-gradient(135deg, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.35) 0%, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.15) 100%)`;
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  {/* 배경 장식 */}
-                  <div
-                    className="absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-25 transition-all duration-300 group-hover:opacity-40"
-                    style={{ backgroundColor: '#A366FF' }}
-                  />
-
-                  <div className="relative z-10 space-y-3">
+                  <div className="relative z-10 space-y-2">
                     <div className="flex items-start justify-between">
-                      <div className="text-6xl">{icon}</div>
+                      <div className="text-4xl">{icon}</div>
                       <div
-                        className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white transition-all duration-300 group-hover:scale-130"
-                        style={{ backgroundColor: '#A366FF' }}
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white transition-all duration-300 group-hover:scale-110"
+                        style={{ backgroundColor: relColor }}
                       >
                         →
                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <h3
-                        className="text-xl font-bold leading-tight md:text-2xl"
-                        style={{ color: '#FFFFFF' }}
-                      >
-                        {rel}
-                      </h3>
-                    </div>
+                    <h3
+                      className="text-sm font-bold leading-tight md:text-base"
+                      style={{ color: '#FFFFFF' }}
+                    >
+                      {rel}
+                    </h3>
                   </div>
                 </button>
               );
@@ -690,12 +681,6 @@ export const AnalyzeClient = () => {
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  {/* 배경 장식 */}
-                  <div
-                    className="absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-25 transition-all duration-300 group-hover:opacity-40"
-                    style={{ backgroundColor: categoryColor }}
-                  />
-
                   <div className="relative z-10 space-y-3">
                     <div className="flex items-start justify-between">
                       <div className="text-6xl">{info.icon}</div>

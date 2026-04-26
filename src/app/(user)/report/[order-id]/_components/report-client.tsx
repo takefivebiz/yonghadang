@@ -76,11 +76,71 @@ export const ReportClient = ({ order, report, initialAnalysisSession }: ReportCl
 
   if (view === 'auth') {
     return (
-      <div style={{ backgroundColor: '#FAF8F5' }}>
-        <GuestAuthForm
-          orderId={order.id}
-          onSuccess={() => setView(order.status === 'done' ? 'report' : 'status')}
+      <div className="relative min-h-screen overflow-hidden" style={{ background: 'linear-gradient(160deg, #1B003F 0%, #191970 100%)' }}>
+        {/* 배경 장식 - blur 요소 */}
+        <div
+          className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full blur-3xl"
+          style={{ backgroundColor: '#6495ED', opacity: 0.15 }}
+          aria-hidden="true"
         />
+        <div
+          className="pointer-events-none absolute -bottom-20 -left-40 h-80 w-80 rounded-full blur-3xl"
+          style={{ backgroundColor: '#E6E6FA', opacity: 0.08 }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute top-1/2 right-1/4 h-72 w-72 rounded-full blur-3xl"
+          style={{ backgroundColor: '#A366FF', opacity: 0.1 }}
+          aria-hidden="true"
+        />
+
+        {/* 네온 라인 장식 - 좌측 */}
+        <div
+          className="pointer-events-none absolute left-0 top-1/4 h-px w-32 opacity-60"
+          style={{
+            background: 'linear-gradient(90deg, transparent, #6495ED, transparent)',
+            boxShadow: '0 0 20px #6495ED, 0 0 40px rgba(100, 149, 237, 0.5)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* 네온 라인 장식 - 우측 */}
+        <div
+          className="pointer-events-none absolute right-0 top-2/3 h-px w-40 opacity-50"
+          style={{
+            background: 'linear-gradient(90deg, transparent, #A366FF, transparent)',
+            boxShadow: '0 0 20px #A366FF, 0 0 40px rgba(163, 102, 255, 0.4)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* 네온 도트 - 좌상단 */}
+        <div
+          className="pointer-events-none absolute left-1/4 top-1/3 h-1.5 w-1.5 rounded-full opacity-70"
+          style={{
+            backgroundColor: '#6495ED',
+            boxShadow: '0 0 15px #6495ED, 0 0 30px rgba(100, 149, 237, 0.6)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* 네온 도트 - 우하단 */}
+        <div
+          className="pointer-events-none absolute bottom-1/4 right-1/3 h-2 w-2 rounded-full opacity-50"
+          style={{
+            backgroundColor: '#A366FF',
+            boxShadow: '0 0 15px #A366FF, 0 0 30px rgba(163, 102, 255, 0.5)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* 콘텐츠 */}
+        <div className="relative z-10">
+          <GuestAuthForm
+            orderId={order.id}
+            onSuccess={() => setView(order.status === 'done' ? 'report' : 'status')}
+          />
+        </div>
       </div>
     );
   }
@@ -100,5 +160,5 @@ export const ReportClient = ({ order, report, initialAnalysisSession }: ReportCl
     return <ReportView report={report} analysisSession={analysisSession} />;
   }
 
-  return <div className="min-h-screen" style={{ backgroundColor: '#FAF8F5' }} />;
+  return <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #1B003F 0%, #191970 100%)' }} />;
 };

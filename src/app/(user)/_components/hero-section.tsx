@@ -1,12 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const AnalysisType = {
   SELF: "self",
   OTHER: "other",
-  RELATIONSHIP: "relationship",
 } as const;
+
+const RELATIONSHIP_OPTIONS = [
+  { label: "썸", icon: "💫" },
+  { label: "연애 중", icon: "💑" },
+  { label: "이별", icon: "💔" },
+  { label: "재회", icon: "🔄" },
+  { label: "친구", icon: "👫" },
+  { label: "가족", icon: "👨‍👩‍👧‍👦" },
+  { label: "직장 동료", icon: "💼" },
+  { label: "기타", icon: "❓" },
+];
 
 export const HeroSection = () => {
   const router = useRouter();
@@ -173,7 +184,7 @@ export const HeroSection = () => {
             지금 제일 궁금한 쪽부터
           </p>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 md:max-w-2xl md:mx-auto">
             {/* [나] 버튼 */}
             <button
               onClick={() => handleSelectType(AnalysisType.SELF)}
@@ -227,35 +238,6 @@ export const HeroSection = () => {
                 className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 style={{
                   background: "linear-gradient(135deg, rgba(163, 102, 255, 0.2), rgba(100, 149, 237, 0.15))",
-                }}
-                aria-hidden="true"
-              />
-            </button>
-
-            {/* [관계] 버튼 */}
-            <button
-              onClick={() => handleSelectType(AnalysisType.RELATIONSHIP)}
-              className="group relative overflow-hidden rounded-2xl px-6 py-8 transition-all duration-300 hover:shadow-2xl md:px-8 md:py-10"
-              style={{
-                border: "1px solid rgba(230, 230, 250, 0.3)",
-                background: "linear-gradient(135deg, rgba(75, 0, 130, 0.15), rgba(25, 25, 112, 0.1))",
-              }}
-            >
-              <div className="relative z-10">
-                <div className="mb-3 text-3xl font-bold md:text-4xl" style={{ color: "#B8A8D8" }}>
-                  [관계]
-                </div>
-                <p className="text-sm font-medium md:text-base" style={{ color: "#D4C5E2" }}>
-                  우리 사이는 어떤 관계일까?
-                </p>
-                <p className="mt-2 text-xs md:text-sm" style={{ color: "#9B8DB8" }}>
-                  관계의 반복 구조, 흐름 읽기
-                </p>
-              </div>
-              <div
-                className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{
-                  background: "linear-gradient(135deg, rgba(230, 230, 250, 0.15), rgba(100, 149, 237, 0.1))",
                 }}
                 aria-hidden="true"
               />

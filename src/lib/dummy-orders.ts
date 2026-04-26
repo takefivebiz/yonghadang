@@ -11,7 +11,7 @@ const DUMMY_ORDERS: Order[] = [
     amount: 4900,
     status: 'done',
     ownerType: 'guest',
-    phoneNumber: '01011111111',
+    phoneNumber: '01012345678',
     createdAt: '2026-04-15T10:30:00.000Z',
   },
   {
@@ -29,7 +29,7 @@ const DUMMY_ORDERS: Order[] = [
     amount: 4900,
     status: 'done',
     ownerType: 'guest',
-    phoneNumber: '01022222222',
+    phoneNumber: '01098765432',
     createdAt: '2026-04-19T09:15:00.000Z',
   },
   {
@@ -38,7 +38,7 @@ const DUMMY_ORDERS: Order[] = [
     amount: 4900,
     status: 'done',
     ownerType: 'guest',
-    phoneNumber: '01033333333',
+    phoneNumber: '01011112222',
     createdAt: '2026-04-18T12:00:00.000Z',
   },
 ];
@@ -90,15 +90,28 @@ export const listAllOrders = (): Order[] => [
 ];
 
 /**
- * 전화번호 + session-id 로 비회원 주문 검증.
+ * 전화번호 + 비밀번호 + session-id 로 비회원 주문 검증.
  * TODO: [백엔드 연동] POST /api/orders/verify 로 교체 (비밀번호 bcrypt 비교는 서버에서)
  */
 export const verifyGuestOrder = (
   sessionId: string,
   phoneNumber: string,
+  password: string,
 ): boolean => {
   const order = getOrder(sessionId);
   if (!order || order.ownerType !== 'guest') return false;
+
+  // 데모용 비밀번호 매핑 (실제로는 DB에서 해시된 비밀번호를 비교해야 함)
+  const demoPasswords: Record<string, string> = {
+    'sess_demo_guest_love': '1234',
+    'sess_demo_guest_emotion': '1234',
+    'sess_demo_guest_relation': '1234',
+  };
+
   const normalize = (v: string): string => v.replace(/\D/g, '');
-  return normalize(order.phoneNumber ?? '') === normalize(phoneNumber);
+
+  return (
+    normalize(order.phoneNumber ?? '') === normalize(phoneNumber) &&
+    demoPasswords[sessionId] === password
+  );
 };

@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { FullReport } from '@/types/report';
 import { AnalysisSession } from '@/types/analysis';
 import { savePendingOrder } from '@/lib/payment';
-import { useRouter } from 'next/navigation';
+import { PendingOrderInput } from '@/types/payment';
 import { getPriceForQuantity, getSavingsAmount, isBestDeal } from '@/lib/pricing';
+import { PaymentModal } from './payment-modal';
 
 interface ReportViewProps {
   report: FullReport;
@@ -18,8 +19,8 @@ interface ReportViewProps {
  * - 유료 질문 선택 (할인 구조 포함)
  */
 export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
-  const router = useRouter();
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [pendingOrder, setPendingOrder] = useState<PendingOrderInput | null>(null);
   const { freeReport, paidQuestions, category, createdAt } = report;
 
   // 분석 타입 정보
@@ -44,15 +45,25 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
 
   const handlePurchase = () => {
     if (selectedQuestions.length === 0) return;
-    savePendingOrder({
+    const order: PendingOrderInput = {
       sessionId: report.sessionId,
       category,
       paidQuestionIds: selectedQuestions,
-    });
-    router.push('/payments');
+      savedAt: Date.now(),
+    };
+    savePendingOrder(order);
+    setPendingOrder(order);
+  };
+
+  const handlePaymentSuccess = () => {
+    setPendingOrder(null);
+    setSelectedQuestions([]);
+    // TODO: [백엔드 연동] 결제 완료 후 리포트 데이터 갱신
+    window.location.reload();
   };
 
   return (
+    <>
     <div className="mx-auto w-full max-w-3xl px-4 py-8 md:py-12">
       {/* 헤더 */}
       <div className="mb-10">
@@ -226,5 +237,15 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
         </section>
       )}
     </div>
+
+    {/* 결제 모달 */}
+    {pendingOrder && (
+      <PaymentModal
+        pendingOrder={pendingOrder}
+        onClose={() => setPendingOrder(null)}
+        onSuccess={handlePaymentSuccess}
+      />
+    )}
+    </>
   );
 };

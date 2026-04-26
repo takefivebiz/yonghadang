@@ -34,6 +34,18 @@ export const COLORS = {
     '직업/진로': '#7B6A9B',
   },
 
+  // 관계 유형 색상
+  relationship: {
+    '썸': '#FF6B9D',
+    '연애 중': '#F7A278',
+    '이별': '#7B8BA8',
+    '재회': '#A8D864',
+    '친구': '#6495ED',
+    '가족': '#FF6B6B',
+    '직장 동료': '#9B8DB8',
+    '기타': '#A366FF',
+  },
+
   // UI 요소
   ui: {
     border: '#E5E5E5',
@@ -57,4 +69,13 @@ export const getCategoryColor = (
   category: '연애' | '감정' | '인간관계' | '직업/진로',
 ): string => {
   return COLORS.category[category];
+};
+
+/**
+ * 관계 유형에 따른 색상 선택
+ */
+export const getRelationshipColor = (
+  relationship: '썸' | '연애 중' | '이별' | '재회' | '친구' | '가족' | '직장 동료' | '기타',
+): string => {
+  return COLORS.relationship[relationship];
 };

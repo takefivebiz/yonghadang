@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Serif_KR, Cinzel } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 /**
@@ -37,6 +38,13 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
     <html lang="ko">
+      <head>
+        {/* 토스페이먼츠 SDK v2 */}
+        <Script
+          src="https://js.tosspayments.com/v2/standard"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body
         className={`${notoSerifKR.variable} ${cinzel.variable} antialiased`}
       >
