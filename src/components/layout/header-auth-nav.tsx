@@ -38,7 +38,7 @@ export const HeaderAuthNav = () => {
   return (
     <>
       <Link
-        href="/guest-login"
+        href="/guest/lookup"
         className="rounded-md px-4 py-2 text-sm transition-colors hover:opacity-90"
         style={{ color: "#BEAEDB" }}
       >
