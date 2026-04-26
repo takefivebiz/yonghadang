@@ -17,14 +17,14 @@ const PaymentsPage = () => {
       <div className="relative z-10 px-4">
         {/* 헤더 */}
         <div className="mx-auto mb-8 max-w-lg text-center">
-          <p className="mb-2 text-xs uppercase tracking-[0.3em] text-foreground/50">
+          <p className="mb-2 text-xs uppercase tracking-[0.3em]" style={{ color: '#A0A0FF' }}>
             Checkout
           </p>
-          <h1 className="text-2xl font-bold md:text-3xl" style={{ color: '#2D3250' }}>
-            마지막 단계예요
+          <h1 className="text-2xl font-bold md:text-3xl" style={{ color: '#F5F5F5' }}>
+            마지막 단계야
           </h1>
-          <p className="mt-2 text-sm text-foreground/60">
-            결제를 완료하면 선택한 분석이 바로 시작됩니다
+          <p className="mt-2 text-sm" style={{ color: '#D0D0D0' }}>
+            결제를 완료하면 선택한 분석이 바로 시작돼
           </p>
         </div>
 

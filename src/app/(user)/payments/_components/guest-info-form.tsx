@@ -37,7 +37,7 @@ export const GuestInfoForm = ({ value, onChange, phoneError, passwordError }: Gu
           비회원 주문 조회 정보
         </h3>
         <p className="text-xs leading-relaxed" style={{ color: '#D4C5E2' }}>
-          결제 완료 후 이 전화번호와 비밀번호로 주문 내역을 조회할 수 있어요.
+          결제 완료 후 이 전화번호와 비밀번호로 주문 내역을 조회할 수 있어.
         </p>
       </div>
 

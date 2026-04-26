@@ -35,13 +35,13 @@ export const PaymentClient = () => {
     let valid = true;
     const phone = guestInfo.phoneNumber.replace(/\D/g, '');
     if (!/^01[016789]\d{7,8}$/.test(phone)) {
-      setPhoneError('올바른 휴대폰번호를 입력해주세요');
+      setPhoneError('올바른 휴대폰번호를 입력해');
       valid = false;
     } else {
       setPhoneError(null);
     }
     if (!/^\d{4}$/.test(guestInfo.password)) {
-      setPasswordError('숫자 4자리 비밀번호를 입력해주세요');
+      setPasswordError('숫자 4자리 비밀번호를 입력해');
       valid = false;
     } else {
       setPasswordError(null);

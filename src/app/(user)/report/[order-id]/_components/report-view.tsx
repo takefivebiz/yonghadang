@@ -63,7 +63,7 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
           >
             {category}
           </span>
-          <span className="text-xs text-muted-foreground">{formattedDate} 분석</span>
+          <span className="text-xs" style={{ color: '#E0E0E0' }}>{formattedDate} 분석</span>
         </div>
       </div>
 
@@ -71,8 +71,8 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
       {freeReport && (
         <section className="mb-12 rounded-2xl border border-white/20 bg-white/10 p-8 backdrop-blur-md md:p-10">
           <div className="mb-6">
-            <span className="text-xs font-semibold text-muted-foreground">FREE INSIGHT</span>
-            <h1 className="mt-2 text-2xl font-bold leading-relaxed md:text-3xl" style={{ color: '#2D3250' }}>
+            <span className="text-xs font-semibold" style={{ color: '#B0B0FF' }}>FREE INSIGHT</span>
+            <h1 className="mt-2 text-2xl font-bold leading-relaxed md:text-3xl" style={{ color: '#F5F5F5' }}>
               {freeReport.headline}
             </h1>
           </div>
@@ -80,12 +80,12 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
           <div className="space-y-8">
             {freeReport.sections.map((section, idx) => (
               <div key={idx}>
-                <h2 className="mb-3 text-base font-semibold" style={{ color: '#2D3250' }}>
+                <h2 className="mb-3 text-base font-semibold" style={{ color: '#E0E0E0' }}>
                   {section.title}
                 </h2>
                 <div className="space-y-3">
                   {section.paragraphs.map((para, pIdx) => (
-                    <p key={pIdx} className="text-sm leading-relaxed text-muted-foreground">
+                    <p key={pIdx} className="text-sm leading-relaxed" style={{ color: '#D0D0D0' }}>
                       {para}
                     </p>
                   ))}
@@ -107,11 +107,11 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
       {paidQuestions.length > 0 && (
         <section>
           <div className="mb-8">
-            <h2 className="text-xl font-bold md:text-2xl" style={{ color: '#2D3250' }}>
+            <h2 className="text-xl font-bold md:text-2xl" style={{ color: '#F5F5F5' }}>
               더 깊이 알고 싶어?
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              궁금한 질문을 선택해서 심층 분석을 확인해보세요.
+            <p className="mt-2 text-sm" style={{ color: '#D0D0D0' }}>
+              궁금한 질문을 선택해서 심층 분석을 확인해봐.
             </p>
           </div>
 
@@ -145,15 +145,15 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
 
                     {/* 내용 */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium leading-relaxed" style={{ color: '#2D3250' }}>
+                      <p className="text-sm font-medium leading-relaxed" style={{ color: '#F5F5F5' }}>
                         {pq.question}
                       </p>
                       <div className="mt-2 flex items-center gap-2">
-                        <span className="inline-block rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-[#6495ED]">
+                        <span className="inline-block rounded-full bg-blue-500/30 px-2.5 py-0.5 text-xs font-semibold text-[#B0D0FF]">
                           {pq.isPurchased ? '✨ 보유 중' : '900원'}
                         </span>
                         {idx === paidQuestions.length - 1 && paidQuestions.length >= 3 && !isPurchased && (
-                          <span className="text-[10px] font-semibold text-orange-600">추천 3번째 질문</span>
+                          <span className="text-[10px] font-semibold text-orange-300">추천 3번째 질문</span>
                         )}
                       </div>
                     </div>
@@ -164,12 +164,12 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
                     <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm md:p-5">
                       {pq.report.map((section, sIdx) => (
                         <div key={sIdx} className={sIdx > 0 ? 'mt-4' : ''}>
-                          <h3 className="text-sm font-semibold" style={{ color: '#2D3250' }}>
+                          <h3 className="text-sm font-semibold" style={{ color: '#E0E0E0' }}>
                             {section.title}
                           </h3>
                           <div className="mt-2 space-y-2">
                             {section.paragraphs.map((para, pIdx) => (
-                              <p key={pIdx} className="text-xs leading-relaxed text-muted-foreground">
+                              <p key={pIdx} className="text-xs leading-relaxed" style={{ color: '#D0D0D0' }}>
                                 {para}
                               </p>
                             ))}
@@ -216,9 +216,9 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
 
           {/* 질문 개수별 가이드 */}
           {selectedQuestions.length === 0 && paidQuestions.length >= 2 && (
-            <div className="rounded-xl border border-white/10 bg-blue-500/20 p-4 text-center text-xs text-white backdrop-blur-sm md:p-5">
+            <div className="rounded-xl border border-white/10 bg-blue-500/20 p-4 text-center text-xs backdrop-blur-sm md:p-5" style={{ color: '#E0E0E0' }}>
               <p>
-                <strong>💡 팁:</strong> 2개 이상 선택하면 자동 할인이 적용됩니다.
+                <strong>💡 팁:</strong> 2개 이상 선택하면 자동 할인이 적용돼.
                 {paidQuestions.length >= 3 && ' 3개 선택 시 600원 절약!'}
               </p>
             </div>
