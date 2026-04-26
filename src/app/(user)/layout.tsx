@@ -8,7 +8,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
       <main
         className="flex-1"
         style={{
-          background: "linear-gradient(to bottom, #1B003F 0%, #4B0082 25%, #191970 50%, #4B0082 75%, #6B2E8F 100%)",
+          background: "linear-gradient(135deg, #1B003F 0%, #4B0082 25%, #191970 50%, #4B0082 75%, #6B2E8F 100%)",
         }}
       >
         {children}
