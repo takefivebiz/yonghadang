@@ -38,7 +38,7 @@ export const CTASection = () => {
           className="mb-6 text-4xl font-bold md:text-5xl"
           style={{ color: "#F0E6FA" }}
         >
-          사람을 읽어보자
+          사람을 읽어봐
         </h2>
 
         <p

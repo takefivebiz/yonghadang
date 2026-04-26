@@ -8,9 +8,7 @@ export const metadata: Metadata = {
 
 const GuestLookupPage = () => {
   return (
-    <div className="min-h-[calc(100vh-4rem)]" style={{ backgroundColor: '#FAF8F5' }}>
-      <GuestLookupClient />
-    </div>
+    <GuestLookupClient />
   );
 };
 
