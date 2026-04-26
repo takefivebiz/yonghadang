@@ -40,59 +40,66 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  // 토스페이먼츠 위젯 초기화 (모달이 열릴 때 한 번만, 중복 초기화 방지)
+  // 토스페이먼츠 위젯 초기화 및 금액 업데이트
   useEffect(() => {
     const initWidget = async () => {
-      // 이미 초기화 중이거나 완료되었으면 스킵
-      if (isInitializing.current || widgetRef.current) {
+      // 이미 초기화 중이면 스킵
+      if (isInitializing.current) {
         return;
       }
 
-      isInitializing.current = true;
+      const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || '';
+      const totalPrice = pendingOrder.paidQuestionIds.length * 900;
+
+      if (!widgetContainerRef.current || !clientKey) {
+        return;
+      }
+
+      // window.TossPayments는 스크립트 태그로 로드됨
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const TossPayments = (window as any).TossPayments;
+      if (!TossPayments) {
+        console.error('TossPayments SDK가 로드되지 않았습니다');
+        setWidgetReady(true);
+        return;
+      }
 
       try {
-        const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || '';
-        const totalPrice = pendingOrder.paidQuestionIds.length * 900;
+        // 처음 초기화일 때만 렌더링
+        if (!widgetRef.current) {
+          isInitializing.current = true;
 
-        if (!widgetContainerRef.current || !clientKey) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const tossPayments = TossPayments(clientKey);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const widgets = tossPayments.widgets({
+            customerKey: isLoggedIn ? `member_${Date.now()}` : `guest_${Date.now()}`,
+          });
+
+          await widgets.setAmount({
+            currency: 'KRW',
+            value: totalPrice,
+          });
+
+          await widgets.renderPaymentMethods({
+            selector: '#payment-widget-container',
+            variantKey: 'DEFAULT'
+          });
+
+          widgetRef.current = widgets;
           isInitializing.current = false;
-          return;
-        }
-
-        // window.TossPayments는 스크립트 태그로 로드됨
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const TossPayments = (window as any).TossPayments;
-        if (!TossPayments) {
-          console.error('TossPayments SDK가 로드되지 않았습니다');
           setWidgetReady(true);
-          isInitializing.current = false;
-          return;
+        } else {
+          // 이미 렌더링된 위젯이면 금액만 업데이트
+          await widgetRef.current.setAmount({
+            currency: 'KRW',
+            value: totalPrice,
+          });
         }
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tossPayments = TossPayments(clientKey);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const widgets = tossPayments.widgets({
-          customerKey: isLoggedIn ? `member_${Date.now()}` : `guest_${Date.now()}`,
-        });
-
-        await widgets.setAmount({
-          currency: 'KRW',
-          value: totalPrice,
-        });
-
-        await widgets.renderPaymentMethods({
-          selector: '#payment-widget-container',
-          variantKey: 'DEFAULT'
-        });
-
-        widgetRef.current = widgets;
-        setWidgetReady(true);
-        isInitializing.current = false;
       } catch (error) {
-        console.error('위젯 초기화 실패:', error);
-        setWidgetReady(true);
+        console.error('위젯 처리 실패:', error);
         isInitializing.current = false;
+        setWidgetReady(true);
       }
     };
 
@@ -100,14 +107,10 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
 
     // cleanup: 언마운트 시만 초기화
     return () => {
-      if (widgetContainerRef.current) {
-        widgetContainerRef.current.innerHTML = '';
-      }
+      // SDK에 등록된 위젯은 유지하고 DOM만 정리
       setWidgetReady(false);
-      widgetRef.current = null;
-      isInitializing.current = false;
     };
-  }, []);
+  }, [isLoggedIn]);
 
   const totalPrice = pendingOrder.paidQuestionIds.length * 900;
 
