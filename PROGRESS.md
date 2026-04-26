@@ -83,14 +83,50 @@
 
 ---
 
+## 완료된 작업 (2026-04-26 계속)
+
+### 4단계: 디자인 시스템 & 페이지 스타일 통일
+
+- **색상 팔레트 확정** (신비로운 보라색-파란색 그라데이션)
+  - Primary: Night Indigo (#1B003F) → Dusky Blue (#6495ED) → Mystical Purple (#A366FF)
+  - Text: Lavender Haze (#F0E6FA), Mauve (#D4C5E2), Wisteria (#BEAEDB)
+  - Gradient: `linear-gradient(to bottom, #1B003F 0%, #4B0082 25%, #191970 50%, #4B0082 75%, #6B2E8F 100%)`
+
+- **레이아웃 전체 그라데이션 적용**
+  - `src/app/(user)/layout.tsx`: 배경 그라데이션 추가 (전체 페이지 배경)
+  - Header/Footer: Night Indigo → Dusky Blue 범위의 색상으로 통일
+
+- **인증 페이지 디자인 업데이트**
+  - `auth/_components/auth-client.tsx`: 헤더 제거, 투명 카드 배경, 그라데이션 텍스트 적용
+  - 로딩 스피너, 에러 메시지, 약관 링크 색상 통일
+
+- **마이페이지 디자인 업데이트**
+  - `my-page/_components/my-page-client.tsx`: 요약 카드, 최근 리포트 카드 그라데이션 배경 적용
+  - `profile-card.tsx`: 프로필 카드 배경, 아바타 그라데이션, 버튼 스타일 업데이트
+  - `order-history-list.tsx`: 카드 배경, 상태 배지 색상 변경
+
+- **결제 플로우 디자인 업데이트**
+  - `payments/_components/payment-client.tsx`: 로딩 스피너, 결제 위젯 영역, 결제 버튼 그라데이션
+  - `order-summary.tsx`: 주문 요약 카드 그라데이션 배경 적용
+  - `guest-info-form.tsx`: 폼 입력 필드, 라벨, 에러 메시지 스타일 신비로운 색상으로 변경
+  - `success/_components/payment-success-client.tsx`: 로딩, 제목, 버튼 그라데이션 업데이트
+  - `fail/page.tsx`: 배경 장식, 아이콘, 모든 텍스트 및 버튼을 새로운 팔레트로 변경
+
+- **리포트 페이지 디자인 업데이트**
+  - `report/[order-id]/_components/report-view.tsx`: 카테고리 배지, 제목, 섹션, 버튼 색상 통일
+  - 결핍 문장 카드, 유료 질문 선택, 구매 CTA 모두 그라데이션 테마 적용
+
+---
+
 ## 다음 작업 예정
 
-### 4단계: 프론트엔드 구현 (새로운 구조 기반)
-- 메인 랜딩 페이지 UI 구현 ([나]/[상대]/[관계] 선택 UX)
-- 분석 플로우 UI 업데이트 (분석 타입별 카테고리 질문)
-- 리포트 UI 업데이트 (분석 타입별 톤 반영)
+### 5단계: 나머지 페이지 디자인 업데이트
+- 문의하기 페이지 (FAQ, 폼) 스타일 업데이트
+- 이용약관, 개인정보처리방침 페이지 스타일 업데이트
+- 비회원 주문 조회 페이지 스타일 업데이트
 
-### 5단계: 백엔드 연동
+### 6단계: 백엔드 연동
 - Supabase 스키마 설계 (분석 타입, 세션 데이터 포함)
 - 분석 세션 저장 로직
 - 더미 리포트 데이터 → 실제 API 호출로 교체
+- 소셜 로그인 실제 구현 (Kakao, Google OAuth)
