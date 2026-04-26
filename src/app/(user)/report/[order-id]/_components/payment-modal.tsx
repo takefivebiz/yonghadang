@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { PendingOrderInput, GuestCheckoutInfo } from '@/types/payment';
 import { generateOrderId, clearPendingOrder } from '@/lib/payment';
+import { getPriceForQuantity, getFullBundlePrice } from '@/lib/pricing';
 import { isMemberLoggedIn } from '@/lib/report-access';
 import { saveLocalOrder } from '@/lib/dummy-orders';
 import { GuestInfoForm } from '@/app/(user)/payments/_components/guest-info-form';
@@ -49,7 +50,9 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
       }
 
       const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || '';
-      const totalPrice = pendingOrder.paidQuestionIds.length * 900;
+      const totalPrice = pendingOrder.isFullBundle
+        ? getFullBundlePrice()
+        : getPriceForQuantity(pendingOrder.paidQuestionIds.length);
 
       if (!widgetContainerRef.current || !clientKey) {
         return;
@@ -108,9 +111,11 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
       // SDK에 등록된 위젯은 유지하고 DOM만 정리
       setWidgetReady(false);
     };
-  }, [isLoggedIn, pendingOrder.paidQuestionIds.length]);
+  }, [isLoggedIn, pendingOrder.paidQuestionIds.length, pendingOrder.isFullBundle]);
 
-  const totalPrice = pendingOrder.paidQuestionIds.length * 900;
+  const totalPrice = pendingOrder.isFullBundle
+    ? getFullBundlePrice()
+    : getPriceForQuantity(pendingOrder.paidQuestionIds.length);
 
   const validateGuest = (): boolean => {
     let valid = true;
@@ -137,7 +142,9 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
 
     try {
       const orderId = pendingOrder.orderId ?? generateOrderId();
-      const totalPrice = pendingOrder.paidQuestionIds.length * 900;
+      const totalPrice = pendingOrder.isFullBundle
+        ? getFullBundlePrice()
+        : getPriceForQuantity(pendingOrder.paidQuestionIds.length);
 
       // 토스페이먼츠 실제 결제 요청
       await widgetRef.current.requestPayment({

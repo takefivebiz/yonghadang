@@ -9,6 +9,8 @@ export interface PendingOrderInput {
   category: AnalysisCategory;
   /** 구매 대상 유료 질문 ID 목록 */
   paidQuestionIds: string[];
+  /** 전체 번들 선택 여부 (₩4,900) */
+  isFullBundle?: boolean;
   /** 결제 전 결정된 orderId */
   orderId?: string;
   /** 비회원 체크아웃 식별 정보 */

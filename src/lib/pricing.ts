@@ -3,9 +3,11 @@
  * - 1개: 900원
  * - 2개: 1,600원 (200원 절약)
  * - 3개: 2,100원 (600원 절약)
+ * - 전체 번들 (8개): 4,900원
  */
 
 export const PRICE_PER_QUESTION = 900;
+export const FULL_BUNDLE_PRICE = 4900;
 
 export const getPriceForQuantity = (quantity: number): number => {
   if (quantity <= 0) return 0;
@@ -13,6 +15,10 @@ export const getPriceForQuantity = (quantity: number): number => {
   if (quantity === 2) return 1600;
   if (quantity >= 3) return 2100;
   return PRICE_PER_QUESTION * quantity;
+};
+
+export const getFullBundlePrice = (): number => {
+  return FULL_BUNDLE_PRICE;
 };
 
 export const getSavingsAmount = (quantity: number): number => {

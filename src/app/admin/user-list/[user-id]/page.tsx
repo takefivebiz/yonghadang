@@ -38,8 +38,8 @@ const StatusBadge = ({ status }: { status: OrderStatus }) => {
 const InfoRow = ({ label, value }: { label: string; value?: string }) =>
   value ? (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-      <span className="w-28 flex-shrink-0 text-sm font-medium text-foreground/50">{label}</span>
-      <span className="text-sm text-foreground">{value}</span>
+      <span className="w-28 flex-shrink-0 text-sm font-medium" style={{ color: '#B8A8D8' }}>{label}</span>
+      <span className="text-sm" style={{ color: '#F0E6FA' }}>{value}</span>
     </div>
   ) : null;
 
@@ -62,17 +62,18 @@ const formatDate = (iso: string) => {
 const OrderRow = ({ order }: { order: AdminOrderSummary }) => (
   <Link
     href={`/admin/order-list/${order.id}`}
-    className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b border-border/50 px-5 py-4 text-sm transition-colors hover:bg-secondary/30 last:border-b-0"
+    className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b px-5 py-4 text-sm transition-colors last:border-b-0 hover:bg-blue-500/10"
+    style={{ borderColor: 'rgba(230, 230, 250, 0.1)' }}
   >
     <div className="min-w-0">
-      <p className="font-medium text-foreground">{order.category} 분석</p>
-      <p className="truncate text-xs text-foreground/50">{order.id}</p>
+      <p className="font-medium" style={{ color: '#F0E6FA' }}>{order.category} 분석</p>
+      <p className="truncate text-xs" style={{ color: '#B8A8D8' }}>{order.id}</p>
     </div>
-    <span className="hidden text-xs text-foreground/60 sm:block">{formatDate(order.createdAt)}</span>
-    <span className="font-semibold">{order.amount.toLocaleString()}원</span>
+    <span className="hidden text-xs sm:block" style={{ color: '#B8A8D8' }}>{formatDate(order.createdAt)}</span>
+    <span className="font-semibold" style={{ color: '#F0E6FA' }}>{order.amount.toLocaleString()}원</span>
     <div className="flex items-center gap-1">
       <StatusBadge status={order.status} />
-      <ChevronRight size={14} className="text-foreground/30" />
+      <ChevronRight size={14} style={{ color: 'rgba(255, 255, 255, 0.2)' }} />
     </div>
   </Link>
 );
@@ -104,7 +105,8 @@ const AdminUserDetailPage = async ({ params }: PageProps) => {
       {/* 뒤로가기 */}
       <Link
         href="/admin/user-list"
-        className="flex items-center gap-1.5 text-sm text-foreground/60 hover:text-foreground"
+        className="flex items-center gap-1.5 text-sm transition-colors hover:text-purple-200"
+        style={{ color: '#B8A8D8' }}
       >
         <ArrowLeft size={16} />
         유저 관리
@@ -112,20 +114,20 @@ const AdminUserDetailPage = async ({ params }: PageProps) => {
 
       {/* 유저 헤더 */}
       <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-lg font-bold text-primary">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold" style={{ background: 'linear-gradient(90deg, #6495ED 0%, #A366FF 100%)', color: '#FFFFFF' }}>
           {user.nickname.slice(0, 1)}
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{user.nickname}</h1>
-          <span className={`mt-0.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${user.userType === "member" ? "bg-lavender text-primary" : "bg-peach text-foreground/70"}`}>
+          <h1 className="text-2xl font-bold" style={{ color: '#F0E6FA' }}>{user.nickname}</h1>
+          <span className={`mt-0.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${user.userType === "member" ? "bg-purple-500/20 text-purple-300" : "bg-orange-500/20 text-orange-300"}`}>
             {user.userType === "member" ? "회원" : "비회원"}
           </span>
         </div>
       </div>
 
       {/* 기본 정보 */}
-      <div className="flex flex-col gap-4 rounded-2xl bg-card p-6 shadow-sm">
-        <h2 className="text-base font-semibold text-foreground">기본 정보</h2>
+      <div className="flex flex-col gap-4 rounded-2xl p-6 shadow-sm" style={{ background: 'linear-gradient(135deg, rgba(100, 149, 237, 0.1), rgba(75, 0, 130, 0.08))', border: '1px solid rgba(230, 230, 250, 0.15)' }}>
+        <h2 className="text-base font-semibold" style={{ color: '#F0E6FA' }}>기본 정보</h2>
         <div className="flex flex-col gap-3">
           <InfoRow label="이메일" value={user.email} />
           <InfoRow label="연락처" value={user.phone} />
@@ -137,19 +139,19 @@ const AdminUserDetailPage = async ({ params }: PageProps) => {
       </div>
 
       {/* 주문 내역 */}
-      <div className="rounded-2xl bg-card shadow-sm overflow-hidden">
-        <div className="border-b border-border px-5 py-4">
-          <h2 className="text-base font-semibold text-foreground">
+      <div className="rounded-2xl shadow-sm overflow-hidden" style={{ background: 'linear-gradient(135deg, rgba(100, 149, 237, 0.1), rgba(75, 0, 130, 0.08))', border: '1px solid rgba(230, 230, 250, 0.15)' }}>
+        <div className="border-b px-5 py-4" style={{ borderColor: 'rgba(230, 230, 250, 0.15)' }}>
+          <h2 className="text-base font-semibold" style={{ color: '#F0E6FA' }}>
             전체 주문 내역
-            <span className="ml-2 text-sm font-normal text-foreground/50">{orders.length}건</span>
+            <span className="ml-2 text-sm font-normal" style={{ color: '#B8A8D8' }}>{orders.length}건</span>
           </h2>
         </div>
 
         {orders.length === 0 ? (
-          <p className="py-12 text-center text-sm text-foreground/50">주문 내역이 없습니다.</p>
+          <p className="py-12 text-center text-sm" style={{ color: '#B8A8D8' }}>주문 내역이 없습니다.</p>
         ) : (
           <>
-            <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 border-b border-border bg-background/50 px-5 py-3 text-xs font-semibold text-foreground/50 uppercase tracking-wide">
+            <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 border-b px-5 py-3 text-xs font-semibold uppercase tracking-wide" style={{ borderColor: 'rgba(230, 230, 250, 0.15)', color: '#B8A8D8', background: 'rgba(100, 149, 237, 0.08)' }}>
               <span>콘텐츠</span>
               <span className="hidden sm:block">주문 일시</span>
               <span>금액</span>

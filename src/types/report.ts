@@ -18,9 +18,13 @@ export interface FreeReport {
 export interface PaidQuestion {
   id: string;
   question: string;
+  /** 이 질문을 왜 봐야 하는지에 대한 짧은 설명 — PRD 6-3.5 */
+  description: string;
   /** 결제 금액 (KRW) */
   price: number;
   isPurchased: boolean;
+  /** 노출 순서 1~8 (1~3 추천, 4~8 아코디언) — PRD 6-3.3 */
+  displayOrder: number;
   /** 구매 후 열람 가능한 확장 리포트 */
   report?: ReportSection[];
 }

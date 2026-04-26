@@ -17,10 +17,10 @@ export const SidebarNav = () => {
     exact ? pathname === href : pathname.startsWith(href);
 
   return (
-    <aside className="flex h-full w-56 flex-shrink-0 flex-col border-r border-border bg-card">
+    <aside className="flex h-full w-56 flex-shrink-0 flex-col" style={{ borderRight: '1px solid rgba(230, 230, 250, 0.15)', background: 'rgba(27, 0, 63, 0.6)', backdropFilter: 'blur(8px)' }}>
       {/* 로고 */}
-      <div className="flex h-16 items-center px-6 border-b border-border">
-        <Link href="/admin" className="font-display text-xl font-bold tracking-widest text-primary">
+      <div className="flex h-16 items-center px-6" style={{ borderBottom: '1px solid rgba(230, 230, 250, 0.15)' }}>
+        <Link href="/admin" className="font-display text-xl font-bold tracking-widest" style={{ color: '#F0E6FA' }}>
           코어로그 관리
         </Link>
       </div>
@@ -33,9 +33,26 @@ export const SidebarNav = () => {
             href={href}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
               isActive(href, exact)
-                ? "bg-primary text-primary-foreground"
-                : "text-foreground/70 hover:bg-secondary hover:text-foreground"
+                ? "text-white"
+                : ""
             }`}
+            style={
+              isActive(href, exact)
+                ? { background: 'linear-gradient(90deg, #6495ED 0%, #A366FF 100%)' }
+                : { color: '#B8A8D8' }
+            }
+            onMouseEnter={(e) => {
+              if (!isActive(href, exact)) {
+                e.currentTarget.style.background = 'rgba(100, 149, 237, 0.15)';
+                e.currentTarget.style.color = '#D4C5E2';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive(href, exact)) {
+                e.currentTarget.style.background = '';
+                e.currentTarget.style.color = '#B8A8D8';
+              }
+            }}
           >
             <Icon size={18} />
             {label}

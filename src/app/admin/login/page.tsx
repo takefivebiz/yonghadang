@@ -27,8 +27,8 @@ const AdminLoginPage = () => {
     // TODO: [백엔드 연동] POST /api/admin/auth/login 실제 호출로 교체
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // 더미 인증: admin@yonghadang.com / admin1234
-    if (email === "admin@yonghadang.com" && password === "admin1234") {
+    // 더미 인증: admin@corelog.com / admin1234
+    if (email === "admin@corelog.com" && password === "admin1234") {
       router.push("/admin");
     } else {
       setError("이메일 또는 비밀번호가 올바르지 않습니다.");
@@ -38,49 +38,82 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm">
+    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden" style={{ background: 'linear-gradient(135deg, #0F0420 0%, #1A0B3F 100%)' }}>
+      {/* 배경 장식 - blur 요소 */}
+      <div
+        className="pointer-events-none absolute top-1/4 left-0 h-96 w-96 rounded-full blur-3xl"
+        style={{ backgroundColor: "#6495ED", opacity: 0.1 }}
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute bottom-1/3 right-1/4 h-80 w-80 rounded-full blur-3xl"
+        style={{ backgroundColor: "#A366FF", opacity: 0.12 }}
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10 w-full max-w-sm">
         {/* 헤더 */}
-        <div className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold tracking-widest text-primary">
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl font-bold tracking-widest" style={{ color: '#F0E6FA' }}>
             코어로그
           </h1>
-          <p className="mt-2 text-sm text-foreground/60">관리자 전용 로그인</p>
+          <p className="mt-3 text-sm" style={{ color: '#B8A8D8' }}>관리자 전용 로그인</p>
         </div>
 
         {/* 폼 카드 */}
-        <div className="rounded-2xl bg-card p-8 shadow-sm">
+        <div
+          className="rounded-2xl p-8 backdrop-blur-md border"
+          style={{
+            background: 'linear-gradient(135deg, rgba(100, 149, 237, 0.1), rgba(75, 0, 130, 0.08))',
+            borderColor: 'rgba(230, 230, 250, 0.15)',
+          }}
+        >
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {/* 이메일 */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-foreground/80">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium" style={{ color: '#D4C5E2' }}>
                 이메일
               </label>
               <div className="relative">
                 <Mail
                   size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40"
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: 'rgba(255, 255, 255, 0.3)' }}
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@yonghadang.com"
+                  placeholder="admin@corelog.com"
                   required
-                  className="w-full rounded-lg border border-border bg-background py-2.5 pl-9 pr-4 text-sm outline-none transition-colors focus:border-primary"
+                  className="w-full rounded-lg border py-3 pl-10 pr-4 text-sm outline-none transition-all"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderColor: 'rgba(230, 230, 250, 0.2)',
+                    color: '#F5F5F5',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#6495ED';
+                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(100, 149, 237, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(230, 230, 250, 0.2)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
             </div>
 
             {/* 비밀번호 */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-foreground/80">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium" style={{ color: '#D4C5E2' }}>
                 비밀번호
               </label>
               <div className="relative">
                 <Lock
                   size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40"
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: 'rgba(255, 255, 255, 0.3)' }}
                 />
                 <input
                   type={showPassword ? "text" : "password"}
@@ -88,12 +121,26 @@ const AdminLoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="비밀번호 입력"
                   required
-                  className="w-full rounded-lg border border-border bg-background py-2.5 pl-9 pr-10 text-sm outline-none transition-colors focus:border-primary"
+                  className="w-full rounded-lg border py-3 pl-10 pr-12 text-sm outline-none transition-all"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderColor: 'rgba(230, 230, 250, 0.2)',
+                    color: '#F5F5F5',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#6495ED';
+                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(100, 149, 237, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(230, 230, 250, 0.2)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground/70"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors hover:opacity-70"
+                  style={{ color: 'rgba(255, 255, 255, 0.4)' }}
                   aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -103,7 +150,7 @@ const AdminLoginPage = () => {
 
             {/* 에러 메시지 */}
             {error && (
-              <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">
+              <p className="rounded-lg px-4 py-3 text-sm" style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#FCA5A5' }}>
                 {error}
               </p>
             )}
@@ -112,15 +159,16 @@ const AdminLoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-1 rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="mt-2 rounded-lg py-3 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+              style={{ background: 'linear-gradient(90deg, #6495ED 0%, #A366FF 100%)' }}
             >
               {isLoading ? "로그인 중..." : "로그인"}
             </button>
           </form>
 
           {/* 더미 힌트 (개발 전용) */}
-          <p className="mt-5 text-center text-xs text-foreground/40">
-            데모: admin@yonghadang.com / admin1234
+          <p className="mt-6 text-center text-xs" style={{ color: 'rgba(212, 197, 226, 0.6)' }}>
+            데모: admin@corelog.com / admin1234
           </p>
         </div>
       </div>
