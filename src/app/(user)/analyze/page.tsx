@@ -12,7 +12,7 @@ const AnalyzePage = () => {
   return (
     <div
       className="min-h-[calc(100vh-4rem)]"
-      style={{ backgroundColor: "#F5F2ED" }}
+      style={{ backgroundColor: "#FFFFFF" }}
     >
       {/* useSearchParams 사용으로 Suspense 필요 */}
       <Suspense
