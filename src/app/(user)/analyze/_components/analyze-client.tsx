@@ -4,25 +4,23 @@ import { useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AnalysisCategory, AnalysisSubcategory, QuestionAnswer } from '@/types/analysis';
 import { calculateTraits, inferUserType } from '@/lib/trait-inference';
+import { COLORS, getAnalysisTypeColor, getCategoryColor } from '@/lib/colors';
 
 type AnalysisType = 'self' | 'other' | 'relationship';
 
 /** 분석 타입별 정보 */
-const ANALYSIS_TYPE_INFO: Record<AnalysisType, { title: string; question: string; color: string }> = {
+const ANALYSIS_TYPE_INFO: Record<AnalysisType, { title: string; question: string }> = {
   self: {
     title: '나를 읽는 중',
     question: '어떤 부분이 궁금해?',
-    color: '#7B6A9B',
   },
   other: {
     title: '상대를 읽는 중',
     question: '상대의 어떤 부분이 궁금해?',
-    color: '#F7A278',
   },
   relationship: {
     title: '우리 관계를 읽는 중',
     question: '우리 사이의 어떤 부분이 궁금해?',
-    color: '#C4B5D4',
   },
 };
 
@@ -31,11 +29,11 @@ const CATEGORIES = ['연애', '감정', '인간관계', '직업/진로'] as cons
 type Category = typeof CATEGORIES[number];
 
 /** 카테고리별 정보 */
-const CATEGORY_INFO: Record<Category, { icon: string; description: string; color: string }> = {
-  연애: { icon: '💕', description: '썸, 연애 중, 이별, 재회', color: '#F7A278' },
-  감정: { icon: '🎭', description: '불안, 답답함, 공허함', color: '#C97B84' },
-  인간관계: { icon: '👥', description: '친구, 가족, 직장', color: '#C4B5D4' },
-  '직업/진로': { icon: '🎯', description: '이직, 방향성, 확신 부족', color: '#7B6A9B' },
+const CATEGORY_INFO: Record<Category, { icon: string; description: string }> = {
+  연애: { icon: '💕', description: '썸, 연애 중, 이별, 재회' },
+  감정: { icon: '🎭', description: '불안, 답답함, 공허함' },
+  인간관계: { icon: '👥', description: '친구, 가족, 직장' },
+  '직업/진로': { icon: '🎯', description: '이직, 방향성, 확신 부족' },
 };
 
 /** PRD 5.5: 하위 분기 선택지 정의 */
@@ -240,10 +238,34 @@ export const AnalyzeClient = () => {
   const typeInfo = ANALYSIS_TYPE_INFO[queryType];
 
   if (step === 'submitting') {
+    const typeColor = getAnalysisTypeColor(queryType);
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
-        <p className="text-base text-foreground/70">{typeInfo.title}...</p>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
+        <div className="relative h-12 w-12">
+          <div
+            className="absolute inset-0 rounded-full border-3 border-transparent"
+            style={{
+              borderTopColor: typeColor,
+              animation: 'spin 1.5s linear infinite',
+            }}
+          />
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+        <div>
+          <p
+            className="mb-2 text-lg font-semibold"
+            style={{ color: COLORS.text.primary }}
+          >
+            {typeInfo.title}...
+          </p>
+          <p className="text-sm" style={{ color: COLORS.text.muted }}>
+            당신의 상황을 분석하고 있습니다
+          </p>
+        </div>
       </div>
     );
   }
@@ -253,14 +275,19 @@ export const AnalyzeClient = () => {
       {/* 분석 타입 & 진행 상태 */}
       {step !== 'category' && (
         <div className="mb-8">
-          <div className="mb-2 flex items-center justify-between text-xs text-foreground/50">
-            <span>{typeInfo.title}</span>
-            <span>{progressStep}/{totalSteps}</span>
+          <div className="mb-3 flex items-center justify-between text-xs">
+            <span style={{ color: COLORS.text.muted }}>{typeInfo.title}</span>
+            <span style={{ color: COLORS.text.muted }}>
+              {progressStep}/{totalSteps}
+            </span>
           </div>
-          <div className="h-1 w-full overflow-hidden rounded-full bg-border">
+          <div
+            className="h-1.5 w-full overflow-hidden rounded-full transition-colors"
+            style={{ backgroundColor: COLORS.ui.borderLight }}
+          >
             <div
-              className="h-full rounded-full bg-foreground/30 transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
+              className="h-full rounded-full transition-all duration-300"
+              style={{ width: `${progressPercent}%`, backgroundColor: getAnalysisTypeColor(queryType) }}
             />
           </div>
         </div>
@@ -270,7 +297,10 @@ export const AnalyzeClient = () => {
       {step === 'category' && (
         <div className="rounded-2xl p-8 md:p-10">
           <div className="mb-10 text-center">
-            <h2 className="mb-2 text-3xl font-bold md:text-4xl" style={{ color: '#2D3250' }}>
+            <h2
+              className="mb-2 text-3xl font-bold md:text-4xl"
+              style={{ color: COLORS.text.primary }}
+            >
               {typeInfo.question}
             </h2>
           </div>
@@ -278,27 +308,33 @@ export const AnalyzeClient = () => {
           <div className="grid gap-4 md:grid-cols-2">
             {CATEGORIES.map((cat) => {
               const info = CATEGORY_INFO[cat];
+              const categoryColor = getCategoryColor(cat);
               return (
                 <button
                   key={cat}
                   onClick={() => handleCategorySelect(cat)}
-                  className="group relative overflow-hidden rounded-2xl border-2 p-6 text-left transition-all hover:shadow-lg active:scale-[0.98]"
+                  className="group relative overflow-hidden rounded-2xl border-2 p-6 text-left transition-all hover:shadow-md active:scale-[0.98]"
                   style={{
-                    borderColor: info.color,
-                    backgroundColor: 'white',
+                    borderColor: categoryColor,
+                    backgroundColor: COLORS.background.card,
                   }}
                 >
                   <div
-                    className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-5"
-                    style={{ backgroundColor: info.color }}
+                    className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-10"
+                    style={{ backgroundColor: categoryColor }}
                   />
 
                   <div className="relative z-10">
                     <div className="mb-3 text-3xl">{info.icon}</div>
-                    <h3 className="mb-2 text-lg font-semibold" style={{ color: '#2D3250' }}>
+                    <h3
+                      className="mb-2 text-lg font-semibold"
+                      style={{ color: COLORS.text.primary }}
+                    >
                       {cat}
                     </h3>
-                    <p className="text-xs text-foreground/60">{info.description}</p>
+                    <p className="text-xs" style={{ color: COLORS.text.muted }}>
+                      {info.description}
+                    </p>
                   </div>
                 </button>
               );
@@ -310,19 +346,38 @@ export const AnalyzeClient = () => {
       {/* 하위 분기 선택 */}
       {step === 'subcategory' && hasSubcategory && (
         <div>
-          <h2 className="mb-6 text-xl font-semibold leading-snug" style={{ color: '#2D3250' }}>
+          <h2
+            className="mb-6 text-xl font-semibold leading-snug"
+            style={{ color: COLORS.text.primary }}
+          >
             더 자세히?
           </h2>
           <div className="flex flex-col gap-3">
-            {SUBCATEGORIES[category!].map((sub) => (
-              <button
-                key={sub}
-                onClick={() => handleSubcategorySelect(sub)}
-                className="flex min-h-[52px] w-full items-center rounded-xl border border-border/50 bg-background px-5 py-3 text-left text-sm font-medium transition-all hover:border-[#C4B5D4] hover:bg-[#FAF8F5]"
-              >
-                {sub}
-              </button>
-            ))}
+            {SUBCATEGORIES[category!].map((sub) => {
+              const categoryColor = getCategoryColor(category!);
+              return (
+                <button
+                  key={sub}
+                  onClick={() => handleSubcategorySelect(sub)}
+                  className="flex min-h-[52px] w-full items-center rounded-xl border px-5 py-3 text-left text-sm font-medium transition-all active:scale-[0.98]"
+                  style={{
+                    borderColor: COLORS.ui.border,
+                    backgroundColor: COLORS.background.card,
+                    color: COLORS.text.primary,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = categoryColor;
+                    e.currentTarget.style.backgroundColor = COLORS.background.hover;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = COLORS.ui.border;
+                    e.currentTarget.style.backgroundColor = COLORS.background.card;
+                  }}
+                >
+                  {sub}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -330,24 +385,43 @@ export const AnalyzeClient = () => {
       {/* 질문 */}
       {step === 'questions' && question && (
         <div>
-          <h2 className="mb-6 text-xl font-semibold leading-snug" style={{ color: '#2D3250' }}>
+          <h2
+            className="mb-6 text-xl font-semibold leading-snug"
+            style={{ color: COLORS.text.primary }}
+          >
             {question.text}
           </h2>
           {question.type === 'multiple' && (
-            <p className="mb-4 text-xs text-foreground/50">여러 개 선택 가능</p>
+            <p className="mb-4 text-xs" style={{ color: COLORS.text.muted }}>
+              여러 개 선택 가능
+            </p>
           )}
           <div className="flex flex-col gap-3">
             {question.options.map((option) => {
               const isSelected = currentAnswer?.selectedOptionIds.includes(option.id);
+              const focusColor = getCategoryColor(category!) || getAnalysisTypeColor(queryType);
               return (
                 <button
                   key={option.id}
                   onClick={() => handleOptionToggle(option.id)}
-                  className={`flex min-h-[52px] w-full items-center rounded-xl border px-5 py-3 text-left text-sm font-medium transition-all ${
-                    isSelected
-                      ? 'border-[#C4B5D4] bg-[#F5F0FA] text-[#2D3250]'
-                      : 'border-border/50 bg-background text-foreground hover:border-[#C4B5D4] hover:bg-[#FAF8F5]'
-                  }`}
+                  className="flex min-h-[52px] w-full items-center rounded-xl border px-5 py-3 text-left text-sm font-medium transition-all active:scale-[0.98]"
+                  style={{
+                    borderColor: isSelected ? focusColor : COLORS.ui.border,
+                    backgroundColor: isSelected ? COLORS.background.selected : COLORS.background.card,
+                    color: COLORS.text.primary,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.borderColor = focusColor;
+                      e.currentTarget.style.backgroundColor = COLORS.background.hover;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.borderColor = COLORS.ui.border;
+                      e.currentTarget.style.backgroundColor = COLORS.background.card;
+                    }
+                  }}
                 >
                   {option.text}
                 </button>
@@ -358,15 +432,28 @@ export const AnalyzeClient = () => {
           <div className="mt-8 flex gap-3">
             <button
               onClick={handleBack}
-              className="flex-1 rounded-xl border border-border/50 py-3 text-sm text-foreground/60 transition-all hover:border-foreground/30"
+              className="flex-1 rounded-xl border py-3 text-sm font-medium transition-all active:scale-[0.98]"
+              style={{
+                borderColor: COLORS.ui.border,
+                color: COLORS.text.secondary,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.background.hover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               이전
             </button>
             <button
               onClick={handleNext}
               disabled={!hasAnswer}
-              className="flex-[2] rounded-xl py-3 text-sm font-medium text-white transition-all disabled:opacity-40"
-              style={{ backgroundColor: hasAnswer ? '#2D3250' : undefined }}
+              className="flex-[2] rounded-xl py-3 text-sm font-medium text-white transition-all"
+              style={{
+                backgroundColor: hasAnswer ? getAnalysisTypeColor(queryType) : COLORS.ui.disabled,
+                cursor: hasAnswer ? 'pointer' : 'not-allowed',
+              }}
             >
               {currentQuestion < questions.length - 1 ? '다음' : '분석 완료'}
             </button>
