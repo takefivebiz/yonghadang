@@ -58,10 +58,6 @@ const formatDate = (iso: string) => {
   return `${date} ${time}`;
 };
 
-const CATEGORY_LABEL: Record<string, string> = {
-  mbti: "MBTI", saju: "사주", tarot: "타로", astrology: "점성술",
-};
-
 /** 주문 내역 행 */
 const OrderRow = ({ order }: { order: AdminOrderSummary }) => (
   <Link

@@ -5,9 +5,9 @@ import { HeaderAuthNav } from "./header-auth-nav";
 export const Header = () => {
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b backdrop-blur-md"
+      className="sticky top-0 z-50 w-full border-b backdrop-blur-sm"
       style={{
-        backgroundColor: "rgba(27, 0, 63, 0.95)",
+        backgroundColor: "rgba(27, 0, 63, 0.5)",
         borderBottomColor: "rgba(230, 230, 250, 0.1)",
       }}
     >

@@ -23,7 +23,6 @@ const formatPhone = (raw: string): string => {
  */
 export const GuestAuthForm = ({ orderId, onSuccess }: GuestAuthFormProps) => {
   const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,7 +50,7 @@ export const GuestAuthForm = ({ orderId, onSuccess }: GuestAuthFormProps) => {
         본인 확인
       </h1>
       <p className="mb-8 text-sm text-foreground/60">
-        결제 시 입력한 전화번호와 비밀번호로 확인해주세요.
+        결제 시 입력한 전화번호로 확인해주세요.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -66,24 +65,7 @@ export const GuestAuthForm = ({ orderId, onSuccess }: GuestAuthFormProps) => {
             placeholder="010-0000-0000"
             className="w-full rounded-xl border border-border/50 bg-background px-4 py-3 text-sm outline-none focus:border-[#C4B5D4]"
             required
-          />
-        </div>
-
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground/80">
-            비밀번호
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => {
-              if (/^\d{0,4}$/.test(e.target.value)) setPassword(e.target.value);
-            }}
-            placeholder="숫자 4자리"
-            maxLength={4}
-            inputMode="numeric"
-            className="w-full rounded-xl border border-border/50 bg-background px-4 py-3 text-sm outline-none focus:border-[#C4B5D4]"
-            required
+            autoFocus
           />
         </div>
 

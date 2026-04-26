@@ -12,13 +12,6 @@ type ReportsState =
   | { phase: 'loading' }
   | { phase: 'ready'; reports: FullReport[] };
 
-const CATEGORY_COLOR: Record<string, string> = {
-  연애: '#F7A278',
-  감정: '#C97B84',
-  인간관계: '#C4B5D4',
-  '직업/진로': '#7B6A9B',
-};
-
 export default function ReportsPage() {
   const [state, setState] = useState<ReportsState>({ phase: 'loading' });
 

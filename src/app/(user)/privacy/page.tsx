@@ -21,18 +21,6 @@ const PrivacyPage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden pb-20">
-      <style>{`
-        @keyframes authFadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
       {/* ── 배경 — 파스텔 라벤더 그라디언트 ── */}
       <div
         aria-hidden="true"
@@ -55,14 +43,11 @@ const PrivacyPage = () => {
 
       <div
         className="relative z-10 mx-auto max-w-2xl px-4 py-12"
-        style={{
-          animation: "authFadeIn 0.6s ease-out forwards",
-          opacity: 0,
-        }}
+        style={{ animation: "authFadeIn 0.6s ease-out" }}
       >
         {/* 헤더 */}
         <header className="mb-12 text-center">
-          <h1 className="font-display text-3xl font-bold text-[#4A3B5C] mb-3">
+          <h1 className="font-display text-3xl font-bold text-[#4A3B5C] mb-2">
             개인정보처리방침
           </h1>
           <p className="text-sm text-[#4A3B5C]/60">
@@ -222,7 +207,6 @@ const PrivacyPage = () => {
           </Link>
         </div>
       </div>
-
     </div>
   );
 };

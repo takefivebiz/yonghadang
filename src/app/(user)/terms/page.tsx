@@ -21,18 +21,6 @@ const TermsPage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden pb-20">
-      <style>{`
-        @keyframes authFadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
       {/* ── 배경 — 파스텔 라벤더 그라디언트 ── */}
       <div
         aria-hidden="true"
@@ -55,14 +43,11 @@ const TermsPage = () => {
 
       <div
         className="relative z-10 mx-auto max-w-2xl px-4 py-12"
-        style={{
-          animation: "authFadeIn 0.6s ease-out forwards",
-          opacity: 0,
-        }}
+        style={{ animation: "authFadeIn 0.6s ease-out" }}
       >
         {/* 헤더 */}
         <header className="mb-12 text-center">
-          <h1 className="font-display text-3xl font-bold text-[#4A3B5C] mb-3">
+          <h1 className="font-display text-3xl font-bold text-[#4A3B5C] mb-2">
             이용약관
           </h1>
           <p className="text-sm text-[#4A3B5C]/60">
@@ -77,7 +62,7 @@ const TermsPage = () => {
             <h2 className="font-display text-lg font-bold text-[#4A3B5C] mb-3">
               제1조 목적
             </h2>
-            <p className="text-sm leading-relaxed text-[#4A4B5C]/80">
+            <p className="text-sm leading-relaxed text-[#4A3B5C]/80">
               이 약관은 코어로그(이하 &quot;회사&quot;)이 제공하는 AI 기반 개인
               분석 및 해석 서비스(이하 &quot;서비스&quot;)의 이용 조건 및 절차,
               이용자의 권리와 의무, 회사의 책임 제한 등에 관한 사항을

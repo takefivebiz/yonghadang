@@ -54,7 +54,7 @@ export const TestimonialsSection = () => {
 
               {/* 인용 */}
               <p className="mb-4 text-xs leading-relaxed md:mb-6 md:text-base text-foreground/80">
-                "{testimonial.quote}"
+                &quot;{testimonial.quote}&quot;
               </p>
 
               {/* 저자 */}

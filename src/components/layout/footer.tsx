@@ -5,7 +5,7 @@ export const Footer = () => {
     <footer
       className="mt-auto border-t"
       style={{
-        backgroundColor: "rgba(107, 46, 143, 0.95)",
+        backgroundColor: "rgba(27, 0, 63, 0.5)",
         borderTopColor: "rgba(230, 230, 250, 0.1)",
       }}
     >

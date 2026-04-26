@@ -17,7 +17,7 @@ export const HeroSection = () => {
 
   return (
     <section className="relative overflow-hidden px-4 py-12 md:py-24">
-      {/* 배경 장식만 - 배경색 제거 */}
+      {/* 배경 장식 - blur 요소 */}
       <div
         className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full blur-3xl"
         style={{ backgroundColor: "#6495ED", opacity: 0.15 }}
@@ -33,6 +33,106 @@ export const HeroSection = () => {
         style={{ backgroundColor: "#A366FF", opacity: 0.1 }}
         aria-hidden="true"
       />
+
+      {/* 네온 라인 장식 - 좌측 */}
+      <div
+        className="pointer-events-none absolute left-0 top-1/4 h-px w-32 opacity-60"
+        style={{
+          background: "linear-gradient(90deg, transparent, #6495ED, transparent)",
+          boxShadow: "0 0 20px #6495ED, 0 0 40px rgba(100, 149, 237, 0.5)",
+          animation: "neonPulse 3s ease-in-out infinite",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* 네온 라인 장식 - 우측 */}
+      <div
+        className="pointer-events-none absolute right-0 top-2/3 h-px w-40 opacity-50"
+        style={{
+          background: "linear-gradient(90deg, transparent, #A366FF, transparent)",
+          boxShadow: "0 0 20px #A366FF, 0 0 40px rgba(163, 102, 255, 0.4)",
+          animation: "neonPulse 4s ease-in-out infinite 0.5s",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* 네온 도트 - 좌상단 */}
+      <div
+        className="pointer-events-none absolute left-1/4 top-1/3 h-1.5 w-1.5 rounded-full opacity-70"
+        style={{
+          backgroundColor: "#6495ED",
+          boxShadow: "0 0 15px #6495ED, 0 0 30px rgba(100, 149, 237, 0.6)",
+          animation: "neonGlow 2.5s ease-in-out infinite",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* 네온 도트 - 우하단 */}
+      <div
+        className="pointer-events-none absolute right-1/3 bottom-1/4 h-1 w-1 rounded-full opacity-60"
+        style={{
+          backgroundColor: "#A366FF",
+          boxShadow: "0 0 12px #A366FF, 0 0 25px rgba(163, 102, 255, 0.5)",
+          animation: "neonGlow 3s ease-in-out infinite 0.8s",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* 네온 대각선 - 상단 */}
+      <svg
+        className="pointer-events-none absolute top-1/4 right-1/3 opacity-50"
+        width="200"
+        height="100"
+        viewBox="0 0 200 100"
+        aria-hidden="true"
+      >
+        <line
+          x1="0"
+          y1="0"
+          x2="200"
+          y2="100"
+          stroke="#6495ED"
+          strokeWidth="1"
+          style={{
+            filter: "drop-shadow(0 0 8px #6495ED)",
+            animation: "neonDraw 4s ease-in-out infinite",
+          }}
+        />
+      </svg>
+
+      <style jsx>{`
+        @keyframes neonPulse {
+          0%, 100% {
+            opacity: 0.4;
+            filter: drop-shadow(0 0 10px currentColor);
+          }
+          50% {
+            opacity: 0.8;
+            filter: drop-shadow(0 0 20px currentColor);
+          }
+        }
+
+        @keyframes neonGlow {
+          0%, 100% {
+            opacity: 0.5;
+            box-shadow: 0 0 10px currentColor, 0 0 20px rgba(100, 149, 237, 0.4);
+          }
+          50% {
+            opacity: 0.9;
+            box-shadow: 0 0 20px currentColor, 0 0 40px rgba(100, 149, 237, 0.7);
+          }
+        }
+
+        @keyframes neonDraw {
+          0%, 100% {
+            stroke-dashoffset: 0;
+            opacity: 0.3;
+          }
+          50% {
+            opacity: 0.7;
+          }
+        }
+      `}</style>
 
       {/* 콘텐츠 */}
       <div className="relative z-10 mx-auto max-w-4xl">

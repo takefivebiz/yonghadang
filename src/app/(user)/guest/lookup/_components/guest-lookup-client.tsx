@@ -50,7 +50,7 @@ export const GuestLookupClient = () => {
         setError('일치하는 기록을 찾을 수 없어요.');
       }
     },
-    [phoneNumber, password, failCount, isLocked, router],
+    [phoneNumber, failCount, isLocked, router],
   );
 
   return (

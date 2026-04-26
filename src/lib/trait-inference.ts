@@ -81,7 +81,7 @@ export const inferUserType = (traits: TraitScores): InferredUserType => {
   );
 
   // 질문 추천 전략 결정
-  const questionStrategy = getQuestionStrategy(axisDirections, sortedTraits);
+  const questionStrategy = getQuestionStrategy(axisDirections);
 
   return {
     topTraits: sortedTraits,
@@ -122,7 +122,6 @@ const getReportTone = (
 /** 질문 추천 전략 결정 — PRD 3.7.4 */
 const getQuestionStrategy = (
   axisDirections: Record<TraitAxis, 'left' | 'neutral' | 'right'>,
-  topTraits: Array<{ trait: keyof TraitScores; score: number }>,
 ): '구조중심' | '감정중심' | '미래흐름' | '자기합리화깨기' => {
   const isAnxious = axisDirections['불안형/안정형'] === 'left';
   const isAvoidant = axisDirections['회피형/직면형'] === 'left';
