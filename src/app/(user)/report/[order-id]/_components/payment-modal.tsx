@@ -39,7 +39,7 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  // 토스페이먼츠 위젯 초기화
+  // 토스페이먼츠 위젯 초기화 (모달이 열릴 때 한 번만)
   useEffect(() => {
     const initWidget = async () => {
       try {
@@ -47,6 +47,9 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
         const totalPrice = pendingOrder.paidQuestionIds.length * 900;
 
         if (!widgetContainerRef.current || !clientKey) return;
+
+        // 컨테이너 초기화
+        widgetContainerRef.current.innerHTML = '';
 
         // window.TossPayments는 스크립트 태그로 로드됨
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,18 +87,15 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
 
     initWidget();
 
-    // cleanup: 언마운트 시 위젯 제거
+    // cleanup: 언마운트 시 컨테이너 초기화
     return () => {
-      if (widgetRef.current?.['__paymentMethodWidget__']) {
-        try {
-          widgetRef.current['__paymentMethodWidget__'].destroy();
-        } catch {
-          // ignore cleanup errors
-        }
+      if (widgetContainerRef.current) {
+        widgetContainerRef.current.innerHTML = '';
       }
       setWidgetReady(false);
+      widgetRef.current = null;
     };
-  }, [isLoggedIn, pendingOrder]);
+  }, []);
 
   const totalPrice = pendingOrder.paidQuestionIds.length * 900;
 
