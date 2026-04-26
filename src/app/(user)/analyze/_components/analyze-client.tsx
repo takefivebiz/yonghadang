@@ -241,19 +241,49 @@ export const AnalyzeClient = () => {
     const typeColor = getAnalysisTypeColor(queryType);
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
-        <div className="relative h-12 w-12">
-          <div
-            className="absolute inset-0 rounded-full border-3 border-transparent"
-            style={{
-              borderTopColor: typeColor,
-              animation: 'spin 1.5s linear infinite',
-            }}
-          />
-          <style>{`
-            @keyframes spin {
-              to { transform: rotate(360deg); }
+        <style>{`
+          @keyframes spin-and-pulse {
+            0% {
+              transform: rotate(0deg) scale(1);
+              opacity: 1;
             }
-          `}</style>
+            50% {
+              transform: rotate(180deg) scale(1.1);
+            }
+            100% {
+              transform: rotate(360deg) scale(1);
+              opacity: 1;
+            }
+          }
+          @keyframes dot-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+          }
+        `}</style>
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative h-16 w-16">
+            <div
+              className="absolute inset-0 rounded-full border-3 border-transparent"
+              style={{
+                borderTopColor: typeColor,
+                borderRightColor: typeColor,
+                animation: 'spin-and-pulse 2.2s ease-in-out infinite',
+              }}
+            />
+          </div>
+          <div className="flex gap-1.5">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="h-1.5 w-1.5 rounded-full"
+                style={{
+                  backgroundColor: typeColor,
+                  animation: `dot-pulse 1.4s ease-in-out infinite`,
+                  animationDelay: `${i * 0.2}s`,
+                }}
+              />
+            ))}
+          </div>
         </div>
         <div>
           <p
@@ -263,7 +293,7 @@ export const AnalyzeClient = () => {
             {typeInfo.title}...
           </p>
           <p className="text-sm" style={{ color: COLORS.text.muted }}>
-            당신의 상황을 분석하고 있습니다
+            상황을 분석하고 있어
           </p>
         </div>
       </div>

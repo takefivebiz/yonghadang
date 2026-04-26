@@ -20,15 +20,24 @@ const AnalyzePage = () => {
         fallback={
           <div className="flex min-h-[60vh] items-center justify-center">
             <style>{`
-              @keyframes spin {
-                to { transform: rotate(360deg); }
+              @keyframes spin-and-pulse {
+                0% {
+                  transform: rotate(0deg) scale(1);
+                }
+                50% {
+                  transform: rotate(180deg) scale(1.05);
+                }
+                100% {
+                  transform: rotate(360deg) scale(1);
+                }
               }
             `}</style>
             <div
-              className="h-8 w-8 rounded-full border-2 border-transparent"
+              className="h-10 w-10 rounded-full border-2 border-transparent"
               style={{
                 borderTopColor: COLORS.text.primary,
-                animation: 'spin 1.5s linear infinite',
+                borderRightColor: COLORS.text.primary,
+                animation: 'spin-and-pulse 1.8s ease-in-out infinite',
               }}
             />
           </div>
