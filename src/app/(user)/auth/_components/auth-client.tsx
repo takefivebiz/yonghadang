@@ -102,7 +102,8 @@ export const AuthClient = () => {
     <div
       className="relative flex min-h-screen w-full flex-col overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, #1B003F 0%, #4B0082 25%, #191970 50%, #4B0082 75%, #6B2E8F 100%)",
+        background:
+          "linear-gradient(135deg, #1B003F 0%, #4B0082 25%, #191970 50%, #4B0082 75%, #6B2E8F 100%)",
       }}
     >
       {/* 배경 장식 블롭 */}
@@ -154,15 +155,15 @@ export const AuthClient = () => {
               className="text-3xl font-bold sm:text-3xl"
               style={{ color: "#F0E6FA" }}
             >
-              너와 나, 우리를 읽어봐
+              로그인을 하면
             </h1>
             <p
               className="mt-4 text-sm leading-relaxed"
               style={{ color: "#D4C5E2" }}
             >
-              소셜 계정 하나면 충분해.
+              언제든 다시 볼 수 있어.
               <br />
-              사람을 이해하는 시간을 시작하자.
+              소셜 계정으로 바로 시작해
             </p>
           </header>
 

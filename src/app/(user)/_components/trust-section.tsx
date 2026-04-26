@@ -127,10 +127,10 @@ export const TrustSection = () => {
             className="text-4xl font-bold md:text-5xl"
             style={{ color: "#F0E6FA" }}
           >
-            이렇게까지 보인다
+            어디까지 보일까?
           </h2>
           <p className="mt-3 text-sm md:text-base" style={{ color: "#B8A8D8" }}>
-            리포트는 단순한 설명이 아니라, 당신의 구조를 직접 보여줘
+            먼저 본 사람들이 이렇게 말해
           </p>
         </div>
 

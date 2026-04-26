@@ -55,7 +55,8 @@ export const CTASection = () => {
       <div
         className="pointer-events-none absolute left-0 top-1/3 h-px w-28 opacity-55"
         style={{
-          background: "linear-gradient(90deg, transparent, #6495ED, transparent)",
+          background:
+            "linear-gradient(90deg, transparent, #6495ED, transparent)",
           boxShadow: "0 0 18px #6495ED, 0 0 35px rgba(100, 149, 237, 0.5)",
           animation: "neonPulse 3.2s ease-in-out infinite",
         }}
@@ -66,7 +67,8 @@ export const CTASection = () => {
       <div
         className="pointer-events-none absolute right-0 top-2/3 h-px w-36 opacity-50"
         style={{
-          background: "linear-gradient(90deg, transparent, #A366FF, transparent)",
+          background:
+            "linear-gradient(90deg, transparent, #A366FF, transparent)",
           boxShadow: "0 0 18px #A366FF, 0 0 35px rgba(163, 102, 255, 0.5)",
           animation: "neonPulse 3.8s ease-in-out infinite 0.4s",
         }}
@@ -119,7 +121,8 @@ export const CTASection = () => {
 
       <style jsx>{`
         @keyframes neonPulse {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 0.4;
             filter: drop-shadow(0 0 10px currentColor);
           }
@@ -130,18 +133,24 @@ export const CTASection = () => {
         }
 
         @keyframes neonGlow {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 0.5;
-            box-shadow: 0 0 12px currentColor, 0 0 25px rgba(100, 149, 237, 0.4);
+            box-shadow:
+              0 0 12px currentColor,
+              0 0 25px rgba(100, 149, 237, 0.4);
           }
           50% {
             opacity: 0.9;
-            box-shadow: 0 0 20px currentColor, 0 0 40px rgba(100, 149, 237, 0.7);
+            box-shadow:
+              0 0 20px currentColor,
+              0 0 40px rgba(100, 149, 237, 0.7);
           }
         }
 
         @keyframes neonDraw {
-          0%, 100% {
+          0%,
+          100% {
             stroke-dashoffset: 0;
             opacity: 0.3;
           }
@@ -157,16 +166,16 @@ export const CTASection = () => {
           className="mb-6 text-4xl font-bold md:text-5xl"
           style={{ color: "#F0E6FA" }}
         >
-          {showRelationships ? "어떤 관계를 읽어볼까?" : "사람을 읽어봐"}
+          {showRelationships ? "어떤 관계를 읽어볼까?" : "이제, 직접 확인해봐"}
         </h2>
 
         <p
-          className="mb-10 text-base leading-relaxed md:text-lg"
+          className="mb-10 text-base leading-relaxed md:text-lg whitespace-pre-line"
           style={{ color: "#D4C5E2" }}
         >
           {showRelationships
             ? "상대와의 관계를 선택해줄래."
-            : "3분이면 충분해. 말과 행동 속에 드러난 것들을 보게 될 거야"}
+            : "3분이면 충분해.\n생각보다 많은 게 보일 거야"}
         </p>
 
         {/* 관계 선택 화면 */}
@@ -215,11 +224,11 @@ export const CTASection = () => {
           </div>
         ) : (
           /* 초기 버튼 선택 */
-          <div className="flex flex-col gap-4 md:flex-row md:justify-center">
+          <div className="flex flex-col gap-4 md:flex-row md:justify-center items-center">
             {/* 나 버튼 */}
             <button
               onClick={handleSelfAnalysis}
-              className="group relative overflow-hidden rounded-3xl px-8 py-6 text-lg font-bold transition-all duration-300 active:scale-95 hover:shadow-2xl"
+              className="w-[220px] flex flex-col gap-4 gap-4 group relative overflow-hidden rounded-3xl px-8 py-6 text-lg font-bold transition-all duration-300 active:scale-95 hover:shadow-2xl"
               style={{
                 background: `linear-gradient(135deg, #7B6A9B55 0%, #7B6A9B25 100%)`,
                 borderLeft: "5px solid #7B6A9B",
@@ -241,14 +250,14 @@ export const CTASection = () => {
                 className="mt-2 text-xs opacity-80"
                 style={{ color: "rgba(255, 255, 255, 0.8)" }}
               >
-                내 선택 구조를 읽어줘
+                나도 몰랐던 내 진짜 마음은?
               </p>
             </button>
 
             {/* 상대 버튼 */}
             <button
               onClick={() => setShowRelationships(true)}
-              className="group relative overflow-hidden rounded-3xl px-8 py-6 text-lg font-bold transition-all duration-300 active:scale-95 hover:shadow-2xl"
+              className="w-[220px] flex flex-col gap-4 group relative overflow-hidden rounded-3xl px-8 py-6 text-lg font-bold transition-all duration-300 active:scale-95 hover:shadow-2xl"
               style={{
                 background: `linear-gradient(135deg, #A366FF55 0%, #A366FF25 100%)`,
                 borderLeft: "5px solid #A366FF",
@@ -270,7 +279,7 @@ export const CTASection = () => {
                 className="mt-2 text-xs opacity-80"
                 style={{ color: "rgba(255, 255, 255, 0.8)" }}
               >
-                상대의 행동 패턴을 읽어줘
+                그 사람은 무슨 생각일까?
               </p>
             </button>
           </div>
