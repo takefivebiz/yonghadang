@@ -62,7 +62,7 @@ export const GuestLookupClient = () => {
         비회원 기록 조회
       </h1>
       <p className="mb-8 text-sm" style={{ color: '#D4C5E2' }}>
-        결제 시 입력한 전화번호와 비밀번호로 리포트를 찾을 수 있어요.
+        결제할 때 입력한 전화번호와 비밀번호로 리포트를 찾아봐.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -147,7 +147,7 @@ export const GuestLookupClient = () => {
       </form>
 
       <p className="mt-6 text-center text-xs" style={{ color: '#B8A8D8' }}>
-        비밀번호는 결제 시 직접 설정한 4자리 숫자예요.
+        비밀번호는 결제할 때 직접 설정한 4자리 숫자야.
       </p>
     </div>
   );
