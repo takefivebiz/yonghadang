@@ -13,12 +13,13 @@ export const Header = () => {
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         {/* 로고 */}
+
         <Link
           href="/"
           className="font-display text-xl font-bold tracking-widest"
           style={{ color: "#BEAEDB" }}
         >
-          Corelog
+          <span>Corelog</span>
         </Link>
 
         {/* 데스크톱 메뉴 (md 이상) */}
