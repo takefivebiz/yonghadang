@@ -110,7 +110,7 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
       // SDK에 등록된 위젯은 유지하고 DOM만 정리
       setWidgetReady(false);
     };
-  }, [isLoggedIn]);
+  }, [isLoggedIn, pendingOrder.paidQuestionIds.length]);
 
   const totalPrice = pendingOrder.paidQuestionIds.length * 900;
 

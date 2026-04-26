@@ -1,4 +1,4 @@
-import { AnalysisSession, AnalysisCategory, TraitScores } from '@/types/analysis';
+import { AnalysisCategory, TraitScores } from '@/types/analysis';
 import { FreeReport, PaidQuestion, FullReport } from '@/types/report';
 
 /**

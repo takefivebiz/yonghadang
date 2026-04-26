@@ -8,7 +8,7 @@ import {
   QuestionAnswer,
 } from '@/types/analysis';
 import { calculateTraits, inferUserType } from '@/lib/trait-inference';
-import { COLORS, getAnalysisTypeColor, getCategoryColor, getRelationshipColor } from '@/lib/colors';
+import { getAnalysisTypeColor, getCategoryColor, getRelationshipColor } from '@/lib/colors';
 
 type AnalysisType = 'self' | 'other' | 'relationship';
 

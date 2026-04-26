@@ -1,5 +1,4 @@
 import { AnalysisCategory, TraitScores } from '@/types/analysis';
-import { FreeReport, ReportSection } from '@/types/report';
 
 /**
  * 무료 리포트 생성 프롬프트 템플릿

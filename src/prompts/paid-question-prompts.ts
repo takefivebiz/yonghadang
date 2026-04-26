@@ -1,5 +1,4 @@
 import { AnalysisCategory, TraitScores } from '@/types/analysis';
-import { PaidQuestion } from '@/types/report';
 
 /**
  * 유료 확장 질문 생성 프롬프트 템플릿

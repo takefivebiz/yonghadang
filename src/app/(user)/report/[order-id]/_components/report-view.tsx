@@ -23,8 +23,6 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
   const [pendingOrder, setPendingOrder] = useState<PendingOrderInput | null>(null);
   const { freeReport, paidQuestions, category, createdAt } = report;
 
-  // 분석 타입 정보
-  const reportTone = analysisSession?.inferredUserType?.reportTone ?? '균형형';
   const formattedDate = new Date(createdAt).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',

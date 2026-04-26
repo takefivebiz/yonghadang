@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { COLORS } from "@/lib/colors";
 
 /** 관계 유형 정의 */
 const RELATIONSHIP_OPTIONS = [

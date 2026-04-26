@@ -1,23 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const AnalysisType = {
   SELF: "self",
   OTHER: "other",
 } as const;
-
-const RELATIONSHIP_OPTIONS = [
-  { label: "썸", icon: "💫" },
-  { label: "연애 중", icon: "💑" },
-  { label: "이별", icon: "💔" },
-  { label: "재회", icon: "🔄" },
-  { label: "친구", icon: "👫" },
-  { label: "가족", icon: "👨‍👩‍👧‍👦" },
-  { label: "직장 동료", icon: "💼" },
-  { label: "기타", icon: "❓" },
-];
 
 export const HeroSection = () => {
   const router = useRouter();
