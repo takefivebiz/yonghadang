@@ -47,7 +47,8 @@ export const TrustSection = () => {
       <div
         className="pointer-events-none absolute left-1/4 top-1/4 h-px w-40 opacity-50"
         style={{
-          background: "linear-gradient(90deg, transparent, #6495ED, transparent)",
+          background:
+            "linear-gradient(90deg, transparent, #6495ED, transparent)",
           boxShadow: "0 0 15px #6495ED, 0 0 30px rgba(100, 149, 237, 0.4)",
           animation: "neonPulse 4s ease-in-out infinite",
         }}
@@ -58,7 +59,8 @@ export const TrustSection = () => {
       <div
         className="pointer-events-none absolute right-1/3 bottom-1/3 h-px w-32 opacity-50"
         style={{
-          background: "linear-gradient(90deg, transparent, #A366FF, transparent)",
+          background:
+            "linear-gradient(90deg, transparent, #A366FF, transparent)",
           boxShadow: "0 0 15px #A366FF, 0 0 30px rgba(163, 102, 255, 0.4)",
           animation: "neonPulse 3.5s ease-in-out infinite 0.6s",
         }}
@@ -89,7 +91,8 @@ export const TrustSection = () => {
 
       <style jsx>{`
         @keyframes neonPulse {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 0.4;
             filter: drop-shadow(0 0 10px currentColor);
           }
@@ -100,13 +103,18 @@ export const TrustSection = () => {
         }
 
         @keyframes neonGlow {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 0.5;
-            box-shadow: 0 0 10px currentColor, 0 0 20px rgba(100, 149, 237, 0.4);
+            box-shadow:
+              0 0 10px currentColor,
+              0 0 20px rgba(100, 149, 237, 0.4);
           }
           50% {
             opacity: 0.9;
-            box-shadow: 0 0 20px currentColor, 0 0 40px rgba(100, 149, 237, 0.7);
+            box-shadow:
+              0 0 20px currentColor,
+              0 0 40px rgba(100, 149, 237, 0.7);
           }
         }
       `}</style>

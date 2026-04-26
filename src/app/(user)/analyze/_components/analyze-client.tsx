@@ -23,15 +23,15 @@ const ANALYSIS_TYPE_INFO: Record<
   },
   other: {
     title: '상대를 읽는 중',
-    question: '상대의 어떤 부분이 궁금해?',
+    question: '어떤 관계인가요?',
   },
   relationship: {
     title: '우리 관계를 읽는 중',
-    question: '우리 사이의 어떤 부분이 궁금해?',
+    question: '어떤 관계인가요?',
   },
 };
 
-/** PRD 5.5: 카테고리 정의 */
+/** PRD 5.5: 카테고리 정의 (자신 분석용) */
 const CATEGORIES = ['연애', '감정', '인간관계', '직업/진로'] as const;
 type Category = (typeof CATEGORIES)[number];
 
@@ -41,6 +41,19 @@ const CATEGORY_INFO: Record<Category, { icon: string; description: string }> = {
   감정: { icon: '🎭', description: '불안, 답답함, 공허함' },
   인간관계: { icon: '👥', description: '친구, 가족, 직장' },
   '직업/진로': { icon: '🎯', description: '이직, 방향성, 확신 부족' },
+};
+
+/** 상대/관계 분석용 관계 유형 */
+const RELATIONSHIP_OPTIONS = ['썸', '연애 중', '이별', '재회', '친구', '가족', '직장 동료', '기타'];
+const RELATIONSHIP_ICONS: Record<string, string> = {
+  '썸': '💫',
+  '연애 중': '💑',
+  '이별': '💔',
+  '재회': '🔄',
+  '친구': '👫',
+  '가족': '👨‍👩‍👧‍👦',
+  '직장 동료': '💼',
+  '기타': '❓',
 };
 
 /** PRD 5.5: 하위 분기 선택지 정의 */
@@ -232,7 +245,7 @@ const DUMMY_QUESTIONS = [
   },
 ];
 
-type Step = 'category' | 'subcategory' | 'questions' | 'submitting';
+type Step = 'category' | 'relationship' | 'subcategory' | 'questions' | 'submitting';
 
 export const AnalyzeClient = () => {
   const router = useRouter();
@@ -240,7 +253,8 @@ export const AnalyzeClient = () => {
   const queryType = (searchParams.get('type') ?? 'self') as AnalysisType;
 
   const [category, setCategory] = useState<AnalysisCategory | null>(null);
-  const [step, setStep] = useState<Step>('category');
+  const [selectedRelationship, setSelectedRelationship] = useState<string | null>(null);
+  const [step, setStep] = useState<Step>(queryType === 'self' ? 'category' : 'relationship');
   const [subcategory, setSubcategory] = useState<AnalysisSubcategory | null>(
     null,
   );
@@ -250,7 +264,7 @@ export const AnalyzeClient = () => {
   const hasSubcategory = category && SUBCATEGORIES[category];
   const questions = DUMMY_QUESTIONS;
   const question = questions[currentQuestion];
-  const totalSteps = (hasSubcategory ? 1 : 0) + questions.length;
+  const totalSteps = (hasSubcategory ? 1 : 0) + (step !== 'category' && step !== 'relationship' ? questions.length : 0);
 
   const handleCategorySelect = useCallback((selectedCategory: string) => {
     const cat = selectedCategory as AnalysisCategory;
@@ -261,6 +275,11 @@ export const AnalyzeClient = () => {
     } else {
       setStep('questions');
     }
+  }, []);
+
+  const handleRelationshipSelect = useCallback((rel: string) => {
+    setSelectedRelationship(rel);
+    setStep('category');
   }, []);
 
   const handleSubcategorySelect = useCallback((sub: string) => {
@@ -352,17 +371,21 @@ export const AnalyzeClient = () => {
       setStep('subcategory');
     } else if (step === 'questions' || step === 'subcategory') {
       setStep('category');
+    } else if (step === 'category' && queryType !== 'self') {
+      setStep('relationship');
     } else {
       router.push('/');
     }
-  }, [currentQuestion, step, hasSubcategory, router]);
+  }, [currentQuestion, step, hasSubcategory, queryType, router]);
 
   const progressStep =
     step === 'category'
       ? 0
-      : step === 'subcategory'
+      : step === 'relationship'
         ? 0
-        : currentQuestion + (hasSubcategory ? 1 : 0);
+        : step === 'subcategory'
+          ? 0
+          : currentQuestion + (hasSubcategory ? 1 : 0);
   const progressPercent = Math.round((progressStep / totalSteps) * 100);
   const typeInfo = ANALYSIS_TYPE_INFO[queryType];
 
@@ -432,7 +455,7 @@ export const AnalyzeClient = () => {
   return (
     <div className="relative z-10 mx-auto max-w-2xl px-4 py-8 md:py-12">
       {/* 분석 타입 & 진행 상태 */}
-      {step !== 'category' && (
+      {step !== 'category' && step !== 'relationship' && (
         <div className="mb-8">
           <div className="mb-3 flex items-center justify-between text-xs">
             <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
@@ -454,8 +477,8 @@ export const AnalyzeClient = () => {
         </div>
       )}
 
-      {/* 카테고리 선택 */}
-      {step === 'category' && (
+      {/* 카테고리 선택 (자신 분석) */}
+      {step === 'category' && queryType === 'self' && (
         <div className="space-y-10 py-6">
           {/* 헤더 */}
           <div className="space-y-6 text-center">
@@ -464,8 +487,7 @@ export const AnalyzeClient = () => {
                 className="mb-4 text-sm font-semibold tracking-wider"
                 style={{ color: 'rgba(255, 255, 255, 0.9)' }}
               >
-                {typeInfo.title.replace('를 읽는 중', '')}
-                {typeInfo.title.includes('를 읽는 중') && ' 분석 중'}
+                {typeInfo.title}
               </p>
               <h1
                 className="text-3xl font-bold leading-tight md:text-4xl"
@@ -475,11 +497,176 @@ export const AnalyzeClient = () => {
               </h1>
             </div>
             <p className="text-sm leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-              당신의 상황에 맞는 카테고리를 선택하면 맞춤 질문이 이어져.
+              당신의 상황에 맞는 카테고리를 선택해줄래.
             </p>
           </div>
 
-          {/* 카테고리 그리드 - 모바일 2x2 */}
+          {/* 카테고리 그리드 */}
+          <div className="grid gap-3 md:gap-4 grid-cols-2">
+            {CATEGORIES.map((cat) => {
+              const info = CATEGORY_INFO[cat];
+              const categoryColor = getCategoryColor(cat);
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handleCategorySelect(cat)}
+                  className="group relative overflow-hidden rounded-3xl p-6 text-left transition-all duration-300 active:scale-[0.95] md:p-8 hover:shadow-2xl"
+                  style={{
+                    background: `linear-gradient(135deg, ${categoryColor}35 0%, ${categoryColor}15 100%)`,
+                    borderLeft: `5px solid ${categoryColor}`,
+                    backdropFilter: 'blur(15px)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = `linear-gradient(135deg, ${categoryColor}45 0%, ${categoryColor}25 100%)`;
+                    e.currentTarget.style.transform = 'translateY(-6px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = `linear-gradient(135deg, ${categoryColor}35 0%, ${categoryColor}15 100%)`;
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  {/* 배경 장식 */}
+                  <div
+                    className="absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-25 transition-all duration-300 group-hover:opacity-40"
+                    style={{ backgroundColor: categoryColor }}
+                  />
+
+                  <div className="relative z-10 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="text-6xl">{info.icon}</div>
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white transition-all duration-300 group-hover:scale-130"
+                        style={{ backgroundColor: categoryColor }}
+                      >
+                        →
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <h3
+                        className="text-xl font-bold leading-tight md:text-2xl"
+                        style={{ color: '#FFFFFF' }}
+                      >
+                        {cat}
+                      </h3>
+                      <p
+                        className="text-xs leading-relaxed md:text-sm"
+                        style={{ color: 'rgba(255, 255, 255, 0.8)' }}
+                      >
+                        {info.description}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 관계 선택 (상대/관계 분석) */}
+      {step === 'relationship' && queryType !== 'self' && (
+        <div className="space-y-10 py-6">
+          {/* 헤더 */}
+          <div className="space-y-6 text-center">
+            <div>
+              <p
+                className="mb-4 text-sm font-semibold tracking-wider"
+                style={{ color: 'rgba(255, 255, 255, 0.9)' }}
+              >
+                {typeInfo.title}
+              </p>
+              <h1
+                className="text-3xl font-bold leading-tight md:text-4xl"
+                style={{ color: '#FFFFFF' }}
+              >
+                {typeInfo.question}
+              </h1>
+            </div>
+            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+              상대와의 관계를 선택해줄래.
+            </p>
+          </div>
+
+          {/* 관계 옵션 그리드 */}
+          <div className="grid gap-3 md:gap-4 grid-cols-2">
+            {RELATIONSHIP_OPTIONS.map((rel) => {
+              const icon = RELATIONSHIP_ICONS[rel] || '💫';
+              return (
+                <button
+                  key={rel}
+                  onClick={() => handleRelationshipSelect(rel)}
+                  className="group relative overflow-hidden rounded-3xl p-6 text-left transition-all duration-300 active:scale-[0.95] md:p-8 hover:shadow-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(163, 102, 255, 0.35) 0%, rgba(163, 102, 255, 0.15) 100%)',
+                    borderLeft: '5px solid #A366FF',
+                    backdropFilter: 'blur(15px)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(163, 102, 255, 0.45) 0%, rgba(163, 102, 255, 0.25) 100%)';
+                    e.currentTarget.style.transform = 'translateY(-6px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(163, 102, 255, 0.35) 0%, rgba(163, 102, 255, 0.15) 100%)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  {/* 배경 장식 */}
+                  <div
+                    className="absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-25 transition-all duration-300 group-hover:opacity-40"
+                    style={{ backgroundColor: '#A366FF' }}
+                  />
+
+                  <div className="relative z-10 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="text-6xl">{icon}</div>
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white transition-all duration-300 group-hover:scale-130"
+                        style={{ backgroundColor: '#A366FF' }}
+                      >
+                        →
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <h3
+                        className="text-xl font-bold leading-tight md:text-2xl"
+                        style={{ color: '#FFFFFF' }}
+                      >
+                        {rel}
+                      </h3>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* 카테고리 선택 (상대/관계 분석 후) */}
+      {step === 'category' && queryType !== 'self' && selectedRelationship && (
+        <div className="space-y-10 py-6">
+          {/* 헤더 */}
+          <div className="space-y-6 text-center">
+            <div>
+              <p
+                className="mb-4 text-sm font-semibold tracking-wider"
+                style={{ color: 'rgba(255, 255, 255, 0.9)' }}
+              >
+                {selectedRelationship} • {typeInfo.title}
+              </p>
+              <h1
+                className="text-3xl font-bold leading-tight md:text-4xl"
+                style={{ color: '#FFFFFF' }}
+              >
+                어떤 부분이 궁금해?
+              </h1>
+            </div>
+            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+              카테고리를 선택해줄래.
+            </p>
+          </div>
+
+          {/* 카테고리 그리드 */}
           <div className="grid gap-3 md:gap-4 grid-cols-2">
             {CATEGORIES.map((cat) => {
               const info = CATEGORY_INFO[cat];
