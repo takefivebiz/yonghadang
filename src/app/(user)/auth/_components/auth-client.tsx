@@ -149,7 +149,7 @@ export const AuthClient = () => {
               className="text-3xl font-bold sm:text-3xl"
               style={{ color: "#F0E6FA" }}
             >
-              너의 이야기를 펼쳐봐
+              너와 나, 우리를 읽어봐
             </h1>
             <p
               className="mt-4 text-sm leading-relaxed"
@@ -157,7 +157,7 @@ export const AuthClient = () => {
             >
               소셜 계정 하나면 충분해.
               <br />
-              너를 읽는 시간을 시작하자.
+              사람을 이해하는 시간을 시작하자.
             </p>
           </header>
 
