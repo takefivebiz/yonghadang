@@ -27,6 +27,8 @@ export const ReportClient = ({ order, report, initialAnalysisSession }: ReportCl
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('sessionId') || order.id;
   const [view, setView] = useState<ViewState>('checking');
+  // TODO: [기능 확장] 분석 세션 정보는 향후 재분석, 히스토리 추적 등에서 활용 예정
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [analysisSession, setAnalysisSession] = useState<AnalysisSession | null>(initialAnalysisSession ?? null);
 
   useEffect(() => {
