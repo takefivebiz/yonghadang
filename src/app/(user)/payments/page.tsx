@@ -13,8 +13,8 @@ export const metadata: Metadata = {
  */
 const PaymentsPage = () => {
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: '#FAF8F5' }}>
-      <div className="relative z-10 px-4 pt-10">
+    <div className="pb-20 pt-10">
+      <div className="relative z-10 px-4">
         {/* 헤더 */}
         <div className="mx-auto mb-8 max-w-lg text-center">
           <p className="mb-2 text-xs uppercase tracking-[0.3em] text-foreground/50">

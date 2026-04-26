@@ -69,7 +69,7 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
 
       {/* 무료 리포트 섹션 */}
       {freeReport && (
-        <section className="mb-12 rounded-2xl border border-border/50 bg-white p-8 md:p-10">
+        <section className="mb-12 rounded-2xl border border-white/20 bg-white/10 p-8 backdrop-blur-md md:p-10">
           <div className="mb-6">
             <span className="text-xs font-semibold text-muted-foreground">FREE INSIGHT</span>
             <h1 className="mt-2 text-2xl font-bold leading-relaxed md:text-3xl" style={{ color: '#2D3250' }}>
@@ -95,8 +95,8 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
           </div>
 
           {/* 결핍 문장 */}
-          <div className="mt-8 rounded-xl border-l-4 border-[#6495ED] bg-blue-50 p-4" style={{ borderLeftColor: '#6495ED' }}>
-            <p className="text-sm font-medium leading-relaxed" style={{ color: '#2D3250' }}>
+          <div className="mt-8 rounded-xl border-l-4 border-[#6495ED] bg-blue-500/20 p-4 backdrop-blur-sm" style={{ borderLeftColor: '#6495ED' }}>
+            <p className="text-sm font-medium leading-relaxed" style={{ color: '#F5F5F5' }}>
               {freeReport.deficitSentence}
             </p>
           </div>
@@ -126,12 +126,12 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
                   <button
                     onClick={() => !isPurchased && toggleQuestion(pq.id)}
                     disabled={isPurchased}
-                    className={`group flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all md:p-5 ${
+                    className={`group flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all backdrop-blur-sm md:p-5 ${
                       isPurchased
-                        ? 'cursor-default opacity-60'
+                        ? 'cursor-default border-white/10 bg-white/5 opacity-60'
                         : isSelected
-                          ? 'border-[#6495ED] bg-blue-50'
-                          : 'border-border/30 hover:border-border/60 hover:bg-gray-50'
+                          ? 'border-[#6495ED] bg-blue-500/20'
+                          : 'border-white/10 hover:border-white/20 hover:bg-white/10'
                     }`}
                   >
                     {/* 체크박스 */}
@@ -161,7 +161,7 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
 
                   {/* 구매한 질문의 리포트 */}
                   {isPurchased && pq.report && (
-                    <div className="mt-3 rounded-xl border border-border/30 bg-gray-50 p-4 md:p-5">
+                    <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm md:p-5">
                       {pq.report.map((section, sIdx) => (
                         <div key={sIdx} className={sIdx > 0 ? 'mt-4' : ''}>
                           <h3 className="text-sm font-semibold" style={{ color: '#2D3250' }}>
@@ -216,7 +216,7 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
 
           {/* 질문 개수별 가이드 */}
           {selectedQuestions.length === 0 && paidQuestions.length >= 2 && (
-            <div className="rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 p-4 text-center text-xs text-muted-foreground md:p-5">
+            <div className="rounded-xl border border-white/10 bg-blue-500/20 p-4 text-center text-xs text-white backdrop-blur-sm md:p-5">
               <p>
                 <strong>💡 팁:</strong> 2개 이상 선택하면 자동 할인이 적용됩니다.
                 {paidQuestions.length >= 3 && ' 3개 선택 시 600원 절약!'}

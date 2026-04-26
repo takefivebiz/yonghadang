@@ -40,9 +40,7 @@ const ReportPage = async ({ params }: Props) => {
   const analysisSession = getDummyAnalysisSession(sessionId);
 
   return (
-    <div style={{ backgroundColor: '#FAF8F5', minHeight: '100vh' }}>
-      <ReportClient order={order} report={report} initialAnalysisSession={analysisSession} />
-    </div>
+    <ReportClient order={order} report={report} initialAnalysisSession={analysisSession} />
   );
 };
 
