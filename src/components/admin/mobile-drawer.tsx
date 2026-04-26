@@ -50,7 +50,7 @@ export const AdminMobileDrawer = () => {
             onClick={close}
             className="font-display text-lg font-bold tracking-widest text-primary"
           >
-            용하당 관리
+            코어로그 관리
           </Link>
           <button
             onClick={close}

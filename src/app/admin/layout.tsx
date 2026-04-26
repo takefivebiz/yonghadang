@@ -3,7 +3,7 @@ import { SidebarNav } from "@/components/admin/sidebar-nav";
 import { AdminMobileDrawer } from "@/components/admin/mobile-drawer";
 
 export const metadata: Metadata = {
-  title: "관리자 | 용하당",
+  title: "관리자 | 코어로그",
   robots: { index: false, follow: false },
 };
 
@@ -28,7 +28,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         <header className="flex h-16 items-center gap-3 border-b border-border bg-card px-4 md:hidden">
           <AdminMobileDrawer />
           <span className="font-display text-lg font-bold tracking-widest text-primary">
-            용하당 관리
+            코어로그 관리
           </span>
         </header>
 

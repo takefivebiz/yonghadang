@@ -1,202 +1,196 @@
-import Link from "next/link";
-import { Content } from "@/types/content";
-import { DummyReport } from "@/lib/dummy-reports";
-import { ReportShare } from "./report-share";
+'use client';
+
+import { useState } from 'react';
+import { FullReport } from '@/types/report';
+import { AnalysisSession } from '@/types/analysis';
+import { savePendingOrder } from '@/lib/payment';
+import { useRouter } from 'next/navigation';
 
 interface ReportViewProps {
-  content: Content;
-  report: DummyReport;
-  createdAt: string;
+  report: FullReport;
+  analysisSession?: AnalysisSession | null;
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  mbti: "MBTI",
-  saju: "사주",
-  tarot: "타로",
-  astrology: "점성술",
-};
-
 /**
- * PRD 6-6. 보고서 확인 페이지 — 전체 공개 뷰.
- * 기본 풀이(첫 섹션)와 심화 풀이(나머지 섹션) 모두 블러 없이 공개.
+ * 리포트 뷰 — PRD 6: 무료 리포트 + 유료 확장 질문 목록
  */
-export const ReportView = ({ content, report, createdAt }: ReportViewProps) => {
-  const formattedDate = new Date(createdAt).toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
+  const router = useRouter();
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const { freeReport, paidQuestions, category, createdAt } = report;
+
+  // PRD 3.7: 추론된 사용자 타입 기반 리포트 톤 적용
+  const reportTone = analysisSession?.inferredUserType?.reportTone ?? '균형형';
+  const questionStrategy = analysisSession?.inferredUserType?.questionStrategy ?? '구조중심';
+  const topTraits = analysisSession?.inferredUserType?.topTraits ?? [];
+
+  // 디버그: 콘솔에 추론 결과 출력
+  if (analysisSession?.inferredUserType) {
+    console.log('📊 사용자 타입 추론 결과:', {
+      reportTone,
+      questionStrategy,
+      topTraits,
+    });
+  }
+
+  const formattedDate = new Date(createdAt).toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 
+  const toggleQuestion = (id: string) => {
+    setSelectedQuestions((prev) =>
+      prev.includes(id) ? prev.filter((q) => q !== id) : [...prev, id],
+    );
+  };
+
+  const handlePurchase = () => {
+    if (selectedQuestions.length === 0) return;
+    savePendingOrder({
+      sessionId: report.sessionId,
+      category,
+      paidQuestionIds: selectedQuestions,
+    });
+    router.push('/payments');
+  };
+
+  const totalPrice = selectedQuestions.length * 4900;
+
   return (
-    <div className="relative min-h-screen overflow-hidden pb-20">
-      {/* ── 배경 — 파스텔 그라디언트 + 신비로운 블러 원 ── */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, #EDE0F8 0%, #F5F0E8 55%)",
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute -right-24 top-20 h-72 w-72 rounded-full blur-3xl"
-        style={{ backgroundColor: "#E8D4F0", opacity: 0.35 }}
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute -left-20 top-96 h-64 w-64 rounded-full blur-3xl"
-        style={{ backgroundColor: "#F5D7E8", opacity: 0.3 }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10">
-        {/* ── 상단 헤더 ── */}
-        <div
-          className="w-full pb-12 pt-16 text-center"
-          style={{
-            background: `linear-gradient(135deg, ${content.gradientFrom}22, ${content.gradientTo}44)`,
-          }}
+    <div className="mx-auto max-w-2xl px-4 py-10">
+      {/* 카테고리 + 날짜 */}
+      <div className="mb-6">
+        <span
+          className="inline-block rounded-full px-3 py-1 text-xs font-medium"
+          style={{ backgroundColor: '#EDE0F8', color: '#2D3250' }}
         >
-          <div className="mx-auto max-w-2xl px-4">
-            {/* 신비로운 상단 심볼 */}
-            <div className="mb-3 flex items-center justify-center gap-2 text-xs uppercase tracking-[0.3em] text-[#9B88AC]">
-              <span aria-hidden="true">✦</span>
-              <span>AI Report</span>
-              <span aria-hidden="true">✦</span>
-            </div>
+          {category}
+        </span>
+        <p className="mt-2 text-xs text-foreground/50">{formattedDate} 분석</p>
+      </div>
 
-            <div className="mb-5 text-7xl" role="img" aria-label={content.title}>
-              {content.thumbnailEmoji}
-            </div>
+      {/* 무료 리포트 */}
+      {freeReport && (
+        <section className="mb-10">
+          <h1 className="mb-6 text-xl font-bold leading-snug" style={{ color: '#2D3250' }}>
+            {freeReport.headline}
+          </h1>
 
-            <span
-              className="mb-3 inline-block rounded-full px-3 py-1 text-xs font-medium"
-              style={{
-                backgroundColor: "rgba(74, 59, 92, 0.08)",
-                color: "#4A3B5C",
-              }}
-            >
-              {CATEGORY_LABELS[content.category] ?? content.category}
-            </span>
-
-            <h1 className="font-display mb-2 text-2xl font-bold text-deep-purple md:text-3xl">
-              {content.title}
-            </h1>
-            <p className="text-xs text-muted-foreground">{formattedDate} 생성</p>
-          </div>
-        </div>
-
-        <div className="mx-auto max-w-2xl px-4 pt-8">
-          {/* ── 결과 첫 문장 강조 (PRD 6-6) ── */}
-          <div
-            className="relative mb-10 overflow-hidden rounded-3xl px-6 py-10 text-center"
-            style={{
-              background: "linear-gradient(170deg, #4a3b5cdd, #805077e6)",
-              boxShadow: "0 16px 60px rgba(74, 59, 92, 0.3)",
-            }}
-          >
-            {/* 상단 별 장식 */}
-            <div
-              className="pointer-events-none absolute inset-x-0 top-0 h-24"
-              style={{
-                background:
-                  "radial-gradient(ellipse 60% 100% at 50% 0%, rgba(245,215,232,0.25) 0%, transparent 70%)",
-              }}
-              aria-hidden="true"
-            />
-            <p className="mb-3 text-xs uppercase tracking-[0.3em] text-white/60">
-              Headline
-            </p>
-            <p className="font-display text-lg font-semibold leading-relaxed text-white md:text-xl">
-              &ldquo;{report.headline}&rdquo;
-            </p>
-          </div>
-
-          {/* ── 섹션 리스트 (기본 + 심화 전체 공개) ── */}
-          <div className="space-y-5">
-            {report.sections.map((section, idx) => (
-              <article
-                key={idx}
-                className="rounded-2xl bg-white/85 px-6 py-6 shadow-sm backdrop-blur"
-                style={{
-                  border: "1.5px solid rgba(74, 59, 92, 0.08)",
-                }}
-              >
-                <div className="mb-4 flex items-center gap-3">
-                  <span
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #E8D4F0, #F5D7E8)",
-                      color: "#4A3B5C",
-                    }}
-                    aria-hidden="true"
-                  >
-                    {idx + 1}
-                  </span>
-                  <h2 className="text-base font-bold text-deep-purple md:text-lg">
-                    {section.title}
-                  </h2>
-                </div>
-
-                <div className="space-y-3">
+          <div className="space-y-6">
+            {freeReport.sections.map((section, idx) => (
+              <div key={idx}>
+                <h2 className="mb-3 text-sm font-semibold" style={{ color: '#2D3250' }}>
+                  {section.title}
+                </h2>
+                <div className="space-y-2">
                   {section.paragraphs.map((para, pIdx) => (
-                    <p
-                      key={pIdx}
-                      className="text-sm leading-relaxed text-[#4A3B5C]/85 md:text-[15px]"
-                    >
+                    <p key={pIdx} className="text-sm leading-relaxed text-foreground/75">
                       {para}
                     </p>
                   ))}
                 </div>
-              </article>
+              </div>
             ))}
           </div>
 
-          {/* ── 마무리 안내 ── */}
+          {/* 결핍 문장 — PRD 3.10.7 */}
           <div
-            className="mt-10 rounded-2xl px-5 py-5 text-center"
-            style={{
-              backgroundColor: "rgba(232, 212, 240, 0.25)",
-              border: "1px solid rgba(74, 59, 92, 0.08)",
-            }}
+            className="mt-8 rounded-2xl p-5"
+            style={{ backgroundColor: '#F5F0FA', borderLeft: '3px solid #C4B5D4' }}
           >
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              이 해석은 AI가 데이터를 기반으로 생성한 참고 자료이며,
-              <br />
-              의학적·심리학적 진단을 대체하지 않습니다.
+            <p className="text-sm font-medium leading-relaxed" style={{ color: '#2D3250' }}>
+              {freeReport.deficitSentence}
             </p>
           </div>
+        </section>
+      )}
 
-          {/* ── 공유 영역 ── */}
-          <div className="mt-10 flex flex-col items-center">
-            <ReportShare headline={report.headline} title={content.title} />
+      {/* 유료 질문 목록 */}
+      {paidQuestions.length > 0 && (
+        <section>
+          <h2 className="mb-4 text-base font-semibold" style={{ color: '#2D3250' }}>
+            더 깊이 알고 싶어?
+          </h2>
+          <p className="mb-5 text-sm text-foreground/60">
+            궁금한 질문을 선택하면 더 심층적인 분석을 볼 수 있어.
+          </p>
+
+          <div className="mb-6 space-y-3">
+            {paidQuestions.map((pq) => {
+              const isSelected = selectedQuestions.includes(pq.id);
+              const isPurchased = pq.isPurchased;
+
+              return (
+                <div key={pq.id}>
+                  <button
+                    onClick={() => !isPurchased && toggleQuestion(pq.id)}
+                    disabled={isPurchased}
+                    className={`flex w-full items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
+                      isPurchased
+                        ? 'cursor-default border-[#C4B5D4]/50 bg-[#F5F0FA]'
+                        : isSelected
+                        ? 'border-[#C4B5D4] bg-[#F5F0FA]'
+                        : 'border-border/50 bg-background hover:border-[#C4B5D4]'
+                    }`}
+                  >
+                    <span
+                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-xs ${
+                        isPurchased
+                          ? 'border-[#C4B5D4] bg-[#C4B5D4] text-white'
+                          : isSelected
+                          ? 'border-[#2D3250] bg-[#2D3250] text-white'
+                          : 'border-border'
+                      }`}
+                    >
+                      {isPurchased ? '✓' : isSelected ? '✓' : ''}
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium" style={{ color: '#2D3250' }}>
+                        {pq.question}
+                      </p>
+                      <p className="mt-1 text-xs text-foreground/50">
+                        {isPurchased ? '구매 완료' : `${pq.price.toLocaleString('ko-KR')}원`}
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* 구매한 질문의 확장 리포트 */}
+                  {isPurchased && pq.report && (
+                    <div className="mt-2 rounded-2xl border border-[#C4B5D4]/30 bg-background p-4">
+                      {pq.report.map((section, idx) => (
+                        <div key={idx}>
+                          <h3 className="mb-2 text-sm font-semibold" style={{ color: '#2D3250' }}>
+                            {section.title}
+                          </h3>
+                          {section.paragraphs.map((para, pIdx) => (
+                            <p key={pIdx} className="mb-2 text-sm leading-relaxed text-foreground/75">
+                              {para}
+                            </p>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          {/* ── 홈으로 ── */}
-          <div className="mt-10 text-center">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-sm text-[#4A3B5C]/50 underline-offset-2 hover:text-[#4A3B5C] hover:underline"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+          {/* 선택한 질문 구매 CTA */}
+          {selectedQuestions.length > 0 && (
+            <div className="sticky bottom-4">
+              <button
+                onClick={handlePurchase}
+                className="flex min-h-[56px] w-full items-center justify-center rounded-2xl text-sm font-semibold text-white shadow-lg transition-all"
+                style={{ backgroundColor: '#2D3250' }}
               >
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              홈으로 돌아가기
-            </Link>
-          </div>
-        </div>
-      </div>
+                {selectedQuestions.length}개 선택 · {totalPrice.toLocaleString('ko-KR')}원 구매하기
+              </button>
+            </div>
+          )}
+        </section>
+      )}
     </div>
   );
 };

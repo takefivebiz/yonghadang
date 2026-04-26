@@ -4,7 +4,7 @@ import { DUMMY_SALES_SUMMARY } from "@/lib/dummy-admin";
 import { SalesSummary, MonthlySales } from "@/types/admin";
 
 export const metadata: Metadata = {
-  title: "매출 조회 | 용하당 관리자",
+  title: "매출 조회 | 코어로그 관리자",
   robots: { index: false, follow: false },
 };
 

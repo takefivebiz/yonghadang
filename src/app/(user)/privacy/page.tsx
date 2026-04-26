@@ -2,11 +2,11 @@ import { type Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "개인정보처리방침 — 용하당",
-  description: "용하당의 개인정보처리방침을 확인하세요.",
+  title: "개인정보처리방침 — 코어로그",
+  description: "코어로그의 개인정보처리방침을 확인하세요.",
   openGraph: {
-    title: "개인정보처리방침 — 용하당",
-    description: "용하당의 개인정보처리방침을 확인하세요.",
+    title: "개인정보처리방침 — 코어로그",
+    description: "코어로그의 개인정보처리방침을 확인하세요.",
   },
   robots: { index: true, follow: true },
 };

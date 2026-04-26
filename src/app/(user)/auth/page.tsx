@@ -3,11 +3,11 @@ import { Suspense } from "react";
 import { AuthClient } from "./_components/auth-client";
 
 export const metadata: Metadata = {
-  title: "로그인 / 회원가입 — 용하당",
+  title: "로그인 / 회원가입 — 코어로그",
   description:
     "카카오 · 구글 계정으로 1초 만에 로그인하고 당신만의 분석 리포트를 이어가세요.",
   openGraph: {
-    title: "로그인 / 회원가입 — 용하당",
+    title: "로그인 / 회원가입 — 코어로그",
     description:
       "카카오 · 구글 계정으로 1초 만에 로그인하고 당신만의 분석 리포트를 이어가세요.",
   },

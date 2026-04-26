@@ -15,12 +15,13 @@ const formatDate = (iso: string) =>
 
 /** 가입 경로 배지 */
 const ProviderBadge = ({ provider }: { provider: AdminUser["provider"] }) => {
-  const MAP = {
-    google: { label: "Google", className: "bg-blue-50 text-blue-600" },
-    kakao:  { label: "Kakao",  className: "bg-yellow-50 text-yellow-700" },
-    guest:  { label: "Guest",  className: "bg-gray-100 text-gray-500" },
+  const MAP: Record<string, { label: string; className: string }> = {
+    google: { label: 'Google', className: 'bg-blue-50 text-blue-600' },
+    kakao:  { label: 'Kakao',  className: 'bg-yellow-50 text-yellow-700' },
+    apple:  { label: 'Apple',  className: 'bg-gray-800 text-white' },
+    guest:  { label: 'Guest',  className: 'bg-gray-100 text-gray-500' },
   };
-  const cfg = MAP[provider ?? "guest"];
+  const cfg = MAP[provider ?? 'guest'];
   return (
     <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}>
       {cfg.label}

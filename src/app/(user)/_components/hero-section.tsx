@@ -1,118 +1,172 @@
-import Link from "next/link";
+"use client";
 
-/**
- * 미니 히어로 섹션 — PRD 6-1.1
- * 서비스 한 줄 소개 및 핵심 CTA 제공. full-screen이 아닌 compact 레이아웃.
- */
+import { useRouter } from "next/navigation";
 
-/** SSR 안전한 결정론적 파티클 위치 */
-const PARTICLES = [
-  { top: 15, left: 10, size: 3.5, delay: 0, color: "#C4AED8" },
-  { top: 20, left: 82, size: 4, delay: 0.8, color: "#E8D4F0" },
-  { top: 60, left: 6, size: 3, delay: 1.4, color: "#D4A5A5" },
-  { top: 72, left: 88, size: 3.5, delay: 0.5, color: "#C4AED8" },
-  { top: 35, left: 95, size: 3, delay: 2.1, color: "#E8D4F0" },
-  { top: 85, left: 30, size: 4, delay: 1.0, color: "#D4A5A5" },
-  { top: 10, left: 50, size: 3, delay: 1.7, color: "#C4AED8" },
-  { top: 80, left: 65, size: 3.5, delay: 0.3, color: "#E8D4F0" },
-];
+const AnalysisType = {
+  SELF: "self",
+  OTHER: "other",
+  RELATIONSHIP: "relationship",
+} as const;
 
 export const HeroSection = () => {
+  const router = useRouter();
+
+  const handleSelectType = (type: (typeof AnalysisType)[keyof typeof AnalysisType]) => {
+    router.push(`/analyze?type=${type}`);
+  };
+
   return (
-    <section className="relative overflow-hidden px-4 pb-14 pt-16 md:pb-20 md:pt-24">
-      {/* ── 배경 그래디언트 ── */}
+    <section className="relative overflow-hidden px-4 py-12 md:py-24">
+      {/* 배경 장식만 - 배경색 제거 */}
       <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 70% at 50% 20%, #EDE0F8 0%, #F5F0E8 70%)",
-        }}
-        aria-hidden="true"
-      />
-
-      {/* ── 배경 블롭 ── */}
-      <div
-        className="pointer-events-none absolute -right-20 -top-10 h-72 w-72 rounded-full blur-3xl"
-        style={{ backgroundColor: "#E8D4F0", opacity: 0.45 }}
+        className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full blur-3xl"
+        style={{ backgroundColor: "#6495ED", opacity: 0.15 }}
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -bottom-8 -left-16 h-64 w-64 rounded-full blur-3xl"
-        style={{ backgroundColor: "#F5D7E8", opacity: 0.4 }}
+        className="pointer-events-none absolute -bottom-20 -left-40 h-80 w-80 rounded-full blur-3xl"
+        style={{ backgroundColor: "#E6E6FA", opacity: 0.08 }}
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute top-1/2 right-1/4 h-72 w-72 rounded-full blur-3xl"
+        style={{ backgroundColor: "#A366FF", opacity: 0.1 }}
         aria-hidden="true"
       />
 
-      {/* ── 파티클 ── */}
-      {PARTICLES.map((p, i) => (
-        <span
-          key={i}
-          className="animate-twinkle absolute rounded-full"
-          style={{
-            top: `${p.top}%`,
-            left: `${p.left}%`,
-            width: `${p.size}px`,
-            height: `${p.size}px`,
-            backgroundColor: p.color,
-            opacity: 0.55,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${2.8 + p.delay * 0.3}s`,
-          }}
-          aria-hidden="true"
-        />
-      ))}
+      {/* 콘텐츠 */}
+      <div className="relative z-10 mx-auto max-w-4xl">
+        {/* 1️⃣ 메인 카피 섹션 */}
+        <div className="mb-12 text-center md:mb-16">
+          <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight md:text-7xl" style={{ color: "#F0E6FA" }}>
+            사람은,
+            <br />
+            <span
+              className="block"
+              style={{
+                backgroundImage: "linear-gradient(90deg, #E6E6FA 0%, #6495ED 50%, #A366FF 100%)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              읽힌다.
+            </span>
+          </h1>
 
-      {/* ── 달 장식 ── */}
-      <div
-        className="animate-float-slow pointer-events-none absolute right-[8%] top-[12%] select-none text-5xl md:text-6xl"
-        style={{ opacity: 0.15, animationDuration: "10s" }}
-        aria-hidden="true"
-      >
-        🌙
-      </div>
+          <p className="mx-auto mb-8 max-w-2xl text-xl leading-relaxed md:text-2xl" style={{ color: "#D4C5E2" }}>
+            나도, 저 사람도, 우리 사이도.
+          </p>
 
-      {/* ── 메인 콘텐츠 ── */}
-      <div className="relative z-10 mx-auto flex max-w-2xl flex-col items-center text-center">
-        {/* 서비스 아이콘 */}
-        <div
-          className="animate-float mb-5 select-none text-5xl md:text-6xl"
-          style={{ animationDuration: "6s" }}
-          aria-hidden="true"
-        >
-          🔮
+          <p className="mx-auto max-w-2xl text-lg md:text-xl" style={{ color: "#B8A8D8" }}>
+            궁금했던 것들이
+            <br />
+            <span className="block" style={{ color: "#F0E6FA", fontWeight: 600 }}>
+              이제 보일 거야.
+            </span>
+          </p>
         </div>
 
-        {/* 태그라인 */}
-        <p className="font-display mb-3 text-xs uppercase tracking-[0.35em] text-muted-foreground">
-          AI Fortune · 용하당
-        </p>
+        {/* 2️⃣ 선택 UX 섹션 (핵심) */}
+        <div className="mb-16 md:mb-24">
+          <p className="mb-6 text-center text-sm font-medium md:text-base" style={{ color: "#B8A8D8" }}>
+            지금 제일 궁금한 쪽부터
+          </p>
 
-        {/* 서비스 한 줄 소개 — PRD 6-1.1: "흐릿했던"으로 공감 → "선명해지는"으로 가치 약속 → "순간"으로 즉시성 */}
-        <h1 className="font-display mb-4 text-3xl font-bold leading-tight tracking-tight text-deep-purple md:text-5xl">
-          흐릿했던 나의 흐름이,
-          <br />
-          <span
-            className="bg-clip-text text-transparent"
-            style={{
-              backgroundImage:
-                "linear-gradient(90deg, #4A3B5C 0%, #9B68B8 55%, #D4A5A5 100%)",
-            }}
-          >
-            선명해지는 순간
-          </span>
-        </h1>
+          <div className="grid gap-4 md:grid-cols-3">
+            {/* [나] 버튼 */}
+            <button
+              onClick={() => handleSelectType(AnalysisType.SELF)}
+              className="group relative overflow-hidden rounded-2xl px-6 py-8 transition-all duration-300 hover:shadow-2xl md:px-8 md:py-10"
+              style={{
+                border: "1px solid rgba(230, 230, 250, 0.3)",
+                background: "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
+              }}
+            >
+              <div className="relative z-10">
+                <div className="mb-3 text-3xl font-bold md:text-4xl" style={{ color: "#B8A8D8" }}>
+                  [나]
+                </div>
+                <p className="text-sm font-medium md:text-base" style={{ color: "#D4C5E2" }}>
+                  나는 어떤 사람일까?
+                </p>
+                <p className="mt-2 text-xs md:text-sm" style={{ color: "#9B8DB8" }}>
+                  내 선택, 패턴, 가치관 읽기
+                </p>
+              </div>
+              <div
+                className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                  background: "linear-gradient(135deg, rgba(230, 230, 250, 0.2), rgba(163, 102, 255, 0.1))",
+                }}
+                aria-hidden="true"
+              />
+            </button>
 
-        {/* 부제 — PRD 6-1.1: 고민 상황 공감 → 4가지 도구를 기능이 아닌 "이야기를 꺼내는 수단"으로 포지셔닝 */}
-        <p className="mb-7 max-w-sm text-base leading-relaxed text-foreground/65 md:text-lg">
-          마음이 흔들릴 때, 선택 앞에서 멈출 때
-          <span className="mt-1 block text-sm text-muted-foreground">
-            사주 · MBTI · 타로 · 점성술, 당신만의 이야기를 꺼내드립니다
-          </span>
-        </p>
+            {/* [상대] 버튼 */}
+            <button
+              onClick={() => handleSelectType(AnalysisType.OTHER)}
+              className="group relative overflow-hidden rounded-2xl px-6 py-8 transition-all duration-300 hover:shadow-2xl md:px-8 md:py-10"
+              style={{
+                border: "1px solid rgba(230, 230, 250, 0.3)",
+                background: "linear-gradient(135deg, rgba(163, 102, 255, 0.15), rgba(100, 149, 237, 0.1))",
+              }}
+            >
+              <div className="relative z-10">
+                <div className="mb-3 text-3xl font-bold md:text-4xl" style={{ color: "#E6E6FA" }}>
+                  [상대]
+                </div>
+                <p className="text-sm font-medium md:text-base" style={{ color: "#D4C5E2" }}>
+                  저 사람은 어떤 사람일까?
+                </p>
+                <p className="mt-2 text-xs md:text-sm" style={{ color: "#9B8DB8" }}>
+                  상대의 행동, 생각, 패턴 읽기
+                </p>
+              </div>
+              <div
+                className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                  background: "linear-gradient(135deg, rgba(163, 102, 255, 0.2), rgba(100, 149, 237, 0.15))",
+                }}
+                aria-hidden="true"
+              />
+            </button>
 
-        {/* 신뢰 지표 — PRD 6-1.1: "무료로 시작"을 맨 앞에 배치해 진입 장벽 최소화 */}
-        <p className="text-xs" style={{ color: "rgba(155, 136, 172, 0.65)" }}>
-          ✦ 무료로 시작 · ✦ 3분 안에 완성 · ✦ 수천 명이 선택한 리포트
-        </p>
+            {/* [관계] 버튼 */}
+            <button
+              onClick={() => handleSelectType(AnalysisType.RELATIONSHIP)}
+              className="group relative overflow-hidden rounded-2xl px-6 py-8 transition-all duration-300 hover:shadow-2xl md:px-8 md:py-10"
+              style={{
+                border: "1px solid rgba(230, 230, 250, 0.3)",
+                background: "linear-gradient(135deg, rgba(75, 0, 130, 0.15), rgba(25, 25, 112, 0.1))",
+              }}
+            >
+              <div className="relative z-10">
+                <div className="mb-3 text-3xl font-bold md:text-4xl" style={{ color: "#B8A8D8" }}>
+                  [관계]
+                </div>
+                <p className="text-sm font-medium md:text-base" style={{ color: "#D4C5E2" }}>
+                  우리 사이는 어떤 관계일까?
+                </p>
+                <p className="mt-2 text-xs md:text-sm" style={{ color: "#9B8DB8" }}>
+                  관계의 반복 구조, 흐름 읽기
+                </p>
+              </div>
+              <div
+                className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                  background: "linear-gradient(135deg, rgba(230, 230, 250, 0.15), rgba(100, 149, 237, 0.1))",
+                }}
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+
+          {/* 신뢰 지표 */}
+          <p className="mt-8 text-center text-xs md:text-sm" style={{ color: "rgba(184, 168, 216, 0.6)" }}>
+            ✓ 무료 · ✓ 3분 완성 · ✓ 해석형 리포트
+          </p>
+        </div>
       </div>
     </section>
   );

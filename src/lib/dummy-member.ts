@@ -9,7 +9,7 @@ import { MemberProfile, SocialProvider } from "@/types/member";
 export const DUMMY_MEMBER: MemberProfile = {
   memberId: "user_demo",
   nickname: "별빛도령",
-  email: "demo@yonghadang.com",
+  email: "demo@corelog.io",
   provider: "kakao",
   joinedAt: "2026-03-02T09:00:00.000Z",
 };
@@ -26,7 +26,7 @@ export const DUMMY_MEMBERS_BY_PROVIDER: Record<SocialProvider, MemberProfile> =
     google: {
       memberId: "user_demo",
       nickname: "별빛도령",
-      email: "demo@yonghadang.com",
+      email: "demo@corelog.io",
       provider: "google",
       joinedAt: "2026-03-02T09:00:00.000Z",
     },

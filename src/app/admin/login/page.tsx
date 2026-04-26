@@ -43,7 +43,7 @@ const AdminLoginPage = () => {
         {/* 헤더 */}
         <div className="mb-8 text-center">
           <h1 className="font-display text-3xl font-bold tracking-widest text-primary">
-            용하당
+            코어로그
           </h1>
           <p className="mt-2 text-sm text-foreground/60">관리자 전용 로그인</p>
         </div>

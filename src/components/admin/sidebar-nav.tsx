@@ -21,7 +21,7 @@ export const SidebarNav = () => {
       {/* 로고 */}
       <div className="flex h-16 items-center px-6 border-b border-border">
         <Link href="/admin" className="font-display text-xl font-bold tracking-widest text-primary">
-          용하당 관리
+          코어로그 관리
         </Link>
       </div>
 

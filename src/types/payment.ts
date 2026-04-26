@@ -1,37 +1,37 @@
-import { ContentCategory } from "./content";
+import { AnalysisCategory } from './analysis';
 
 /**
- * /start 에서 /payments 로 넘어갈 때 sessionStorage 에 저장되는 입력 정보.
- * PRD 6-5: "입력 정보 요약" 섹션을 위한 데이터 구조.
+ * /analyze 완료 후 /payments 로 넘어갈 때 sessionStorage 에 저장되는 데이터.
+ * PRD 5.6: 최종 제출 시 한 번에 서버로 전송.
  */
 export interface PendingOrderInput {
-  contentSlug: string;
-  category: ContentCategory;
-  /** 입력 정보 요약 표시용 (라벨 + 값 페어) */
-  summary: Array<{ label: string; value: string }>;
-  /** 결제 전 결정된 orderId — 결제 성공 후 Order 레코드 생성에 사용 */
+  sessionId: string;
+  category: AnalysisCategory;
+  /** 구매 대상 유료 질문 ID 목록 */
+  paidQuestionIds: string[];
+  /** 결제 전 결정된 orderId */
   orderId?: string;
-  /** 비회원 체크아웃 — 결제 완료 후 리포트 열람 검증용 */
+  /** 비회원 체크아웃 식별 정보 */
   guestPhone?: string;
-  guestPassword?: string;
-  /** 저장 시각 — 만료 체크용 (PRD 3.1 pending 30분 만료 정책) */
+  /** 저장 시각 — 만료 체크용 (30분 만료) */
   savedAt: number;
 }
 
-/** 비회원 결제 시 입력되는 식별 정보 (PRD 6-5) */
+/** 비회원 결제 시 입력되는 식별 정보 */
 export interface GuestCheckoutInfo {
   phoneNumber: string;
+  /** 4자리 숫자 비밀번호 — PRD 5.3: bcrypt 해시로 DB 저장 */
   password: string;
 }
 
-/** 토스 successUrl 로 리다이렉트될 때 쿼리 파라미터로 전달되는 결제 승인 정보 */
+/** 토스 successUrl 쿼리 파라미터 */
 export interface TossPaymentSuccessParams {
   paymentKey: string;
   orderId: string;
   amount: string;
 }
 
-/** 토스 failUrl 로 리다이렉트될 때 쿼리 파라미터로 전달되는 결제 실패 정보 */
+/** 토스 failUrl 쿼리 파라미터 */
 export interface TossPaymentFailParams {
   code: string;
   message: string;

@@ -2,7 +2,7 @@ import { type Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "결제 실패 — 용하당",
+  title: "결제 실패 — 코어로그",
   description: "결제가 완료되지 않았습니다.",
   robots: { index: false, follow: false },
 };

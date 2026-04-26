@@ -2,11 +2,11 @@ import { type Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "이용약관 — 용하당",
-  description: "용하당의 서비스 이용약관을 확인하세요.",
+  title: "이용약관 — 코어로그",
+  description: "코어로그의 서비스 이용약관을 확인하세요.",
   openGraph: {
-    title: "이용약관 — 용하당",
-    description: "용하당의 서비스 이용약관을 확인하세요.",
+    title: "이용약관 — 코어로그",
+    description: "코어로그의 서비스 이용약관을 확인하세요.",
   },
   robots: { index: true, follow: true },
 };
@@ -78,7 +78,7 @@ const TermsPage = () => {
               제1조 목적
             </h2>
             <p className="text-sm leading-relaxed text-[#4A4B5C]/80">
-              이 약관은 용하당(이하 &quot;회사&quot;)이 제공하는 AI 기반 개인
+              이 약관은 코어로그(이하 &quot;회사&quot;)이 제공하는 AI 기반 개인
               분석 및 해석 서비스(이하 &quot;서비스&quot;)의 이용 조건 및 절차,
               이용자의 권리와 의무, 회사의 책임 제한 등에 관한 사항을
               규정합니다.

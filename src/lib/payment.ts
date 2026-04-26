@@ -1,7 +1,7 @@
 import { PendingOrderInput } from "@/types/payment";
 
 /** sessionStorage 키 — /start → /payments 데이터 전달용 */
-export const SESSION_PENDING_KEY = "yonghadang:pending_order";
+export const SESSION_PENDING_KEY = "corelog:pending_order";
 
 /** pending 주문 만료 시간 — PRD 3.1 pending 30분 만료 정책과 동기화 */
 const PENDING_EXPIRY_MS = 30 * 60 * 1000;
@@ -41,7 +41,7 @@ export const generateCustomerKey = (): string => {
   return `cust_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 };
 
-/** /start 에서 입력 정보 저장 (브라우저 전용) */
+/** /analyze 완료 후 /payments 로 넘어갈 때 입력 정보 저장 (브라우저 전용) */
 export const savePendingOrder = (
   input: Omit<PendingOrderInput, "savedAt">,
 ): void => {

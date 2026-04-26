@@ -9,9 +9,9 @@
 
 import { MemberProfile } from "@/types/member";
 
-const GUEST_ACCESS_PREFIX = "yonghadang:report_access:";
-const MEMBER_SESSION_KEY = "yonghadang:member_session";
-const GUEST_LOGIN_KEY = "yonghadang:guest_login";
+const GUEST_ACCESS_PREFIX = "corelog:report_access:";
+const MEMBER_SESSION_KEY = "corelog:member_session";
+const GUEST_LOGIN_KEY = "corelog:guest_login";
 
 /** 주문별 비회원 열람 허용 토큰 저장 (30분 유효) */
 const GUEST_ACCESS_TTL_MS = 30 * 60 * 1000;
@@ -88,7 +88,7 @@ export const getMemberProfile = (): MemberProfile | null => {
 };
 
 /** 로그인/로그아웃 상태 변경을 헤더 등 구독자에게 알리는 커스텀 이벤트 */
-export const AUTH_CHANGE_EVENT = "yonghadang:auth-changed";
+export const AUTH_CHANGE_EVENT = "corelog:auth-changed";
 
 /**
  * 회원 로그인 시뮬레이션 — 프로필을 localStorage 에 저장.

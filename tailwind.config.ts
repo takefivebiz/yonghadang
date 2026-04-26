@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * 용하당 디자인 팔레트
+ * 코어로그 디자인 팔레트
  * globals.css의 @config로 로드됨 (Tailwind v4 방식)
  *
  * 사용 예시:

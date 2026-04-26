@@ -1,28 +1,26 @@
-import { Suspense } from 'react';
 import { type Metadata } from 'next';
 import { HeroSection } from './_components/hero-section';
-import { ContentSection } from './_components/content-section';
+import { EmpathySection } from './_components/empathy-section';
+import { TrustSection } from './_components/trust-section';
+import { CTASection } from './_components/cta-section';
 
 export const metadata: Metadata = {
-  title: '용하당 — AI 사주, MBTI, 타로, 점성술',
+  title: 'Corelog — 사람을 읽는 AI 리포트',
   description:
-    'AI가 분석하는 심층 사주, MBTI, 타로, 점성술 서비스. 당신만의 운명 보고서를 3분 안에 확인하세요.',
+    '사람은 읽힌다. 나도, 저 사람도, 우리 사이도. 3분 안에 무료로 시작하세요.',
   openGraph: {
-    title: '용하당 — AI 사주, MBTI, 타로, 점성술',
-    description: 'AI가 분석하는 심층 사주, MBTI, 타로, 점성술 서비스.',
+    title: 'Corelog — 사람을 읽는 AI 리포트',
+    description: '선택과 패턴을 통해 사람을 해석합니다. 나의 선택, 상대의 행동, 관계의 구조를 한눈에 파악하세요.',
   },
 };
 
 const HomePage = () => {
   return (
     <>
-      {/* 1. 히어로 — 미니 히어로 */}
       <HeroSection />
-
-      {/* 2. 콘텐츠 탐색 — 카테고리 탭 + 카드 그리드 (useSearchParams는 Suspense 필요) */}
-      <Suspense>
-        <ContentSection />
-      </Suspense>
+      <EmpathySection />
+      <TrustSection />
+      <CTASection />
     </>
   );
 };

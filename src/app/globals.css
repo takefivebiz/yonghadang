@@ -48,7 +48,7 @@
 :root {
   --radius: 0.625rem;
 
-  /* 용하당 테마 — Pastel Light */
+  /* 코어로그 테마 — Pastel Light */
   --background: #F5F0E8;          /* Cream 배경 */
   --foreground: #4A3B5C;          /* Deep Purple 텍스트 */
   --card: #FFFFFF;

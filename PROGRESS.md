@@ -3,8 +3,8 @@
 ## 프로젝트 정보
 
 - **프로젝트명:** corelog (코어로그)
-- **위치:** `~/Desktop/yonghadang` (`/Users/suyeon/Desktop/yonghadang`)
-- **생성일:** 2026-04-15
+- **위치:** `~/Desktop/corelog` (`/Users/suyeon/Desktop/corelog`)
+- **생성일:** 2026-04-20
 
 ## 기술 스택
 
@@ -19,57 +19,78 @@
 | 언어 설정    | `lang="ko"`                    |
 | 폰트         | Geist Sans / Geist Mono        |
 
-## 생성된 파일 구조
+---
 
-```
-yonghadang/
-├── package.json            # 의존성 정의
-├── next.config.ts          # Next.js 설정
-├── tsconfig.json           # TypeScript 설정 (@/* alias)
-├── postcss.config.mjs      # Tailwind v4 PostCSS 설정
-├── components.json         # shadcn/ui 설정
-├── eslint.config.mjs       # ESLint flat config
-├── next-env.d.ts           # Next.js 타입 선언
-├── .gitignore
-├── PROGRESS.md             # 이 파일
-└── src/
-    ├── app/
-    │   ├── globals.css     # Tailwind v4 + shadcn CSS 변수 (라이트/다크)
-    │   ├── layout.tsx      # 루트 레이아웃
-    │   └── page.tsx        # 메인 페이지 (환영 화면)
-    ├── components/
-    │   └── ui/             # shadcn 컴포넌트 설치 위치 (비어있음)
-    ├── hooks/              # 커스텀 훅 (비어있음)
-    └── lib/
-        └── utils.ts        # cn() 유틸리티 (clsx + tailwind-merge)
-```
+## 완료된 작업 (2026-04-25)
 
-## 완료된 작업
+### 1단계: 프로젝트 클린업 & Corelog 전환
 
-- [x] 바탕화면에 yonghadang 폴더 생성
-- [x] Context7 MCP로 Next.js / shadcn/ui 최신 문서 참조
-- [x] 프로젝트 전체 보일러플레이트 파일 생성
-- [x] Tailwind v4 + shadcn/ui CSS 변수 (라이트/다크 테마) 설정
-- [x] cn() 유틸리티 함수 작성
+- 이전 프로젝트(yonghadang) 코드 제거 및 코어로그 전환
+  - 삭제: `/astrology`, `/mbti`, `/saju`, `/tarot`, `/start`, `/guest-check`, `/guest-login` 라우트
+  - 삭제: `content.ts`, `content-detail.ts`, `dummy-contents.ts`, `dummy-content-details.ts`, `dummy-reports.ts`(구)
+  - 삭제: `yonghadang-PRD.md`, `category-page-layout.tsx`, `content-section.tsx`, `content-card.tsx`
 
-## 미완료 작업 (로컬 터미널에서 실행 필요)
+- Corelog 브랜딩 & 타입 시스템 구축
+  - 신규: `src/types/analysis.ts` — 분석 카테고리, 질문, 답변, 세션 타입
+  - 신규: `src/types/report.ts` — 무료/유료 리포트, 확장 질문 타입
+  - 업데이트: `order.ts`, `payment.ts`, `admin.ts` — Corelog 기반으로 재정의
 
-```bash
-cd ~/Desktop/yonghadang
-npm install
-npx shadcn@latest init     # components.json 자동 인식됨
-npm run dev                 # http://localhost:3000
-```
+- Storage key 전환: `yonghadang:*` → `corelog:*`
 
-## 다음 단계 제안
+### 2단계: 라우트 구조 정비
 
-- PRD 문서 작성 (현 시점에서는 보류 중)
-- 페이지 및 기능 설계
-- shadcn/ui 컴포넌트 추가 (`npx shadcn@latest add button` 등)
-- 데이터베이스 / 인증 등 백엔드 연동 검토
+| 라우트               | 상태  | 설명                              |
+| -------------------- | ----- | --------------------------------- |
+| `/`                  | ✅ 완료 | Corelog 메인 랜딩 (카테고리 선택) |
+| `/analyze`           | ✅ 완료 | 분석 플로우 (6단계 질문)          |
+| `/report/[session-id]` | ✅ 완료 | 무료+유료 리포트 통합 페이지    |
+| `/guest/lookup`      | ✅ 완료 | 비회원 기록 조회                  |
+| `/auth`              | ✅ 유지 | 소셜 로그인 (Google, Kakao)       |
+| `/my-page`           | ✅ 유지 | 마이페이지 + 구매 내역            |
+| `/payments`          | ✅ 업데이트 | Corelog 결제 플로우           |
+| `/payments/success`  | ✅ 업데이트 | 결제 완료 콜백                |
+| `/terms`, `/privacy`, `/contact` | ✅ 유지 |                      |
+| `/admin/*`           | ✅ 업데이트 | 관리자 (Corelog 데이터 기반)  |
 
-## 참고
+---
 
-- PRD 문서는 사용자 요청에 따라 아직 생성하지 않음
-- 네트워크 제약으로 npm install은 로컬에서 직접 실행 필요
-- Claude Code CLI 사용 시 터미널에서 직접 명령 실행 가능
+## 완료된 작업 (2026-04-26)
+
+### 3단계: Corelog 랜딩 리디자인 (방향성 전환)
+
+- **핵심 컨셉 변경**: 자기해석 → 사람 해석 (나/상대/관계)
+- **메인 카피 확정**: "사람은, 읽힌다. 나도, 저 사람도, 우리 사이도."
+- **랜딩 페이지 구조 재정의**:
+  1. 메인 카피 (임팩트)
+  2. 선택 UX ([나] [상대] [관계]) — 핵심
+  3. 공감 섹션
+  4. 신뢰 섹션 (샘플)
+  5. CTA (리포트 확인하기)
+
+- **분석 플로우 업데이트**:
+  - Step 0: 분석 타입 선택 (랜딩에서) → Step 1: 카테고리 선택 → Step 2: 하위 분기 → Step 3~4: 질문
+  - type 파라미터: `self|other|relationship`
+  - 분석 타입별 톤 변경 (호칭, 관점 다름)
+
+- **PRD.md 반영**:
+  - 1.1 브랜드 정의 변경
+  - 1.2 제품 포지셔닝 변경 (자기해석 → 사람 해석)
+  - 3.1 설계 원칙 업데이트
+  - 3.2 카테고리 분리 원칙 재정의
+  - 3.9.2.5 분석 타입별 톤 추가
+  - 6-1 메인 랜딩 페이지 전체 재구성
+  - 6-2 분석 플로우 Step 0~4 재정의
+
+---
+
+## 다음 작업 예정
+
+### 4단계: 프론트엔드 구현 (새로운 구조 기반)
+- 메인 랜딩 페이지 UI 구현 ([나]/[상대]/[관계] 선택 UX)
+- 분석 플로우 UI 업데이트 (분석 타입별 카테고리 질문)
+- 리포트 UI 업데이트 (분석 타입별 톤 반영)
+
+### 5단계: 백엔드 연동
+- Supabase 스키마 설계 (분석 타입, 세션 데이터 포함)
+- 분석 세션 저장 로직
+- 더미 리포트 데이터 → 실제 API 호출로 교체

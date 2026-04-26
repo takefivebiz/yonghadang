@@ -42,7 +42,7 @@ export const MobileDrawer = () => {
             onClick={close}
             className="font-display text-xl font-bold tracking-widest text-primary"
           >
-            용하당
+            코어로그
           </Link>
           <button
             onClick={close}

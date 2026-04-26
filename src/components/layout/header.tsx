@@ -4,14 +4,21 @@ import { HeaderAuthNav } from "./header-auth-nav";
 
 export const Header = () => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
+    <header
+      className="sticky top-0 z-50 w-full border-b backdrop-blur-md"
+      style={{
+        backgroundColor: "rgba(27, 0, 63, 0.95)",
+        borderBottomColor: "rgba(230, 230, 250, 0.1)",
+      }}
+    >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         {/* 로고 */}
         <Link
           href="/"
-          className="font-display text-xl font-bold tracking-widest text-primary"
+          className="font-display text-xl font-bold tracking-widest"
+          style={{ color: "#BEAEDB" }}
         >
-          용하당
+          Corelog
         </Link>
 
         {/* 데스크톱 메뉴 (md 이상) */}

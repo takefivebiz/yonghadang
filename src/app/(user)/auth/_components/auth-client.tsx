@@ -99,17 +99,17 @@ export const AuthClient = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-gradient-to-b from-[#EDE0F8] via-[#F5F0E8] to-[#F5F0E8]">
+    <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
       {/* 배경 장식 블롭 */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-32 top-20 h-80 w-80 rounded-full blur-3xl"
-        style={{ backgroundColor: "#E8D4F0", opacity: 0.4 }}
+        style={{ backgroundColor: "#6495ED", opacity: 0.15 }}
       />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -left-24 top-1/3 h-72 w-72 rounded-full blur-3xl"
-        style={{ backgroundColor: "#F5D7E8", opacity: 0.35 }}
+        style={{ backgroundColor: "#A366FF", opacity: 0.1 }}
       />
 
       {/* 별/달 장식 */}
@@ -139,13 +139,22 @@ export const AuthClient = () => {
         >
           {/* 헤더 */}
           <header className="mb-8 text-center">
-            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[#9B88AC]">
+            <p
+              className="mb-2 text-xs font-medium uppercase tracking-widest"
+              style={{ color: "#BEAEDB" }}
+            >
               Sign in
             </p>
-            <h1 className="text-3xl font-bold text-[#4A3B5C] sm:text-3xl">
+            <h1
+              className="text-3xl font-bold sm:text-3xl"
+              style={{ color: "#F0E6FA" }}
+            >
               당신의 이야기를 이어가세요
             </h1>
-            <p className="mt-4 text-sm leading-relaxed text-[#4A3B5C]/70">
+            <p
+              className="mt-4 text-sm leading-relaxed"
+              style={{ color: "#D4C5E2" }}
+            >
               소셜 계정 하나면 충분해요.
               <br />
               별빛이 안내하는 자리로 모셔드릴게요.
@@ -155,7 +164,12 @@ export const AuthClient = () => {
           {/* 로그인 카드 */}
           <section
             aria-labelledby="auth-card-heading"
-            className="rounded-3xl border border-[#E8D4F0]/60 bg-white px-6 py-8 shadow-lg backdrop-blur-sm sm:px-8 sm:py-10"
+            className="rounded-3xl border px-6 py-8 backdrop-blur-md sm:px-8 sm:py-10"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
+              borderColor: "rgba(230, 230, 250, 0.15)",
+            }}
           >
             <h2 id="auth-card-heading" className="sr-only">
               소셜 로그인
@@ -164,10 +178,14 @@ export const AuthClient = () => {
             {isRedirecting ? (
               <div className="flex flex-col items-center justify-center gap-3 py-8">
                 <div
-                  className="h-6 w-6 rounded-full border-2 border-[#E8D4F0] border-t-[#9B88AC]"
-                  style={{ animation: "spin 1s linear infinite" }}
+                  className="h-6 w-6 rounded-full border-2"
+                  style={{
+                    borderColor: "rgba(230, 230, 250, 0.2)",
+                    borderTopColor: "#BEAEDB",
+                    animation: "spin 1s linear infinite",
+                  }}
                 />
-                <p className="text-xs text-[#4A3B5C]/70">
+                <p className="text-xs" style={{ color: "#D4C5E2" }}>
                   로그인 상태 확인 중...
                 </p>
               </div>
@@ -193,25 +211,31 @@ export const AuthClient = () => {
                 {errorMessage && (
                   <p
                     role="alert"
-                    className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-center text-sm text-red-600"
+                    className="mt-4 rounded-lg px-4 py-3 text-center text-sm text-red-400"
+                    style={{ backgroundColor: "rgba(239, 68, 68, 0.1)" }}
                   >
                     {errorMessage}
                   </p>
                 )}
 
                 {/* 약관 안내 */}
-                <p className="mt-6 text-center text-xs leading-relaxed text-[#4A3B5C]/60">
+                <p
+                  className="mt-6 text-center text-xs leading-relaxed"
+                  style={{ color: "#B8A8D8" }}
+                >
                   로그인 시{" "}
                   <Link
                     href="/terms"
-                    className="text-[#4A3B5C] underline hover:font-semibold"
+                    className="underline transition-colors hover:text-white"
+                    style={{ color: "#BEAEDB" }}
                   >
                     이용약관
                   </Link>
                   {" 및 "}
                   <Link
                     href="/privacy"
-                    className="text-[#4A3B5C] underline hover:font-semibold"
+                    className="underline transition-colors hover:text-white"
+                    style={{ color: "#BEAEDB" }}
                   >
                     개인정보처리방침
                   </Link>
@@ -223,11 +247,12 @@ export const AuthClient = () => {
 
           {/* 비회원 주문 조회 */}
           <div className="mt-6 text-center">
-            <p className="text-xs text-[#4A3B5C]/60">
+            <p className="text-xs" style={{ color: "#B8A8D8" }}>
               계정 없이 주문하셨나요?{" "}
               <Link
                 href="/guest-login"
-                className="font-medium text-[#4A3B5C] hover:underline"
+                className="font-medium underline transition-colors hover:text-white"
+                style={{ color: "#BEAEDB" }}
               >
                 비회원 주문 조회
               </Link>

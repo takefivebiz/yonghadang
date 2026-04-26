@@ -22,13 +22,13 @@ const cinzel = Cinzel({
 
 export const metadata: Metadata = {
   title: {
-    default: '용하당 — AI 사주, MBTI, 타로, 점성술',
-    template: '%s | 용하당',
+    default: '코어로그 — AI 자기해석 리포트',
+    template: '%s | 코어로그',
   },
   description:
-    'AI가 분석하는 심층 사주, MBTI, 타로, 점성술 서비스. 용하당에서 나만의 운명 보고서를 확인하세요.',
+    '당신의 선택과 응답으로 현재 상태, 패턴, 선택 구조를 분석합니다. 코어로그에서 나만의 분석 리포트를 확인하세요.',
   openGraph: {
-    siteName: '용하당',
+    siteName: '코어로그',
     locale: 'ko_KR',
     type: 'website',
   },

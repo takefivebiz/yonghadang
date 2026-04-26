@@ -59,10 +59,10 @@ export const ProfileCard = ({ profile, onProfileChange }: ProfileCardProps) => {
 
   return (
     <section
-      className="relative overflow-hidden rounded-3xl border border-[#E8D4F0] bg-white px-6 py-7 shadow-sm"
+      className="relative overflow-hidden rounded-3xl border px-6 py-7"
       style={{
-        background:
-          "linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 55%, #F9F2FB 100%)",
+        background: "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
+        borderColor: "rgba(230, 230, 250, 0.15)",
       }}
     >
       {/* 신비로운 장식 — 우측 상단 나선/별 */}
@@ -79,13 +79,16 @@ export const ProfileCard = ({ profile, onProfileChange }: ProfileCardProps) => {
           className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full text-3xl shadow-inner"
           style={{
             background:
-              "linear-gradient(135deg, #E8D4F0 0%, #F5D7E8 55%, #D4A5A5 100%)",
-            color: "#4A3B5C",
+              "linear-gradient(135deg, #6495ED 0%, #A366FF 100%)",
+            color: "#F0E6FA",
           }}
           aria-hidden="true"
         >
           🌙
-          <span className="absolute -bottom-1 -right-1 rounded-full bg-white px-1 text-sm shadow-md">
+          <span
+            className="absolute -bottom-1 -right-1 rounded-full px-1 text-sm shadow-md"
+            style={{ backgroundColor: "#F0E6FA", color: "#A366FF" }}
+          >
             ✦
           </span>
         </div>
@@ -94,13 +97,25 @@ export const ProfileCard = ({ profile, onProfileChange }: ProfileCardProps) => {
           {/* 닉네임 + 수정 */}
           {!editing ? (
             <div className="flex items-center gap-2">
-              <h2 className="font-display text-2xl font-bold text-[#4A3B5C]">
+              <h2 className="font-display text-2xl font-bold" style={{ color: "#F0E6FA" }}>
                 {profile.nickname}
               </h2>
               <button
                 type="button"
                 onClick={() => setEditing(true)}
-                className="rounded-full border border-[#E8D4F0] bg-white px-3 py-1 text-xs text-[#9B88AC] transition-all duration-200 hover:border-[#4A3B5C] hover:text-[#4A3B5C]"
+                className="rounded-full border px-3 py-1 text-xs transition-all duration-200"
+                style={{
+                  borderColor: "rgba(230, 230, 250, 0.3)",
+                  color: "#BEAEDB",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#BEAEDB";
+                  e.currentTarget.style.color = "#F0E6FA";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(230, 230, 250, 0.3)";
+                  e.currentTarget.style.color = "#BEAEDB";
+                }}
                 aria-label="닉네임 수정"
               >
                 ✎ 수정
@@ -115,7 +130,18 @@ export const ProfileCard = ({ profile, onProfileChange }: ProfileCardProps) => {
                   onChange={(e) => setDraftNickname(e.target.value)}
                   maxLength={16}
                   autoFocus
-                  className="w-full max-w-xs rounded-xl border border-[#E8D4F0] bg-white px-3 py-2 text-base font-semibold text-[#4A3B5C] outline-none transition-colors focus:border-[#4A3B5C]"
+                  className="w-full max-w-xs rounded-xl border px-3 py-2 text-base font-semibold outline-none transition-colors"
+                  style={{
+                    borderColor: "rgba(230, 230, 250, 0.3)",
+                    backgroundColor: "rgba(100, 149, 237, 0.08)",
+                    color: "#F0E6FA",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#BEAEDB";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(230, 230, 250, 0.3)";
+                  }}
                   placeholder="닉네임"
                   aria-label="닉네임 입력"
                 />
@@ -124,8 +150,8 @@ export const ProfileCard = ({ profile, onProfileChange }: ProfileCardProps) => {
                   onClick={handleSave}
                   className="rounded-full px-3 py-2 text-xs font-semibold transition-all duration-200 hover:scale-[1.03]"
                   style={{
-                    backgroundColor: "#4A3B5C",
-                    color: "#F5F0E8",
+                    background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",
+                    color: "white",
                   }}
                 >
                   저장
@@ -133,13 +159,17 @@ export const ProfileCard = ({ profile, onProfileChange }: ProfileCardProps) => {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="rounded-full border border-[#E8D4F0] bg-white px-3 py-2 text-xs text-[#9B88AC] transition-colors hover:text-[#4A3B5C]"
+                  className="rounded-full border px-3 py-2 text-xs transition-colors"
+                  style={{
+                    borderColor: "rgba(230, 230, 250, 0.3)",
+                    color: "#BEAEDB",
+                  }}
                 >
                   취소
                 </button>
               </div>
               {error && (
-                <p className="text-xs text-[#D4475A]" role="alert">
+                <p className="text-xs text-red-400" role="alert">
                   {error}
                 </p>
               )}
@@ -149,7 +179,7 @@ export const ProfileCard = ({ profile, onProfileChange }: ProfileCardProps) => {
           {/* 이메일 + 소셜 뱃지 */}
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <SocialBadge provider={profile.provider} />
-            <span className="text-sm text-[#4A3B5C]/70 break-all">
+            <span className="text-sm break-all" style={{ color: "#D4C5E2" }}>
               {profile.email}
             </span>
           </div>
@@ -160,7 +190,19 @@ export const ProfileCard = ({ profile, onProfileChange }: ProfileCardProps) => {
           <button
             type="button"
             onClick={handleLogout}
-            className="rounded-full border border-[#E8D4F0] bg-white px-4 py-2 text-sm font-medium text-[#4A3B5C]/70 transition-all duration-200 hover:border-[#4A3B5C] hover:text-[#4A3B5C]"
+            className="rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200"
+            style={{
+              borderColor: "rgba(230, 230, 250, 0.3)",
+              color: "#D4C5E2",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "#BEAEDB";
+              e.currentTarget.style.color = "#F0E6FA";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "rgba(230, 230, 250, 0.3)";
+              e.currentTarget.style.color = "#D4C5E2";
+            }}
           >
             로그아웃
           </button>

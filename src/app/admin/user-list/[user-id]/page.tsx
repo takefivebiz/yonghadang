@@ -13,7 +13,7 @@ interface PageProps {
 export const generateMetadata = async ({ params }: PageProps): Promise<Metadata> => {
   const { "user-id": userId } = await params;
   return {
-    title: `유저 상세 ${userId} | 용하당 관리자`,
+    title: `유저 상세 ${userId} | 코어로그 관리자`,
     robots: { index: false, follow: false },
   };
 };
@@ -69,7 +69,7 @@ const OrderRow = ({ order }: { order: AdminOrderSummary }) => (
     className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b border-border/50 px-5 py-4 text-sm transition-colors hover:bg-secondary/30 last:border-b-0"
   >
     <div className="min-w-0">
-      <p className="font-medium text-foreground">{order.contentTitle}</p>
+      <p className="font-medium text-foreground">{order.category} 분석</p>
       <p className="truncate text-xs text-foreground/50">{order.id}</p>
     </div>
     <span className="hidden text-xs text-foreground/60 sm:block">{formatDate(order.createdAt)}</span>
