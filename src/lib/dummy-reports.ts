@@ -110,20 +110,20 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
     paidQuestions: [
       {
         id: 'pq_love_01',
-        question: '상대가 나를 어떻게 보고 있을까? — 시선 구조 분석',
-        price: 4900,
+        question: '이 선택이 나중에 후회될 가능성은?',
+        price: 900,
         isPurchased: false,
       },
       {
         id: 'pq_love_02',
-        question: '내가 이 관계에서 반복하는 선택 구조는 뭘까?',
-        price: 4900,
+        question: '상대는 지금 나를 어떻게 보고 있을까?',
+        price: 900,
         isPurchased: false,
       },
       {
         id: 'pq_love_03',
-        question: '지금 이 감정이 진짜 연애 감정인지, 다른 무언가인지 구분하기',
-        price: 4900,
+        question: '나는 왜 항상 이런 선택을 반복할까?',
+        price: 900,
         isPurchased: false,
       },
     ],
@@ -158,24 +158,30 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
     paidQuestions: [
       {
         id: 'pq_career_01',
-        question: '내가 진짜 원하는 방향과 현실 기준 사이의 충돌 구조',
-        price: 4900,
+        question: '지금 바꾸면 나중에 후회할 가능성은?',
+        price: 900,
         isPurchased: true,
         report: [
           {
-            title: '충돌의 원인',
+            title: '후회 가능성 분석',
             paragraphs: [
-              '네가 현실 기준이라고 부르는 것들 — 안정성, 수입, 리스크 — 이건 진짜 네 기준이 아니야.',
-              '주변에서 반복적으로 들어온 기준을 내면화한 거야. 내면화가 너무 깊어서 네 것처럼 느껴지는 것뿐이야.',
-              '진짜 충돌은 "하고 싶은 것 vs 해야 하는 것"이 아니라, "내 기준 vs 내면화된 타인의 기준"이야.',
+              '현실 기준으로만 판단하면 후회할 가능성이 높아.',
+              '하지만 지금 상태로 계속 가면 그것도 후회가 될 거야.',
+              '중요한 건 어떤 선택이 진짜 네 기준인지를 알아야 한다는 것이야.',
             ],
           },
         ],
       },
       {
         id: 'pq_career_02',
-        question: '이 선택 앞에서 내가 회피해온 것들',
-        price: 4900,
+        question: '주변 사람들은 이 선택을 어떻게 볼까?',
+        price: 900,
+        isPurchased: false,
+      },
+      {
+        id: 'pq_career_03',
+        question: '나는 왜 항상 안정성에 끌릴까?',
+        price: 900,
         isPurchased: false,
       },
     ],
@@ -210,14 +216,20 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
     paidQuestions: [
       {
         id: 'pq_emotion_01',
-        question: '이 감정의 진짜 원인은 뭘까? — 감정 추적',
-        price: 4900,
+        question: '이 감정이 계속되면 어떤 결과가 올까?',
+        price: 900,
         isPurchased: false,
       },
       {
         id: 'pq_emotion_02',
-        question: '감정 변화에 따라 내가 반복하는 행동들',
-        price: 4900,
+        question: '주변 사람들도 내 감정 변화를 느낄까?',
+        price: 900,
+        isPurchased: false,
+      },
+      {
+        id: 'pq_emotion_03',
+        question: '감정 변화의 패턴 속에서 내가 반복하는 행동은?',
+        price: 900,
         isPurchased: false,
       },
     ],
@@ -252,14 +264,20 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
     paidQuestions: [
       {
         id: 'pq_relation_01',
-        question: '내가 관계를 멀어지게 하는 패턴 분석',
-        price: 4900,
+        question: '이 거리감이 더 커질 가능성은?',
+        price: 900,
         isPurchased: false,
       },
       {
         id: 'pq_relation_02',
-        question: '상대와의 관계에서 내가 표현하지 못하는 것들',
-        price: 4900,
+        question: '상대는 내 어색함을 알아챌까?',
+        price: 900,
+        isPurchased: false,
+      },
+      {
+        id: 'pq_relation_03',
+        question: '나는 왜 항상 관계에서 거리감을 느낄까?',
+        price: 900,
         isPurchased: false,
       },
     ],

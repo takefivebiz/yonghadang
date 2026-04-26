@@ -39,7 +39,6 @@ const DUMMY_ORDERS: Order[] = [
     status: 'done',
     ownerType: 'guest',
     phoneNumber: '01033333333',
-    errorMessage: null,
     createdAt: '2026-04-18T12:00:00.000Z',
   },
 ];

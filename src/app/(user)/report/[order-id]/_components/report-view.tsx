@@ -5,6 +5,7 @@ import { FullReport } from '@/types/report';
 import { AnalysisSession } from '@/types/analysis';
 import { savePendingOrder } from '@/lib/payment';
 import { useRouter } from 'next/navigation';
+import { getPriceForQuantity, getSavingsAmount, isBestDeal } from '@/lib/pricing';
 
 interface ReportViewProps {
   report: FullReport;
@@ -12,49 +13,28 @@ interface ReportViewProps {
 }
 
 /**
- * 리포트 뷰 — PRD 6: 무료 리포트 + 유료 확장 질문 목록
- * - 분석 타입별 톤 적용 (인지형/감정형/균형형)
- * - 카테고리별 리포트 구조 다양화
+ * 리포트 뷰 — PRD 6, 9.3, 9.6
+ * - 무료 리포트 표시
+ * - 유료 질문 선택 (할인 구조 포함)
  */
 export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
   const router = useRouter();
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const { freeReport, paidQuestions, category, createdAt } = report;
 
-  // PRD 3.7: 추론된 사용자 타입 기반 리포트 톤 적용
+  // 분석 타입 정보
   const reportTone = analysisSession?.inferredUserType?.reportTone ?? '균형형';
-  const questionStrategy = analysisSession?.inferredUserType?.questionStrategy ?? '구조중심';
-  const topTraits = analysisSession?.inferredUserType?.topTraits ?? [];
-
   const formattedDate = new Date(createdAt).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
 
-  // 분석 타입별 톤 색상 정의
-  const toneColors = {
-    인지형: {
-      headline: '#2D3250', // 진한 보라
-      border: '#BEAEDB',
-      bg: 'rgba(100, 149, 237, 0.08)',
-      accent: '#6495ED',
-    },
-    감정형: {
-      headline: '#C4A69D', // 따뜻한 갈색
-      border: '#D4AFA0',
-      bg: 'rgba(196, 166, 157, 0.08)',
-      accent: '#E8C4B8',
-    },
-    균형형: {
-      headline: '#4A3B5C', // 중간 보라
-      border: '#BEAEDB',
-      bg: 'rgba(141, 90, 170, 0.08)',
-      accent: '#8D5AAA',
-    },
-  };
-
-  const toneColor = toneColors[reportTone];
+  // 가격 계산
+  const totalPrice = getPriceForQuantity(selectedQuestions.length);
+  const savingsAmount = getSavingsAmount(selectedQuestions.length);
+  const showSavings = selectedQuestions.length >= 2;
+  const showBestDeal = isBestDeal(selectedQuestions.length);
 
   const toggleQuestion = (id: string) => {
     setSelectedQuestions((prev) =>
@@ -72,74 +52,40 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
     router.push('/payments');
   };
 
-  const totalPrice = selectedQuestions.length * 4900;
-
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-8 md:py-10">
-      {/* 헤더: 카테고리 + 톤 뱃지 + 날짜 */}
-      <div className="mb-8">
-        <div className="flex flex-wrap items-center gap-2 mb-3">
+    <div className="mx-auto w-full max-w-3xl px-4 py-8 md:py-12">
+      {/* 헤더 */}
+      <div className="mb-10">
+        <div className="mb-4 flex items-center gap-2">
           <span
-            className="inline-block rounded-full px-3 py-1 text-xs font-medium"
-            style={{
-              background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",
-              color: "white",
-            }}
+            className="inline-block rounded-full px-3 py-1 text-xs font-semibold text-white"
+            style={{ background: 'linear-gradient(90deg, #6495ED 0%, #A366FF 100%)' }}
           >
             {category}
           </span>
-          <span
-            className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-medium"
-            style={{
-              backgroundColor: toneColor.bg,
-              color: toneColor.headline,
-              border: `1px solid ${toneColor.border}`,
-            }}
-          >
-            {reportTone}
-          </span>
+          <span className="text-xs text-muted-foreground">{formattedDate} 분석</span>
         </div>
-        <p className="text-xs" style={{ color: '#9B88AC' }}>
-          {formattedDate} 분석
-        </p>
       </div>
 
-      {/* 무료 리포트 */}
+      {/* 무료 리포트 섹션 */}
       {freeReport && (
-        <section className="mb-12">
-          {/* 헤드라인 — 톤별 다른 스타일 */}
-          <div
-            className="mb-8 rounded-3xl p-6"
-            style={{
-              background: toneColor.bg,
-              borderLeft: `4px solid ${toneColor.border}`,
-            }}
-          >
-            <h1
-              className="text-lg font-bold leading-relaxed"
-              style={{ color: toneColor.headline }}
-            >
+        <section className="mb-12 rounded-2xl border border-border/50 bg-white p-8 md:p-10">
+          <div className="mb-6">
+            <span className="text-xs font-semibold text-muted-foreground">FREE INSIGHT</span>
+            <h1 className="mt-2 text-2xl font-bold leading-relaxed md:text-3xl" style={{ color: '#2D3250' }}>
               {freeReport.headline}
             </h1>
           </div>
 
-          {/* 섹션 목록 */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             {freeReport.sections.map((section, idx) => (
               <div key={idx}>
-                <h2
-                  className="mb-3 text-sm font-semibold"
-                  style={{ color: toneColor.headline }}
-                >
+                <h2 className="mb-3 text-base font-semibold" style={{ color: '#2D3250' }}>
                   {section.title}
                 </h2>
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {section.paragraphs.map((para, pIdx) => (
-                    <p
-                      key={pIdx}
-                      className="text-sm leading-relaxed"
-                      style={{ color: '#4A3B5C' }}
-                    >
+                    <p key={pIdx} className="text-sm leading-relaxed text-muted-foreground">
                       {para}
                     </p>
                   ))}
@@ -148,54 +94,30 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
             ))}
           </div>
 
-          {/* 결핍 문장 — PRD 3.10.7 */}
-          <div
-            className="mt-8 rounded-2xl p-5"
-            style={{
-              background: toneColor.bg,
-              borderLeft: `3px solid ${toneColor.border}`,
-            }}
-          >
-            <p
-              className="text-sm font-medium leading-relaxed"
-              style={{ color: toneColor.headline }}
-            >
+          {/* 결핍 문장 */}
+          <div className="mt-8 rounded-xl border-l-4 border-[#6495ED] bg-blue-50 p-4" style={{ borderLeftColor: '#6495ED' }}>
+            <p className="text-sm font-medium leading-relaxed" style={{ color: '#2D3250' }}>
               {freeReport.deficitSentence}
-            </p>
-          </div>
-
-          {/* 톤 설명 */}
-          <div className="mt-6 text-xs" style={{ color: '#9B88AC' }}>
-            <p>
-              💡 이 분석은 <strong>{reportTone}</strong> 성향을 반영하여 작성되었습니다.
-              {reportTone === '인지형' && ' 논리적이고 구조적인 관점에서 상황을 분석했어요.'}
-              {reportTone === '감정형' && ' 감정과 심리 중심으로 깊이 있게 분석했어요.'}
-              {reportTone === '균형형' && ' 이성과 감정의 균형을 맞춰 분석했어요.'}
             </p>
           </div>
         </section>
       )}
 
-      {/* 유료 질문 목록 */}
+      {/* 유료 질문 섹션 */}
       {paidQuestions.length > 0 && (
         <section>
-          <div className="mb-6">
-            <h2 className="mb-2 text-base font-semibold" style={{ color: '#2D3250' }}>
+          <div className="mb-8">
+            <h2 className="text-xl font-bold md:text-2xl" style={{ color: '#2D3250' }}>
               더 깊이 알고 싶어?
             </h2>
-            <p className="text-sm" style={{ color: '#9B88AC' }}>
-              궁금한 질문을 선택하면 더 심층적인 분석을 볼 수 있어.
-              {selectedQuestions.length > 0 && (
-                <span style={{ color: toneColor.headline }} className="font-medium">
-                  {' '}
-                  {selectedQuestions.length}개 선택됨
-                </span>
-              )}
+            <p className="mt-2 text-sm text-muted-foreground">
+              궁금한 질문을 선택해서 심층 분석을 확인해보세요.
             </p>
           </div>
 
+          {/* 질문 목록 */}
           <div className="mb-6 space-y-3">
-            {paidQuestions.map((pq) => {
+            {paidQuestions.map((pq, idx) => {
               const isSelected = selectedQuestions.includes(pq.id);
               const isPurchased = pq.isPurchased;
 
@@ -204,73 +126,54 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
                   <button
                     onClick={() => !isPurchased && toggleQuestion(pq.id)}
                     disabled={isPurchased}
-                    className={`flex w-full items-start gap-3 rounded-2xl border p-5 text-left transition-all ${
+                    className={`group flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-all md:p-5 ${
                       isPurchased
-                        ? 'cursor-default opacity-80'
+                        ? 'cursor-default opacity-60'
                         : isSelected
-                        ? 'shadow-md'
-                        : 'hover:shadow-sm'
+                          ? 'border-[#6495ED] bg-blue-50'
+                          : 'border-border/30 hover:border-border/60 hover:bg-gray-50'
                     }`}
-                    style={{
-                      borderColor: isPurchased
-                        ? "rgba(100, 149, 237, 0.1)"
-                        : isSelected
-                        ? toneColor.border
-                        : "rgba(100, 149, 237, 0.2)",
-                      background: isPurchased
-                        ? "rgba(200, 200, 200, 0.03)"
-                        : isSelected
-                        ? toneColor.bg
-                        : "rgba(100, 149, 237, 0.02)",
-                    }}
                   >
+                    {/* 체크박스 */}
                     <span
-                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${
-                        isPurchased || isSelected ? "text-white" : ""
+                      className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${
+                        isPurchased || isSelected ? 'border-[#6495ED] bg-[#6495ED]' : 'border-border/50'
                       }`}
-                      style={{
-                        borderColor: isPurchased || isSelected ? toneColor.border : "rgba(100, 149, 237, 0.3)",
-                        backgroundColor: isPurchased || isSelected ? toneColor.accent : "transparent",
-                      }}
                     >
-                      {isPurchased ? '✓' : isSelected ? '✓' : ''}
+                      {(isPurchased || isSelected) && <span className="text-white">✓</span>}
                     </span>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium" style={{ color: '#2D3250' }}>
+
+                    {/* 내용 */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium leading-relaxed" style={{ color: '#2D3250' }}>
                         {pq.question}
                       </p>
-                      <p className="mt-1 text-xs font-medium" style={{ color: toneColor.headline }}>
-                        {isPurchased ? '✨ 구매 완료' : `💜 ${pq.price.toLocaleString('ko-KR')}원`}
-                      </p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="inline-block rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-[#6495ED]">
+                          {pq.isPurchased ? '✨ 보유 중' : '900원'}
+                        </span>
+                        {idx === paidQuestions.length - 1 && paidQuestions.length >= 3 && !isPurchased && (
+                          <span className="text-[10px] font-semibold text-orange-600">추천 3번째 질문</span>
+                        )}
+                      </div>
                     </div>
                   </button>
 
-                  {/* 구매한 질문의 확장 리포트 */}
+                  {/* 구매한 질문의 리포트 */}
                   {isPurchased && pq.report && (
-                    <div
-                      className="mt-3 rounded-2xl border p-5"
-                      style={{
-                        borderColor: toneColor.border,
-                        background: toneColor.bg,
-                      }}
-                    >
-                      {pq.report.map((section, idx) => (
-                        <div key={idx} className={idx > 0 ? 'mt-4' : ''}>
-                          <h3
-                            className="mb-2 text-sm font-semibold"
-                            style={{ color: toneColor.headline }}
-                          >
+                    <div className="mt-3 rounded-xl border border-border/30 bg-gray-50 p-4 md:p-5">
+                      {pq.report.map((section, sIdx) => (
+                        <div key={sIdx} className={sIdx > 0 ? 'mt-4' : ''}>
+                          <h3 className="text-sm font-semibold" style={{ color: '#2D3250' }}>
                             {section.title}
                           </h3>
-                          {section.paragraphs.map((para, pIdx) => (
-                            <p
-                              key={pIdx}
-                              className="mb-2 text-sm leading-relaxed"
-                              style={{ color: '#4A3B5C' }}
-                            >
-                              {para}
-                            </p>
-                          ))}
+                          <div className="mt-2 space-y-2">
+                            {section.paragraphs.map((para, pIdx) => (
+                              <p key={pIdx} className="text-xs leading-relaxed text-muted-foreground">
+                                {para}
+                              </p>
+                            ))}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -280,18 +183,44 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
             })}
           </div>
 
-          {/* 선택한 질문 구매 CTA */}
+          {/* 구매 CTA */}
           {selectedQuestions.length > 0 && (
-            <div className="sticky bottom-4 left-0 right-0">
+            <div className="sticky bottom-4 left-0 right-0 space-y-2">
+              {showBestDeal && (
+                <p className="text-center text-xs font-semibold text-orange-600">
+                  🔥 가장 많이 선택되는 조합입니다!
+                </p>
+              )}
+
               <button
                 onClick={handlePurchase}
-                className="flex min-h-[56px] w-full items-center justify-center rounded-2xl text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90"
+                className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90 md:px-6 md:py-4"
                 style={{
-                  background: `linear-gradient(90deg, ${toneColor.accent} 0%, #A366FF 100%)`,
+                  background: 'linear-gradient(90deg, #6495ED 0%, #A366FF 100%)',
                 }}
               >
-                {selectedQuestions.length}개 선택 · {totalPrice.toLocaleString('ko-KR')}원 구매하기
+                <span>
+                  {selectedQuestions.length}개 선택
+                  {showSavings && <span className="ml-1 text-xs font-normal">· {savingsAmount.toLocaleString()}원 절약</span>}
+                </span>
+                <span>{totalPrice.toLocaleString()}원</span>
               </button>
+
+              {showSavings && (
+                <p className="text-center text-[10px] font-semibold text-[#6495ED]">
+                  💜 {savingsAmount.toLocaleString()}원 할인 적용되었습니다
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* 질문 개수별 가이드 */}
+          {selectedQuestions.length === 0 && paidQuestions.length >= 2 && (
+            <div className="rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 p-4 text-center text-xs text-muted-foreground md:p-5">
+              <p>
+                <strong>💡 팁:</strong> 2개 이상 선택하면 자동 할인이 적용됩니다.
+                {paidQuestions.length >= 3 && ' 3개 선택 시 600원 절약!'}
+              </p>
             </div>
           )}
         </section>
