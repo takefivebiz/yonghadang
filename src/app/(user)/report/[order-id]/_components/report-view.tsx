@@ -63,29 +63,32 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
       <div className="mb-6">
         <span
           className="inline-block rounded-full px-3 py-1 text-xs font-medium"
-          style={{ backgroundColor: '#EDE0F8', color: '#2D3250' }}
+          style={{
+            background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",
+            color: "white",
+          }}
         >
           {category}
         </span>
-        <p className="mt-2 text-xs text-foreground/50">{formattedDate} 분석</p>
+        <p className="mt-2 text-xs" style={{ color: '#D4C5E2' }}>{formattedDate} 분석</p>
       </div>
 
       {/* 무료 리포트 */}
       {freeReport && (
         <section className="mb-10">
-          <h1 className="mb-6 text-xl font-bold leading-snug" style={{ color: '#2D3250' }}>
+          <h1 className="mb-6 text-xl font-bold leading-snug" style={{ color: '#F0E6FA' }}>
             {freeReport.headline}
           </h1>
 
           <div className="space-y-6">
             {freeReport.sections.map((section, idx) => (
               <div key={idx}>
-                <h2 className="mb-3 text-sm font-semibold" style={{ color: '#2D3250' }}>
+                <h2 className="mb-3 text-sm font-semibold" style={{ color: '#BEAEDB' }}>
                   {section.title}
                 </h2>
                 <div className="space-y-2">
                   {section.paragraphs.map((para, pIdx) => (
-                    <p key={pIdx} className="text-sm leading-relaxed text-foreground/75">
+                    <p key={pIdx} className="text-sm leading-relaxed" style={{ color: '#D4C5E2' }}>
                       {para}
                     </p>
                   ))}
@@ -97,9 +100,12 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
           {/* 결핍 문장 — PRD 3.10.7 */}
           <div
             className="mt-8 rounded-2xl p-5"
-            style={{ backgroundColor: '#F5F0FA', borderLeft: '3px solid #C4B5D4' }}
+            style={{
+              background: "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
+              borderLeft: "3px solid #BEAEDB",
+            }}
           >
-            <p className="text-sm font-medium leading-relaxed" style={{ color: '#2D3250' }}>
+            <p className="text-sm font-medium leading-relaxed" style={{ color: '#F0E6FA' }}>
               {freeReport.deficitSentence}
             </p>
           </div>
@@ -109,10 +115,10 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
       {/* 유료 질문 목록 */}
       {paidQuestions.length > 0 && (
         <section>
-          <h2 className="mb-4 text-base font-semibold" style={{ color: '#2D3250' }}>
+          <h2 className="mb-4 text-base font-semibold" style={{ color: '#F0E6FA' }}>
             더 깊이 알고 싶어?
           </h2>
-          <p className="mb-5 text-sm text-foreground/60">
+          <p className="mb-5 text-sm" style={{ color: '#D4C5E2' }}>
             궁금한 질문을 선택하면 더 심층적인 분석을 볼 수 있어.
           </p>
 
@@ -128,28 +134,40 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
                     disabled={isPurchased}
                     className={`flex w-full items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
                       isPurchased
-                        ? 'cursor-default border-[#C4B5D4]/50 bg-[#F5F0FA]'
+                        ? 'cursor-default'
                         : isSelected
-                        ? 'border-[#C4B5D4] bg-[#F5F0FA]'
-                        : 'border-border/50 bg-background hover:border-[#C4B5D4]'
+                        ? ''
+                        : 'hover:border-[#BEAEDB]'
                     }`}
+                    style={{
+                      borderColor: isPurchased
+                        ? "rgba(230, 230, 250, 0.1)"
+                        : isSelected
+                        ? "#BEAEDB"
+                        : "rgba(230, 230, 250, 0.15)",
+                      background: isPurchased
+                        ? "rgba(100, 149, 237, 0.05)"
+                        : isSelected
+                        ? "rgba(100, 149, 237, 0.15)"
+                        : "transparent",
+                    }}
                   >
                     <span
-                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-xs ${
-                        isPurchased
-                          ? 'border-[#C4B5D4] bg-[#C4B5D4] text-white'
-                          : isSelected
-                          ? 'border-[#2D3250] bg-[#2D3250] text-white'
-                          : 'border-border'
+                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-xs font-bold ${
+                        isPurchased || isSelected ? "text-white" : ""
                       }`}
+                      style={{
+                        borderColor: isPurchased || isSelected ? "#BEAEDB" : "rgba(230, 230, 250, 0.2)",
+                        backgroundColor: isPurchased || isSelected ? "#BEAEDB" : "transparent",
+                      }}
                     >
                       {isPurchased ? '✓' : isSelected ? '✓' : ''}
                     </span>
                     <div className="flex-1">
-                      <p className="text-sm font-medium" style={{ color: '#2D3250' }}>
+                      <p className="text-sm font-medium" style={{ color: '#F0E6FA' }}>
                         {pq.question}
                       </p>
-                      <p className="mt-1 text-xs text-foreground/50">
+                      <p className="mt-1 text-xs" style={{ color: '#D4C5E2' }}>
                         {isPurchased ? '구매 완료' : `${pq.price.toLocaleString('ko-KR')}원`}
                       </p>
                     </div>
@@ -157,14 +175,20 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
 
                   {/* 구매한 질문의 확장 리포트 */}
                   {isPurchased && pq.report && (
-                    <div className="mt-2 rounded-2xl border border-[#C4B5D4]/30 bg-background p-4">
+                    <div
+                      className="mt-2 rounded-2xl border p-4"
+                      style={{
+                        borderColor: "rgba(230, 230, 250, 0.15)",
+                        background: "rgba(100, 149, 237, 0.08)",
+                      }}
+                    >
                       {pq.report.map((section, idx) => (
                         <div key={idx}>
-                          <h3 className="mb-2 text-sm font-semibold" style={{ color: '#2D3250' }}>
+                          <h3 className="mb-2 text-sm font-semibold" style={{ color: '#BEAEDB' }}>
                             {section.title}
                           </h3>
                           {section.paragraphs.map((para, pIdx) => (
-                            <p key={pIdx} className="mb-2 text-sm leading-relaxed text-foreground/75">
+                            <p key={pIdx} className="mb-2 text-sm leading-relaxed" style={{ color: '#D4C5E2' }}>
                               {para}
                             </p>
                           ))}
@@ -182,8 +206,10 @@ export const ReportView = ({ report, analysisSession }: ReportViewProps) => {
             <div className="sticky bottom-4">
               <button
                 onClick={handlePurchase}
-                className="flex min-h-[56px] w-full items-center justify-center rounded-2xl text-sm font-semibold text-white shadow-lg transition-all"
-                style={{ backgroundColor: '#2D3250' }}
+                className="flex min-h-[56px] w-full items-center justify-center rounded-2xl text-sm font-semibold text-white shadow-lg transition-all hover:opacity-90"
+                style={{
+                  background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",
+                }}
               >
                 {selectedQuestions.length}개 선택 · {totalPrice.toLocaleString('ko-KR')}원 구매하기
               </button>
