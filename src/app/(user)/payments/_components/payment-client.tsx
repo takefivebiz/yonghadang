@@ -69,7 +69,13 @@ export const PaymentClient = () => {
   if (!pendingOrder) {
     return (
       <div className="flex justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-2"
+          style={{
+            borderColor: "rgba(230, 230, 250, 0.2)",
+            borderTopColor: "#BEAEDB",
+          }}
+        />
       </div>
     );
   }
@@ -89,8 +95,14 @@ export const PaymentClient = () => {
       )}
 
       {/* 결제 위젯 자리 — TODO: [백엔드 연동] 토스페이먼츠 위젯 마운트 */}
-      <div className="min-h-[80px] rounded-2xl border border-dashed border-border/50 bg-background p-5">
-        <p className="text-center text-xs text-foreground/40">토스페이먼츠 결제 위젯 영역</p>
+      <div
+        className="min-h-[80px] rounded-2xl border border-dashed p-5"
+        style={{
+          borderColor: "rgba(230, 230, 250, 0.15)",
+          background: "rgba(100, 149, 237, 0.05)",
+        }}
+      >
+        <p className="text-center text-xs" style={{ color: '#B8A8D8' }}>토스페이먼츠 결제 위젯 영역</p>
       </div>
 
       {/* 결제 버튼 */}
@@ -98,7 +110,9 @@ export const PaymentClient = () => {
         onClick={handlePayment}
         disabled={isPaying}
         className="flex min-h-[56px] w-full items-center justify-center rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
-        style={{ backgroundColor: '#2D3250' }}
+        style={{
+          background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",
+        }}
       >
         {isPaying ? (
           <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
@@ -107,7 +121,7 @@ export const PaymentClient = () => {
         )}
       </button>
 
-      <p className="text-center text-xs text-foreground/40">
+      <p className="text-center text-xs" style={{ color: '#B8A8D8' }}>
         결제는 토스페이먼츠를 통해 안전하게 처리됩니다
       </p>
     </div>

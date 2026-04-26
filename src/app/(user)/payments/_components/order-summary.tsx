@@ -13,29 +13,38 @@ export const OrderSummary = ({ pendingOrder }: OrderSummaryProps) => {
   const total = paidQuestionIds.length * pricePerQuestion;
 
   return (
-    <div className="rounded-2xl border border-border/50 bg-background p-5">
-      <h2 className="mb-4 text-sm font-semibold" style={{ color: '#2D3250' }}>
+    <div
+      className="rounded-2xl border p-5"
+      style={{
+        background: "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
+        borderColor: "rgba(230, 230, 250, 0.15)",
+      }}
+    >
+      <h2 className="mb-4 text-sm font-semibold" style={{ color: '#F0E6FA' }}>
         주문 요약
       </h2>
 
       <div className="mb-3 flex items-center justify-between text-sm">
-        <span className="text-foreground/60">카테고리</span>
-        <span className="font-medium" style={{ color: '#2D3250' }}>{category}</span>
+        <span style={{ color: '#D4C5E2' }}>카테고리</span>
+        <span className="font-medium" style={{ color: '#F0E6FA' }}>{category}</span>
       </div>
 
       <div className="mb-3 flex items-center justify-between text-sm">
-        <span className="text-foreground/60">선택한 질문</span>
-        <span className="font-medium" style={{ color: '#2D3250' }}>
+        <span style={{ color: '#D4C5E2' }}>선택한 질문</span>
+        <span className="font-medium" style={{ color: '#F0E6FA' }}>
           {paidQuestionIds.length}개
         </span>
       </div>
 
-      <div className="border-t border-border/40 pt-3">
+      <div
+        className="border-t pt-3"
+        style={{ borderColor: "rgba(230, 230, 250, 0.1)" }}
+      >
         <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold" style={{ color: '#2D3250' }}>
+          <span className="text-sm font-semibold" style={{ color: '#D4C5E2' }}>
             총 결제 금액
           </span>
-          <span className="text-lg font-bold" style={{ color: '#2D3250' }}>
+          <span className="text-lg font-bold" style={{ color: '#F0E6FA' }}>
             {total.toLocaleString('ko-KR')}원
           </span>
         </div>

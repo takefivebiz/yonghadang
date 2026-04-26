@@ -33,12 +33,10 @@ const PaymentFailPage = async ({ searchParams }: PaymentFailPageProps) => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      {/* 배경 장식 */}
       <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, #F8E0E0 0%, #F5F0E8 60%)",
-        }}
+        className="pointer-events-none absolute top-0 right-0 h-96 w-96 rounded-full blur-3xl"
+        style={{ backgroundColor: "#EF4444", opacity: 0.08 }}
         aria-hidden="true"
       />
 
@@ -48,8 +46,8 @@ const PaymentFailPage = async ({ searchParams }: PaymentFailPageProps) => {
           <div
             className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full"
             style={{
-              background: "linear-gradient(135deg, #F5D0D0, #FDECEC)",
-              boxShadow: "0 8px 32px rgba(200, 80, 80, 0.15)",
+              background: "linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1))",
+              boxShadow: "0 8px 32px rgba(239, 68, 68, 0.15)",
             }}
             aria-hidden="true"
           >
@@ -58,7 +56,7 @@ const PaymentFailPage = async ({ searchParams }: PaymentFailPageProps) => {
               height="32"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#C04040"
+              stroke="#EF4444"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -67,10 +65,10 @@ const PaymentFailPage = async ({ searchParams }: PaymentFailPageProps) => {
             </svg>
           </div>
 
-          <h1 className="font-display mb-2 text-2xl font-bold text-deep-purple md:text-3xl">
+          <h1 className="font-display mb-2 text-2xl font-bold md:text-3xl" style={{ color: '#F0E6FA' }}>
             결제가 완료되지 않았어요
           </h1>
-          <p className="mb-10 text-sm text-muted-foreground">
+          <p className="mb-10 text-sm" style={{ color: '#D4C5E2' }}>
             입력하신 정보는 그대로 남아있어요. 다시 시도해보세요.
           </p>
         </div>
@@ -80,26 +78,26 @@ const PaymentFailPage = async ({ searchParams }: PaymentFailPageProps) => {
           <div
             className="mb-6 space-y-3 rounded-2xl px-5 py-5 text-sm"
             style={{
-              backgroundColor: "rgba(255,255,255,0.85)",
-              border: "1.5px solid rgba(74, 59, 92, 0.1)",
+              background: "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
+              border: "1.5px solid rgba(230, 230, 250, 0.15)",
             }}
           >
             {message && (
               <div>
-                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider" style={{ color: '#B8A8D8' }}>
                   실패 사유
                 </p>
-                <p className="text-foreground/85">{message}</p>
+                <p style={{ color: '#F0E6FA' }}>{message}</p>
               </div>
             )}
             {code && (
-              <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
+              <div className="flex items-center justify-between pt-2 text-xs" style={{ color: '#D4C5E2' }}>
                 <span>에러 코드</span>
                 <span className="font-mono">{code}</span>
               </div>
             )}
             {orderId && (
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="flex items-center justify-between text-xs" style={{ color: '#D4C5E2' }}>
                 <span>주문번호</span>
                 <span
                   className="max-w-[60%] truncate font-mono"
@@ -116,25 +114,24 @@ const PaymentFailPage = async ({ searchParams }: PaymentFailPageProps) => {
         <div className="space-y-3">
           <Link
             href={retryHref}
-            className="block w-full rounded-full py-4 text-center text-sm font-semibold transition-all duration-300 hover:scale-[1.02]"
+            className="block w-full rounded-full py-4 text-center text-sm font-semibold transition-all duration-300 hover:scale-[1.02] text-white"
             style={{
-              backgroundColor: "#4A3B5C",
-              color: "#F5F0E8",
-              boxShadow: "0 4px 24px rgba(74, 59, 92, 0.35)",
+              background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",
             }}
           >
             다시 결제하기
           </Link>
           <Link
             href="/"
-            className="block w-full text-center text-xs text-muted-foreground underline-offset-2 hover:underline"
+            className="block w-full text-center text-xs underline-offset-2 hover:underline"
+            style={{ color: '#D4C5E2' }}
           >
             홈으로 돌아가기
           </Link>
         </div>
 
         {/* 문의 안내 */}
-        <p className="mt-8 text-center text-xs leading-relaxed text-muted-foreground">
+        <p className="mt-8 text-center text-xs leading-relaxed" style={{ color: '#B8A8D8' }}>
           문제가 반복된다면 고객센터로 문의해주세요.
         </p>
       </div>

@@ -30,7 +30,13 @@ export const PaymentSuccessClient = () => {
   if (!sessionId) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-2"
+          style={{
+            borderColor: "rgba(230, 230, 250, 0.2)",
+            borderTopColor: "#BEAEDB",
+          }}
+        />
       </div>
     );
   }
@@ -38,20 +44,22 @@ export const PaymentSuccessClient = () => {
   return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <div className="mb-6 text-5xl">✓</div>
-      <h1 className="mb-3 text-2xl font-bold" style={{ color: '#2D3250' }}>
+      <h1 className="mb-3 text-2xl font-bold" style={{ color: '#F0E6FA' }}>
         결제가 완료됐어요
       </h1>
-      <p className="mb-2 text-sm text-foreground/60">
+      <p className="mb-2 text-sm" style={{ color: '#D4C5E2' }}>
         {amount ? `${Number(amount).toLocaleString('ko-KR')}원` : ''}
       </p>
-      <p className="mb-8 text-sm text-foreground/60">
+      <p className="mb-8 text-sm" style={{ color: '#D4C5E2' }}>
         AI가 분석을 시작했어요. 리포트 페이지에서 확인하세요.
       </p>
 
       <Link
         href={`/report/${sessionId}`}
         className="inline-flex min-h-[52px] items-center justify-center rounded-xl px-8 text-sm font-semibold text-white transition-opacity hover:opacity-80"
-        style={{ backgroundColor: '#2D3250' }}
+        style={{
+          background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",
+        }}
       >
         리포트 확인하기
       </Link>
