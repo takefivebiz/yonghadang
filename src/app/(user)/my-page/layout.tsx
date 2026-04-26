@@ -26,7 +26,7 @@ const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
     <div
       className="relative min-h-screen"
       style={{
-        background: "linear-gradient(135deg, #1B003F 0%, #6495ED 50%, #A366FF 100%)",
+        background: "linear-gradient(to bottom, #1B003F 0%, #4B0082 25%, #191970 50%, #4B0082 75%, #6B2E8F 100%)",
       }}
     >
       <div className="relative z-10">
