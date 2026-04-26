@@ -28,6 +28,7 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
   const widgetContainerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const widgetRef = useRef<any>(null);
+  const isInitializing = useRef(false);
 
   useEffect(() => {
     setIsLoggedIn(isMemberLoggedIn());
@@ -39,17 +40,24 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  // 토스페이먼츠 위젯 초기화 (모달이 열릴 때 한 번만)
+  // 토스페이먼츠 위젯 초기화 (모달이 열릴 때 한 번만, 중복 초기화 방지)
   useEffect(() => {
     const initWidget = async () => {
+      // 이미 초기화 중이거나 완료되었으면 스킵
+      if (isInitializing.current || widgetRef.current) {
+        return;
+      }
+
+      isInitializing.current = true;
+
       try {
         const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || '';
         const totalPrice = pendingOrder.paidQuestionIds.length * 900;
 
-        if (!widgetContainerRef.current || !clientKey) return;
-
-        // 컨테이너 초기화
-        widgetContainerRef.current.innerHTML = '';
+        if (!widgetContainerRef.current || !clientKey) {
+          isInitializing.current = false;
+          return;
+        }
 
         // window.TossPayments는 스크립트 태그로 로드됨
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,6 +65,7 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
         if (!TossPayments) {
           console.error('TossPayments SDK가 로드되지 않았습니다');
           setWidgetReady(true);
+          isInitializing.current = false;
           return;
         }
 
@@ -79,21 +88,24 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
 
         widgetRef.current = widgets;
         setWidgetReady(true);
+        isInitializing.current = false;
       } catch (error) {
         console.error('위젯 초기화 실패:', error);
         setWidgetReady(true);
+        isInitializing.current = false;
       }
     };
 
     initWidget();
 
-    // cleanup: 언마운트 시 컨테이너 초기화
+    // cleanup: 언마운트 시만 초기화
     return () => {
       if (widgetContainerRef.current) {
         widgetContainerRef.current.innerHTML = '';
       }
       setWidgetReady(false);
       widgetRef.current = null;
+      isInitializing.current = false;
     };
   }, []);
 
