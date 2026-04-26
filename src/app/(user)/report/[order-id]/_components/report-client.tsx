@@ -13,6 +13,7 @@ import { ReportStatus } from './report-status';
 interface ReportClientProps {
   order: Order;
   report: FullReport;
+  initialAnalysisSession?: AnalysisSession | null;
 }
 
 type ViewState = 'checking' | 'auth' | 'status' | 'report';
@@ -22,11 +23,11 @@ type ViewState = 'checking' | 'auth' | 'status' | 'report';
  * - 인증 상태 확인 → 인증 통과 → AI 생성 상태 분기
  * TODO: [백엔드 연동] Server Component에서 Supabase 세션 기반으로 처리
  */
-export const ReportClient = ({ order, report }: ReportClientProps) => {
+export const ReportClient = ({ order, report, initialAnalysisSession }: ReportClientProps) => {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('sessionId') || order.id;
   const [view, setView] = useState<ViewState>('checking');
-  const [analysisSession, setAnalysisSession] = useState<AnalysisSession | null>(null);
+  const [analysisSession, setAnalysisSession] = useState<AnalysisSession | null>(initialAnalysisSession ?? null);
 
   useEffect(() => {
     // sessionStorage에서 분석 세션 가져오기 (분석 직후 리포트로 이동한 경우)

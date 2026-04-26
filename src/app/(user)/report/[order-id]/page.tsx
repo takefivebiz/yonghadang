@@ -1,7 +1,7 @@
 import { type Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getOrder } from '@/lib/dummy-orders';
-import { getDummyReport } from '@/lib/dummy-reports';
+import { getDummyReport, getDummyAnalysisSession } from '@/lib/dummy-reports';
 import { ReportClient } from './_components/report-client';
 
 interface Props {
@@ -36,9 +36,12 @@ const ReportPage = async ({ params }: Props) => {
   const report = getDummyReport(sessionId);
   if (!report) notFound();
 
+  // TODO: [백엔드 연동] /api/analysis/[session-id] 실제 호출로 교체
+  const analysisSession = getDummyAnalysisSession(sessionId);
+
   return (
     <div style={{ backgroundColor: '#FAF8F5', minHeight: '100vh' }}>
-      <ReportClient order={order} report={report} />
+      <ReportClient order={order} report={report} initialAnalysisSession={analysisSession} />
     </div>
   );
 };
