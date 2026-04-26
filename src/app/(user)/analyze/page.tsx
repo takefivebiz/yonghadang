@@ -1,11 +1,10 @@
-import { Suspense } from 'react';
-import { type Metadata } from 'next';
-import { AnalyzeClient } from './_components/analyze-client';
-import { COLORS } from '@/lib/colors';
+import { Suspense } from "react";
+import { type Metadata } from "next";
+import { AnalyzeClient } from "./_components/analyze-client";
 
 export const metadata: Metadata = {
-  title: '분석 시작 | Corelog',
-  description: '당신의 상황을 분석해 하나의 리포트로 만듭니다.',
+  title: "분석 시작 | Corelog",
+  description: "상황을 분석해 하나의 리포트로 만들어줄게.",
   robots: { index: false },
 };
 
@@ -13,7 +12,7 @@ const AnalyzePage = () => {
   return (
     <div
       className="min-h-[calc(100vh-4rem)]"
-      style={{ backgroundColor: COLORS.background.page }}
+      style={{ backgroundColor: "#F5F2ED" }}
     >
       {/* useSearchParams 사용으로 Suspense 필요 */}
       <Suspense
@@ -35,9 +34,9 @@ const AnalyzePage = () => {
             <div
               className="h-10 w-10 rounded-full border-2 border-transparent"
               style={{
-                borderTopColor: COLORS.text.primary,
-                borderRightColor: COLORS.text.primary,
-                animation: 'spin-and-pulse 1.8s ease-in-out infinite',
+                borderTopColor: "#2D3250",
+                borderRightColor: "#2D3250",
+                animation: "spin-and-pulse 1.8s ease-in-out infinite",
               }}
             />
           </div>
