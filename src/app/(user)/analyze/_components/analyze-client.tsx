@@ -430,7 +430,7 @@ export const AnalyzeClient = () => {
   }
 
   return (
-    <div className="relative z-10 mx-auto max-w-2xl px-4 py-8 md:py-12">
+    <div className="relative z-10 mx-auto max-w-3xl px-4 py-8 md:py-12">
       {/* 분석 타입 & 진행 상태 */}
       {step !== 'category' && (
         <div className="mb-8">
@@ -456,31 +456,31 @@ export const AnalyzeClient = () => {
 
       {/* 카테고리 선택 */}
       {step === 'category' && (
-        <div className="space-y-10 py-6">
+        <div className="space-y-12 py-8">
           {/* 헤더 */}
-          <div className="space-y-6">
+          <div className="space-y-6 text-center">
             <div>
               <p
-                className="mb-4 text-sm font-medium"
+                className="mb-4 text-sm font-semibold tracking-wider"
                 style={{ color: 'rgba(255, 255, 255, 0.9)' }}
               >
                 {typeInfo.title.replace('를 읽는 중', '')}
                 {typeInfo.title.includes('를 읽는 중') && ' 분석 중'}
               </p>
               <h1
-                className="text-3xl font-bold leading-tight md:text-4xl"
+                className="text-4xl font-bold leading-tight md:text-5xl"
                 style={{ color: '#FFFFFF' }}
               >
                 {typeInfo.question}
               </h1>
             </div>
-            <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.75)' }}>
+            <p className="text-base leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
               당신의 상황에 맞는 카테고리를 선택하면 맞춤 질문이 이어져.
             </p>
           </div>
 
           {/* 카테고리 그리드 */}
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-5 md:gap-6 md:grid-cols-2">
             {CATEGORIES.map((cat) => {
               const info = CATEGORY_INFO[cat];
               const categoryColor = getCategoryColor(cat);
@@ -488,49 +488,52 @@ export const AnalyzeClient = () => {
                 <button
                   key={cat}
                   onClick={() => handleCategorySelect(cat)}
-                  className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border-2 p-6 text-left transition-all active:scale-[0.98] md:p-8"
+                  className="group relative overflow-hidden rounded-3xl p-8 text-left transition-all duration-300 active:scale-[0.95] md:p-10 hover:shadow-2xl"
                   style={{
-                    borderColor: `rgba(255, 255, 255, 0.3)`,
-                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                    backdropFilter: 'blur(10px)',
+                    background: `linear-gradient(135deg, ${categoryColor}35 0%, ${categoryColor}15 100%)`,
+                    borderLeft: `5px solid ${categoryColor}`,
+                    backdropFilter: 'blur(15px)',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = categoryColor;
-                    e.currentTarget.style.backgroundColor =
-                      'rgba(255, 255, 255, 0.18)';
+                    e.currentTarget.style.background = `linear-gradient(135deg, ${categoryColor}45 0%, ${categoryColor}25 100%)`;
+                    e.currentTarget.style.transform = 'translateY(-6px)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-                    e.currentTarget.style.backgroundColor =
-                      'rgba(255, 255, 255, 0.12)';
+                    e.currentTarget.style.background = `linear-gradient(135deg, ${categoryColor}35 0%, ${categoryColor}15 100%)`;
+                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
+                  {/* 배경 장식 */}
                   <div
-                    className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-10"
+                    className="absolute -right-12 -top-12 h-40 w-40 rounded-full opacity-25 transition-all duration-300 group-hover:opacity-40"
                     style={{ backgroundColor: categoryColor }}
                   />
 
-                  <div className="relative z-10 flex items-start justify-between">
-                    <div>
-                      <div className="mb-3 text-4xl">{info.icon}</div>
+                  <div className="relative z-10 space-y-5">
+                    <div className="flex items-start justify-between">
+                      <div className="text-7xl">{info.icon}</div>
+                      <div
+                        className="flex h-12 w-12 items-center justify-center rounded-full text-xl font-bold text-white transition-all duration-300 group-hover:scale-130"
+                        style={{ backgroundColor: categoryColor }}
+                      >
+                        →
+                      </div>
+                    </div>
+                    <div className="space-y-2">
                       <h3
-                        className="text-lg font-semibold"
+                        className="text-2xl font-bold leading-tight md:text-3xl"
                         style={{ color: '#FFFFFF' }}
                       >
                         {cat}
                       </h3>
-                    </div>
-                    <div
-                      className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white transition-transform group-hover:scale-110"
-                      style={{ backgroundColor: categoryColor }}
-                    >
-                      →
+                      <p
+                        className="text-sm leading-relaxed"
+                        style={{ color: 'rgba(255, 255, 255, 0.8)' }}
+                      >
+                        {info.description}
+                      </p>
                     </div>
                   </div>
-
-                  <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                    {info.description}
-                  </p>
                 </button>
               );
             })}
