@@ -26,7 +26,7 @@ export const GuestLookupClient = () => {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       const orders = listAllOrders().filter((o) => o.ownerType === "guest");
-      const matched = orders.find((o) => verifyGuestOrder(o.id, phoneNumber));
+      const matched = orders.find((o) => verifyGuestOrder(o.id, phoneNumber, password));
 
       setIsLoading(false);
 
