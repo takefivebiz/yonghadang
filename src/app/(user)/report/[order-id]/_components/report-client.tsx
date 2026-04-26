@@ -157,7 +157,7 @@ export const ReportClient = ({ order, report, initialAnalysisSession }: ReportCl
   }
 
   if (view === 'report') {
-    return <ReportView report={report} analysisSession={analysisSession} />;
+    return <ReportView report={report} />;
   }
 
   return <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #1B003F 0%, #191970 100%)' }} />;
