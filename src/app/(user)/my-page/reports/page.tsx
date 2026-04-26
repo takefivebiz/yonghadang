@@ -53,12 +53,12 @@ export default function ReportsPage() {
           <span
             className="inline-block h-6 w-6 animate-spin rounded-full border-2"
             style={{
-              borderColor: 'rgba(74,59,92,0.15)',
-              borderTopColor: '#9B88AC',
+              borderColor: 'rgba(230, 230, 250, 0.2)',
+              borderTopColor: '#BEAEDB',
             }}
             aria-hidden="true"
           />
-          <p className="text-sm text-[#4A3B5C]/70">리포트를 불러오는 중...</p>
+          <p className="text-sm" style={{ color: '#D4C5E2' }}>리포트를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -69,11 +69,13 @@ export default function ReportsPage() {
   if (reports.length === 0) {
     return (
       <div className="text-center">
-        <p className="mb-4 text-foreground/60">아직 리포트가 없어요.</p>
+        <p className="mb-4" style={{ color: '#D4C5E2' }}>아직 리포트가 없어요.</p>
         <Link
           href="/analyze"
           className="inline-block rounded-full px-6 py-2.5 text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95"
-          style={{ backgroundColor: '#2D3250' }}
+          style={{
+            background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",
+          }}
         >
           지금 시작하기 →
         </Link>
@@ -87,26 +89,30 @@ export default function ReportsPage() {
         <Link
           key={report.sessionId}
           href={`/report/${report.sessionId}`}
-          className="rounded-2xl border border-border/30 bg-white p-5 md:p-6 transition-all hover:shadow-md"
+          className="rounded-2xl border p-5 md:p-6 transition-all hover:opacity-90"
+          style={{
+            background: "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
+            borderColor: "rgba(230, 230, 250, 0.15)",
+          }}
         >
           <div className="flex items-start justify-between">
             <div className="flex-1">
               {/* 카테고리 뱃지 */}
               <div className="mb-2 inline-block rounded-full px-3 py-1 text-xs font-medium"
                 style={{
-                  backgroundColor: `${CATEGORY_COLOR[report.category] || '#C4B5D4'}20`,
-                  color: CATEGORY_COLOR[report.category] || '#C4B5D4',
+                  backgroundColor: "rgba(100, 149, 237, 0.2)",
+                  color: '#BEAEDB',
                 }}>
                 {report.category}
               </div>
 
               {/* 제목 */}
-              <p className="mb-2 font-semibold md:text-lg" style={{ color: '#2D3250' }}>
+              <p className="mb-2 font-semibold md:text-lg" style={{ color: '#F0E6FA' }}>
                 {report.freeReport?.headline || '분석 리포트'}
               </p>
 
               {/* 메타 정보 */}
-              <div className="flex flex-wrap gap-3 text-xs text-foreground/60">
+              <div className="flex flex-wrap gap-3 text-xs" style={{ color: '#D4C5E2' }}>
                 <span>{new Date(report.createdAt).toLocaleDateString('ko-KR')}</span>
                 {report.paidQuestions && (
                   <span>
@@ -121,8 +127,8 @@ export default function ReportsPage() {
               <span
                 className="inline-block rounded-full px-3 py-1 text-xs font-medium"
                 style={{
-                  backgroundColor: 'rgba(196, 181, 212, 0.15)',
-                  color: '#C4B5D4',
+                  backgroundColor: "rgba(100, 149, 237, 0.2)",
+                  color: '#BEAEDB',
                 }}
               >
                 보기 →

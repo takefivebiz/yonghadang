@@ -23,7 +23,12 @@ const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
   }, [pathname]);
 
   return (
-    <div className="relative min-h-screen">
+    <div
+      className="relative min-h-screen"
+      style={{
+        background: "linear-gradient(135deg, #1B003F 0%, #6495ED 50%, #A366FF 100%)",
+      }}
+    >
       <div className="relative z-10">
         {/* 탭 네비게이션 */}
         <div

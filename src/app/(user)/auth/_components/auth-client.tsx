@@ -99,17 +99,22 @@ export const AuthClient = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
+    <div
+      className="relative flex min-h-screen w-full flex-col overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, #1B003F 0%, #6495ED 50%, #A366FF 100%)",
+      }}
+    >
       {/* 배경 장식 블롭 */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-32 top-20 h-80 w-80 rounded-full blur-3xl"
-        style={{ backgroundColor: "#6495ED", opacity: 0.15 }}
+        style={{ backgroundColor: "#6495ED", opacity: 0.1 }}
       />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -left-24 top-1/3 h-72 w-72 rounded-full blur-3xl"
-        style={{ backgroundColor: "#A366FF", opacity: 0.1 }}
+        style={{ backgroundColor: "#A366FF", opacity: 0.08 }}
       />
 
       {/* 별/달 장식 */}
