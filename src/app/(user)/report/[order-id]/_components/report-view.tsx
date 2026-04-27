@@ -5,6 +5,7 @@ import { FullReport } from '@/types/report';
 import { savePendingOrder } from '@/lib/payment';
 import { PendingOrderInput } from '@/types/payment';
 import { getPriceForQuantity, getSavingsAmount, isBestDeal, getFullBundlePrice, PRICE_PER_QUESTION } from '@/lib/pricing';
+import { TypewriterText } from '@/components/ui/typewriter-text';
 import { PaymentModal } from './payment-modal';
 import { ChevronDown } from 'lucide-react';
 
@@ -108,7 +109,7 @@ export const ReportView = ({ report }: ReportViewProps) => {
           <div className="mb-6">
             <span className="text-xs font-semibold" style={{ color: '#B0B0FF' }}>FREE INSIGHT</span>
             <h1 className="mt-2 text-2xl font-bold leading-relaxed md:text-3xl" style={{ color: '#F5F5F5' }}>
-              {freeReport.headline}
+              <TypewriterText text={freeReport.headline} speed={25} />
             </h1>
           </div>
 
@@ -121,7 +122,7 @@ export const ReportView = ({ report }: ReportViewProps) => {
                 <div className="space-y-3">
                   {section.paragraphs.map((para, pIdx) => (
                     <p key={pIdx} className="text-sm leading-relaxed" style={{ color: '#D0D0D0' }}>
-                      {para}
+                      <TypewriterText text={para} speed={20} />
                     </p>
                   ))}
                 </div>
@@ -132,7 +133,7 @@ export const ReportView = ({ report }: ReportViewProps) => {
           {/* 결핍 문장 */}
           <div className="mt-8 rounded-xl border-l-4 border-[#6495ED] bg-blue-500/20 p-4 backdrop-blur-sm" style={{ borderLeftColor: '#6495ED' }}>
             <p className="text-sm font-medium leading-relaxed" style={{ color: '#F5F5F5' }}>
-              {freeReport.deficitSentence}
+              <TypewriterText text={freeReport.deficitSentence} speed={25} />
             </p>
           </div>
         </section>
@@ -173,8 +174,10 @@ export const ReportView = ({ report }: ReportViewProps) => {
                   >
                     {/* 체크박스 */}
                     <span
-                      className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${
-                        isPurchased || isSelected || selectFullBundle ? 'border-[#6495ED] bg-[#6495ED]' : 'border-border/50'
+                      className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+                        isPurchased || isSelected || selectFullBundle
+                          ? 'border-[#6495ED] bg-[#6495ED]'
+                          : 'border-white/30 hover:border-white/50'
                       }`}
                     >
                       {(isPurchased || isSelected || selectFullBundle) && <span className="text-white">✓</span>}
@@ -259,8 +262,10 @@ export const ReportView = ({ report }: ReportViewProps) => {
                         >
                           {/* 체크박스 */}
                           <span
-                            className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${
-                              isPurchased || isSelected || selectFullBundle ? 'border-[#6495ED] bg-[#6495ED]' : 'border-border/50'
+                            className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+                              isPurchased || isSelected || selectFullBundle
+                                ? 'border-[#6495ED] bg-[#6495ED]'
+                                : 'border-white/30 hover:border-white/50'
                             }`}
                           >
                             {(isPurchased || isSelected || selectFullBundle) && <span className="text-white">✓</span>}
