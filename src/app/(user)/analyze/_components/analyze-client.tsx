@@ -845,6 +845,23 @@ export const AnalyzeClient = () => {
                         'rgba(255, 255, 255, 0.1)';
                     }
                   }}
+                  onFocus={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.borderColor = focusColor;
+                      e.currentTarget.style.backgroundColor =
+                        'rgba(255, 255, 255, 0.15)';
+                      e.currentTarget.style.outline = `2px solid ${focusColor}60`;
+                      e.currentTarget.style.outlineOffset = '2px';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                      e.currentTarget.style.backgroundColor =
+                        'rgba(255, 255, 255, 0.1)';
+                      e.currentTarget.style.outline = 'none';
+                    }
+                  }}
                 >
                   {option.text}
                 </button>
@@ -855,7 +872,7 @@ export const AnalyzeClient = () => {
           <div className="mt-8 flex gap-3">
             <button
               onClick={handleBack}
-              className="flex-1 rounded-xl border py-3 text-sm font-medium transition-all active:scale-[0.98]"
+              className="flex-1 rounded-xl border py-3 text-sm font-medium transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
               style={{
                 borderColor: 'rgba(255, 255, 255, 0.2)',
                 color: 'rgba(255, 255, 255, 0.8)',
@@ -874,7 +891,7 @@ export const AnalyzeClient = () => {
             <button
               onClick={handleNext}
               disabled={!hasAnswer}
-              className="flex-[2] rounded-xl py-3 text-sm font-medium text-white transition-all"
+              className="flex-[2] rounded-xl py-3 text-sm font-medium text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
               style={{
                 backgroundColor: hasAnswer
                   ? getAnalysisTypeColor(queryType)

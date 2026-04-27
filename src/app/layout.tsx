@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Serif_KR, Cinzel } from "next/font/google";
 import Script from "next/script";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 /**
@@ -49,6 +50,16 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
         className={`${notoSerifKR.variable} ${cinzel.variable} antialiased`}
       >
         {children}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: "rgba(30, 10, 60, 0.95)",
+              border: "1px solid rgba(230, 230, 250, 0.15)",
+              color: "#F0E6FA",
+            },
+          }}
+        />
       </body>
     </html>
   );

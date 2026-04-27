@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { MemberProfile } from "@/types/member";
 import { logoutMember, updateMemberProfile } from "@/lib/report-access";
 import { SocialBadge } from "./social-badge";
+import { toast } from "sonner";
 
 interface ProfileCardProps {
   profile: MemberProfile;
@@ -39,11 +40,13 @@ export const ProfileCard = ({ profile, onProfileChange }: ProfileCardProps) => {
     const next = updateMemberProfile({ nickname: trimmed });
     if (!next) {
       setError("프로필 수정에 실패했어요. 다시 로그인해주세요");
+      toast.error("프로필 수정에 실패했어요");
       return;
     }
     onProfileChange(next);
     setEditing(false);
     setError(null);
+    toast.success("닉네임이 변경되었어요");
   };
 
   const handleCancel = () => {

@@ -27,7 +27,7 @@ export const HeaderAuthNav = () => {
     return (
       <Link
         href="/my-page"
-        className="rounded-md px-4 py-2 text-sm transition-colors hover:opacity-90"
+        className="rounded-md px-4 py-2 text-sm transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
         style={{ color: "#BEAEDB" }}
       >
         마이페이지
@@ -39,14 +39,14 @@ export const HeaderAuthNav = () => {
     <>
       <Link
         href="/guest/lookup"
-        className="rounded-md px-4 py-2 text-sm transition-colors hover:opacity-90"
+        className="rounded-md px-4 py-2 text-sm transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
         style={{ color: "#BEAEDB" }}
       >
         비회원 조회
       </Link>
       <Link
         href="/auth"
-        className="rounded-md px-4 py-2 text-sm font-medium transition-all hover:shadow-lg hover:scale-105 active:scale-95"
+        className="rounded-md px-4 py-2 text-sm font-medium transition-all hover:shadow-lg hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
         style={{
           background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",
           color: "white",

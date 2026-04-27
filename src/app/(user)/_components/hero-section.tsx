@@ -207,13 +207,13 @@ export const HeroSection = () => {
               style={{
                 border: "1px solid rgba(230, 230, 250, 0.3)",
                 background:
-                  "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
+                  "linear-gradient(135deg, rgba(163, 102, 255, 0.15), rgba(100, 149, 237, 0.1))",
               }}
             >
               <div className="relative z-10">
                 <div
                   className="mb-3 text-3xl font-bold md:text-4xl"
-                  style={{ color: "#B8A8D8" }}
+                  style={{ color: "#E6E6FA" }}
                 >
                   [나]
                 </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface FAQItem {
   id: string;
@@ -79,19 +80,19 @@ export const ContactClient = () => {
 
     // 유효성 검사
     if (!formData.name.trim()) {
-      alert("이름을 입력해주세요");
+      toast.error("이름을 입력해주세요");
       return;
     }
     if (!formData.email.trim() || !formData.email.includes("@")) {
-      alert("올바른 이메일을 입력해주세요");
+      toast.error("올바른 이메일을 입력해주세요");
       return;
     }
     if (!formData.title.trim()) {
-      alert("제목을 입력해주세요");
+      toast.error("제목을 입력해주세요");
       return;
     }
     if (!formData.content.trim()) {
-      alert("내용을 입력해주세요");
+      toast.error("내용을 입력해주세요");
       return;
     }
 
@@ -101,6 +102,7 @@ export const ContactClient = () => {
     window.setTimeout(() => {
       // TODO: [백엔드 연동] POST /api/contact 호출
       setFormState("success");
+      toast.success("문의가 접수되었습니다. 빠른 시일 내에 답변드릴게요.");
       setFormData({
         name: "",
         email: "",
@@ -159,7 +161,7 @@ export const ContactClient = () => {
               <button
                 key={item.id}
                 onClick={() => handleFAQToggle(item.id)}
-                className="w-full text-left transition-all duration-300"
+                className="w-full rounded-xl text-left transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
               >
                 <div
                   className="flex items-center justify-between rounded-xl px-5 py-4 transition-all duration-300"
@@ -230,7 +232,7 @@ export const ContactClient = () => {
                 value={formData.name}
                 onChange={handleFormChange}
                 placeholder="홍길동"
-                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors"
+                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
                 style={{
                   borderColor: "rgba(74, 59, 92, 0.2)",
                   backgroundColor: "rgba(255, 255, 255, 0.85)",
@@ -254,7 +256,7 @@ export const ContactClient = () => {
                 value={formData.email}
                 onChange={handleFormChange}
                 placeholder="example@email.com"
-                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors"
+                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
                 style={{
                   borderColor: "rgba(74, 59, 92, 0.2)",
                   backgroundColor: "rgba(255, 255, 255, 0.85)",
@@ -276,7 +278,7 @@ export const ContactClient = () => {
                 name="category"
                 value={formData.category}
                 onChange={handleFormChange}
-                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors"
+                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
                 style={{
                   borderColor: "rgba(74, 59, 92, 0.2)",
                   backgroundColor: "rgba(255, 255, 255, 0.85)",
@@ -303,7 +305,7 @@ export const ContactClient = () => {
                 value={formData.title}
                 onChange={handleFormChange}
                 placeholder="문의 제목을 입력해주세요"
-                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors"
+                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
                 style={{
                   borderColor: "rgba(74, 59, 92, 0.2)",
                   backgroundColor: "rgba(255, 255, 255, 0.85)",
@@ -327,7 +329,7 @@ export const ContactClient = () => {
                 onChange={handleFormChange}
                 placeholder="자세한 내용을 입력해주세요 (최소 10자)"
                 rows={6}
-                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none resize-none transition-colors"
+                className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none resize-none transition-colors focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
                 style={{
                   borderColor: "rgba(74, 59, 92, 0.2)",
                   backgroundColor: "rgba(255, 255, 255, 0.85)",
@@ -353,7 +355,7 @@ export const ContactClient = () => {
             <button
               type="submit"
               disabled={formState === "submitting"}
-              className="w-full rounded-full py-4 text-sm font-semibold transition-all duration-300 hover:scale-[1.02]"
+              className="w-full rounded-full py-4 text-sm font-semibold transition-all duration-300 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/50"
               style={
                 formState === "submitting"
                   ? {
