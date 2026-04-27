@@ -199,25 +199,6 @@ export const ReportView = ({ report }: ReportViewProps) => {
                     </div>
                   </button>
 
-                  {/* 구매한 질문의 리포트 */}
-                  {isPurchased && pq.report && (
-                    <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm md:p-5">
-                      {pq.report.map((section, sIdx) => (
-                        <div key={sIdx} className={sIdx > 0 ? 'mt-4' : ''}>
-                          <h3 className="text-sm font-semibold" style={{ color: '#E0E0E0' }}>
-                            {section.title}
-                          </h3>
-                          <div className="mt-2 space-y-2">
-                            {section.paragraphs.map((para, pIdx) => (
-                              <p key={pIdx} className="text-xs leading-relaxed" style={{ color: '#D0D0D0' }}>
-                                {para}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -287,25 +268,6 @@ export const ReportView = ({ report }: ReportViewProps) => {
                           </div>
                         </button>
 
-                        {/* 구매한 질문의 리포트 */}
-                        {isPurchased && pq.report && (
-                          <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm md:p-5">
-                            {pq.report.map((section, sIdx) => (
-                              <div key={sIdx} className={sIdx > 0 ? 'mt-4' : ''}>
-                                <h3 className="text-sm font-semibold" style={{ color: '#E0E0E0' }}>
-                                  {section.title}
-                                </h3>
-                                <div className="mt-2 space-y-2">
-                                  {section.paragraphs.map((para, pIdx) => (
-                                    <p key={pIdx} className="text-xs leading-relaxed" style={{ color: '#D0D0D0' }}>
-                                      {para}
-                                    </p>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     );
                   })}
