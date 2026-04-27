@@ -26,7 +26,7 @@ const FAQ_ITEMS: FAQItem[] = [
     id: "faq-3",
     question: "비회원으로 구매한 리포트는 어떻게 조회하나요?",
     answer:
-      "헤더의 '비회원 주문 조회' 버튼을 클릭한 후, 결제 시 등록한 휴대폰번호와 비밀번호로 로그인하시면 구매 내역을 확인할 수 있습니다.",
+      "헤더의 '비회원 리포트 조회' 버튼을 클릭한 후, 결제 시 등록한 휴대폰번호와 비밀번호로 로그인하시면 구매 내역을 확인할 수 있습니다.",
   },
   {
     id: "faq-4",
@@ -67,7 +67,7 @@ export const ContactClient = () => {
   const handleFormChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, value } = e.currentTarget;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -101,7 +101,13 @@ export const ContactClient = () => {
     window.setTimeout(() => {
       // TODO: [백엔드 연동] POST /api/contact 호출
       setFormState("success");
-      setFormData({ name: "", email: "", category: "기타", title: "", content: "" });
+      setFormData({
+        name: "",
+        email: "",
+        category: "기타",
+        title: "",
+        content: "",
+      });
       window.setTimeout(() => setFormState("idle"), 3000);
     }, 800);
   };
@@ -172,7 +178,9 @@ export const ContactClient = () => {
                     className="flex-shrink-0 text-[#4A3B5C]/60 transition-transform duration-300"
                     style={{
                       transform:
-                        expandedFAQ === item.id ? "rotate(180deg)" : "rotate(0)",
+                        expandedFAQ === item.id
+                          ? "rotate(180deg)"
+                          : "rotate(0)",
                     }}
                   >
                     ▼

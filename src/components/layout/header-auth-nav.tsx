@@ -42,7 +42,7 @@ export const HeaderAuthNav = () => {
         className="rounded-md px-4 py-2 text-sm transition-colors hover:opacity-90"
         style={{ color: "#BEAEDB" }}
       >
-        비회원 주문 조회
+        비회원 조회
       </Link>
       <Link
         href="/auth"

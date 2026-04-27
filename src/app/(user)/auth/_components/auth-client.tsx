@@ -254,13 +254,13 @@ export const AuthClient = () => {
           {/* 비회원 주문 조회 */}
           <div className="mt-6 text-center">
             <p className="text-xs" style={{ color: "#B8A8D8" }}>
-              계정 없이 주문하셨나요?{" "}
+              계정 없이 결제했다면{" "}
               <Link
-                href="/guest-login"
+                href="/guest/lookup"
                 className="font-medium underline transition-colors hover:text-white"
                 style={{ color: "#BEAEDB" }}
               >
-                비회원 주문 조회
+                비회원 리포트 조회
               </Link>
             </p>
           </div>

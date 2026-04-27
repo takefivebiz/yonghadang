@@ -26,7 +26,9 @@ export const GuestLookupClient = () => {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       const orders = listAllOrders().filter((o) => o.ownerType === "guest");
-      const matched = orders.find((o) => verifyGuestOrder(o.id, phoneNumber, password));
+      const matched = orders.find((o) =>
+        verifyGuestOrder(o.id, phoneNumber, password),
+      );
 
       setIsLoading(false);
 
@@ -56,7 +58,7 @@ export const GuestLookupClient = () => {
   return (
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="mb-2 text-2xl font-bold" style={{ color: "#F0E6FA" }}>
-        리포트 찾기
+        리포트 조회
       </h1>
       <p className="mb-8 text-sm" style={{ color: "#D4C5E2" }}>
         전화번호랑 비밀번호로 찾을 수 있어.

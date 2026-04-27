@@ -2,12 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart2, ClipboardList, Users } from "lucide-react";
+import { BarChart2, ClipboardList, Users, TrendingUp, FileText, Repeat2, History } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "매출 조회", icon: BarChart2, exact: true },
   { href: "/admin/order-list", label: "주문 내역", icon: ClipboardList, exact: false },
   { href: "/admin/user-list", label: "유저 관리", icon: Users, exact: false },
+  { href: "/admin/questions", label: "질문 분석", icon: TrendingUp, exact: false },
+  { href: "/admin/reports", label: "리포트 분석", icon: FileText, exact: false },
+  { href: "/admin/loops", label: "탐색 루프 분석", icon: Repeat2, exact: false },
+  { href: "/admin/question-logs", label: "질문 로그", icon: History, exact: false },
 ] as const;
 
 export const SidebarNav = () => {

@@ -30,7 +30,18 @@ export const MobileDrawerAuthNav = ({ onClose }: MobileDrawerAuthNavProps) => {
       <Link
         href="/my-page"
         onClick={onClose}
-        className="rounded-md px-3 py-3 text-base text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+        className="rounded-lg px-4 py-3 text-sm font-medium transition-colors"
+        style={{
+          color: "#D8C9E8",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(100, 149, 237, 0.15)";
+          e.currentTarget.style.color = "#F0E6FA";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "";
+          e.currentTarget.style.color = "#D8C9E8";
+        }}
       >
         마이페이지
       </Link>
@@ -40,16 +51,37 @@ export const MobileDrawerAuthNav = ({ onClose }: MobileDrawerAuthNavProps) => {
   return (
     <>
       <Link
-        href="/guest-login"
+        href="/guest/lookup"
         onClick={onClose}
-        className="rounded-md px-3 py-3 text-base text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
+        className="rounded-lg px-4 py-3 text-sm font-medium transition-colors"
+        style={{
+          color: "#D8C9E8",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(100, 149, 237, 0.15)";
+          e.currentTarget.style.color = "#F0E6FA";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "";
+          e.currentTarget.style.color = "#D8C9E8";
+        }}
       >
-        비회원 주문 조회
+        비회원 리포트 조회
       </Link>
       <Link
         href="/auth"
         onClick={onClose}
-        className="mt-2 rounded-md bg-primary px-3 py-3 text-center text-base font-medium text-primary-foreground transition-opacity hover:opacity-90"
+        className="mt-2 rounded-lg px-4 py-3 text-center text-sm font-medium transition-all"
+        style={{
+          background: "linear-gradient(135deg, #6495ED 0%, #A366FF 100%)",
+          color: "#FFFFFF",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(100, 149, 237, 0.3)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "";
+        }}
       >
         로그인
       </Link>
