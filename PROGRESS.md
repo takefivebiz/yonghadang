@@ -69,7 +69,7 @@
 
 - **분석 플로우 업데이트**:
   - Step 0: 분석 타입 선택 (랜딩에서) → Step 1: 카테고리 선택 → Step 2: 하위 분기 → Step 3~4: 질문
-  - type 파라미터: `self|other|relationship`
+  - type 파라미터: `self|other`
   - 분석 타입별 톤 변경 (호칭, 관점 다름)
 
 - **PRD.md 반영**:
@@ -118,15 +118,99 @@
 
 ---
 
+## 완료된 작업 (2026-04-28)
+
+### 5단계: E2E 테스트 시나리오 5 — 비회원 세션 관리 및 조회
+
+**시나리오 개요**: 비회원이 무료 리포트 조회 → 유료 질문 구매 → 나중에 전화번호+비밀번호로 재접근하는 전체 플로우 구현
+
+#### 데이터 모델 개선
+
+- `src/types/order.ts`:
+  - 추가: `paid?: boolean` (결제 상태)
+  - 추가: `paidQuestionIds?: string[]` (구매 질문 목록)
+  - 삭제: `expiresAt?: string` (유료 세션은 만료 없음)
+
+#### 비회원 결제 플로우 (Anonymous → Guest)
+
+- `payment-modal.tsx`:
+  - 결제 전 `guestInfo` (phoneNumber, password) 수집
+  - 결제 성공 시 `saveLocalOrder()`로 localStorage에 주문 저장
+    ```typescript
+    saveLocalOrder({
+      ownerType: "guest",
+      paid: true,
+      paidQuestionIds: pendingOrder.paidQuestionIds,
+      phoneNumber: guestInfo.phoneNumber(숫자만),
+    });
+    ```
+  - 결제 완료 후 **바로 `/report/{sessionId}` 리다이렉트** (별도 페이지 거치지 않음)
+  - `sessionStorage`에 `purchased_{sessionId}` 저장
+
+#### 비회원 재접근 플로우
+
+- **경로 A: 직접 URL 접근** (`/report/{sessionId}`)
+  - `guest-auth-form.tsx`: 전화번호+비밀번호 검증
+  - 검증 후 `grantGuestAccess()` 호출 (30분 유효한 sessionStorage 토큰)
+  - localStorage의 `paidQuestionIds`를 sessionStorage로 동기화
+
+- **경로 B: 비회원 조회 페이지** (`/guest/lookup`)
+  - `guest-lookup-client.tsx`: 전화번호+비밀번호로 검색
+  - **핵심 수정**: `grantGuestAccess()` 호출 (이것이 없으면 report 페이지에서 또 본인확인 폼이 나타남)
+  - localStorage의 `paidQuestionIds`를 sessionStorage로 동기화
+  - `/report/{sessionId}`로 자동 리다이렉트
+
+#### 세션 만료 로직 완전 제거
+
+- `report/[order-id]/page.tsx`: `ReportExpired` 컴포넌트 및 expiresAt 체크 삭제
+- 유료 구매 세션은 시간 제한 없이 영구 접근 가능
+
+#### 주요 버그 수정
+
+| 버그                            | 해결책                                                                    |
+| ------------------------------- | ------------------------------------------------------------------------- |
+| 비회원 조회 후 본인확인 폼 중복 | `guest-lookup-client`에 `grantGuestAccess(matched.id)` 추가               |
+| 구매 질문 미표시                | `guest-auth-form`과 `guest-lookup-client`에서 paidQuestionIds 동기화 추가 |
+| 더미 데이터 검증 실패           | 모든 guest 타입 더미 주문에 `phoneNumber: '01012345678'` 추가             |
+| 결제 후 비회원 정보 소실        | `saveLocalOrder()` 호출을 `requestPayment()` 전으로 변경                  |
+
+#### 수정된 파일 목록
+
+- `src/types/order.ts`: paid, paidQuestionIds 필드 추가
+- `src/lib/dummy-orders.ts`: phoneNumber 추가, expiresAt 로직 제거
+- `src/app/(user)/report/[order-id]/_components/payment-modal.tsx`: 비회원 정보 수집, 저장 순서 개선
+- `src/app/(user)/report/[order-id]/_components/guest-auth-form.tsx`: paidQuestionIds 동기화 추가
+- `src/app/(user)/guest/lookup/_components/guest-lookup-client.tsx`: grantGuestAccess 호출, paidQuestionIds 동기화 추가
+- `src/app/(user)/report/[order-id]/page.tsx`: ReportExpired 제거, expiresAt 체크 제거
+- `src/app/(user)/payments/success/_components/payment-success-client.tsx`: expiresAt 생성 로직 제거
+- `docs/PRD.md`: 시나리오 5 구현 내용 업데이트
+
+#### 테스트된 플로우
+
+✓ 비회원 무료 리포트 조회  
+✓ 유료 질문 결제 (전화번호+비밀번호)  
+✓ 결제 완료 후 바로 리포트 접근  
+✓ 비회원 조회 페이지에서 조회  
+✓ 구매한 유료 질문 표시  
+✓ 세션 만료 없이 영구 접근
+
+#### 백엔드 필요사항
+
+- [ ] `POST /api/guest/lookup`: 비회원 세션 검색 (phone + password 기반)
+- [ ] `POST /api/guest/verify`: 전화번호+비밀번호 검증
+- [ ] `POST /api/orders`: 주문 생성 시 paidQuestionIds 저장
+- [ ] `GET /api/orders/{id}`: 주문 조회 시 paidQuestionIds 포함
+
+---
+
 ## 다음 작업 예정
 
-### 5단계: 나머지 페이지 디자인 업데이트
+### 6단계: E2E 테스트 시나리오 6 — 관리자 플로우
 
-- 문의하기 페이지 (FAQ, 폼) 스타일 업데이트
-- 이용약관, 개인정보처리방침 페이지 스타일 업데이트
-- 비회원 리포트 조회 페이지 스타일 업데이트
+- [ ] 관리자 대시보드 페이지 구현
+- [ ] 대시보드 데이터 연동 (더미 → 실제 API)
 
-### 6단계: 백엔드 연동
+### 7단계: 백엔드 연동
 
 - Supabase 스키마 설계 (분석 타입, 세션 데이터 포함)
 - 분석 세션 저장 로직

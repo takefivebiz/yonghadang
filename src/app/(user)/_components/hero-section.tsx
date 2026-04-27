@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const AnalysisType = {
   SELF: "self",
@@ -9,6 +10,17 @@ const AnalysisType = {
 
 export const HeroSection = () => {
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false);
+  const [enableAnimations, setEnableAnimations] = useState(true);
+
+  useEffect(() => {
+    const mobile = window.innerWidth < 768;
+    setIsMobile(mobile);
+
+    // 모바일이거나 prefers-reduced-motion이 설정된 경우 애니메이션 비활성화
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setEnableAnimations(!mobile && !prefersReducedMotion);
+  }, []);
 
   const handleSelectType = (
     type: (typeof AnalysisType)[keyof typeof AnalysisType],
@@ -18,117 +30,125 @@ export const HeroSection = () => {
 
   return (
     <section className="relative overflow-hidden px-4 py-12 md:py-24">
-      {/* 배경 장식 - blur 요소 */}
-      <div
-        className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full blur-3xl"
-        style={{ backgroundColor: "#6495ED", opacity: 0.15 }}
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute -bottom-20 -left-40 h-80 w-80 rounded-full blur-3xl"
-        style={{ backgroundColor: "#E6E6FA", opacity: 0.08 }}
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute top-1/2 right-1/4 h-72 w-72 rounded-full blur-3xl"
-        style={{ backgroundColor: "#A366FF", opacity: 0.1 }}
-        aria-hidden="true"
-      />
+      {/* 배경 장식 - 모바일에서는 비활성화 */}
+      {!isMobile && (
+        <>
+          <div
+            className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full"
+            style={{
+              backgroundColor: "#6495ED",
+              opacity: 0.08,
+              filter: enableAnimations ? 'blur(80px)' : 'blur(40px)'
+            }}
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -bottom-20 -left-40 h-80 w-80 rounded-full"
+            style={{
+              backgroundColor: "#E6E6FA",
+              opacity: 0.04,
+              filter: enableAnimations ? 'blur(80px)' : 'blur(40px)'
+            }}
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute top-1/2 right-1/4 h-72 w-72 rounded-full"
+            style={{
+              backgroundColor: "#A366FF",
+              opacity: 0.05,
+              filter: enableAnimations ? 'blur(80px)' : 'blur(40px)'
+            }}
+            aria-hidden="true"
+          />
+        </>
+      )}
 
-      {/* 네온 라인 장식 - 좌측 */}
-      <div
-        className="pointer-events-none absolute left-0 top-1/4 h-px w-32 opacity-60"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #6495ED, transparent)",
-          boxShadow: "0 0 20px #6495ED, 0 0 40px rgba(100, 149, 237, 0.5)",
-          animation: "neonPulse 3s ease-in-out infinite",
-        }}
-        aria-hidden="true"
-      />
+      {/* 네온 라인 장식 - 데스크탑에서만 표시 */}
+      {enableAnimations && (
+        <>
+          <div
+            className="pointer-events-none absolute left-0 top-1/4 h-px w-32 opacity-40 hidden md:block"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, #6495ED, transparent)",
+              boxShadow: "0 0 15px #6495ED",
+              animation: "neonPulse 3s ease-in-out infinite",
+            }}
+            aria-hidden="true"
+          />
 
-      {/* 네온 라인 장식 - 우측 */}
-      <div
-        className="pointer-events-none absolute right-0 top-2/3 h-px w-40 opacity-50"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #A366FF, transparent)",
-          boxShadow: "0 0 20px #A366FF, 0 0 40px rgba(163, 102, 255, 0.4)",
-          animation: "neonPulse 4s ease-in-out infinite 0.5s",
-        }}
-        aria-hidden="true"
-      />
+          <div
+            className="pointer-events-none absolute right-0 top-2/3 h-px w-40 opacity-30 hidden md:block"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, #A366FF, transparent)",
+              boxShadow: "0 0 15px #A366FF",
+              animation: "neonPulse 4s ease-in-out infinite 0.5s",
+            }}
+            aria-hidden="true"
+          />
 
-      {/* 네온 도트 - 좌상단 */}
-      <div
-        className="pointer-events-none absolute left-1/4 top-1/3 h-1.5 w-1.5 rounded-full opacity-70"
-        style={{
-          backgroundColor: "#6495ED",
-          boxShadow: "0 0 15px #6495ED, 0 0 30px rgba(100, 149, 237, 0.6)",
-          animation: "neonGlow 2.5s ease-in-out infinite",
-        }}
-        aria-hidden="true"
-      />
+          <div
+            className="pointer-events-none absolute left-1/4 top-1/3 h-1.5 w-1.5 rounded-full opacity-50 hidden md:block"
+            style={{
+              backgroundColor: "#6495ED",
+              boxShadow: "0 0 10px #6495ED",
+              animation: "neonGlow 2.5s ease-in-out infinite",
+            }}
+            aria-hidden="true"
+          />
 
-      {/* 네온 도트 - 우하단 */}
-      <div
-        className="pointer-events-none absolute right-1/3 bottom-1/4 h-1 w-1 rounded-full opacity-60"
-        style={{
-          backgroundColor: "#A366FF",
-          boxShadow: "0 0 12px #A366FF, 0 0 25px rgba(163, 102, 255, 0.5)",
-          animation: "neonGlow 3s ease-in-out infinite 0.8s",
-        }}
-        aria-hidden="true"
-      />
+          <div
+            className="pointer-events-none absolute right-1/3 bottom-1/4 h-1 w-1 rounded-full opacity-40 hidden md:block"
+            style={{
+              backgroundColor: "#A366FF",
+              boxShadow: "0 0 8px #A366FF",
+              animation: "neonGlow 3s ease-in-out infinite 0.8s",
+            }}
+            aria-hidden="true"
+          />
 
-      {/* 네온 대각선 - 상단 */}
-      <svg
-        className="pointer-events-none absolute top-1/4 right-1/3 opacity-50"
-        width="200"
-        height="100"
-        viewBox="0 0 200 100"
-        aria-hidden="true"
-      >
-        <line
-          x1="0"
-          y1="0"
-          x2="200"
-          y2="100"
-          stroke="#6495ED"
-          strokeWidth="1"
-          style={{
-            filter: "drop-shadow(0 0 8px #6495ED)",
-            animation: "neonDraw 4s ease-in-out infinite",
-          }}
-        />
-      </svg>
+          <svg
+            className="pointer-events-none absolute top-1/4 right-1/3 opacity-30 hidden md:block"
+            width="200"
+            height="100"
+            viewBox="0 0 200 100"
+            aria-hidden="true"
+          >
+            <line
+              x1="0"
+              y1="0"
+              x2="200"
+              y2="100"
+              stroke="#6495ED"
+              strokeWidth="1"
+              style={{
+                filter: "drop-shadow(0 0 6px #6495ED)",
+                animation: "neonDraw 4s ease-in-out infinite",
+              }}
+            />
+          </svg>
+        </>
+      )}
 
       <style jsx>{`
         @keyframes neonPulse {
           0%,
           100% {
-            opacity: 0.4;
-            filter: drop-shadow(0 0 10px currentColor);
+            opacity: 0.3;
           }
           50% {
-            opacity: 0.8;
-            filter: drop-shadow(0 0 20px currentColor);
+            opacity: 0.6;
           }
         }
 
         @keyframes neonGlow {
           0%,
           100% {
-            opacity: 0.5;
-            box-shadow:
-              0 0 10px currentColor,
-              0 0 20px rgba(100, 149, 237, 0.4);
+            opacity: 0.4;
           }
           50% {
-            opacity: 0.9;
-            box-shadow:
-              0 0 20px currentColor,
-              0 0 40px rgba(100, 149, 237, 0.7);
+            opacity: 0.7;
           }
         }
 
@@ -136,10 +156,16 @@ export const HeroSection = () => {
           0%,
           100% {
             stroke-dashoffset: 0;
-            opacity: 0.3;
+            opacity: 0.2;
           }
           50% {
-            opacity: 0.7;
+            opacity: 0.5;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          * {
+            animation: none !important;
           }
         }
       `}</style>
