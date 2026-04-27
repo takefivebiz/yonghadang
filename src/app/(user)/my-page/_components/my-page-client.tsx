@@ -5,11 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MemberProfile } from "@/types/member";
 import { FullReport } from "@/types/report";
-import {
-  getMemberProfile,
-  loginAsMember,
-} from "@/lib/report-access";
-import { DUMMY_MEMBER } from "@/lib/dummy-member";
+import { getMemberProfile } from "@/lib/report-access";
 import { listAllOrders } from "@/lib/dummy-orders";
 import { DUMMY_REPORTS } from "@/lib/dummy-reports";
 import { ProfileCard } from "./profile-card";
@@ -23,12 +19,10 @@ export const MyPageDashboardClient = () => {
   const [state, setState] = useState<DashboardState>({ phase: "loading" });
 
   useEffect(() => {
-    let profile = getMemberProfile();
+    const profile = getMemberProfile();
 
-    if (!profile) {
-      loginAsMember(DUMMY_MEMBER);
-      profile = DUMMY_MEMBER;
-    }
+    // layout 가드에서 처리하므로 null이면 리다이렉트 중 — 로딩 유지
+    if (!profile) return;
 
     // 회원의 리포트 필터
     const myOrders = listAllOrders()

@@ -48,6 +48,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       </head>
       <body
         className={`${notoSerifKR.variable} ${cinzel.variable} antialiased`}
+        suppressHydrationWarning
       >
         {children}
         <Toaster

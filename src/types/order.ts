@@ -22,6 +22,10 @@ export interface Order {
   phoneNumber?: string;
   /** 회원: Supabase user id */
   memberId?: string;
+  /** 유료 질문 구매 여부. true면 guest 소유권으로 업그레이드, localStorage 영속 저장. */
+  paid?: boolean;
+  /** 구매한 질문 ID 목록 (유료 구매 시에만 저장) */
+  paidQuestionIds?: string[];
   errorMessage?: string;
   createdAt: string;
 }

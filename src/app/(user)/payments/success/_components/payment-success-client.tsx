@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { saveLocalOrder, getOrder } from '@/lib/dummy-orders';
 
 /**
  * 결제 성공 페이지 클라이언트.
@@ -36,9 +37,40 @@ export const PaymentSuccessClient = () => {
     }
     sessionStorage.setItem(processedKey, 'true');
 
+    // 비회원 결제 후 order를 'guest'로 업데이트
+    const targetSession = sessionIdParam || orderId;
+    const guestCheckoutKey = `guest_checkout_${targetSession}`;
+    const guestCheckout = sessionStorage.getItem(guestCheckoutKey);
+
+    if (guestCheckout) {
+      try {
+        const { phoneNumber, password } = JSON.parse(guestCheckout) as {
+          phoneNumber: string;
+          password: string;
+        };
+        const order = getOrder(targetSession);
+        if (order && order.ownerType === 'anonymous') {
+          // 비회원 무료리포트에서 유료 결제 후 'guest'로 업그레이드
+          // anonymous → guest 전환: sessionStorage에서 localStorage로 이동
+          saveLocalOrder({
+            ...order,
+            ownerType: 'guest',
+            paid: true,
+            phoneNumber,
+            amount: order.amount || 0,
+          });
+          // sessionStorage에서 무료 리포트 토큰 제거
+          sessionStorage.removeItem(`corelog_report_${targetSession}`);
+        }
+        sessionStorage.removeItem(guestCheckoutKey);
+      } catch (e) {
+        console.error('Failed to update order:', e);
+      }
+    }
+
     // TODO: [백엔드 연동] 결제 승인 API 호출 후 session-id 받기
     // 현재는 payment-modal에서 전달한 sessionId 파라미터 우선 사용
-    setSessionId(sessionIdParam || orderId);
+    setSessionId(targetSession);
   }, [orderId, sessionIdParam, router]);
 
   if (!sessionId) {

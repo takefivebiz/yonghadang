@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Order } from '@/types/order';
-import { getMemberProfile, loginAsMember } from '@/lib/report-access';
-import { DUMMY_MEMBER } from '@/lib/dummy-member';
+import { getMemberProfile } from '@/lib/report-access';
 import { listAllOrders } from '@/lib/dummy-orders';
 
 type OrdersState =
@@ -22,12 +21,8 @@ export const OrdersClient = () => {
   const [state, setState] = useState<OrdersState>({ phase: 'loading' });
 
   useEffect(() => {
-    let profile = getMemberProfile();
-
-    if (!profile) {
-      loginAsMember(DUMMY_MEMBER);
-      profile = DUMMY_MEMBER;
-    }
+    const profile = getMemberProfile();
+    if (!profile) return;
 
     const myOrders = listAllOrders()
       .filter(

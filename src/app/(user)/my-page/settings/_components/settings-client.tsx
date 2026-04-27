@@ -6,10 +6,8 @@ import { toast } from 'sonner';
 import { MemberProfile } from '@/types/member';
 import {
   getMemberProfile,
-  loginAsMember,
   logoutMember,
 } from '@/lib/report-access';
-import { DUMMY_MEMBER } from '@/lib/dummy-member';
 import { ProfileCard } from '../../_components/profile-card';
 
 type SettingsState =
@@ -22,12 +20,8 @@ export const SettingsClient = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
-    let profile = getMemberProfile();
-
-    if (!profile) {
-      loginAsMember(DUMMY_MEMBER);
-      profile = DUMMY_MEMBER;
-    }
+    const profile = getMemberProfile();
+    if (!profile) return;
 
     setState({ phase: 'ready', profile });
   }, []);

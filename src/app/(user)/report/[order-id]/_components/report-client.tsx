@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { Order } from '@/types/order';
 import { FullReport } from '@/types/report';
 import { AnalysisSession } from '@/types/analysis';
-import { hasGuestAccess, isMemberLoggedIn } from '@/lib/report-access';
+import { hasGuestAccess, isMemberLoggedIn, getMemberProfile } from '@/lib/report-access';
 import { GuestAuthForm } from './guest-auth-form';
 import { ReportView } from './report-view';
 import { ReportStatus } from './report-status';
@@ -32,6 +33,13 @@ export const ReportClient = ({ order, report, initialAnalysisSession }: ReportCl
   const [analysisSession, setAnalysisSession] = useState<AnalysisSession | null>(initialAnalysisSession ?? null);
 
   useEffect(() => {
+    // 결제 실패 후 복귀 시 토스트 표시
+    const failMsg = sessionStorage.getItem(`payment_fail_toast_${order.id}`);
+    if (failMsg) {
+      sessionStorage.removeItem(`payment_fail_toast_${order.id}`);
+      toast.error(failMsg);
+    }
+
     // sessionStorage에서 분석 세션 가져오기 (분석 직후 리포트로 이동한 경우)
     const stored = sessionStorage.getItem(`analysis_${sessionId}`);
     if (stored) {
@@ -44,9 +52,13 @@ export const ReportClient = ({ order, report, initialAnalysisSession }: ReportCl
     }
 
     const authed =
-      order.ownerType === 'member'
-        ? isMemberLoggedIn()
-        : hasGuestAccess(order.id);
+      order.ownerType === 'anonymous'
+        ? true // 비회원 무료리포트는 인증 불필요
+        : order.ownerType === 'member'
+        // 로그인 여부 + memberId 일치 여부 동시 검증 (타인의 리포트 접근 차단)
+        // TODO: [백엔드 연동] 서버에서 Supabase RLS로 소유권 검증
+        ? isMemberLoggedIn() && getMemberProfile()?.memberId === order.memberId
+        : hasGuestAccess(order.id); // 'guest'는 전화번호+비밀번호 인증 필요
 
     if (!authed) {
       setView('auth');

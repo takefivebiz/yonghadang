@@ -17,9 +17,11 @@ const DUMMY_ORDERS: Order[] = [
   {
     id: 'sess_demo_guest_love',
     category: '연애',
-    amount: 0,
+    amount: 900,
     status: 'done',
-    ownerType: 'anonymous',
+    ownerType: 'guest',
+    paid: true,
+    phoneNumber: '01012345678',
     createdAt: '2026-04-15T10:30:00.000Z',
   },
   {
@@ -37,6 +39,8 @@ const DUMMY_ORDERS: Order[] = [
     amount: 0,
     status: 'done',
     ownerType: 'anonymous',
+    paid: false,
+    phoneNumber: '01012345678',
     createdAt: '2026-04-19T09:15:00.000Z',
   },
   {
@@ -45,6 +49,8 @@ const DUMMY_ORDERS: Order[] = [
     amount: 0,
     status: 'done',
     ownerType: 'anonymous',
+    paid: false,
+    phoneNumber: '01012345678',
     createdAt: '2026-04-18T12:00:00.000Z',
   },
 ];
@@ -106,6 +112,12 @@ export const verifyGuestOrder = (
 ): boolean => {
   const order = getOrder(sessionId);
   if (!order || order.ownerType !== 'guest') return false;
+
+  // 유료 구매 여부 확인 — paid가 true여야만 guest 세션으로 인정
+  // TODO: [백엔드 연동] 서버에서 order.paid 필드 검증
+  if (!order.paid) {
+    return false;
+  }
 
   // 데모용 비밀번호 매핑 (실제로는 DB에서 해시된 비밀번호를 비교해야 함)
   const demoPasswords: Record<string, string> = {

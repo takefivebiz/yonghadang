@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface PaymentFailClientProps {
@@ -8,6 +9,7 @@ interface PaymentFailClientProps {
   message?: string;
   orderId?: string;
   content?: string;
+  sessionId?: string;
 }
 
 /**
@@ -22,7 +24,10 @@ export const PaymentFailClient = ({
   message,
   orderId,
   content,
+  sessionId,
 }: PaymentFailClientProps) => {
+  const router = useRouter();
+
   useEffect(() => {
     // 실패 정보를 localStorage에 기록 (테스트 데이터 추적용)
     if (typeof window !== 'undefined' && orderId) {
@@ -45,9 +50,35 @@ export const PaymentFailClient = ({
         console.error('[Payment Fail] localStorage 기록 실패', err);
       }
     }
-  }, [orderId, code, message]);
 
-  const retryHref = content ? `/payments?content=${content}` : '/';
+    // sessionId가 있으면 sessionStorage 롤백 후 토스트 플래그 저장 → 리포트로 복귀
+    if (sessionId) {
+      // redirect로 발생한 실패: 결제 전 스냅샷으로 구매 기록 복원
+      const snapshotRaw = sessionStorage.getItem(`payment_snapshot_${sessionId}`);
+      if (snapshotRaw) {
+        try {
+          const { items, axes } = JSON.parse(snapshotRaw) as { items: string | null; axes: string | null };
+          const purchasedKey = `purchased_${sessionId}`;
+          const axesKey = `purchased_axes_${sessionId}`;
+          items === null ? sessionStorage.removeItem(purchasedKey) : sessionStorage.setItem(purchasedKey, items);
+          axes === null ? sessionStorage.removeItem(axesKey) : sessionStorage.setItem(axesKey, axes);
+        } catch {
+          // 롤백 실패 시 무시
+        }
+        sessionStorage.removeItem(`payment_snapshot_${sessionId}`);
+      }
+
+      const failMsg = message || '결제가 완료되지 않았어요. 다시 시도해주세요.';
+      sessionStorage.setItem(`payment_fail_toast_${sessionId}`, failMsg);
+      router.replace(`/report/${sessionId}`);
+    }
+  }, [orderId, code, message, sessionId, router]);
+
+  const retryHref = sessionId
+    ? `/report/${sessionId}`
+    : content
+    ? `/payments?content=${content}`
+    : '/';
 
   return (
     <div className="relative min-h-screen overflow-hidden">

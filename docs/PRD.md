@@ -2697,6 +2697,8 @@ type TelegramAlertEvent =
 - [x] 이미 완료된 세션 URL (`/report/[session-id]`)에 접근 후 **분석 시작 페이지로 뒤로가기** 시 중복 분석이 생성되지 않는가 — 더미 데이터 구조상 동일 sessionId 재사용, 중복 오더 없음
 - [x] 모바일 환경에서 **빠른 탭 연타**로 카테고리/분기/답변을 연속 선택할 때 UI가 깨지거나 중복 요청이 발생하지 않는가 — `isSubmittingRef`로 중복 제출 방지
 
+---
+
 #### 시나리오 2 — 유료 리포트 구매 플로우 (Happy Path)
 
 ```
@@ -2724,6 +2726,8 @@ type TelegramAlertEvent =
 - [x] 결제 진행 중 **탭을 닫았다가 재오픈** 시 처리 중이던 주문 상태가 올바르게 복원되거나 안내가 표시되는가 — `readPendingOrder()`로 초기 state에서 바로 복원
 - [x] 결제 위젯이 열린 상태에서 **뒤로가기**를 눌렀을 때 결제 플로우가 안전하게 취소되고 이전 페이지로 이동하는가 — `popstate` 이벤트에서 `onClose()` 호출
 
+---
+
 #### 시나리오 3 — 결제 실패 플로우
 
 ```
@@ -2735,60 +2739,132 @@ type TelegramAlertEvent =
 → 리포트 페이지 복귀 (유료 질문 미구매 상태 유지)
 ```
 
-- [ ] 결제 실패 토스트가 노출되는가
-- [ ] 실패 후 리포트 페이지로 정상 복귀하는가
-- [ ] 구매 전 상태(잠금)가 유지되는가
+- [x] 결제 실패 토스트가 노출되는가 (sonner toast.error)
+- [x] 실패 후 리포트 페이지로 정상 복귀하는가 (payment*fail_toast*\* 플래그 기반)
+- [x] 구매 전 상태(잠금)가 유지되는가 (payment*snapshot*\* 기반 sessionStorage 롤백)
 
 **극단적 케이스**
 
-- [ ] 결제 실패 후 **즉시 재결제**를 시도할 때 새 orderId가 발급되고 이전 실패 주문과 충돌하지 않는가
-- [ ] `/payment/fail` 콜백 URL을 **직접 조작**하여 접근 시 안전하게 처리되는가 (orderId 없이 접근, 존재하지 않는 orderId 등)
-- [ ] 결제 실패 후 **여러 번 뒤로가기**를 반복할 때 결제 위젯이 다시 올바르게 렌더링되는가
-- [ ] 네트워크 요청이 느린 환경(throttling)에서 결제 버튼을 **빠르게 여러 번** 클릭했을 때 중복 orderId 생성이 방지되는가
+- [x] 결제 실패 후 **즉시 재결제**를 시도할 때 새 orderId가 발급되고 이전 실패 주문과 충돌하지 않는가 (generateOrderId() 매번 새 ID)
+- [x] `/payment/fail` 콜백 URL을 **직접 조작**하여 접근 시 안전하게 처리되는가 (sessionId 없으면 실패 UI만 표시)
+- [x] 결제 실패 후 **여러 번 뒤로가기**를 반복할 때 결제 위젯이 다시 올바르게 렌더링되는가 (isInitializing.current 체크)
+- [x] 네트워크 요청이 느린 환경(throttling)에서 결제 버튼을 **빠르게 여러 번** 클릭했을 때 중복 orderId 생성이 방지되는가 (isPaying disabled)
 
-#### 시나리오 4 — 회원가입 & 로그인 플로우
+**백엔드 필요**
+
+- [ ] `POST /api/payments/fail` 호출하여 `orders.status = 'failed'` + `fail_code`, `fail_message` DB 기록 ⚠️ **[백엔드 연동 필요]**
+
+---
+
+#### 시나리오 4 — 소셜 로그인 플로우
+
+> **참고**: Corelog는 카카오 / 구글 **소셜 로그인 전용**. 이메일/비밀번호 회원가입 폼 없음.
 
 ```
-회원가입 페이지 접근
-→ 이메일/비밀번호 입력
-→ 회원가입 완료 (이메일 인증 생략 가능)
-→ 로그인 성공
-→ 마이페이지(/mypage) 정상 접근
+/auth 접근
+→ 카카오 또는 구글 버튼 클릭
+→ OAuth 인증
+→ 로그인 성공 → ?next= 경로 또는 / 로 리다이렉트
+→ 마이페이지(/my-page) 정상 접근
 ```
 
-- [ ] 회원가입 폼 유효성 검사가 동작하는가
-- [ ] 로그인 성공 후 리다이렉트가 되는가
-- [ ] 미로그인 상태로 `/mypage` 접근 시 `/login`으로 리다이렉트되는가
+- [x] 로그인 성공 후 `?next=` 경로로 리다이렉트되는가 (`redirectToSite(nextPath, ...)` 구현)
+- [x] 미로그인 상태로 `/my-page` 접근 시 `/auth?next=/my-page`로 리다이렉트되는가 (`my-page/layout.tsx` 인증 가드)
+- [x] 이미 로그인된 상태에서 `/auth` 직접 접근 시 목적지로 바로 이동하는가 (`auth-client.tsx` 마운트 시 즉시 체크)
 
 **극단적 케이스**
 
-- [ ] **이미 가입된 이메일**로 재가입 시도 시 "이미 존재하는 계정" 에러가 표시되는가
-- [ ] **빈 폼** 제출 시 각 필드에 유효성 에러 메시지가 개별적으로 표시되는가
-- [ ] **잘못된 이메일 형식** 입력 시 (예: `user@`, `user.com`) 유효성 검사가 차단하는가
-- [ ] **비밀번호 규칙 위반** 시 (짧은 비밀번호, 특수문자 미포함 등) 즉시 피드백이 표시되는가
-- [ ] 이메일 필드에 **XSS 공격 문자열** (`<script>alert(1)</script>`) 입력 시 화면에 스크립트가 실행되지 않는가
-- [ ] 이메일/비밀번호에 **SQL 인젝션 패턴** (`' OR '1'='1`, `'; DROP TABLE users; --`) 입력 시 에러 없이 안전하게 처리되는가
-- [ ] **로그인 실패를 5회 이상 반복**할 때 계정 잠금 또는 안내 메시지가 표시되는가 (브루트 포스 방어)
-- [ ] 비밀번호 입력란에 **1000자 이상의 텍스트** 붙여넣기 시 UI가 깨지지 않고 길이 제한이 작동하는가
-- [ ] 이미 로그인된 상태에서 `/login` 또는 `/signup`에 **직접 URL 접근** 시 마이페이지 또는 홈으로 리다이렉트되는가
-- [ ] 로그인 진행 중 **탭 전환 후 돌아와서 제출** 시 세션 상태가 올바른가
+- [x] 로그인 버튼 **중복 클릭** 시 중복 요청이 방지되는가 (`phase === "authenticating"` 가드)
+- [x] 로그인 진행 중 **탭 전환 후 돌아와서 제출** 시 세션 상태가 올바른가 (`phase` 상태 유지로 처리)
+- [x] `?next=` 파라미터에 **오픈 리다이렉트 공격** URL 삽입 시 차단되는가 (`sanitizeNextPath` — `/`로 시작하지 않거나 `//`로 시작하면 차단)
 
-#### 시나리오 5 — 비회원 세션 만료 플로우
+**백엔드 필요**
+
+- [ ] `supabase.auth.signInWithOAuth({ provider })` 실제 OAuth 연동 ⚠️ **[백엔드 연동 필요]**
+- [ ] `/api/auth/callback` 세션 교환 후 `?next=` 경로 복귀 ⚠️ **[백엔드 연동 필요]**
+- [ ] **OAuth 브루트 포스 방어** — 공급자(Kakao/Google) 레벨에서 처리, Supabase Auth 설정으로 보완 ⚠️ **[백엔드 연동 필요]**
+
+---
+
+#### 시나리오 5 — 비회원 세션 관리 및 조회
 
 ```
-만료된 session-id로 /report/[session-id] 접근
-→ 만료 안내 페이지 렌더링
-→ 새 분석 시작 CTA 확인
+비회원 무료 분석 → 유료 질문 구매 → 결제 완료
+→ 같은 리포트에서 확장 결과 즉시 확인
+→ 비회원 조회 페이지에서 재접근 가능
 ```
 
-- [ ] 만료된 세션 접근 시 만료 페이지가 표시되는가
-- [ ] 존재하지 않는 session-id 접근 시 404 또는 에러 페이지가 표시되는가
+**비회원 세션 생명주기 — anonymous → guest 전환**
+
+무료 리포트와 유료 확장 리포트는 분리된 상품이 아니라 **같은 리포트의 확장판**이다. 따라서 orderId는 유지되고, 결제 여부에 따라 **소유권과 저장소만 변환**된다. **비회원이 유료로 구매한 것은 영구적으로 접근 가능**하다.
+
+| 단계 | ownerType | paid | 저장소 | 접근 | 영속성 |
+|------|-----------|------|--------|------|--------|
+| 1. 무료 분석 | `anonymous` | false | sessionStorage | URL 불가 (브라우저 내만) | 임시 (브라우저 종료 시 삭제) |
+| 2. 유료 결제 후 | `guest` | true | localStorage | URL 가능 (phoneNumber+password) | **영구 (만료 없음)** |
+| 회원 분석 | `member` | (N/A) | Supabase | 로그인 계정 | 영구 (수동 삭제까지) |
+
+**전환 흐름**
+
+```
+[비회원 무료 분석]
+↓
+orderId 생성, ownerType: 'anonymous', paid: false, sessionStorage 저장
+↓
+사용자가 유료 질문 선택 후 결제
+↓
+[결제 완료]
+↓
+같은 orderId로 업그레이드: ownerType: 'guest', paid: true, paidQuestionIds 저장
+sessionStorage 삭제 → localStorage로 이동
+↓
+/report/[orderId] 유지 (사용자는 같은 페이지에서 계속 봄, 구매한 질문 즉시 표시)
+```
+
+**재접근 흐름 (비회원 조회)**
+
+```
+/guest/lookup 접근
+↓
+전화번호 + 비밀번호 입력
+↓
+verifyGuestOrder() 검증 (ownerType: 'guest' + paid: true 확인)
+↓
+grantGuestAccess() 호출 (30분 인증 토큰 저장)
+↓
+localStorage의 paidQuestionIds → sessionStorage로 복사
+↓
+/report/[orderId] 이동 (본인확인 폼 없이 바로 리포트 + 구매한 질문 표시)
+```
+
+- [x] 무료 분석 후 **유료 질문 구매 시 같은 orderId가 유지**되는가 (anonymous → guest 전환, paid: true 설정, paidQuestionIds 저장)
+- [x] 결제 완료 후 **저장소가 전환**되는가 (sessionStorage → localStorage)
+- [x] 결제 완료 후 **바로 리포트 페이지에서 확장 결과 표시**되는가 (별도 페이지 거치지 않고 즉시 반영)
+- [x] 존재하지 않는 session-id 접근 시 404 페이지가 표시되는가 (`notFound()` → 커스텀 404 페이지)
+- [x] 비회원 기존 리포트 조회 시 paid 검증이 작동하는가 (`verifyGuestOrder()` → `paid === true` 확인, 미구매 → `false` 반환)
+- [x] 비회원 조회 후 **본인확인 폼이 중복 나타나지 않는가** (`guest-lookup`에서 `grantGuestAccess()` 호출 → report-client에서 `hasGuestAccess()` 통과)
 
 **극단적 케이스**
 
-- [ ] `/report/` 뒤에 **임의의 문자열, 특수문자, 매우 긴 문자열** 입력 시 서버가 정상 처리하는가 (예: `/report/../../../../etc/passwd`, `/report/<script>`)
-- [ ] **타인의 session-id**를 추측하여 접근 시 본인 소유가 아닌 세션은 열람 불가 처리되는가 (세션 소유권 검증)
-- [ ] 세션이 만료된 상태에서 **결제 URL을 직접 입력**하여 결제를 시도할 때 적절한 에러가 표시되는가
+- [x] `/report/` 뒤에 **임의의 문자열, 특수문자, 매우 긴 문자열** 입력 시 서버가 정상 처리하는가 (Next.js URL 인코딩 + `getOrder()` 미매칭 → `notFound()`)
+- [x] **회원 타인의 session-id** 접근 시 열람 불가 처리되는가 (`report-client.tsx` — `memberId` 일치 여부 검증)
+- [x] **결제 실패 후 복귀** 시 이전 상태로 롤백되는가 (sessionStorage 스냅샷 복원)
+- [x] 구매하지 않은 anonymous 세션으로 **비회원 조회 페이지에서 조회** 시도 시 실패 처리되는가 (`verifyGuestOrder()` paid check → `false` 반환)
+- [x] **결제 중 다른 탭에서 같은 세션 접근** 시 정합성이 유지되는가 (localStorage 기반 저장)
+
+**백엔드 필요**
+
+- [ ] 회원/비회원 세션 소유권 서버 검증 — Supabase RLS 또는 API에서 `user_id` 비교 ⚠️ **[백엔드 연동 필요]**
+  - 클라이언트: `report-client.tsx`에서 memberId 일치 여부 검증 구현 완료
+  - 서버: RLS 또는 API 레벨에서 세션 소유권 검증 필요
+- [ ] 결제 완료 후 order 상태 업데이트 — ownerType: 'guest', paid: true, paidQuestionIds 설정 ⚠️ **[백엔드 연동 필요]**
+  - 클라이언트: payment-modal에서 order를 localStorage에 미리 저장 (requestPayment 전, paidQuestionIds 포함)
+  - 서버: Toss 웹훅에서 실제 결제 확인 후 DB에 order 저장
+- [ ] 비회원 본인확인 API — POST /api/guest/verify (phoneNumber, password, orderId) ⚠️ **[백엔드 연동 필요]**
+  - 클라이언트: `verifyGuestOrder()` 에서 bcrypt 비교는 클라이언트 데모용
+  - 서버: 실제 해시 비교 및 order ownership 검증 필요
+
+---
 
 #### 시나리오 6 — 관리자 플로우
 
@@ -2814,6 +2890,8 @@ type TelegramAlertEvent =
 - [ ] 관리자 콘텐츠 CRUD에서 **필수 필드를 비운 채 저장** 시 유효성 검사가 막아주는가
 - [ ] 관리자 콘텐츠 입력 필드에 **마크다운 또는 HTML 태그** 입력 시 렌더링 또는 이스케이프 처리가 올바른가
 
+---
+
 #### 시나리오 7 — 에러 상태 플로우
 
 ```
@@ -2833,6 +2911,8 @@ AI 스트리밍 실패 시 → 에러 메시지 UI 표시
 - [ ] 네트워크를 **오프라인으로 전환** 후 버튼 클릭 시 적절한 오프라인 에러 메시지가 표시되는가
 - [ ] 서버 오류(500) 응답 시 **에러 바운더리(Error Boundary)** 가 전체 앱이 아닌 해당 컴포넌트만 Fallback UI로 대체하는가
 
+---
+
 #### 시나리오 8 — 동시성 & 중복 요청 플로우 (Concurrency Edge Cases)
 
 - [ ] **폼 제출 버튼을 빠르게 연타** 시 동일한 API 요청이 중복 발생하지 않는가 (버튼 비활성화 또는 debounce 처리)
@@ -2841,6 +2921,8 @@ AI 스트리밍 실패 시 → 에러 메시지 UI 표시
 - [ ] 같은 계정으로 **두 개의 브라우저 탭에서 동시에 로그인**을 시도할 때 세션 충돌이 발생하지 않는가
 - [ ] 동일한 `orderId`를 포함한 결제 성공 콜백을 **동시에 두 번** 서버로 전송 시 중복 처리가 방지되는가 (멱등성)
 
+---
+
 #### 시나리오 9 — 입력 경계값 & 보안 플로우 (Input Boundary & Security)
 
 - [ ] 모든 텍스트 입력 필드에 **1000자 이상의 문자열** 입력 시 UI 레이아웃이 깨지지 않고 서버가 정상 처리하는가
@@ -2848,6 +2930,8 @@ AI 스트리밍 실패 시 → 에러 메시지 UI 표시
 - [ ] URL 파라미터에 **인코딩되지 않은 특수문자** 입력 시 서버가 안전하게 처리하는가 (예: `/report/abc%00xyz`)
 - [ ] 브라우저 개발자 도구로 **LocalStorage/Cookie의 세션 토큰을 삭제** 후 보호된 페이지를 유지하려 할 때 로그인 페이지로 리다이렉트되는가
 - [ ] **브라우저 자동완성**으로 이전 테스트 계정 정보가 채워진 상태에서 폼 제출 시 정상 동작하는가
+
+---
 
 #### 시나리오 10 — 결제 완료 후 재접근 플로우 (Post-Payment Edge Cases)
 

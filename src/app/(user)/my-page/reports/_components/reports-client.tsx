@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FullReport } from '@/types/report';
-import { getMemberProfile, loginAsMember } from '@/lib/report-access';
-import { DUMMY_MEMBER } from '@/lib/dummy-member';
+import { getMemberProfile } from '@/lib/report-access';
 import { listAllOrders } from '@/lib/dummy-orders';
 import { DUMMY_REPORTS } from '@/lib/dummy-reports';
 
@@ -16,12 +15,8 @@ export const ReportsClient = () => {
   const [state, setState] = useState<ReportsState>({ phase: 'loading' });
 
   useEffect(() => {
-    let profile = getMemberProfile();
-
-    if (!profile) {
-      loginAsMember(DUMMY_MEMBER);
-      profile = DUMMY_MEMBER;
-    }
+    const profile = getMemberProfile();
+    if (!profile) return;
 
     const myOrders = listAllOrders()
       .filter(

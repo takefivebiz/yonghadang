@@ -151,27 +151,52 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
         ? getFullBundlePrice()
         : getPriceForQuantity(pendingOrder.paidQuestionIds.length);
 
-      // 📌 결제 전 구매 정보를 모두 sessionStorage에 저장 (redirect 후 복원)
+      // 결제 전 기존 값 스냅샷 저장 (실패 시 롤백용)
       const purchasedKey = `purchased_${pendingOrder.sessionId}`;
-      const existing = JSON.parse(sessionStorage.getItem(purchasedKey) || '[]') as string[];
+      const axesKey = `purchased_axes_${pendingOrder.sessionId}`;
+      const snapshotItems = sessionStorage.getItem(purchasedKey);
+      const snapshotAxes = sessionStorage.getItem(axesKey);
+
+      // 📌 결제 전 구매 정보를 모두 sessionStorage에 저장 (redirect 후 복원)
+      const existing = JSON.parse(snapshotItems || '[]') as string[];
       const merged = [...new Set([...existing, ...pendingOrder.paidQuestionIds])];
       sessionStorage.setItem(purchasedKey, JSON.stringify(merged));
 
       // 📌 구매된 축 저장 (핵심!)
-      const existingAxes = JSON.parse(sessionStorage.getItem(`purchased_axes_${pendingOrder.sessionId}`) || '[]') as number[];
+      const existingAxes = JSON.parse(snapshotAxes || '[]') as number[];
       const currentAxis = existingAxes.length < 3 ? (existingAxes.length + 1) : null;
       if (currentAxis) {
         const newAxes = [...new Set([...existingAxes, currentAxis])];
-        sessionStorage.setItem(`purchased_axes_${pendingOrder.sessionId}`, JSON.stringify(newAxes));
+        sessionStorage.setItem(axesKey, JSON.stringify(newAxes));
       }
 
-      // 결제 성공 후 바로 리포트로 복귀 (구매 완료 질문 즉시 표시)
+      // 롤백 정보를 sessionStorage에 저장 (redirect 후 결제 실패 시 payment-fail이 복원)
+      sessionStorage.setItem(
+        `payment_snapshot_${pendingOrder.sessionId}`,
+        JSON.stringify({ items: snapshotItems, axes: snapshotAxes })
+      );
+
+      // 결제 성공 후 바로 리포트로 복귀 (별도 페이지 거치지 않음)
       const origin = window.location.origin;
       const successUrl = `${origin}/report/${pendingOrder.sessionId}`;
-      const failUrl = `${origin}/payments/fail`;
+      const failUrl = `${origin}/payments/fail?sessionId=${pendingOrder.sessionId}`;
 
       // redirect 전에 미리 제거 (Toss 결제 성공 후 새 페이지 로드 시 모달이 다시 열리지 않도록)
       clearPendingOrder();
+
+      // 📌 결제 전에 미리 guest order를 localStorage에 저장
+      // redirect되는 경우와 로컬 환경 모두에서 작동하려면 requestPayment 전에 저장해야 함
+      saveLocalOrder({
+        id: pendingOrder.sessionId,
+        category: pendingOrder.category,
+        amount: totalPrice,
+        status: 'done',
+        ownerType: isLoggedIn ? 'member' : 'guest',
+        paid: !isLoggedIn, // 비회원 결제만 paid: true
+        phoneNumber: isLoggedIn ? undefined : guestInfo.phoneNumber.replace(/\D/g, ''),
+        paidQuestionIds: !isLoggedIn ? pendingOrder.paidQuestionIds : undefined, // 비회원 구매 질문 목록 저장
+        createdAt: new Date().toISOString(),
+      });
 
       // 토스페이먼츠 결제 요청
       await widgetRef.current.requestPayment({
@@ -184,20 +209,26 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
         failUrl,
       });
 
-      // requestPayment가 redirect 없이 resolve된 경우 (로컬 환경) 직접 처리
-      saveLocalOrder({
-        id: pendingOrder.sessionId,
-        category: pendingOrder.category,
-        amount: totalPrice,
-        status: 'done',
-        ownerType: isLoggedIn ? 'member' : 'guest',
-        phoneNumber: isLoggedIn ? undefined : guestInfo.phoneNumber.replace(/\D/g, ''),
-        createdAt: new Date().toISOString(),
-      });
-
+      // requestPayment가 redirect 없이 resolve된 경우 (로컬 환경) 이미 위에서 처리됨
       onSuccess(orderId);
     } catch (error) {
       console.error('결제 실패:', error);
+
+      // 모달 내 취소/실패(redirect 없이 throw)인 경우 sessionStorage 롤백
+      const purchasedKey = `purchased_${pendingOrder.sessionId}`;
+      const axesKey = `purchased_axes_${pendingOrder.sessionId}`;
+      const snapshotRaw = sessionStorage.getItem(`payment_snapshot_${pendingOrder.sessionId}`);
+      if (snapshotRaw) {
+        try {
+          const { items, axes } = JSON.parse(snapshotRaw) as { items: string | null; axes: string | null };
+          items === null ? sessionStorage.removeItem(purchasedKey) : sessionStorage.setItem(purchasedKey, items);
+          axes === null ? sessionStorage.removeItem(axesKey) : sessionStorage.setItem(axesKey, axes);
+        } catch {
+          // 롤백 실패 시 무시
+        }
+        sessionStorage.removeItem(`payment_snapshot_${pendingOrder.sessionId}`);
+      }
+
       setIsPaying(false);
     }
   };

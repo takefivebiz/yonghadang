@@ -1,8 +1,9 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { isMemberLoggedIn } from '@/lib/report-access';
 
 const TABS = [
   { id: 'dashboard', label: '대시보드', href: '/my-page' },
@@ -13,6 +14,14 @@ const TABS = [
 
 const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
+  const router = useRouter();
+
+  // 미로그인 시 /auth로 리다이렉트 (모든 my-page 하위 페이지 공통 가드)
+  useEffect(() => {
+    if (!isMemberLoggedIn()) {
+      router.replace(`/auth?next=${encodeURIComponent(pathname)}`);
+    }
+  }, [pathname, router]);
 
   const activeTab = useMemo(() => {
     if (pathname === '/my-page') return 'dashboard';

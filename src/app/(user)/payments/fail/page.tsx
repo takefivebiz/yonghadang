@@ -13,6 +13,7 @@ interface PaymentFailPageProps {
     message?: string;
     orderId?: string;
     content?: string;
+    sessionId?: string;
   }>;
 }
 
@@ -25,9 +26,9 @@ interface PaymentFailPageProps {
  *       orders.status=failed + fail_code/fail_message 기록 (idempotent).
  */
 const PaymentFailPage = async ({ searchParams }: PaymentFailPageProps) => {
-  const { code, message, orderId, content } = await searchParams;
+  const { code, message, orderId, content, sessionId } = await searchParams;
 
-  return <PaymentFailClient code={code} message={message} orderId={orderId} content={content} />;
+  return <PaymentFailClient code={code} message={message} orderId={orderId} content={content} sessionId={sessionId} />;
 };
 
 export default PaymentFailPage;

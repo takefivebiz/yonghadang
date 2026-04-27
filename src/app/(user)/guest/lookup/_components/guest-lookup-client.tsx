@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { verifyGuestOrder, listAllOrders } from "@/lib/dummy-orders";
+import { grantGuestAccess } from "@/lib/report-access";
 
 /** PRD 5.3: 비회원 기록 조회 — 전화번호 + 비밀번호 조합으로 세션 찾기 */
 export const GuestLookupClient = () => {
@@ -33,6 +34,17 @@ export const GuestLookupClient = () => {
       setIsLoading(false);
 
       if (matched) {
+        // 인증 성공 후 report 페이지에서 본인확인 폼이 안 나타나도록 토큰 저장
+        grantGuestAccess(matched.id);
+
+        // localStorage의 order에서 구매한 질문 데이터를 sessionStorage로 복사
+        if (matched.paidQuestionIds) {
+          sessionStorage.setItem(
+            `purchased_${matched.id}`,
+            JSON.stringify(matched.paidQuestionIds)
+          );
+        }
+
         router.push(`/report/${matched.id}`);
         return;
       }

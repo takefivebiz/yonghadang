@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { verifyGuestOrder } from "@/lib/dummy-orders";
+import { verifyGuestOrder, getOrder, listAllOrders } from "@/lib/dummy-orders";
 import { grantGuestAccess } from "@/lib/report-access";
 
 interface GuestAuthFormProps {
@@ -57,6 +57,25 @@ export const GuestAuthForm = ({ orderId, onSuccess }: GuestAuthFormProps) => {
     const ok = verifyGuestOrder(orderId, phone, password);
     if (ok) {
       grantGuestAccess(orderId);
+
+      // localStorage의 order에서 구매한 질문 데이터를 sessionStorage로 복사
+      // (비회원 조회 후에도 구매한 질문이 표시되도록)
+      if (typeof window !== 'undefined') {
+        try {
+          const allOrders = listAllOrders();
+          const targetOrder = allOrders.find((o) => o.id === orderId);
+          if (targetOrder?.paidQuestionIds) {
+            // order에 저장된 paidQuestionIds를 sessionStorage로 복사
+            sessionStorage.setItem(
+              `purchased_${orderId}`,
+              JSON.stringify(targetOrder.paidQuestionIds)
+            );
+          }
+        } catch (e) {
+          console.error('Failed to sync purchased data:', e);
+        }
+      }
+
       onSuccess();
     } else {
       setError("전화번호 또는 비밀번호가 일치하지 않아요.");
