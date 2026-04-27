@@ -16,7 +16,12 @@ export const metadata: Metadata = {
  */
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex h-screen" style={{ background: 'linear-gradient(135deg, #0F0420 0%, #1A0B3F 100%)' }}>
+    <div
+      className="flex h-screen"
+      style={{
+        background: "linear-gradient(135deg, #0F0420 0%, #1A0B3F 100%)",
+      }}
+    >
       {/* 배경 장식 - blur 요소 */}
       <div
         className="pointer-events-none fixed top-1/4 left-0 h-96 w-96 rounded-full blur-3xl"
@@ -35,11 +40,21 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* 콘텐츠 영역 */}
-      <div className="flex flex-1 flex-col overflow-hidden relative z-10">
+      <div className="flex flex-1 flex-col relative z-10 min-w-0">
         {/* 모바일 헤더 */}
-        <header className="flex h-16 items-center gap-3 px-4 md:hidden" style={{ borderBottom: '1px solid rgba(230, 230, 250, 0.15)', background: 'rgba(27, 0, 63, 0.8)', backdropFilter: 'blur(8px)' }}>
+        <header
+          className="flex h-16 items-center gap-3 px-4 md:hidden"
+          style={{
+            borderBottom: "1px solid rgba(230, 230, 250, 0.15)",
+            background: "rgba(27, 0, 63, 0.8)",
+            backdropFilter: "blur(8px)",
+          }}
+        >
           <AdminMobileDrawer />
-          <span className="font-display text-lg font-bold tracking-widest" style={{ color: '#F0E6FA' }}>
+          <span
+            className="font-display text-lg font-bold tracking-widest"
+            style={{ color: "#F0E6FA" }}
+          >
             코어로그 관리
           </span>
         </header>

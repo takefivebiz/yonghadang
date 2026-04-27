@@ -138,7 +138,7 @@ export const AuthClient = () => {
       </div>
 
       {/* 메인 콘텐츠 */}
-      <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-12 sm:py-16">
+      <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-4 sm:py-6">
         <div
           className="w-full max-w-sm"
           style={{ animation: "authFadeIn 0.6s ease-out" }}

@@ -18,8 +18,10 @@ const formatPercent = (value: number) => `${value.toFixed(1)}%`;
 const ReportAnalyticsPage = () => {
   const analytics = DUMMY_REPORT_ANALYTICS;
   const totalReports = analytics.freeReportCount + analytics.paidReportCount;
-  const freePercent =
-    ((analytics.freeReportCount / totalReports) * 100).toFixed(1);
+  const freePercent = (
+    (analytics.freeReportCount / totalReports) *
+    100
+  ).toFixed(1);
 
   // 원형 차트용 비율 (CSS) 계산
   const freePercentNum = parseFloat(freePercent);
@@ -37,7 +39,7 @@ const ReportAnalyticsPage = () => {
       </div>
 
       {/* 주요 지표 그리드 */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* 무료 vs 유료 리포트 비율 */}
         <div
           className="rounded-2xl p-6 shadow-sm"
@@ -47,13 +49,16 @@ const ReportAnalyticsPage = () => {
             border: "1px solid rgba(230, 230, 250, 0.15)",
           }}
         >
-          <h2 className="mb-6 text-base font-semibold" style={{ color: "#F0E6FA" }}>
+          <h2
+            className="mb-6 text-base font-semibold"
+            style={{ color: "#F0E6FA" }}
+          >
             무료 vs 유료 리포트 비율
           </h2>
 
-          <div className="flex items-center gap-8">
+          <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-8">
             {/* 원형 차트 (CSS) */}
-            <div className="relative h-40 w-40 flex-shrink-0">
+            <div className="relative h-40 w-40 flex-shrink-0 mx-auto md:mx-0">
               <svg
                 viewBox="0 0 100 100"
                 className="h-full w-full"
@@ -79,15 +84,11 @@ const ReportAnalyticsPage = () => {
                   strokeWidth="12"
                   strokeDasharray={`${((100 - freePercentNum) / 100) * 251.2} 251.2`}
                   style={{
-                    strokeDashoffset: `${
-                      -((freePercentNum / 100) * 251.2)
-                    }px`,
+                    strokeDashoffset: `${-((freePercentNum / 100) * 251.2)}px`,
                   }}
                 />
               </svg>
-              <div
-                className="absolute inset-0 flex items-center justify-center flex-col"
-              >
+              <div className="absolute inset-0 flex items-center justify-center flex-col">
                 <span
                   className="text-lg font-bold"
                   style={{ color: "#F0E6FA" }}
@@ -142,7 +143,10 @@ const ReportAnalyticsPage = () => {
             border: "1px solid rgba(230, 230, 250, 0.15)",
           }}
         >
-          <h2 className="mb-6 text-base font-semibold" style={{ color: "#F0E6FA" }}>
+          <h2
+            className="mb-6 text-base font-semibold"
+            style={{ color: "#F0E6FA" }}
+          >
             생성 성공/실패율
           </h2>
 
@@ -153,15 +157,13 @@ const ReportAnalyticsPage = () => {
                 className="w-full rounded-t-lg transition-opacity hover:opacity-80"
                 style={{
                   height: `${analytics.successRate * 2}px`,
-                  background: "linear-gradient(180deg, #00D084 0%, #00A863 100%)",
+                  background:
+                    "linear-gradient(180deg, #00D084 0%, #00A863 100%)",
                   minHeight: "4px",
                 }}
               />
               <div className="text-center">
-                <p
-                  className="text-lg font-bold"
-                  style={{ color: "#F0E6FA" }}
-                >
+                <p className="text-lg font-bold" style={{ color: "#F0E6FA" }}>
                   {formatPercent(analytics.successRate)}
                 </p>
                 <p className="text-xs" style={{ color: "#B8A8D8" }}>
@@ -176,15 +178,13 @@ const ReportAnalyticsPage = () => {
                 className="w-full rounded-t-lg transition-opacity hover:opacity-80"
                 style={{
                   height: `${analytics.failureRate * 2}px`,
-                  background: "linear-gradient(180deg, #FF6B6B 0%, #FF4757 100%)",
+                  background:
+                    "linear-gradient(180deg, #FF6B6B 0%, #FF4757 100%)",
                   minHeight: "4px",
                 }}
               />
               <div className="text-center">
-                <p
-                  className="text-lg font-bold"
-                  style={{ color: "#F0E6FA" }}
-                >
+                <p className="text-lg font-bold" style={{ color: "#F0E6FA" }}>
                   {formatPercent(analytics.failureRate)}
                 </p>
                 <p className="text-xs" style={{ color: "#B8A8D8" }}>

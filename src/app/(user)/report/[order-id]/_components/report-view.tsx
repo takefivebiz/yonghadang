@@ -281,33 +281,35 @@ export const ReportView = ({ report }: ReportViewProps) => {
             <div className="mb-8">
               <button
                 onClick={handleFullBundleToggle}
-                className={`flex w-full items-center justify-between rounded-xl border p-4 text-left transition-all backdrop-blur-sm md:p-5 ${
+                className={`flex w-full flex-col md:flex-row md:items-center md:justify-between rounded-xl border p-4 text-left transition-all backdrop-blur-sm md:p-5 gap-3 md:gap-0 ${
                   selectFullBundle
                     ? 'border-[#A366FF] bg-purple-500/20'
                     : 'border-white/10 hover:border-white/20 hover:bg-white/10'
                 }`}
               >
-                {/* 체크박스 */}
-                <span
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${
-                    selectFullBundle ? 'border-[#A366FF] bg-[#A366FF]' : 'border-border/50'
-                  }`}
-                >
-                  {selectFullBundle && <span className="text-white">✓</span>}
-                </span>
+                <div className="flex items-center gap-3">
+                  {/* 체크박스 */}
+                  <span
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${
+                      selectFullBundle ? 'border-[#A366FF] bg-[#A366FF]' : 'border-border/50'
+                    }`}
+                  >
+                    {selectFullBundle && <span className="text-white">✓</span>}
+                  </span>
 
-                {/* 내용 */}
-                <div className="flex-1 min-w-0 px-4">
-                  <p className="text-sm font-semibold" style={{ color: '#F5F5F5' }}>
-                    현재 단계 전체 질문 보기
-                  </p>
-                  <p className="mt-1 text-xs" style={{ color: '#D0D0D0' }}>
-                    추천 3개 + 추가 5개 (총 8개 질문)
-                  </p>
+                  {/* 내용 */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold" style={{ color: '#F5F5F5' }}>
+                      현재 단계 전체 질문 보기
+                    </p>
+                    <p className="mt-1 text-xs" style={{ color: '#D0D0D0' }}>
+                      추천 3개 + 추가 5개 (총 8개 질문)
+                    </p>
+                  </div>
                 </div>
 
                 {/* 가격 */}
-                <div className="text-right">
+                <div className="text-right md:ml-4 md:flex-shrink-0">
                   <p className="text-sm font-bold text-[#A366FF]">₩{getFullBundlePrice().toLocaleString()}</p>
                   <p className="text-xs text-green-400">약 {(PRICE_PER_QUESTION * 8 - getFullBundlePrice()).toLocaleString()}원 절약</p>
                 </div>
