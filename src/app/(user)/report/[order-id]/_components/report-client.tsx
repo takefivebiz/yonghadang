@@ -58,20 +58,126 @@ export const ReportClient = ({ order, report, initialAnalysisSession }: ReportCl
 
   if (view === 'auth' && order.ownerType === 'member') {
     return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <p className="mb-3 text-2xl font-bold" style={{ color: '#2D3250' }}>
-          로그인이 필요해요
-        </p>
-        <p className="mb-8 text-sm text-foreground/60">
-          이 리포트는 구매하신 회원만 열람할 수 있어요.
-        </p>
-        <a
-          href={`/auth?redirect=/report/${order.id}`}
-          className="inline-block rounded-xl px-8 py-3 text-sm font-semibold text-white"
-          style={{ backgroundColor: '#2D3250' }}
-        >
-          로그인하러 가기
-        </a>
+      <div className="relative min-h-screen overflow-hidden" style={{ background: 'linear-gradient(160deg, #1B003F 0%, #191970 100%)' }}>
+        {/* 배경 장식 - blur 요소 */}
+        <div
+          className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full blur-3xl"
+          style={{ backgroundColor: '#6495ED', opacity: 0.15 }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -bottom-20 -left-40 h-80 w-80 rounded-full blur-3xl"
+          style={{ backgroundColor: '#E6E6FA', opacity: 0.08 }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute top-1/2 right-1/4 h-72 w-72 rounded-full blur-3xl"
+          style={{ backgroundColor: '#A366FF', opacity: 0.1 }}
+          aria-hidden="true"
+        />
+
+        {/* 네온 라인 장식 - 좌측 */}
+        <div
+          className="pointer-events-none absolute left-0 top-1/4 h-px w-32 opacity-60"
+          style={{
+            background: 'linear-gradient(90deg, transparent, #6495ED, transparent)',
+            boxShadow: '0 0 20px #6495ED, 0 0 40px rgba(100, 149, 237, 0.5)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* 네온 라인 장식 - 우측 */}
+        <div
+          className="pointer-events-none absolute right-0 top-2/3 h-px w-40 opacity-50"
+          style={{
+            background: 'linear-gradient(90deg, transparent, #A366FF, transparent)',
+            boxShadow: '0 0 20px #A366FF, 0 0 40px rgba(163, 102, 255, 0.4)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* 네온 도트 - 좌상단 */}
+        <div
+          className="pointer-events-none absolute left-1/4 top-1/3 h-1.5 w-1.5 rounded-full opacity-70"
+          style={{
+            backgroundColor: '#6495ED',
+            boxShadow: '0 0 15px #6495ED, 0 0 30px rgba(100, 149, 237, 0.6)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* 네온 도트 - 우하단 */}
+        <div
+          className="pointer-events-none absolute bottom-1/4 right-1/3 h-2 w-2 rounded-full opacity-50"
+          style={{
+            backgroundColor: '#A366FF',
+            boxShadow: '0 0 15px #A366FF, 0 0 30px rgba(163, 102, 255, 0.5)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* 콘텐츠 */}
+        <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
+          <div className="mx-auto w-full max-w-md">
+            {/* 아이콘 */}
+            <div
+              className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full"
+              style={{
+                background: 'linear-gradient(135deg, rgba(100, 149, 237, 0.2), rgba(163, 102, 255, 0.15))',
+                boxShadow: '0 8px 32px rgba(100, 149, 237, 0.15)',
+              }}
+              aria-hidden="true"
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6495ED"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 2a10 10 0 0 1 10 10v6H2v-6a10 10 0 0 1 10-10Z" />
+                <path d="M9 13v4" />
+                <path d="M15 13v4" />
+                <circle cx="12" cy="18" r="0.5" fill="#6495ED" />
+              </svg>
+            </div>
+
+            {/* 텍스트 */}
+            <div className="text-center">
+              <h1 className="mb-2 text-2xl font-bold md:text-3xl" style={{ color: '#F5F5F5' }}>
+                로그인이 필요해요
+              </h1>
+              <p className="mb-8 text-sm leading-relaxed" style={{ color: '#D4C5E2' }}>
+                이 리포트는 구매하신 회원만 열람할 수 있어요.
+                <br />
+                계정에 로그인해서 내 분석 결과를 확인해보세요.
+              </p>
+            </div>
+
+            {/* 버튼 */}
+            <a
+              href={`/auth?redirect=/report/${order.id}`}
+              className="block w-full rounded-full py-4 text-center text-sm font-semibold transition-all duration-300 hover:scale-[1.02] text-white"
+              style={{
+                background: 'linear-gradient(90deg, #6495ED 0%, #A366FF 100%)',
+              }}
+            >
+              로그인하러 가기
+            </a>
+
+            {/* 추가 안내 */}
+            <p className="mt-8 text-center text-xs leading-relaxed" style={{ color: '#B8A8D8' }}>
+              계정이 없다면
+              <br />
+              <a href="/auth" className="underline hover:text-white transition-colors">
+                가입하기
+              </a>
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
