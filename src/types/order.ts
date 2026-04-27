@@ -3,8 +3,8 @@ import { AnalysisCategory } from './analysis';
 /** 주문/세션 상태 — PRD 5.8 AI 생성 상태 처리 */
 export type OrderStatus = 'pending' | 'generating' | 'done' | 'error';
 
-/** 주문 소유자 유형 */
-export type OrderOwnerType = 'member' | 'guest';
+/** 주문 소유자 유형 — 'anonymous': 비회원 무료리포트 (인증 불필요), 'guest': 비회원 결제 완료 (인증 필요) */
+export type OrderOwnerType = 'member' | 'guest' | 'anonymous';
 
 /**
  * 주문 레코드 (프론트엔드 더미 전용).

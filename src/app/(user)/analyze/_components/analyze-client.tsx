@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   AnalysisCategory,
@@ -273,19 +273,47 @@ const DUMMY_QUESTIONS = [
 
 type Step = 'category' | 'relationship' | 'subcategory' | 'questions' | 'submitting';
 
+/** sessionStorage에 저장하는 분석 진행 상태 */
+type SavedAnalysisProgress = {
+  step: Step;
+  category: AnalysisCategory | null;
+  subcategory: AnalysisSubcategory | null;
+  selectedRelationship: string | null;
+  currentQuestion: number;
+  answers: QuestionAnswer[];
+  queryType: AnalysisType;
+};
+
 export const AnalyzeClient = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryType = (searchParams.get('type') ?? 'self') as AnalysisType;
 
-  const [category, setCategory] = useState<AnalysisCategory | null>(null);
-  const [selectedRelationship, setSelectedRelationship] = useState<string | null>(null);
-  const [step, setStep] = useState<Step>(queryType === 'self' ? 'category' : 'relationship');
-  const [subcategory, setSubcategory] = useState<AnalysisSubcategory | null>(
-    null,
+  // URL의 category 파라미터로 카테고리 선택 단계 건너뛰기 (랜딩 카테고리 버튼 연동)
+  const queryCategory = searchParams.get('category') as AnalysisCategory | null;
+  const isValidQueryCategory = queryCategory !== null && (CATEGORIES as readonly string[]).includes(queryCategory);
+
+  const [category, setCategory] = useState<AnalysisCategory | null>(
+    isValidQueryCategory ? queryCategory : null,
   );
+  const [selectedRelationship, setSelectedRelationship] = useState<string | null>(null);
+  const [step, setStep] = useState<Step>(() => {
+    if (isValidQueryCategory && queryCategory) {
+      return SUBCATEGORIES[queryCategory] ? 'subcategory' : 'questions';
+    }
+    return queryType === 'self' ? 'category' : 'relationship';
+  });
+  const [subcategory, setSubcategory] = useState<AnalysisSubcategory | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<QuestionAnswer[]>([]);
+
+  // 중복 제출 방지 (모바일 빠른 탭 연타 대응)
+  const isSubmittingRef = useRef(false);
+  // handleBack 최신 참조 (브라우저 뒤로가기 이벤트 핸들러에서 사용)
+  const handleBackRef = useRef<() => void>(() => {});
+
+  // 이전 분석 진행 상태 복원 배너
+  const [showResumeBanner, setShowResumeBanner] = useState(false);
 
   const hasSubcategory = category && SUBCATEGORIES[category];
   const questions = DUMMY_QUESTIONS;
@@ -314,6 +342,9 @@ export const AnalyzeClient = () => {
   }, []);
 
   const handleSubmit = useCallback(() => {
+    // 중복 제출 방지 (모바일 빠른 탭 연타 대응)
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setStep('submitting');
 
     const traits = calculateTraits(answers, questions);
@@ -410,6 +441,80 @@ export const AnalyzeClient = () => {
     }
   }, [currentQuestion, step, hasSubcategory, queryType, router]);
 
+  // handleBack 최신 참조 동기화
+  useEffect(() => {
+    handleBackRef.current = handleBack;
+  }, [handleBack]);
+
+  // 분석 진행 상태를 sessionStorage에 저장 (새로고침/이탈 후 복원용)
+  useEffect(() => {
+    if (step === 'submitting') {
+      // 제출 완료 시 진행 상태 제거
+      sessionStorage.removeItem('analyze_progress');
+      return;
+    }
+    if (step !== 'category' && step !== 'relationship') {
+      const progress: SavedAnalysisProgress = {
+        step, category, subcategory, selectedRelationship, currentQuestion, answers, queryType,
+      };
+      sessionStorage.setItem('analyze_progress', JSON.stringify(progress));
+    }
+  }, [step, category, subcategory, selectedRelationship, currentQuestion, answers, queryType]);
+
+  // 마운트 시 저장된 진행 상태가 있으면 복원 배너 표시
+  useEffect(() => {
+    if (step === 'category' || step === 'relationship') {
+      const saved = sessionStorage.getItem('analyze_progress');
+      if (saved) {
+        try {
+          JSON.parse(saved);
+          setShowResumeBanner(true);
+        } catch {
+          sessionStorage.removeItem('analyze_progress');
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 브라우저 뒤로가기(popstate) 처리 — 이탈 대신 이전 단계로 이동
+  useEffect(() => {
+    window.history.pushState({ analyzeStep: step, q: currentQuestion }, '');
+  }, [step, currentQuestion]);
+
+  useEffect(() => {
+    const onPop = () => {
+      handleBackRef.current();
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  /** 이전 분석 이어서 하기 */
+  const handleResume = useCallback(() => {
+    const saved = sessionStorage.getItem('analyze_progress');
+    if (!saved) return;
+    try {
+      const progress = JSON.parse(saved) as SavedAnalysisProgress;
+      setStep(progress.step);
+      setCategory(progress.category);
+      setSubcategory(progress.subcategory);
+      setSelectedRelationship(progress.selectedRelationship);
+      setCurrentQuestion(progress.currentQuestion);
+      setAnswers(progress.answers);
+      setShowResumeBanner(false);
+    } catch {
+      sessionStorage.removeItem('analyze_progress');
+      setShowResumeBanner(false);
+    }
+  }, []);
+
+  /** 이전 분석 버리고 새로 시작 */
+  const handleDiscardProgress = useCallback(() => {
+    sessionStorage.removeItem('analyze_progress');
+    setShowResumeBanner(false);
+  }, []);
+
   const progressStep =
     step === 'category'
       ? 0
@@ -422,61 +527,30 @@ export const AnalyzeClient = () => {
   const typeInfo = ANALYSIS_TYPE_INFO[queryType];
 
   if (step === 'submitting') {
-    const typeColor = getAnalysisTypeColor(queryType);
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
         <style>{`
-          @keyframes spin-and-pulse {
-            0% {
-              transform: rotate(0deg) scale(1);
-              opacity: 1;
-            }
-            50% {
-              transform: rotate(180deg) scale(1.1);
-            }
-            100% {
-              transform: rotate(360deg) scale(1);
-              opacity: 1;
-            }
-          }
-          @keyframes dot-pulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-          }
+          @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+          .spinner-spin { animation: spin 2.5s linear infinite; }
         `}</style>
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative h-16 w-16">
-            <div
-              className="absolute inset-0 rounded-full border-3 border-transparent"
-              style={{
-                borderTopColor: typeColor,
-                borderRightColor: typeColor,
-                animation: 'spin-and-pulse 2.2s ease-in-out infinite',
-              }}
-            />
-          </div>
-          <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="h-1.5 w-1.5 rounded-full"
-                style={{
-                  backgroundColor: typeColor,
-                  animation: `dot-pulse 1.4s ease-in-out infinite`,
-                  animationDelay: `${i * 0.2}s`,
-                }}
-              />
-            ))}
-          </div>
+        <div className="relative h-20 w-20" aria-hidden="true">
+          {/* 회전 링 */}
+          <svg className="spinner-spin absolute inset-0 h-full w-full" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="35" fill="none" stroke="#A366FF" strokeWidth="2.5" opacity="0.3" />
+            <circle cx="40" cy="40" r="35" fill="none" stroke="url(#spinGrad)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="55 220" />
+            <defs>
+              <linearGradient id="spinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{stopColor: "#A366FF"}} />
+                <stop offset="100%" style={{stopColor: "#F5D7E8"}} />
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
         <div>
-          <p
-            className="mb-2 text-lg font-semibold"
-            style={{ color: '#FFFFFF' }}
-          >
+          <p className="mb-2 text-lg font-semibold" style={{ color: '#FFFFFF' }}>
             {typeInfo.title}...
           </p>
-          <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+          <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
             상황을 분석하고 있어
           </p>
         </div>
@@ -486,24 +560,67 @@ export const AnalyzeClient = () => {
 
   return (
     <div className="relative z-10 mx-auto max-w-2xl px-4 py-8 md:py-12">
+      {/* 이전 분석 진행 상태 복원 배너 (새로고침/이탈 후 복귀 시 표시) */}
+      {showResumeBanner && (
+        <div
+          className="mb-6 rounded-2xl border p-4"
+          style={{
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(12px)',
+          }}
+        >
+          <p className="mb-3 text-sm font-medium" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+            이전에 분석하던 내용이 있어요.
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={handleResume}
+              className="flex-1 rounded-xl py-2 text-xs font-semibold text-white transition-all active:scale-[0.98]"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+            >
+              이어서 하기
+            </button>
+            <button
+              onClick={handleDiscardProgress}
+              className="flex-1 rounded-xl py-2 text-xs transition-all active:scale-[0.98]"
+              style={{ color: 'rgba(255, 255, 255, 0.55)' }}
+            >
+              새로 시작
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 분석 타입 & 진행 상태 */}
       {step !== 'category' && step !== 'relationship' && (
         <div className="mb-8">
-          <div className="mb-3 flex items-center justify-between text-xs">
-            <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+          <div className="mb-4 flex items-center justify-between">
+            <span className="text-sm font-semibold" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
               {typeInfo.title}
             </span>
-            <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            <span className="text-sm font-bold" style={{
+              color: getAnalysisTypeColor(queryType),
+              textShadow: `0 0 8px ${getAnalysisTypeColor(queryType)}40`
+            }}>
               {progressStep}/{totalSteps}
             </span>
           </div>
           <div
-            className="h-1.5 w-full overflow-hidden rounded-full transition-colors"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+            className="relative h-4 w-full overflow-hidden rounded-full"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              boxShadow: 'inset 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 12px rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
           >
             <div
-              className="h-full rounded-full transition-all duration-300"
-              style={{ width: `${progressPercent}%`, backgroundColor: getAnalysisTypeColor(queryType) }}
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${progressPercent}%`,
+                background: `linear-gradient(90deg, ${getAnalysisTypeColor(queryType)}, #A366FF)`,
+                boxShadow: `0 0 16px ${getAnalysisTypeColor(queryType)}, 0 0 8px #A366FF, inset 0 1px 3px rgba(255, 255, 255, 0.4)`,
+              }}
             />
           </div>
         </div>

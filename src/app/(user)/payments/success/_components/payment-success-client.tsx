@@ -15,6 +15,8 @@ export const PaymentSuccessClient = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   const orderId = searchParams.get('orderId');
+  // payment-modal에서 전달한 sessionId (리포트로 복귀하기 위한 원본 세션 ID)
+  const sessionIdParam = searchParams.get('sessionId');
   const amount = searchParams.get('amount');
 
   useEffect(() => {
@@ -22,10 +24,22 @@ export const PaymentSuccessClient = () => {
       router.replace('/');
       return;
     }
+
+    // 동일 success URL 중복 접근 방지 (뒤로가기 후 재접근 시 이미 처리된 결제)
+    const processedKey = `payment_processed_${orderId}`;
+    const alreadyProcessed = sessionStorage.getItem(processedKey);
+    if (alreadyProcessed) {
+      // 이미 처리된 결제 — 리포트 페이지로 바로 이동
+      const targetSession = sessionIdParam || orderId;
+      router.replace(`/report/${targetSession}`);
+      return;
+    }
+    sessionStorage.setItem(processedKey, 'true');
+
     // TODO: [백엔드 연동] 결제 승인 API 호출 후 session-id 받기
-    // 현재는 orderId를 session-id로 사용
-    setSessionId(orderId);
-  }, [orderId, router]);
+    // 현재는 payment-modal에서 전달한 sessionId 파라미터 우선 사용
+    setSessionId(sessionIdParam || orderId);
+  }, [orderId, sessionIdParam, router]);
 
   if (!sessionId) {
     return (
@@ -55,7 +69,7 @@ export const PaymentSuccessClient = () => {
       </p>
 
       <Link
-        href={`/report/${sessionId}`}
+        href={`/report/${sessionIdParam || sessionId}`}
         className="inline-flex min-h-[52px] items-center justify-center rounded-xl px-8 text-sm font-semibold text-white transition-opacity hover:opacity-80"
         style={{
           background: "linear-gradient(90deg, #6495ED 0%, #A366FF 100%)",

@@ -41,6 +41,14 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
     return () => { document.body.style.overflow = ''; };
   }, []);
 
+  // 브라우저 뒤로가기 시 결제 모달 닫기 (결제 플로우 안전 취소)
+  useEffect(() => {
+    window.history.pushState({ modal: 'payment' }, '');
+    const onPop = () => { onClose(); };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [onClose]);
+
   // 토스페이먼츠 위젯 초기화 및 금액 업데이트
   useEffect(() => {
     const initWidget = async () => {
@@ -133,10 +141,7 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
 
   const handlePayment = async () => {
     if (!isLoggedIn && !validateGuest()) return;
-    if (!widgetRef.current) {
-      console.error('결제 위젯이 초기화되지 않았습니다');
-      return;
-    }
+    if (!widgetRef.current) return;
 
     setIsPaying(true);
 
@@ -146,16 +151,40 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
         ? getFullBundlePrice()
         : getPriceForQuantity(pendingOrder.paidQuestionIds.length);
 
-      // 토스페이먼츠 실제 결제 요청
+      // 📌 결제 전 구매 정보를 모두 sessionStorage에 저장 (redirect 후 복원)
+      const purchasedKey = `purchased_${pendingOrder.sessionId}`;
+      const existing = JSON.parse(sessionStorage.getItem(purchasedKey) || '[]') as string[];
+      const merged = [...new Set([...existing, ...pendingOrder.paidQuestionIds])];
+      sessionStorage.setItem(purchasedKey, JSON.stringify(merged));
+
+      // 📌 구매된 축 저장 (핵심!)
+      const existingAxes = JSON.parse(sessionStorage.getItem(`purchased_axes_${pendingOrder.sessionId}`) || '[]') as number[];
+      const currentAxis = existingAxes.length < 3 ? (existingAxes.length + 1) : null;
+      if (currentAxis) {
+        const newAxes = [...new Set([...existingAxes, currentAxis])];
+        sessionStorage.setItem(`purchased_axes_${pendingOrder.sessionId}`, JSON.stringify(newAxes));
+      }
+
+      // 결제 성공 후 바로 리포트로 복귀 (구매 완료 질문 즉시 표시)
+      const origin = window.location.origin;
+      const successUrl = `${origin}/report/${pendingOrder.sessionId}`;
+      const failUrl = `${origin}/payments/fail`;
+
+      // redirect 전에 미리 제거 (Toss 결제 성공 후 새 페이지 로드 시 모달이 다시 열리지 않도록)
+      clearPendingOrder();
+
+      // 토스페이먼츠 결제 요청
       await widgetRef.current.requestPayment({
         orderId,
         orderName: `${pendingOrder.category} 리포트 ${pendingOrder.paidQuestionIds.length}개 질문`,
         customerName: isLoggedIn ? 'Member' : '비회원',
         customerEmail: isLoggedIn ? 'member@example.com' : guestInfo.phoneNumber,
         customerMobilePhone: !isLoggedIn ? guestInfo.phoneNumber.replace(/\D/g, '') : undefined,
+        successUrl,
+        failUrl,
       });
 
-      // 결제 성공 시 로컬 주문 저장
+      // requestPayment가 redirect 없이 resolve된 경우 (로컬 환경) 직접 처리
       saveLocalOrder({
         id: pendingOrder.sessionId,
         category: pendingOrder.category,
@@ -166,7 +195,6 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
         createdAt: new Date().toISOString(),
       });
 
-      clearPendingOrder();
       onSuccess(orderId);
     } catch (error) {
       console.error('결제 실패:', error);
@@ -269,7 +297,7 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
         {/* 결제 버튼 */}
         <button
           onClick={handlePayment}
-          disabled={isPaying}
+          disabled={!widgetReady || isPaying}
           className="flex min-h-[52px] w-full items-center justify-center rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
           style={{ background: 'linear-gradient(90deg, #6495ED 0%, #A366FF 100%)' }}
         >

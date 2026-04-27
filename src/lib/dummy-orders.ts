@@ -6,12 +6,20 @@ import { Order } from '@/types/order';
  */
 const DUMMY_ORDERS: Order[] = [
   {
+    id: 'sess_demo_self_love',
+    category: '연애',
+    amount: 0,
+    status: 'done',
+    ownerType: 'member',
+    memberId: 'user_demo',
+    createdAt: '2026-04-20T11:00:00.000Z',
+  },
+  {
     id: 'sess_demo_guest_love',
     category: '연애',
-    amount: 4900,
+    amount: 0,
     status: 'done',
-    ownerType: 'guest',
-    phoneNumber: '01012345678',
+    ownerType: 'anonymous',
     createdAt: '2026-04-15T10:30:00.000Z',
   },
   {
@@ -26,19 +34,17 @@ const DUMMY_ORDERS: Order[] = [
   {
     id: 'sess_demo_guest_emotion',
     category: '감정',
-    amount: 4900,
+    amount: 0,
     status: 'done',
-    ownerType: 'guest',
-    phoneNumber: '01098765432',
+    ownerType: 'anonymous',
     createdAt: '2026-04-19T09:15:00.000Z',
   },
   {
     id: 'sess_demo_guest_relation',
     category: '인간관계',
-    amount: 4900,
+    amount: 0,
     status: 'done',
-    ownerType: 'guest',
-    phoneNumber: '01011112222',
+    ownerType: 'anonymous',
     createdAt: '2026-04-18T12:00:00.000Z',
   },
 ];

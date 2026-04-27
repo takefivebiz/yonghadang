@@ -211,7 +211,23 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "지금 선택이 나중에 어떤 영향을 미칠지 현실적으로 봐.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: false,
+        report: [
+          {
+            title: '후회의 구조',
+            paragraphs: [
+              '후회는 "나쁜 선택"이 아니라 "결정하지 않음"에서 더 강하게 온다. 지금 이 상태를 계속 유지하는 것 자체가 선택이라는 걸 알고 있어야 해.',
+              '불확실한 감정을 안고 판단을 유보하는 패턴이 이어질수록, 나중에 "그때 결정했어야 했는데"라는 감각이 더 뚜렷하게 남게 돼.',
+            ],
+          },
+          {
+            title: '지금 할 수 있는 것',
+            paragraphs: [
+              '후회를 줄이는 방법은 완벽한 선택이 아니야. 지금 내가 무엇을 원하는지 직면하고, 그걸 기준으로 움직이는 것뿐이야.',
+            ],
+          },
+        ],
       },
       {
         id: 'pq_love_02',
@@ -219,7 +235,23 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 너를 진짜 어떻게 생각하고 있는지 읽어볼 거야.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
+        report: [
+          {
+            title: '상대 시선 읽기',
+            paragraphs: [
+              '네가 감정을 드러내지 않고 결정을 미루는 동안, 상대는 "이 사람이 나를 어떻게 생각하는지 모르겠다"는 불명확함을 느끼고 있을 가능성이 높아.',
+              '불안형 패턴을 가진 사람은 자신을 보호하기 위해 감정을 숨기는데, 상대 입장에서 그건 무관심이나 무감각으로 읽힐 수 있어.',
+            ],
+          },
+          {
+            title: '관계의 신호',
+            paragraphs: [
+              '상대가 아직 관계를 유지하고 있다면, 그건 완전히 포기하지 않았다는 신호야. 하지만 방치의 시간이 길어질수록 그 신호도 흐려져.',
+            ],
+          },
+        ],
       },
       {
         id: 'pq_love_03',
@@ -227,7 +259,23 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "반복되는 선택의 패턴 속 진짜 원인을 찾아볼 거야.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
+        report: [
+          {
+            title: '반복의 뿌리',
+            paragraphs: [
+              '비슷한 상황이 반복된다는 건 환경의 문제가 아니야. 특정 감정 상태에서 작동하는 선택 회로가 있다는 뜻이야.',
+              '불안형 + 회피형 조합에서 자주 나타나는 패턴은 이렇게 생겼어. 기회가 보이면 접근하고, 관계가 깊어질 것 같으면 거리를 두고, 상대가 멀어지면 다시 불안해지는 루프.',
+            ],
+          },
+          {
+            title: '패턴을 끊으려면',
+            paragraphs: [
+              '반복을 끊는 건 의지로 안 돼. 루프가 작동하는 순간을 알아채고, 그 순간에 "내가 지금 뭘 피하려는 거지?"를 물어보는 게 먼저야.',
+            ],
+          },
+        ],
       },
       {
         id: 'pq_love_04',
@@ -235,7 +283,23 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "판단이 흐려지는 이유가 뭔지 명확히 해줄 거야.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
+        report: [
+          {
+            title: '판단 흐림의 원인',
+            paragraphs: [
+              '지금 판단이 흐려지는 건 정보가 부족해서가 아니야. 판단 기준 자체가 상황에 따라 바뀌기 때문이야.',
+              '한 순간엔 "감정이 중요하다"고 보다가, 다음 순간엔 "현실적으로 생각해야지"가 되는 식으로 기준이 흔들리면 아무리 생각해도 결론이 안 나.',
+            ],
+          },
+          {
+            title: '기준 세우기',
+            paragraphs: [
+              '판단 전에 먼저 물어야 해. "나한테 가장 중요한 한 가지가 뭔데?" 그 답이 나오면, 나머지 기준은 거기서 정렬돼.',
+            ],
+          },
+        ],
       },
       {
         id: 'pq_love_05',
@@ -243,7 +307,23 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "관계를 계속하고 싶은 진짜 이유가 뭔지 알아볼 거야.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
+        report: [
+          {
+            title: '유지의 동기',
+            paragraphs: [
+              '관계를 유지하는 이유가 "이 사람이 좋아서"인지, "끝냈을 때의 공허함이 두려워서"인지가 핵심이야.',
+              '두 번째 이유라면, 이 관계는 상대를 위한 게 아니라 나의 불안을 채우기 위한 구조가 돼 있을 가능성이 높아.',
+            ],
+          },
+          {
+            title: '솔직한 확인',
+            paragraphs: [
+              '"만약 이 관계가 끝난다면 내가 가장 먼저 느끼는 감각이 뭐지?" — 그 대답이 진짜 이유를 보여줘.',
+            ],
+          },
+        ],
       },
       {
         id: 'pq_love_06',
@@ -251,7 +331,23 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "자신도 모르는 심리적 회피가 뭔지 보여줄 거야.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
+        report: [
+          {
+            title: '회피의 대상',
+            paragraphs: [
+              '가장 많이 피하는 건 "결과를 확인하는 것"이야. 결정을 내리면 그 결과가 나오는데, 그 결과가 원하는 게 아닐 수 있다는 두려움.',
+              '두 번째로 많이 피하는 건 "내가 틀렸을 수 있다는 사실"이야. 선택하지 않으면 틀릴 일도 없으니까.',
+            ],
+          },
+          {
+            title: '회피를 인정하면',
+            paragraphs: [
+              '"나 지금 결과가 두려워서 안 움직이는 거야"를 인식하는 것만으로도 절반은 풀려. 회피는 인식되는 순간 힘이 약해져.',
+            ],
+          },
+        ],
       },
       {
         id: 'pq_love_07',
@@ -259,7 +355,23 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "겉의 갈등 뒤에 숨겨진 진짜 문제가 뭔지 알려줄 거야.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
+        report: [
+          {
+            title: '겉 문제와 속 문제',
+            paragraphs: [
+              '겉으로 보이는 문제는 "어떻게 할지 모르겠다"인데, 속에 있는 진짜 문제는 "내가 뭘 원하는지 모르겠다"야.',
+              '선택지 앞에서 막히는 게 아니라, 선택의 기준이 없어서 막히는 구조야. 그래서 정보를 더 모아도, 조언을 더 들어도 해결이 안 되는 거야.',
+            ],
+          },
+          {
+            title: '진짜 작업',
+            paragraphs: [
+              '진짜 작업은 이 상황을 "어떻게 해결하냐"가 아니야. "나는 어떤 사람이고 뭘 원하는 사람인가"를 먼저 정리하는 거야.',
+            ],
+          },
+        ],
       },
       {
         id: 'pq_love_08',
@@ -267,7 +379,409 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "변화를 위해 내가 먼저 할 수 있는 게 뭔지 제시할 거야.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
+        report: [
+          {
+            title: '첫 번째 행동',
+            paragraphs: [
+              '변화의 첫 번째는 거창한 결심이 아니야. "오늘 이 상황에 대해 아무 행동도 안 해도 된다"는 허락을 자신에게 주는 것부터야.',
+              '긴장 속에서 결정을 강요받는 느낌이 들면, 판단력은 오히려 더 흐려져. 여유를 확보하는 게 먼저야.',
+            ],
+          },
+          {
+            title: '다음 단계',
+            paragraphs: [
+              '그 다음엔 딱 하나만 물어봐. "이 상황에서 내가 진짜 원하는 게 뭐야?" — 이 질문의 답을 찾는 게 변화의 시작이야.',
+            ],
+          },
+        ],
+      },
+      // 축 2: 관계의 깊이와 신뢰 중심 질문
+      {
+        id: 'pq_love_09',
+        question: '우리 관계의 신뢰도는 얼마나 될까?',
+        description: "지금 관계에 있는 신뢰의 수준을 객관적으로 평가해볼 거야.",
+        price: 900,
+        displayOrder: 1,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '신뢰도 진단',
+            paragraphs: [
+              '신뢰는 한 번의 행동으로 쌓이지 않아. 일관성 있는 작은 행동들이 모여서 신뢰가 되는 거야.',
+              '지금 너희 관계에서 그런 일관성이 있었는지, 언제부터 깨지기 시작했는지를 보면 신뢰도가 보여.',
+            ],
+          },
+          {
+            title: '신뢰 회복의 첫걸음',
+            paragraphs: [
+              '신뢰를 회복하려면 큰 행동이 필요한 게 아니야. 작은 약속을 지키는 것의 반복이 필요해.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_10',
+        question: '상대와의 대화에서 내가 놓치고 있는 게 뭐야?',
+        description: "소통의 차이가 어디에서 비롯되는지 구체적으로 봐.",
+        price: 900,
+        displayOrder: 2,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '대화의 틈',
+            paragraphs: [
+              '말은 하는데 전달이 안 되는 경험을 해본 적 있어? 그건 말 자체의 문제가 아니라 듣는 자세의 문제야.',
+              '불안형 사람은 상대의 말을 다 들으려고 하기보다 내 불안감을 해소하는 답을 찾으려고 해.',
+            ],
+          },
+          {
+            title: '진정한 소통',
+            paragraphs: [
+              '상대 말을 이해하려고 들을 때, 상대도 너를 이해하려고 들기 시작해.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_11',
+        question: '내가 이 관계에서 원하는 최소 조건은?',
+        description: "타협 불가능한 최소 기준이 뭔지 명확히 해줄 거야.",
+        price: 900,
+        displayOrder: 3,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '최소 조건의 중요성',
+            paragraphs: [
+              '기준이 없으면 선택이 계속 흔들려. 최소 조건이라는 기준선이 있으면, 그 선 아래로는 절대 내려가지 않을 수 있어.',
+              '지금 너는 그 최소 조건을 명확히 하지 못했을 가능성이 높아.',
+            ],
+          },
+          {
+            title: '기준선 그기',
+            paragraphs: [
+              '물어봐. "이건 절대 포기할 수 없는 게 뭐야?" — 그 대답이 너의 최소 조건이야.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_12',
+        question: '상대가 지금 나에게 하는 말은 정말 진심일까?',
+        description: "상대의 말이 행동으로 뒷받침되는지 검증해볼 거야.",
+        price: 900,
+        displayOrder: 4,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '말과 행동의 간격',
+            paragraphs: [
+              '사람은 말로는 뭐든 할 수 있어. 중요한 건 그 말이 행동으로 이어지는가야.',
+              '상대가 하는 말들이 최근 몇 주간 일관되게 행동으로 나타났는지 봐.',
+            ],
+          },
+          {
+            title: '진심 읽기',
+            paragraphs: [
+              '진심은 반복되는 작은 행동에서 보여. 한 번의 큰 행동보다 자잘한 일관성이 중요해.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_13',
+        question: '만약 지금 선택을 하지 않으면 어떤 일이 벌어질까?',
+        description: "선택 연기의 대가가 실제로 얼마나 큰지 시뮬레이션해볼 거야.",
+        price: 900,
+        displayOrder: 5,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '연기의 비용',
+            paragraphs: [
+              '선택을 미루는 게 안전해 보이지만, 실제로는 상황을 더 악화시켜. 시간이 흐르면서 관계는 더 약해져.',
+              '지금 결정할 때와 3개월 뒤에 결정할 때의 상황이 완전히 달라질 수 있어.',
+            ],
+          },
+          {
+            title: '시간의 대가',
+            paragraphs: [
+              '당신의 시간도 상대의 시간도 소중해. 불확실성을 안고 계속 기다리는 건 둘 다에게 손실이야.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_14',
+        question: '내 불안감이 실제로 현실인지 착각인지 어떻게 구분할 수 있을까?',
+        description: "불안감이 합리적 신호인지 심리적 패턴인지 판별해볼 거야.",
+        price: 900,
+        displayOrder: 6,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '불안의 이중성',
+            paragraphs: [
+              '불안감이 항상 신호는 아니야. 심리적 패턴이 만드는 환각일 수도 있어.',
+              '현실적 근거가 있는 불안과 기분에서 비롯된 불안을 구분하는 게 중요해.',
+            ],
+          },
+          {
+            title: '신호와 소음 분별',
+            paragraphs: [
+              '불안을 느낄 때 물어봐. "이 불안의 근거가 지난주에도 있었나?" — 반복되면 신호, 그때그때 다르면 소음일 가능성이 높아.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_15',
+        question: '이 관계를 계속할 때의 장점과 끝낼 때의 장점은 뭐야?',
+        description: "둘 다의 측면을 공정하게 비교해볼 거야.",
+        price: 900,
+        displayOrder: 7,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '양쪽 선택의 가치',
+            paragraphs: [
+              '계속하는 것만 생각하고 끝내는 것의 장점은 안 본 시간이 길었어. 반대로 생각해봐.',
+              '둘 다 어떤 이득이 있을지, 어떤 손실이 있을지를 균형 있게 봐야 해.',
+            ],
+          },
+          {
+            title: '공정한 비교',
+            paragraphs: [
+              '감정 없이, 마치 친구의 일을 조언한다고 생각하고 써봐.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_16',
+        question: '지금 내가 상대를 위해 할 수 있는 최선은 뭐야?',
+        description: "상대를 고려한 선택의 관점에서 생각해볼 거야.",
+        price: 900,
+        displayOrder: 8,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '상대 중심 선택',
+            paragraphs: [
+              '지금까지는 내 불안감을 해소하는 선택만 했어. 상대 입장에서 뭐가 가장 좋은 선택일지 생각해봐.',
+              '때론 나를 위한 선택과 상대를 위한 선택이 같을 수도 있어.',
+            ],
+          },
+          {
+            title: '책임 있는 선택',
+            paragraphs: [
+              '상대도 너와 같은 인간이고, 너의 선택의 영향 아래 있어. 그걸 인식하는 순간 선택이 달라져.',
+            ],
+          },
+        ],
+      },
+      // 축 3: 성장과 미래 중심 질문
+      {
+        id: 'pq_love_17',
+        question: '이 관계가 나를 어떤 방향으로 변화시키고 있어?',
+        description: "관계 속에서의 내 성장이나 퇴행을 객관적으로 봐.",
+        price: 900,
+        displayOrder: 1,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '관계 속의 변화',
+            paragraphs: [
+              '사람은 관계 속에서 변한다. 좋은 방향으로도, 나쁜 방향으로도.',
+              '이 관계 때문에 더 불안해지고 약해졌다면, 그건 너를 성장시키는 관계가 아닐 수 있어.',
+            ],
+          },
+          {
+            title: '건강한 관계의 신호',
+            paragraphs: [
+              '건강한 관계는 넌 더 강해지고, 상대도 더 강해지도록 만들어.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_18',
+        question: '5년 뒤에 이 결정을 어떻게 평가할 것 같아?',
+        description: "장기적 관점에서 지금의 선택을 평가해봐.",
+        price: 900,
+        displayOrder: 2,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '시간의 관점',
+            paragraphs: [
+              '지금 보이는 게 5년 뒤에도 중요할까? 그때는 다른 관점에서 이 선택을 볼 거야.',
+              '만약 5년 뒤의 너라면 지금 너에게 뭐라고 말해줄까?',
+            ],
+          },
+          {
+            title: '미래 자아와의 대화',
+            paragraphs: [
+              '그 대화 속에 답이 있어.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_19',
+        question: '지금 이 관계에서 배우고 있는 게 뭐야?',
+        description: "긍정적 학습 경험이 있는지 확인해봐.",
+        price: 900,
+        displayOrder: 3,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '관계 속의 배움',
+            paragraphs: [
+              '모든 관계는 뭔가를 가르쳐줘. 그건 긍정적일 수도 있고 부정적일 수도 있어.',
+              '너는 이 관계에서 더 나은 방향으로 뭔가를 배우고 있는가? 아니면 원래 약점을 자꾸 더 자극받는 건가?',
+            ],
+          },
+          {
+            title: '성장의 기회',
+            paragraphs: [
+              '관계가 주는 불편함도 성장의 기회가 될 수 있어. 하지만 그래야만 그 관계가 존재해야 하는 건 아니야.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_20',
+        question: '상대와의 함께한 시간이 나에게 어떤 의미가 되고 싶어?',
+        description: "이 시간들이 장기적으로 나한테 어떤 가치가 되길 바라는지 생각해봐.",
+        price: 900,
+        displayOrder: 4,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '시간의 가치',
+            paragraphs: [
+              '시간은 되돌릴 수 없는 자산이야. 지금 이 시간이 나중에 어떤 의미가 될지 생각하는 건 중요해.',
+              '행복했던 기억이 되기를 원해? 아니면 배움이 되기를 원해? 아니면 그냥 잊혀지기를 원해?',
+            ],
+          },
+          {
+            title: '의도적인 시간',
+            paragraphs: [
+              '의도 없이 흘러가는 시간과 의도를 가지고 채워나가는 시간은 달라.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_21',
+        question: '내 꿈과 이 관계의 방향이 맞춰지고 있어?',
+        description: "개인적 목표와 관계의 방향 사이에 충돌이 없는지 봐.",
+        price: 900,
+        displayOrder: 5,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '방향의 일치',
+            paragraphs: [
+              '관계가 나의 인생 방향과 충돌하면, 그건 아무리 좋은 관계도 지속하기 힘들어.',
+              '지금 관계 때문에 내 꿈을 연기하고 있진 않아? 아니면 상대의 꿈을 무시하고 있진 않아?',
+            ],
+          },
+          {
+            title: '상호 성장',
+            paragraphs: [
+              '가장 좋은 관계는 서로의 꿈을 응원하는 관계야.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_22',
+        question: '내가 이 관계를 끝낼 용기는 있을까?',
+        description: "꼭 필요하다면 끝낼 수 있는 용기가 있는지 확인해봐.",
+        price: 900,
+        displayOrder: 6,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '용기의 근원',
+            paragraphs: [
+              '용기는 무모함이 아니야. 그건 충분한 생각 끝에 나오는 결단이야.',
+              '만약 이 관계를 끝내야 한다면 너는 용감할 수 있을까? 그 대답이 너의 자존감 수준을 보여줘.',
+            ],
+          },
+          {
+            title: '자존감과 선택',
+            paragraphs: [
+              '자존감이 낮으면 나쁜 관계도 끝내기 어려워. 자존감이 높으면 필요한 선택을 할 수 있어.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_23',
+        question: '지금의 선택이 다음 관계에 어떤 영향을 미칠까?',
+        description: "현재의 결정이 미래의 관계 패턴을 어떻게 만들 것 같은지 봐.",
+        price: 900,
+        displayOrder: 7,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '패턴의 전승',
+            paragraphs: [
+              '지금 관계에서 배운 패턴은 다음 관계에도 나타나. 만약 지금 경계하지 않고 선택을 미루면, 다음 관계에서도 같은 패턴을 반복할 가능성이 높아.',
+              '관계는 혼자가 아니야. 너의 선택이 만드는 패턴이 다른 사람들과의 관계까지 영향을 미쳐.',
+            ],
+          },
+          {
+            title: '건강한 패턴 만들기',
+            paragraphs: [
+              '지금 관계에서 건강한 결정을 하는 것이 다음 관계의 건강함을 보장해.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_love_24',
+        question: '결국 나는 어떤 사람이 되고 싶어?',
+        description: "관계의 문제를 넘어 본질적인 자아 질문에 답해봐.",
+        price: 900,
+        displayOrder: 8,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '본질적 질문',
+            paragraphs: [
+              '이 관계를 계속할지 끝낼지는 사실 표면적인 질문이야. 더 근본적인 질문은 이거야. "나는 어떤 사람이 되고 싶은가?"',
+              '그 질문에 대한 답이 명확하면, 이 관계를 계속할지 말지는 자동으로 결정돼.',
+            ],
+          },
+          {
+            title: '자아 정의',
+            paragraphs: [
+              '너는 약한 사람이 아니야. 단지 자신이 뭘 원하는지 아직 명확하지 않은 거야. 그걸 아는 순간 모든 선택이 명확해져.',
+            ],
+          },
+        ],
       },
     ],
   },
@@ -305,6 +819,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "최악의 상황이 정말 나쁜지 현실적으로 봐.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: true,
         report: [
           {
@@ -323,6 +838,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "타인의 눈이 내 판단을 얼마나 좌지우지하는지 볼 거야.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -331,6 +847,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "안정을 추구하는 이유의 근본을 이해할 수 있게 해줄 거야.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -339,6 +856,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "변화할 때 실제로 마주할 어려움이 뭔지 구체화해줄 거야.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -347,6 +865,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "의심과 확신 사이의 거리가 정확히 얼마나 되는지 봐.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -355,6 +874,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "심리적으로 준비가 되어 있는지 점검해볼 거야.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -363,6 +883,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "행동하지 않을 때의 비용이 얼마나 되는지 현실화해줄 거야.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -371,6 +892,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "5년, 10년 뒤에 지금 선택을 어떻게 평가할지 봐.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
       },
     ],
@@ -409,6 +931,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "지금 감정이 가져올 파급 효과를 예측해볼 거야.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -417,6 +940,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "내 감정 변화가 주변에 어떻게 보이는지 알려줄 거야.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -425,6 +949,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "같은 감정 상태에서 반복되는 내 행동 패턴을 보여줄 거야.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -433,6 +958,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "감정의 근원이 되는 심리적 요인을 찾아줄 거야.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -441,6 +967,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "지금의 대처 방식이 도움이 되는지 점검해볼 거야.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -449,6 +976,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "안정을 위해 지금 바로 할 수 있는 구체적인 방법을 제시할 거야.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -457,6 +985,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "감정이 실제로 변화하고 있다는 신호가 뭔지 알려줄 거야.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -465,6 +994,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "지금 가장 필요한 게 정확히 뭔지 명확히 할 거야.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
       },
     ],
@@ -503,6 +1033,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "현재의 거리감이 더 커질 가능성이 있는지 판단해줄 거야.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -511,6 +1042,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 느끼는 나의 어색함의 수준을 인식한다.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -519,6 +1051,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "관계 거리감의 패턴화된 원인을 파악한다.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -527,6 +1060,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "관계 초반의 편함이 진짜인지 현재의 어색함이 진짜인지 판단한다.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -535,6 +1069,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "이전과 다른 선택을 하기 위한 구체적 방법을 제시한다.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -543,6 +1078,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 자신의 진심을 받아줄 준비가 되었는지 본다.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -551,6 +1087,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "자신이 진정 원하는 관계의 형태를 명확히 한다.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -559,6 +1096,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "지금부터 변화를 시작할 가능성을 평가한다.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
       },
     ],
@@ -598,6 +1136,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "불안감의 근원이 되는 심리적 뿌리를 찾는다.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -606,6 +1145,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "관계 외에서 자신을 안정시킬 수 있는 것을 안다.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -614,6 +1154,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "현재의 악순환이 가져올 미래를 현실화한다.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -622,6 +1163,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "반복되는 확인욕구를 멈출 수 있는 가능성을 본다.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -630,6 +1172,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대에게서 찾는 것이 실제로 뭔지 깨닫는다.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -638,6 +1181,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "불안감 없이 편안함을 느끼는 순간의 조건을 파악한다.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -646,6 +1190,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "패턴을 바꾸기 위한 첫 번째 선택을 제시한다.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -654,7 +1199,282 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대를 신뢰할 수 있는 근거를 함께 만든다.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
+      },
+      // 축 2: 관계의 깊이와 신뢰 중심 질문
+      {
+        id: 'pq_self_love_09',
+        question: '우리 관계의 신뢰도는 얼마나 될까?',
+        description: "지금 관계에 있는 신뢰의 수준을 객관적으로 평가해볼 거야.",
+        price: 900,
+        displayOrder: 1,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '신뢰도 진단',
+            paragraphs: [
+              '신뢰는 한 번의 행동으로 쌓이지 않아. 일관성 있는 작은 행동들이 모여서 신뢰가 되는 거야.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_10',
+        question: '상대와의 대화에서 내가 놓치고 있는 게 뭐야?',
+        description: "소통의 차이가 어디에서 비롯되는지 구체적으로 봐.",
+        price: 900,
+        displayOrder: 2,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '대화의 틈',
+            paragraphs: [
+              '말은 하는데 전달이 안 되는 경험을 해본 적 있어? 그건 말 자체의 문제가 아니라 듣는 자세의 문제야.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_11',
+        question: '내가 이 관계에서 원하는 최소 조건은?',
+        description: "타협 불가능한 최소 기준이 뭔지 명확히 해줄 거야.",
+        price: 900,
+        displayOrder: 3,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '최소 조건의 중요성',
+            paragraphs: [
+              '기준이 없으면 선택이 계속 흔들려.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_12',
+        question: '상대가 지금 나에게 하는 말은 정말 진심일까?',
+        description: "상대의 말이 행동으로 뒷받침되는지 검증해볼 거야.",
+        price: 900,
+        displayOrder: 4,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '말과 행동의 간격',
+            paragraphs: [
+              '사람은 말로는 뭐든 할 수 있어.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_13',
+        question: '만약 지금 선택을 하지 않으면 어떤 일이 벌어질까?',
+        description: "선택 연기의 대가가 실제로 얼마나 큰지 시뮬레이션해볼 거야.",
+        price: 900,
+        displayOrder: 5,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '연기의 비용',
+            paragraphs: [
+              '선택을 미루는 게 안전해 보이지만, 실제로는 상황을 더 악화시켜.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_14',
+        question: '내 불안감이 실제로 현실인지 착각인지 어떻게 구분할 수 있을까?',
+        description: "불안감이 합리적 신호인지 심리적 패턴인지 판별해볼 거야.",
+        price: 900,
+        displayOrder: 6,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '불안의 이중성',
+            paragraphs: [
+              '불안감이 항상 신호는 아니야.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_15',
+        question: '이 관계를 계속할 때의 장점과 끝낼 때의 장점은 뭐야?',
+        description: "둘 다의 측면을 공정하게 비교해볼 거야.",
+        price: 900,
+        displayOrder: 7,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '양쪽 선택의 가치',
+            paragraphs: [
+              '둘 다 어떤 이득이 있을지 균형 있게 봐야 해.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_16',
+        question: '지금 내가 상대를 위해 할 수 있는 최선은 뭐야?',
+        description: "상대를 고려한 선택의 관점에서 생각해볼 거야.",
+        price: 900,
+        displayOrder: 8,
+        axis: 2,
+        isPurchased: false,
+        report: [
+          {
+            title: '상대 중심 선택',
+            paragraphs: [
+              '지금까지는 내 불안감을 해소하는 선택만 했어.',
+            ],
+          },
+        ],
+      },
+      // 축 3: 성장과 미래 중심 질문
+      {
+        id: 'pq_self_love_17',
+        question: '이 관계가 나를 어떤 방향으로 변화시키고 있어?',
+        description: "관계 속에서의 내 성장이나 퇴행을 객관적으로 봐.",
+        price: 900,
+        displayOrder: 1,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '관계 속의 변화',
+            paragraphs: [
+              '사람은 관계 속에서 변한다.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_18',
+        question: '5년 뒤에 이 결정을 어떻게 평가할 것 같아?',
+        description: "장기적 관점에서 지금의 선택을 평가해봐.",
+        price: 900,
+        displayOrder: 2,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '시간의 관점',
+            paragraphs: [
+              '지금 보이는 게 5년 뒤에도 중요할까?',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_19',
+        question: '지금 이 관계에서 배우고 있는 게 뭐야?',
+        description: "긍정적 학습 경험이 있는지 확인해봐.",
+        price: 900,
+        displayOrder: 3,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '관계 속의 배움',
+            paragraphs: [
+              '모든 관계는 뭔가를 가르쳐줘.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_20',
+        question: '상대와의 함께한 시간이 나에게 어떤 의미가 되고 싶어?',
+        description: "이 시간들이 장기적으로 나한테 어떤 가치가 되길 바라는지 생각해봐.",
+        price: 900,
+        displayOrder: 4,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '시간의 가치',
+            paragraphs: [
+              '시간은 되돌릴 수 없는 자산이야.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_21',
+        question: '내 꿈과 이 관계의 방향이 맞춰지고 있어?',
+        description: "개인적 목표와 관계의 방향 사이에 충돌이 없는지 봐.",
+        price: 900,
+        displayOrder: 5,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '방향의 일치',
+            paragraphs: [
+              '관계가 나의 인생 방향과 충돌하면.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_22',
+        question: '내가 이 관계를 끝낼 용기는 있을까?',
+        description: "꼭 필요하다면 끝낼 수 있는 용기가 있는지 확인해봐.",
+        price: 900,
+        displayOrder: 6,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '용기의 근원',
+            paragraphs: [
+              '용기는 무모함이 아니야.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_23',
+        question: '지금의 선택이 다음 관계에 어떤 영향을 미칠까?',
+        description: "현재의 결정이 미래의 관계 패턴을 어떻게 만들 것 같은지 봐.",
+        price: 900,
+        displayOrder: 7,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '패턴의 전승',
+            paragraphs: [
+              '지금 관계에서 배운 패턴은 다음 관계에도 나타나.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pq_self_love_24',
+        question: '결국 나는 어떤 사람이 되고 싶어?',
+        description: "관계의 문제를 넘어 본질적인 자아 질문에 답해봐.",
+        price: 900,
+        displayOrder: 8,
+        axis: 3,
+        isPurchased: false,
+        report: [
+          {
+            title: '본질적 질문',
+            paragraphs: [
+              '이 관계를 계속할지 끝낼지는 사실 표면적인 질문이야.',
+            ],
+          },
+        ],
       },
     ],
   },
@@ -693,6 +1513,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "의식적 이유와 무의식적 이유를 구분한다.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -701,6 +1522,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "최악의 경우를 현실적으로 평가하고 대비한다.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -709,6 +1531,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "10년 뒤의 자신이 지금 선택을 어떻게 평가할지 본다.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -717,6 +1540,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "도전 시 실제로 필요한 것을 명확히 한다.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -725,6 +1549,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "자신의 숨겨진 역량을 인식한다.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -733,6 +1558,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "현 상태의 안전성이 진짜인지 착각인지 판단한다.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -741,6 +1567,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "지금이 유일한 기회인 이유를 이해한다.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -749,6 +1576,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "개인적 성공의 정의를 명확히 한다.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
       },
     ],
@@ -788,6 +1616,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 관계를 어떻게 정의하고 있는지 안다.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -796,6 +1625,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대의 행동에서 진짜 의도를 읽는다.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -804,6 +1634,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 변하기 어려운 근본적 특성을 파악한다.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -812,6 +1643,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대의 겉과 속을 구분하고 진짜 감정을 본다.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -820,6 +1652,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 미래를 함께 그리는지 판단한다.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -828,6 +1661,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 실제로 소중하게 여기는 것을 안다.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -836,6 +1670,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "자신이 상대에게 미치는 영향의 크기를 인식한다.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -844,6 +1679,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "이 관계의 궁극적 방향성을 예측한다.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
       },
     ],
@@ -883,6 +1719,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 진정 추구하는 방향을 발견한다.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -891,6 +1728,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "주도성 부족의 심리적 뿌리를 파악한다.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -899,6 +1737,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "팀 환경에서 상대가 필요로 하는 지원을 명확히 한다.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -907,6 +1746,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "겉으로 드러나지 않은 상대의 숨겨진 능력을 발견한다.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -915,6 +1755,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "성장을 막고 있는 심리적 장벽을 인식한다.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -923,6 +1764,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 가장 잘 일할 수 있는 환경의 조건을 안다.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -931,6 +1773,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대가 리더십을 발휘할 가능성을 평가한다.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -939,6 +1782,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대의 경력 경로를 함께 설계한다.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
       },
     ],
@@ -978,6 +1822,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "겉의 갈등과 진짜 문제를 구분한다.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -986,6 +1831,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대도 이 관계의 변화를 원하는지 알아본다.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -994,6 +1840,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "패턴을 깨기 위해 내가 먼저 할 수 있는 구체적 행동을 안다.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1002,6 +1849,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "근본적 가치관의 맞음과 안 맞음을 판단한다.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1010,6 +1858,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "관계 지속의 장단점을 현실적으로 저울질한다.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1018,6 +1867,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "상대의 진정한 마음을 분명히 본다.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1026,6 +1876,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "문제가 어디서 시작되었는지 추적한다.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1034,6 +1885,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "앞으로의 관계가 어떻게 흘러갈지 예측한다.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
       },
     ],
@@ -1073,6 +1925,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "두 사람의 기질적, 심리적 근본 차이를 파악한다.",
         price: 900,
         displayOrder: 1,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1081,6 +1934,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "누가 먼저 변해야 전체 구조가 변할지 판단한다.",
         price: 900,
         displayOrder: 2,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1089,6 +1943,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "조직 차원에서 이 팀의 성공을 위해 필요한 개입을 제시한다.",
         price: 900,
         displayOrder: 3,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1097,6 +1952,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "각자가 실제로 담당해야 할 역할을 명확히 한다.",
         price: 900,
         displayOrder: 4,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1105,6 +1961,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "현재 손상된 신뢰를 회복할 가능성을 평가한다.",
         price: 900,
         displayOrder: 5,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1113,6 +1970,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "팀 구조를 개선하기 위한 구체적 방안을 제시한다.",
         price: 900,
         displayOrder: 6,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1121,6 +1979,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "앞으로의 협업 방식을 재설계한다.",
         price: 900,
         displayOrder: 7,
+        axis: 1,
         isPurchased: false,
       },
       {
@@ -1129,6 +1988,7 @@ export const DUMMY_REPORTS: Record<string, FullReport> = {
         description: "이 팀의 미래 성장 가능성을 예측한다.",
         price: 900,
         displayOrder: 8,
+        axis: 1,
         isPurchased: false,
       },
     ],

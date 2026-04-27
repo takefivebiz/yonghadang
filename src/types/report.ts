@@ -25,6 +25,8 @@ export interface PaidQuestion {
   isPurchased: boolean;
   /** 노출 순서 1~8 (1~3 추천, 4~8 아코디언) — PRD 6-3.3 */
   displayOrder: number;
+  /** 축 그룹 (1~3): 3회 구매 루프에서 중복 없이 8개씩 제공 (기본값: 1) */
+  axis?: 1 | 2 | 3;
   /** 구매 후 열람 가능한 확장 리포트 */
   report?: ReportSection[];
 }

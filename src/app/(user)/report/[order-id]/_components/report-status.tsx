@@ -146,17 +146,24 @@ export const ReportStatus = ({
 
   return (
     <div className="mx-auto w-full max-w-md py-16 text-center">
-      {/* 회전하는 신비로운 심볼 */}
+      {/* 심플한 스피너 */}
       <div className="mb-8 flex items-center justify-center">
-        <div
-          className="relative flex h-24 w-24 items-center justify-center rounded-full"
-          style={{
-            background: "linear-gradient(135deg, #E8D4F0, #F5D7E8)",
-            boxShadow: "0 8px 40px rgba(232, 212, 240, 0.5)",
-          }}
-          aria-hidden="true"
-        >
-          <span className="animate-pulse text-4xl">✦</span>
+        <style>{`
+          @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+          .spinner-spin { animation: spin 2.5s linear infinite; }
+        `}</style>
+        <div className="relative h-20 w-20" aria-hidden="true">
+          {/* 회전 링 */}
+          <svg className="spinner-spin absolute inset-0 h-full w-full" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="35" fill="none" stroke="#A366FF" strokeWidth="2.5" opacity="0.2" />
+            <circle cx="40" cy="40" r="35" fill="none" stroke="url(#spinGradReport)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="55 220" />
+            <defs>
+              <linearGradient id="spinGradReport" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{stopColor: "#F5D7E8"}} />
+                <stop offset="100%" style={{stopColor: "#A366FF"}} />
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
       </div>
 
@@ -170,20 +177,35 @@ export const ReportStatus = ({
       </p>
 
       {/* 프로그레스 바 */}
-      <div className="mb-3">
+      <div className="mb-4">
+        <style>{`
+          @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+          }
+          .progress-shimmer {
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+          }
+        `}</style>
         <div
-          className="h-2 w-full overflow-hidden rounded-full"
-          style={{ backgroundColor: "rgba(74, 59, 92, 0.1)" }}
+          className="relative h-3 w-full overflow-hidden rounded-full"
+          style={{
+            backgroundColor: "rgba(74, 59, 92, 0.15)",
+            boxShadow: "inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 8px rgba(196, 174, 216, 0.2)",
+          }}
           role="progressbar"
           aria-valuenow={progressPct}
           aria-valuemin={0}
           aria-valuemax={100}
         >
           <div
-            className="h-full rounded-full transition-all duration-700"
+            className="h-full rounded-full progress-shimmer transition-all duration-700"
             style={{
               width: `${progressPct}%`,
-              background: "linear-gradient(90deg, #C4AED8, #F5D7E8)",
+              background: "linear-gradient(90deg, #C4AED8, #F5D7E8, #C4AED8, #F5D7E8)",
+              boxShadow: `0 0 16px #F5D7E8, inset 0 1px 2px rgba(255, 255, 255, 0.4)`,
+              backgroundPosition: "-1000px 0",
             }}
           />
         </div>
