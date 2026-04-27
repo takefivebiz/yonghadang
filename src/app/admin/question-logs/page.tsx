@@ -1,6 +1,5 @@
 "use client";
 
-import { type Metadata } from "next";
 import { useState } from "react";
 import { AlertCircle, CheckCircle2, Copy, Trash2, Flag } from "lucide-react";
 import { DUMMY_QUESTION_LOGS } from "@/lib/dummy-admin";

@@ -94,15 +94,28 @@ export const PaymentClient = () => {
         />
       )}
 
-      {/* 결제 위젯 자리 — TODO: [백엔드 연동] 토스페이먼츠 위젯 마운트 */}
+      {/* 결제 위젯 자리 — 테스트 환경 시뮬레이션 */}
       <div
-        className="min-h-[80px] rounded-2xl border border-dashed p-5"
+        className="rounded-2xl border p-5"
         style={{
-          borderColor: "rgba(230, 230, 250, 0.15)",
-          background: "rgba(100, 149, 237, 0.05)",
+          borderColor: "rgba(100, 149, 237, 0.3)",
+          background: "rgba(100, 149, 237, 0.08)",
         }}
       >
-        <p className="text-center text-xs" style={{ color: '#B8A8D8' }}>토스페이먼츠 결제 위젯 영역</p>
+        <div className="mb-3 inline-flex rounded-lg px-2.5 py-1" style={{ background: "rgba(100, 149, 237, 0.2)" }}>
+          <span className="text-xs font-medium" style={{ color: '#6495ED' }}>
+            🔄 테스트 환경
+          </span>
+        </div>
+        <p className="text-sm font-semibold" style={{ color: '#E0E0E0' }}>
+          토스페이먼츠 결제 위젯
+        </p>
+        <p className="mt-2 text-xs leading-relaxed" style={{ color: '#B8A8D8' }}>
+          실제 결제 기능은 백엔드 연동 후 활성화됩니다. 현재는 테스트 카드로 결제 플로우를 시뮬레이션합니다.
+        </p>
+        <p className="mt-2 text-xs" style={{ color: '#8A7FA8' }}>
+          💳 테스트 카드: 4330-0000-0000-1234 / 25/01 / 123
+        </p>
       </div>
 
       {/* 결제 버튼 */}

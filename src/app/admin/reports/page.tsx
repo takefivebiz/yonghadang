@@ -20,8 +20,6 @@ const ReportAnalyticsPage = () => {
   const totalReports = analytics.freeReportCount + analytics.paidReportCount;
   const freePercent =
     ((analytics.freeReportCount / totalReports) * 100).toFixed(1);
-  const paidPercent =
-    ((analytics.paidReportCount / totalReports) * 100).toFixed(1);
 
   // 원형 차트용 비율 (CSS) 계산
   const freePercentNum = parseFloat(freePercent);

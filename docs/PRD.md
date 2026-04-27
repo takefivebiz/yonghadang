@@ -2547,22 +2547,23 @@ type TelegramAlertEvent =
 
 #### 환경 변수 (`.env.local`)
 
-- [ ] `NEXT_PUBLIC_SUPABASE_URL` — Supabase 프로젝트 URL 세팅
-- [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon 키 세팅
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` — 서비스 롤 키 세팅 (서버 사이드 전용)
-- [ ] `ANTHROPIC_API_KEY` — Claude API 키 세팅 (실제 호출 여부 결정 후 설정)
-- [ ] `TOSS_CLIENT_KEY` — Toss Payments **테스트 키** (`test_ck_...`) 세팅
-- [ ] `TOSS_SECRET_KEY` — Toss Payments **테스트 시크릿 키** (`test_sk_...`) 세팅
-- [ ] `NEXT_PUBLIC_APP_URL` — `http://localhost:3000` 으로 세팅
+- [ ] `NEXT_PUBLIC_SUPABASE_URL` — Supabase 프로젝트 URL 세팅 ⚠️ **[백엔드 연동 필요]**
+- [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon 키 세팅 ⚠️ **[백엔드 연동 필요]**
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` — 서비스 롤 키 세팅 (서버 사이드 전용) ⚠️ **[백엔드 연동 필요]**
+- [ ] `ANTHROPIC_API_KEY` — Claude API 키 세팅 (실제 호출 여부 결정 후 설정) ⚠️ **[백엔드 연동 필요]**
+- [x] `NEXT_PUBLIC_TOSS_CLIENT_KEY` — Toss Payments **위젯 테스트 키** (`test_gck_...`) 세팅 ✅ 설정 완료
+- [ ] `TOSS_SECRET_KEY` — Toss Payments **테스트 시크릿 키** (`test_sk_...`) 세팅 ⚠️ **[백엔드 연동 필요]** (결제 서버 승인 시 사용)
+- [x] `NEXT_PUBLIC_SITE_URL_DEVELOPMENT` — `http://localhost:3000` 으로 세팅 ✅ 설정 완료
+- [x] `NEXT_PUBLIC_SITE_URL_PRODUCTION` — 프로덕션 도메인 세팅 ✅ 설정 완료
 
 > **주의**: 절대 프로덕션 Toss 키(`live_ck_...`)나 프로덕션 Supabase DB를 테스트에 사용하지 않는다.
 
 #### 코드 품질
 
-- [ ] `npm run type-check` — TypeScript 타입 에러 0건
-- [ ] `npm run lint` — ESLint 에러 0건
-- [ ] `npm run build` — 빌드 성공 (경고는 확인 후 무시 가능)
-- [ ] `npm run dev` — 개발 서버 `localhost:3000` 정상 기동
+- [x] `npm run type-check` — TypeScript 타입 에러 0건
+- [x] `npm run lint` — ESLint 에러 0건
+- [x] `npm run build` — 빌드 성공 (경고는 확인 후 무시 가능)
+- [x] `npm run dev` — 개발 서버 `localhost:3000` 정상 기동
 
 ---
 
@@ -2570,14 +2571,18 @@ type TelegramAlertEvent =
 
 #### 연결 대상 확인
 
-- [ ] 연결된 Supabase가 **테스트 전용 프로젝트** 또는 **로컬 인스턴스**인지 확인 (프로덕션 DB 금지)
-- [ ] RLS(Row Level Security) 정책이 서비스 역할 기준으로 올바르게 적용되어 있는가
+- [ ] 연결된 Supabase가 **테스트 전용 프로젝트** 또는 **로컬 인스턴스**인지 확인 (프로덕션 DB 금지) ⚠️ **[백엔드 연동 필요]**
+- [ ] RLS(Row Level Security) 정책이 서비스 역할 기준으로 올바르게 적용되어 있는가 ⚠️ **[백엔드 연동 필요]**
 
 #### 필수 기초 데이터
 
-- [ ] 카테고리 4개 (`연애`, `인간관계`, `직업/진로`, `감정`) DB에 존재
-- [ ] 각 카테고리의 하위 분기(subcategory) 데이터 존재
-- [ ] `questions` 테이블에 테스트용 유료 질문 **8개 이상** 존재 (카테고리별 최소 2개)
+- [ ] 카테고리 4개 (`연애`, `감정`, `인간관계`, `직업/진로`) DB에 존재 ⚠️ **[백엔드 연동 필요]**
+- [ ] 각 카테고리의 하위 분기(subcategory) 데이터 존재 ⚠️ **[백엔드 연동 필요]**
+  - 연애: `썸`, `연애 중`, `이별`, `재회`
+  - 감정: `불안`, `답답함`, `공허함`
+  - 인간관계: `친구`, `가족`, `직장`, `사람 전반`
+  - 직업/진로: `이직`, `방향성`, `확신 부족`, `현실 vs 적성`
+- [ ] `questions` 테이블에 테스트용 유료 질문 **8개 이상** 존재 (카테고리별 최소 2개) ⚠️ **[백엔드 연동 필요]**
 
 #### 테스트 계정
 
@@ -2586,13 +2591,15 @@ type TelegramAlertEvent =
 | 일반 회원 | `test-user@corelog.test`  | `Test1234!`  | `profiles.role = 'user'`  |
 | 관리자    | `test-admin@corelog.test` | `Admin1234!` | `profiles.role = 'admin'` |
 
-- [ ] 위 테스트 계정이 Supabase Auth에 등록되어 있는가
-- [ ] 일반 회원 계정의 `profiles` 레코드가 존재하는가
-- [ ] 관리자 계정의 `profiles.role = 'admin'` 인가
+- [ ] 위 테스트 계정이 Supabase Auth에 등록되어 있는가 ⚠️ **[백엔드 연동 필요]**
+- [ ] 일반 회원 계정의 `profiles` 레코드가 존재하는가 ⚠️ **[백엔드 연동 필요]**
+- [ ] 관리자 계정의 `profiles.role = 'admin'` 인가 ⚠️ **[백엔드 연동 필요]**
 
 #### 정리 계획
 
 - [ ] 테스트 종료 후 생성된 `analysis_sessions`, `orders`, `paid_reports` 데이터 정리 방법이 정의되어 있는가
+  - **현재 상태**: localStorage 기반 더미 데이터 사용 중. 브라우저 DevTools → Application → Local Storage 에서 `corelog:` 접두사 키 수동 삭제 가능
+  - **백엔드 연동 후**: DB 테이블 초기화 스크립트 준비 필요
 
 ---
 
@@ -2600,7 +2607,8 @@ type TelegramAlertEvent =
 
 #### Toss Payments
 
-- [ ] `.env.local`에 테스트 키(`test_ck_`, `test_sk_`)가 설정되어 있는가
+- [x] `.env.local`에 **클라이언트 키** (`NEXT_PUBLIC_TOSS_CLIENT_KEY=test_gck_...`) 설정됨 ✅
+- [ ] `.env.local`에 **시크릿 키** (`TOSS_SECRET_KEY=test_sk_...`) 설정 ⚠️ **[백엔드 연동 필요]** (결제 서버 승인용)
 - [ ] Toss 테스트 카드 정보 준비:
 
 | 시나리오  | 카드 번호                               | 비고                                          |
@@ -2608,22 +2616,30 @@ type TelegramAlertEvent =
 | 결제 성공 | `4330-0000-0000-1234`                   | 유효기간: `25/01` / CVC: `123`                |
 | 잔액 부족 | Toss 테스트 대시보드의 실패 케이스 사용 | 에러 코드 `EXCEED_MAX_DAILY_PAYMENT_COUNT` 등 |
 
-- [ ] 결제 성공 콜백 `/payment/success` 가 `localhost:3000`에서 정상 라우팅되는가
-- [ ] 결제 실패 콜백 `/payment/fail` 가 `localhost:3000`에서 정상 라우팅되는가
-- [ ] Toss 대시보드(테스트 모드)에서 결제 내역 조회 가능한가
+- [x] 결제 성공 콜백 `/payments/success` 가 `localhost:3000`에서 정상 라우팅됨 ✅
+- [x] 결제 실패 콜백 `/payments/fail` 가 `localhost:3000`에서 정상 라우팅됨 ✅
+  - 실패 정보를 `localStorage:corelog:failed_payments`에 기록하여 테스트 추적 가능
+- [ ] `/api/payments/confirm` — 실제 결제 승인 API 호출 ⚠️ **[백엔드 연동 필요]**
+- [ ] Toss 대시보드(테스트 모드)에서 결제 내역 조회 가능한가 — **현재 시뮬레이션 상태** (실제 거래 기록 없음)
 
 #### Anthropic Claude
 
-- [ ] AI 호출 방식 결정:
+- [ ] `ANTHROPIC_API_KEY` 설정 ⚠️ **[백엔드 연동 필요]**
+- [ ] AI 호출 방식 결정: ⚠️ **[백엔드 연동 필요]**
   - [ ] **실제 호출** — API 키 유효 확인, 비용 발생 인지
-  - [ ] **Mock 처리** — Mock 스트리밍 응답 데이터가 준비되어 있는가
-- [ ] 스트리밍 응답(`/api/reports/.../stream`)이 `localhost`에서 정상 동작하는가
-- [ ] AI 타임아웃(30초) 초과 시 에러 UI가 표시되는가
+  - [x] **Mock 처리** — ✅ 더미 리포트로 시뮬레이션 중
+- [x] 스트리밍 응답 UI (**타이핑 효과**) ✅ 구현됨
+  - 무료 리포트의 headline, 본문, deficit sentence에 타이핑 효과 적용
+  - 속도: headline 25ms/char, 본문 20ms/char
+- [ ] `/api/reports/.../stream` — 실제 AI 스트리밍 API ⚠️ **[백엔드 연동 필요]**
+- [ ] AI 타임아웃(30초) 초과 시 에러 UI — **현재 미구현** (더미 데이터 사용 중)
 
 #### Supabase Auth
 
-- [ ] 이메일 인증이 필요한 경우: Supabase 대시보드에서 "이메일 인증 비활성화" 설정 또는 테스트 이메일 서버 준비
-- [ ] OAuth(카카오, 구글) 사용 시: 리다이렉트 URL에 `http://localhost:3000` 등록 여부 확인
+- [ ] Supabase 클라이언트 초기화 ⚠️ **[백엔드 연동 필요]**
+- [ ] OAuth(카카오, 구글) 리다이렉트 URL 등록 (`http://localhost:3000/api/auth/callback`) ⚠️ **[백엔드 연동 필요]**
+- [ ] 이메일 인증 설정 (비활성화 또는 테스트 이메일 서버) ⚠️ **[백엔드 연동 필요]**
+- [x] OAuth 로그인 버튼 UI ✅ (Google/Kakao 더미 로그인으로 시뮬레이션 중)
 
 ---
 

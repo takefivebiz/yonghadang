@@ -9,8 +9,33 @@ import {
 } from '@/types/analysis';
 import { calculateTraits, inferUserType } from '@/lib/trait-inference';
 import { getAnalysisTypeColor, getCategoryColor, getRelationshipColor } from '@/lib/colors';
+import { isMemberLoggedIn } from '@/lib/report-access';
 
 type AnalysisType = 'self' | 'other' | 'relationship';
+
+/**
+ * 카테고리별 더미 리포트 session ID 매핑 (프론트엔드 데모용)
+ * 회원 로그인 상태: 회원 소유 리포트 사용
+ * 비회원 상태: 비회원 소유 리포트 사용
+ */
+const getDemoSessionId = (category: string, isLoggedIn: boolean): string => {
+  const loggedInMap: Record<string, string> = {
+    연애: 'sess_demo_guest_love',
+    감정: 'sess_demo_guest_emotion',
+    인간관계: 'sess_demo_guest_relation',
+    '직업/진로': 'sess_demo_member_career', // 회원 소유 리포트
+  };
+
+  const guestMap: Record<string, string> = {
+    연애: 'sess_demo_guest_love',
+    감정: 'sess_demo_guest_emotion',
+    인간관계: 'sess_demo_guest_relation',
+    '직업/진로': 'sess_demo_guest_relation', // 비회원도 접근 가능
+  };
+
+  const map = isLoggedIn ? loggedInMap : guestMap;
+  return map[category] || `sess_${Date.now()}`;
+};
 
 /** 분석 타입별 정보 */
 const ANALYSIS_TYPE_INFO: Record<
@@ -59,6 +84,7 @@ const RELATIONSHIP_ICONS: Record<string, string> = {
 /** PRD 5.5: 하위 분기 선택지 정의 */
 const SUBCATEGORIES: Record<string, string[]> = {
   연애: ['썸', '연애 중', '이별', '재회'],
+  감정: ['불안', '답답함', '공허함'],
   인간관계: ['친구', '가족', '직장', '사람 전반'],
   '직업/진로': ['이직', '방향성', '확신 부족', '현실 vs 적성'],
 };
@@ -293,7 +319,9 @@ export const AnalyzeClient = () => {
     const traits = calculateTraits(answers, questions);
     const inferredType = inferUserType(traits);
 
-    const mockSessionId = `sess_${Date.now()}`;
+    // 데모 환경: 카테고리별 더미 리포트 session ID 사용 (로그인 상태 고려)
+    const isLoggedIn = isMemberLoggedIn();
+    const mockSessionId = getDemoSessionId(category as string, isLoggedIn);
     const analysisSession = {
       sessionId: mockSessionId,
       analysisType: queryType,

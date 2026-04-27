@@ -2,18 +2,6 @@
 
 import { useRouter } from "next/navigation";
 
-/** 관계 유형 정의 */
-const RELATIONSHIP_OPTIONS = [
-  { label: "썸", icon: "💫" },
-  { label: "연애 중", icon: "💑" },
-  { label: "이별", icon: "💔" },
-  { label: "재회", icon: "🔄" },
-  { label: "친구", icon: "👫" },
-  { label: "가족", icon: "👨‍👩‍👧‍👦" },
-  { label: "직장 동료", icon: "💼" },
-  { label: "기타", icon: "❓" },
-];
-
 /**
  * CTA 섹션
  * 배경 제거 - 전체 그라데이션과 연결
