@@ -12,7 +12,7 @@ export const metadata: Metadata = {
  * - PC: 좌측 사이드바 네비게이션
  * - 모바일: 상단 헤더 + 드로어 메뉴
  *
- * TODO: [백엔드 연동] 미들웨어에서 관리자 세션 검증 후 미인증 시 /admin/login 리다이렉트
+ * TODO: [백엔드 연동] 미들웨어에서 관리자 세션 검증 후 미인증 시 /login 리다이렉트
  */
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   return (

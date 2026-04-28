@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 
 /**
- * PRD 7-1 관리자 로그인 (/admin/login).
+ * PRD 7-1 관리자 로그인 (/login).
  * - 이메일/비밀번호 로그인 폼
  * - 로그인 성공 시 /admin으로 리다이렉트
  *
@@ -25,10 +25,17 @@ const AdminLoginPage = () => {
     setIsLoading(true);
 
     // TODO: [백엔드 연동] POST /api/admin/auth/login 실제 호출로 교체
+    // - Server Action 또는 API Route에서 admins 테이블 검증
+    // - JWT 세션 쿠키(HttpOnly) 발급
+    // - 현재 document.cookie 방식은 개발/테스트용
     await new Promise((resolve) => setTimeout(resolve, 800));
 
     // 더미 인증: admin@corelog.com / admin1234
     if (email === "admin@corelog.com" && password === "admin1234") {
+      // 로그인 성공 시 쿠키 저장
+      // HttpOnly 쿠키는 서버에서만 설정 가능하므로 개발 단계에서는 일반 쿠키 사용
+      // 백엔드 연동 시 Server Action에서 Set-Cookie 헤더로 발급
+      document.cookie = "admin_auth=1; path=/; SameSite=Strict";
       router.push("/admin");
     } else {
       setError("이메일 또는 비밀번호가 올바르지 않습니다.");
@@ -166,10 +173,12 @@ const AdminLoginPage = () => {
             </button>
           </form>
 
-          {/* 더미 힌트 (개발 전용) */}
-          <p className="mt-6 text-center text-xs" style={{ color: 'rgba(212, 197, 226, 0.6)' }}>
-            데모: admin@corelog.com / admin1234
-          </p>
+          {/* 더미 힌트 (개발 환경에서만) */}
+          {process.env.NODE_ENV === 'development' && (
+            <p className="mt-6 text-center text-xs" style={{ color: 'rgba(212, 197, 226, 0.6)' }}>
+              데모: admin@corelog.com / admin1234
+            </p>
+          )}
         </div>
       </div>
     </div>

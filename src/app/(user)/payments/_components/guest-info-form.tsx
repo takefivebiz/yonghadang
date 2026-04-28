@@ -113,7 +113,7 @@ export const GuestInfoForm = ({
           <input
             id="guest-password"
             type="password"
-            autoComplete="new-password"
+            autoComplete="off"
             placeholder="4자 이상 입력"
             value={value.password}
             aria-invalid={passwordError !== null}

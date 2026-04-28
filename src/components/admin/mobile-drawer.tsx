@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Menu,
   X,
@@ -13,6 +13,7 @@ import {
   FileText,
   Repeat2,
   History,
+  LogOut,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -52,12 +53,20 @@ const NAV_ITEMS = [
 
 export const AdminMobileDrawer = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
   const pathname = usePathname();
 
   const close = () => setIsOpen(false);
 
   const isActive = (href: string, exact: boolean) =>
     exact ? pathname === href : pathname.startsWith(href);
+
+  const handleLogout = () => {
+    // admin_auth 쿠키 삭제
+    document.cookie = "admin_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    close();
+    router.push("/login");
+  };
 
   return (
     <>
@@ -181,14 +190,28 @@ export const AdminMobileDrawer = () => {
           </div>
         </nav>
 
-        {/* 푸터 */}
+        {/* 푸터 — 로그아웃 버튼 */}
         <div
-          className="px-4 py-2 sm:py-3 flex-shrink-0"
+          className="px-3 py-3 flex-shrink-0"
           style={{ borderTop: "1px solid rgba(230, 230, 250, 0.15)" }}
         >
-          <p className="text-xs text-center" style={{ color: "#9B8BB5" }}>
-            관리자 패널
-          </p>
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all"
+            style={{
+              background: "rgba(239, 68, 68, 0.15)",
+              color: "#FCA5A5",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(239, 68, 68, 0.25)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)";
+            }}
+          >
+            <LogOut size={18} className="flex-shrink-0" />
+            <span>로그아웃</span>
+          </button>
         </div>
       </div>
     </>

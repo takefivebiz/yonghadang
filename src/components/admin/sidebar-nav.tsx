@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BarChart2, ClipboardList, Users, TrendingUp, FileText, Repeat2, History } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { BarChart2, ClipboardList, Users, TrendingUp, FileText, Repeat2, History, LogOut } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "매출 조회", icon: BarChart2, exact: true },
@@ -15,10 +15,17 @@ const NAV_ITEMS = [
 ] as const;
 
 export const SidebarNav = () => {
+  const router = useRouter();
   const pathname = usePathname();
 
   const isActive = (href: string, exact: boolean) =>
     exact ? pathname === href : pathname.startsWith(href);
+
+  const handleLogout = () => {
+    // admin_auth 쿠키 삭제
+    document.cookie = "admin_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    router.push("/login");
+  };
 
   return (
     <aside className="flex h-full w-56 flex-shrink-0 flex-col" style={{ borderRight: '1px solid rgba(230, 230, 250, 0.15)', background: 'rgba(27, 0, 63, 0.6)', backdropFilter: 'blur(8px)' }}>
@@ -30,7 +37,7 @@ export const SidebarNav = () => {
       </div>
 
       {/* 네비게이션 */}
-      <nav className="flex flex-col gap-1 px-3 py-4">
+      <nav className="flex flex-col gap-1 px-3 py-4 flex-1">
         {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => (
           <Link
             key={href}
@@ -63,6 +70,26 @@ export const SidebarNav = () => {
           </Link>
         ))}
       </nav>
+
+      {/* 로그아웃 버튼 */}
+      <div className="border-t px-3 py-4" style={{ borderColor: 'rgba(230, 230, 250, 0.15)' }}>
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
+          style={{ color: '#B8A8D8' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+            e.currentTarget.style.color = '#FCA5A5';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '';
+            e.currentTarget.style.color = '#B8A8D8';
+          }}
+        >
+          <LogOut size={18} />
+          로그아웃
+        </button>
+      </div>
     </aside>
   );
 };

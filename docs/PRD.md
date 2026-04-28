@@ -2794,17 +2794,18 @@ type TelegramAlertEvent =
 → 비회원 조회 페이지에서 재접근 가능
 ```
 
-**비회원 세션 생명주기 — anonymous → guest 전환**
+**비회원 세션 생명주기 — 토큰 기반 임시 접근**
 
-무료 리포트와 유료 확장 리포트는 분리된 상품이 아니라 **같은 리포트의 확장판**이다. 따라서 orderId는 유지되고, 결제 여부에 따라 **소유권과 저장소만 변환**된다. **비회원이 유료로 구매한 것은 영구적으로 접근 가능**하다.
+무료 리포트와 유료 확장 리포트는 분리된 상품이 아니라 **같은 리포트의 확장판**이다. 따라서 orderId는 유지되고, 결제 여부에 따라 **paid 플래그와 paidQuestionIds만 추가**된다. **비회원이 유료로 구매한 것은 영구적으로 localStorage에 저장되지만, 재접근 시마다 전화번호 + 비밀번호로 검증**한다.
 
-| 단계 | ownerType | paid | 저장소 | 접근 | 영속성 |
-|------|-----------|------|--------|------|--------|
-| 1. 무료 분석 | `anonymous` | false | sessionStorage | URL 불가 (브라우저 내만) | 임시 (브라우저 종료 시 삭제) |
-| 2. 유료 결제 후 | `guest` | true | localStorage | URL 가능 (phoneNumber+password) | **영구 (만료 없음)** |
-| 회원 분석 | `member` | (N/A) | Supabase | 로그인 계정 | 영구 (수동 삭제까지) |
+| 단계              | ownerType   | paid  | paidQuestionIds | 접근           | 토큰                  | 영속성                       |
+| ----------------- | ----------- | ----- | --------------- | -------------- | --------------------- | ---------------------------- |
+| 1. 무료 분석      | `anonymous` | false | -               | sessionStorage | 없음                  | 임시 (브라우저 종료 시 삭제) |
+| 2. 유료 결제 후   | `anonymous` | true  | [구매 질문 ID]  | localStorage   | 30분 (결제 직후 발급) | 영구 (무효화 불가)           |
+| 재접근 (URL 공유) | `anonymous` | true  | [구매 질문 ID]  | localStorage   | 없음 → 인증 필요      | 영구                         |
+| 회원 분석         | `member`    | (N/A) | -               | Supabase       | 로그인 토큰           | 영구 (수동 삭제까지)         |
 
-**전환 흐름**
+**결제 직후 흐름 (본인인증 X, 즉시 리포트 표시)**
 
 ```
 [비회원 무료 분석]
@@ -2815,54 +2816,71 @@ orderId 생성, ownerType: 'anonymous', paid: false, sessionStorage 저장
 ↓
 [결제 완료]
 ↓
-같은 orderId로 업그레이드: ownerType: 'guest', paid: true, paidQuestionIds 저장
-sessionStorage 삭제 → localStorage로 이동
+같은 orderId로 업그레이드: ownerType: 'anonymous', paid: true, paidQuestionIds 저장 (localStorage)
 ↓
-/report/[orderId] 유지 (사용자는 같은 페이지에서 계속 봄, 구매한 질문 즉시 표시)
+grantGuestAccess(orderId) 호출 → 30분 토큰 발급
+↓
+/report/[orderId] 유지 (사용자는 같은 페이지에서 계속 봄, 구매한 질문 즉시 표시, 본인인증 폼 X)
 ```
 
-**재접근 흐름 (비회원 조회)**
+**토큰 만료 후 재접근 흐름 (본인인증 O)**
 
 ```
-/guest/lookup 접근
+사용자가 같은 /report/[orderId] URL 재접근 (30분 이후)
 ↓
-전화번호 + 비밀번호 입력
+hasGuestAccess() 확인 → 토큰 만료, false 반환
 ↓
-verifyGuestOrder() 검증 (ownerType: 'guest' + paid: true 확인)
+GuestAuthForm 표시 (전화번호 + 비밀번호 입력)
 ↓
-grantGuestAccess() 호출 (30분 인증 토큰 저장)
+verifyGuestOrder() 검증 (phone + password 일치 확인)
 ↓
-localStorage의 paidQuestionIds → sessionStorage로 복사
+grantGuestAccess() 호출 → 새 30분 토큰 발급
 ↓
-/report/[orderId] 이동 (본인확인 폼 없이 바로 리포트 + 구매한 질문 표시)
+report-client: view 전환 → 구매한 질문 표시
 ```
 
-- [x] 무료 분석 후 **유료 질문 구매 시 같은 orderId가 유지**되는가 (anonymous → guest 전환, paid: true 설정, paidQuestionIds 저장)
+**URL 공유 시나리오**
+
+```
+비회원이 /report/[orderId] URL 공유 → 다른 사람이 접근
+↓
+무료 리포트: 누구나 볼 수 있음 (ownerType: 'anonymous')
+↓
+유료 리포트: GuestAuthForm 표시 (hasGuestAccess() 없으므로)
+↓
+전화번호 + 비밀번호 입력 → 미매칭 → 실패 (paid: true이지만 order 검증 실패)
+```
+
+- [x] 무료 분석 후 **유료 질문 구매 시 같은 orderId가 유지**되는가 (paid: true 설정, paidQuestionIds 저장)
 - [x] 결제 완료 후 **저장소가 전환**되는가 (sessionStorage → localStorage)
-- [x] 결제 완료 후 **바로 리포트 페이지에서 확장 결과 표시**되는가 (별도 페이지 거치지 않고 즉시 반영)
+- [x] 결제 완료 직후 **본인인증 폼 없이 바로 리포트에서 확장 결과 표시**되는가 (grantGuestAccess() → 30분 토큰)
+- [x] 결제 직후 **토큰 기반 즉시 접근** 가능한가 (hasGuestAccess() = true)
+- [x] **30분 후 토큰 만료되는가** (grantGuestAccess의 30분 TTL)
+- [x] 토큰 만료 후 **GuestAuthForm이 표시되는가** (hasGuestAccess() = false)
+- [x] 비회원 재인증 후 **새 토큰이 발급되는가** (verifyGuestOrder() → grantGuestAccess())
+- [x] URL 공유 받은 타인이 **유료 리포트 접근 시 본인인증 요구**되는가 (GuestAuthForm + verifyGuestOrder)
 - [x] 존재하지 않는 session-id 접근 시 404 페이지가 표시되는가 (`notFound()` → 커스텀 404 페이지)
-- [x] 비회원 기존 리포트 조회 시 paid 검증이 작동하는가 (`verifyGuestOrder()` → `paid === true` 확인, 미구매 → `false` 반환)
-- [x] 비회원 조회 후 **본인확인 폼이 중복 나타나지 않는가** (`guest-lookup`에서 `grantGuestAccess()` 호출 → report-client에서 `hasGuestAccess()` 통과)
 
 **극단적 케이스**
 
 - [x] `/report/` 뒤에 **임의의 문자열, 특수문자, 매우 긴 문자열** 입력 시 서버가 정상 처리하는가 (Next.js URL 인코딩 + `getOrder()` 미매칭 → `notFound()`)
 - [x] **회원 타인의 session-id** 접근 시 열람 불가 처리되는가 (`report-client.tsx` — `memberId` 일치 여부 검증)
 - [x] **결제 실패 후 복귀** 시 이전 상태로 롤백되는가 (sessionStorage 스냅샷 복원)
-- [x] 구매하지 않은 anonymous 세션으로 **비회원 조회 페이지에서 조회** 시도 시 실패 처리되는가 (`verifyGuestOrder()` paid check → `false` 반환)
+- [x] **토큰 만료 후 재인증**할 때 마다 새 토큰이 발급되는가 (verifyGuestOrder() → grantGuestAccess())
 - [x] **결제 중 다른 탭에서 같은 세션 접근** 시 정합성이 유지되는가 (localStorage 기반 저장)
+- [x] 구매하지 않은 anonymous 세션 URL이 **다른 사람과 공유되었을 때** 무료 리포트만 보이는가 (ownerType: 'anonymous' + paid: false)
 
 **백엔드 필요**
 
 - [ ] 회원/비회원 세션 소유권 서버 검증 — Supabase RLS 또는 API에서 `user_id` 비교 ⚠️ **[백엔드 연동 필요]**
   - 클라이언트: `report-client.tsx`에서 memberId 일치 여부 검증 구현 완료
   - 서버: RLS 또는 API 레벨에서 세션 소유권 검증 필요
-- [ ] 결제 완료 후 order 상태 업데이트 — ownerType: 'guest', paid: true, paidQuestionIds 설정 ⚠️ **[백엔드 연동 필요]**
+- [ ] 결제 완료 후 order 상태 업데이트 — ownerType: 'anonymous', paid: true, paidQuestionIds 설정 ⚠️ **[백엔드 연동 필요]**
   - 클라이언트: payment-modal에서 order를 localStorage에 미리 저장 (requestPayment 전, paidQuestionIds 포함)
   - 서버: Toss 웹훅에서 실제 결제 확인 후 DB에 order 저장
 - [ ] 비회원 본인확인 API — POST /api/guest/verify (phoneNumber, password, orderId) ⚠️ **[백엔드 연동 필요]**
   - 클라이언트: `verifyGuestOrder()` 에서 bcrypt 비교는 클라이언트 데모용
-  - 서버: 실제 해시 비교 및 order ownership 검증 필요
+  - 서버: 실제 해시 비교, paid === true 확인 및 order ownership 검증 필요
 
 ---
 
@@ -2870,25 +2888,45 @@ localStorage의 paidQuestionIds → sessionStorage로 복사
 
 ```
 /admin/login 접근
-→ 관리자 계정 로그인
+→ 관리자 계정 로그인 (admin@corelog.com / admin1234)
+→ admin_auth 쿠키 저장
 → 관리자 대시보드 접근
-→ 콘텐츠 관리(질문 목록) 확인
-→ 유저 목록 확인
-→ 결제 내역 확인
+→ 사이드바/드로어 메뉴로 각 페이지 이동
+→ 로그아웃
 ```
 
-- [ ] 일반 유저로 `/admin` 접근 시 `/admin/login`으로 리다이렉트되는가
-- [ ] 관리자 로그인 후 대시보드 정상 접근 가능한가
-- [ ] 관리자 기능(콘텐츠 CRUD 등)이 정상 동작하는가
+**기본 흐름**
+
+- [x] **비로그인 상태**에서 `/admin` 접근 시 `/admin/login`으로 리다이렉트되는가 (미들웨어에서 `admin_auth` 쿠키 확인)
+- [x] 관리자 로그인 후 **대시보드 정상 접근** 가능한가 (쿠키 저장 후 미들웨어 통과)
+- [x] 로그인 후 **새로고침 해도 대시보드 유지**되는가 (쿠키 지속성)
+- [x] **로그아웃 버튼** 클릭 시 쿠키 삭제 후 `/admin/login` 리다이렉트되는가
+- [x] `/admin/users`, `/admin/questions` 등 **모든 하위 경로도 보호**되는가
+- [x] 사이드바 메뉴로 **모든 관리자 페이지 이동 가능**한가 (매출 → 주문 → 유저 → 질문 → 리포트 → 루프 → 로그)
 
 **극단적 케이스**
 
-- [ ] **비로그인 상태**에서 `/admin`, `/admin/users`, `/admin/contents` 등 모든 관리자 하위 경로에 직접 접근 시 `/admin/login`으로 리다이렉트되는가
-- [ ] **일반 유저 권한(`role = 'user'`)** 계정으로 로그인된 상태에서 `/admin` URL 직접 접근 시 403 또는 리다이렉트 처리가 되는가
-- [ ] 관리자 세션이 **만료된 상태**에서 관리자 API를 호출하려 할 때 401/403 응답이 내려오는가
-- [ ] 관리자 권한으로 **질문 삭제** 시 이미 해당 질문을 구매한 유저의 리포트 접근에 영향이 없는가
-- [ ] 관리자 콘텐츠 CRUD에서 **필수 필드를 비운 채 저장** 시 유효성 검사가 막아주는가
-- [ ] 관리자 콘텐츠 입력 필드에 **마크다운 또는 HTML 태그** 입력 시 렌더링 또는 이스케이프 처리가 올바른가
+- [x] **비로그인 상태**에서 `/admin`, `/admin/users`, `/admin/questions` 등 모든 관리자 경로 직접 접근 시 `/admin/login`으로 리다이렉트되는가 (미들웨어 matcher 적용)
+- [x] **로그아웃 후 다시 접근** 시 `/admin/login`으로 리다이렉트되고 쿠키 삭제 확인되는가
+- [x] **개발자 도구에서 쿠키 수동 삭제** 후 `/admin` 접근 시 `/admin/login`으로 리다이렉트되는가
+- [x] **모바일 모드**에서도 메뉴 → 로그아웃 동일하게 작동하는가
+- [ ] **일반 유저 권한(`role = 'user'`)** 계정으로 로그인된 상태에서 `/admin` URL 직접 접근 시 403 또는 리다이렉트 처리가 되는가 ⚠️ **[권한 분리 미구현]**
+- [ ] 관리자 세션이 **만료된 상태**에서 관리자 API를 호출하려 할 때 401/403 응답이 내려오는가 ⚠️ **[세션 만료 미구현]**
+- [ ] 관리자 권한으로 **질문 삭제** 시 이미 해당 질문을 구매한 유저의 리포트 접근에 영향이 없는가 ⚠️ **[CRUD 미구현]**
+- [ ] 관리자 콘텐츠 CRUD에서 **필수 필드를 비운 채 저장** 시 유효성 검사가 막아주는가 ⚠️ **[CRUD 미구현]**
+- [ ] 관리자 콘텐츠 입력 필드에 **마크다운 또는 HTML 태그** 입력 시 렌더링 또는 이스케이프 처리가 올바른가 ⚠️ **[CRUD 미구현]**
+
+**백엔드 필요**
+
+- [ ] 관리자 로그인 검증 — `admins` 테이블 조회 후 JWT 쿠키 발급 ⚠️ **[백엔드 연동 필요]**
+  - 클라이언트: `document.cookie`로 쿠키 저장 (개발/테스트용)
+  - 서버: Server Action에서 `admins` 테이블 검증 후 HttpOnly JWT 쿠키 발급
+- [ ] 미들웨어 세션 검증 — JWT 서명 및 만료 시간 검증 ⚠️ **[백엔드 연동 필요]**
+  - 클라이언트: 쿠키 존재 여부만 확인 (개발/테스트용)
+  - 서버: `supabase.auth.getUser()` 또는 JWT 디코딩으로 서명 검증 + TTL(24h) 확인
+- [ ] 권한 분리 — `role === 'admin'` 검증 ⚠️ **[백엔드 연동 필요]**
+  - 클라이언트: 현재 모든 로그인한 사용자를 관리자로 취급
+  - 서버: admins 테이블의 `role` 필드 확인 후 'admin' 권한만 허용
 
 ---
 

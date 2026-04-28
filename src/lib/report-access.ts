@@ -98,6 +98,8 @@ export const loginAsMember = (profile: MemberProfile): void => {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(MEMBER_SESSION_KEY, JSON.stringify(profile));
+    // 미들웨어에서 회원 여부 확인을 위해 쿠키 저장
+    document.cookie = "user_session=1; path=/; SameSite=Strict";
     window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
   } catch {
     // 쿼터 초과 등 무시
@@ -125,6 +127,8 @@ export const updateMemberProfile = (
 export const logoutMember = (): void => {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(MEMBER_SESSION_KEY);
+  // 미들웨어 쿠키도 삭제
+  document.cookie = "user_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
   window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
 };
 
