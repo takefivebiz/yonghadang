@@ -44,7 +44,7 @@ export const PaymentSuccessClient = () => {
 
     if (guestCheckout) {
       try {
-        const { phoneNumber, password } = JSON.parse(guestCheckout) as {
+        const { phoneNumber } = JSON.parse(guestCheckout) as {
           phoneNumber: string;
           password: string;
         };

@@ -232,8 +232,16 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
       if (snapshotRaw) {
         try {
           const { items, axes } = JSON.parse(snapshotRaw) as { items: string | null; axes: string | null };
-          items === null ? sessionStorage.removeItem(purchasedKey) : sessionStorage.setItem(purchasedKey, items);
-          axes === null ? sessionStorage.removeItem(axesKey) : sessionStorage.setItem(axesKey, axes);
+          if (items === null) {
+            sessionStorage.removeItem(purchasedKey);
+          } else {
+            sessionStorage.setItem(purchasedKey, items);
+          }
+          if (axes === null) {
+            sessionStorage.removeItem(axesKey);
+          } else {
+            sessionStorage.setItem(axesKey, axes);
+          }
         } catch {
           // 롤백 실패 시 무시
         }

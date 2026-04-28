@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { verifyGuestOrder, getOrder, listAllOrders } from "@/lib/dummy-orders";
+import { verifyGuestOrder, listAllOrders } from "@/lib/dummy-orders";
 import { grantGuestAccess } from "@/lib/report-access";
 
 interface GuestAuthFormProps {
