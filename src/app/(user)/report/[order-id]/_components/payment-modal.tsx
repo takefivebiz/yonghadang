@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { PendingOrderInput, GuestCheckoutInfo } from '@/types/payment';
 import { generateOrderId, clearPendingOrder } from '@/lib/payment';
 import { getPriceForQuantity, getFullBundlePrice } from '@/lib/pricing';
-import { isMemberLoggedIn } from '@/lib/report-access';
-import { saveLocalOrder } from '@/lib/dummy-orders';
+import { isMemberLoggedIn, grantGuestAccess } from '@/lib/report-access';
+import { saveLocalOrder, verifyGuestOrder } from '@/lib/dummy-orders';
 import { GuestInfoForm } from '@/app/(user)/payments/_components/guest-info-form';
 
 interface PaymentModalProps {
@@ -141,6 +141,19 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
 
   const handlePayment = async () => {
     if (!isLoggedIn && !validateGuest()) return;
+
+    // 비회원 결제 시 전화번호+비밀번호 검증
+    if (!isLoggedIn) {
+      const ok = verifyGuestOrder(pendingOrder.sessionId, guestInfo.phoneNumber, guestInfo.password);
+      if (!ok) {
+        setPasswordError('전화번호 또는 비밀번호가 일치하지 않아요.');
+        setIsPaying(false);
+        return;
+      }
+      // ✅ 결제 직전에 토큰 발급 (결제 후 본인확인 없이 리포트 접근)
+      grantGuestAccess(pendingOrder.sessionId);
+    }
+
     if (!widgetRef.current) return;
 
     setIsPaying(true);
@@ -188,14 +201,15 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
       // redirect 전에 미리 제거 (Toss 결제 성공 후 새 페이지 로드 시 모달이 다시 열리지 않도록)
       clearPendingOrder();
 
-      // 📌 결제 전에 미리 guest order를 localStorage에 저장
-      // redirect되는 경우와 로컬 환경 모두에서 작동하려면 requestPayment 전에 저장해야 함
+      // 📌 결제 후 order 업데이트 (비회원은 anonymous 유지, paidQuestionIds만 저장)
+      // grantGuestAccess로 30분 토큰 발급했으므로, 결제 직후 본인확인 불필요
+      // 토큰 만료 후 재진입 시에만 본인확인 요구
       saveLocalOrder({
         id: pendingOrder.sessionId,
         category: pendingOrder.category,
         amount: totalPrice,
         status: 'done',
-        ownerType: isLoggedIn ? 'member' : 'guest',
+        ownerType: isLoggedIn ? 'member' : 'anonymous', // 비회원도 anonymous 유지 (paidQuestionIds로 구분)
         paid: !isLoggedIn, // 비회원 결제만 paid: true
         phoneNumber: isLoggedIn ? undefined : guestInfo.phoneNumber.replace(/\D/g, ''),
         paidQuestionIds: !isLoggedIn ? pendingOrder.paidQuestionIds : undefined, // 비회원 구매 질문 목록 저장
