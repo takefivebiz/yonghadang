@@ -10,6 +10,7 @@ import {
 import { calculateTraits, inferUserType } from '@/lib/trait-inference';
 import { getAnalysisTypeColor, getCategoryColor, getRelationshipColor } from '@/lib/colors';
 import { isMemberLoggedIn } from '@/lib/report-access';
+import { saveLocalOrder } from '@/lib/dummy-orders';
 
 type AnalysisType = 'self' | 'other' | 'relationship';
 
@@ -372,6 +373,19 @@ export const AnalyzeClient = () => {
       `analysis_${mockSessionId}`,
       JSON.stringify(analysisSession),
     );
+
+    // 비회원 무료리포트 임시 주문 생성 (localStorage 저장)
+    if (!isLoggedIn) {
+      saveLocalOrder({
+        id: mockSessionId,
+        category: category as AnalysisCategory,
+        amount: 0,
+        status: 'done',
+        ownerType: 'anonymous',
+        paid: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
 
     setTimeout(() => {
       router.push(`/report/${mockSessionId}`);
