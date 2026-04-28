@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getOrder } from '@/lib/dummy-orders';
 import { getDummyReport, getDummyAnalysisSession } from '@/lib/dummy-reports';
 import { ReportClient } from './_components/report-client';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 interface Props {
   params: Promise<{ 'order-id': string }>;
@@ -40,7 +41,9 @@ const ReportPage = async ({ params }: Props) => {
   const analysisSession = getDummyAnalysisSession(sessionId);
 
   return (
-    <ReportClient order={order} report={report} initialAnalysisSession={analysisSession} />
+    <ErrorBoundary>
+      <ReportClient order={order} report={report} initialAnalysisSession={analysisSession} />
+    </ErrorBoundary>
   );
 };
 

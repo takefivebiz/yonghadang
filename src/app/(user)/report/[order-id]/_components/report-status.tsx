@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { getOrder } from "@/lib/dummy-orders";
 import { OrderStatus } from "@/types/order";
@@ -16,12 +16,15 @@ interface ReportStatusProps {
 /** 프로그레스 시각 효과 — 3초 간격 폴링 + 부드럽게 증가하는 퍼센트 */
 const MAX_POLL_MS = 10 * 60 * 1000; // PRD 6-6: 최대 10분 타임아웃
 const POLL_INTERVAL_MS = 3000;
+/** 연속 fetch 실패가 이 횟수를 초과하면 네트워크 에러로 전환 */
+const MAX_CONSECUTIVE_ERRORS = 3;
 
 /**
  * PRD 6-6. AI 생성 상태 UI.
  * - pending / generating: 프로그레스 바 + 폴링
  * - error: 실패 안내 + 재시도/고객센터 링크
  * - timeout: 10분 초과 안내 (에러와 별도 분기)
+ * - networkError: 연속 3회 fetch 실패 시 안내
  */
 export const ReportStatus = ({
   orderId,
@@ -34,6 +37,9 @@ export const ReportStatus = ({
   const [elapsedMs, setElapsedMs] = useState(0);
   /** 폴링 타임아웃(10분) 초과 여부 — 에러 UI 메시지 분기용 */
   const [isTimeout, setIsTimeout] = useState(false);
+  /** 네트워크 불안정으로 인한 에러 여부 */
+  const [isNetworkError, setIsNetworkError] = useState(false);
+  const consecutiveErrorsRef = useRef(0);
 
   // 3초 간격 폴링 — 서버에서 status=done 으로 전환되면 상위에 알림
   useEffect(() => {
@@ -42,26 +48,39 @@ export const ReportStatus = ({
     const start = Date.now();
 
     // TODO: [백엔드 연동] getOrder → fetch("/api/orders/[id]") 로 교체
+    // 교체 시 try/catch로 감싸고 consecutiveErrorsRef 카운터 활용
     const poll = window.setInterval(() => {
-      const updated = getOrder(orderId);
-      if (!updated) return;
+      try {
+        const updated = getOrder(orderId);
+        // 성공 시 연속 에러 카운터 리셋
+        consecutiveErrorsRef.current = 0;
 
-      setElapsedMs(Date.now() - start);
+        if (!updated) return;
 
-      if (updated.status === "done") {
-        setStatus("done");
-        onDone();
-        return;
-      }
-      if (updated.status === "error") {
-        setStatus("error");
-        return;
-      }
+        setElapsedMs(Date.now() - start);
 
-      // 타임아웃 도달 — 에러로 전환하고 타임아웃 플래그 설정
-      if (Date.now() - start > MAX_POLL_MS) {
-        setIsTimeout(true);
-        setStatus("error");
+        if (updated.status === "done") {
+          setStatus("done");
+          onDone();
+          return;
+        }
+        if (updated.status === "error") {
+          setStatus("error");
+          return;
+        }
+
+        // 타임아웃 도달 — 에러로 전환하고 타임아웃 플래그 설정
+        if (Date.now() - start > MAX_POLL_MS) {
+          setIsTimeout(true);
+          setStatus("error");
+        }
+      } catch {
+        // 연속 실패 카운터 증가 — MAX_CONSECUTIVE_ERRORS 초과 시 네트워크 에러 처리
+        consecutiveErrorsRef.current += 1;
+        if (consecutiveErrorsRef.current >= MAX_CONSECUTIVE_ERRORS) {
+          setIsNetworkError(true);
+          setStatus("error");
+        }
       }
     }, POLL_INTERVAL_MS);
 
@@ -78,6 +97,30 @@ export const ReportStatus = ({
 
     return () => window.clearInterval(tick);
   }, [status]);
+
+  /** 페이지 이탈 없이 폴링을 재시작하는 재시도 핸들러 */
+  const handleRetry = () => {
+    consecutiveErrorsRef.current = 0;
+    setIsTimeout(false);
+    setIsNetworkError(false);
+    setProgress(8);
+    setElapsedMs(0);
+    // status를 pending으로 되돌려 폴링 useEffect 재실행
+    setStatus("pending");
+  };
+
+  // ── 에러 메시지 분기 ───────────────────────────────────────
+  const errorTitle = isTimeout
+    ? "리포트 생성 시간이 초과됐어요"
+    : isNetworkError
+    ? "네트워크 연결이 불안정해요"
+    : "리포트 생성에 실패했어요";
+
+  const errorDesc = isTimeout
+    ? "10분이 지나도 리포트가 완성되지 않았어요. 잠시 후 다시 시도하시거나 고객센터로 문의해주세요."
+    : isNetworkError
+    ? "서버와의 연결이 3회 이상 실패했어요. 네트워크 상태를 확인 후 다시 시도해주세요."
+    : (errorMessage ?? "AI 분석 중 일시적인 오류가 발생했어요. 다시 시도하시거나 고객센터로 문의해주세요.");
 
   // ── 에러 상태 ──────────────────────────────────────────────
   if (status === "error") {
@@ -108,18 +151,16 @@ export const ReportStatus = ({
         </div>
 
         <h2 className="font-display mb-2 text-xl font-bold text-deep-purple">
-          {isTimeout ? "리포트 생성 시간이 초과됐어요" : "리포트 생성에 실패했어요"}
+          {errorTitle}
         </h2>
         <p className="mb-8 text-sm leading-relaxed text-muted-foreground">
-          {isTimeout
-            ? "10분이 지나도 리포트가 완성되지 않았어요.\n잠시 후 다시 시도하시거나 고객센터로 문의해주세요."
-            : (errorMessage ?? "AI 분석 중 일시적인 오류가 발생했어요.\n다시 시도하시거나 고객센터로 문의해주세요.")}
+          {errorDesc}
         </p>
 
         <div className="space-y-3">
           <button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={handleRetry}
             className="w-full rounded-full py-4 text-sm font-semibold transition-all duration-300 hover:scale-[1.02]"
             style={{
               backgroundColor: "#4A3B5C",

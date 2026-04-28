@@ -65,6 +65,8 @@ export const ContactClient = () => {
     setExpandedFAQ(expandedFAQ === id ? null : id);
   };
 
+  const CONTENT_MAX = 1000;
+
   const handleFormChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -93,6 +95,10 @@ export const ContactClient = () => {
     }
     if (!formData.content.trim()) {
       toast.error("내용을 입력해주세요");
+      return;
+    }
+    if (formData.content.length > CONTENT_MAX) {
+      toast.error(`내용은 ${CONTENT_MAX.toLocaleString()}자 이하로 입력해주세요`);
       return;
     }
 
@@ -232,6 +238,8 @@ export const ContactClient = () => {
                 value={formData.name}
                 onChange={handleFormChange}
                 placeholder="홍길동"
+                maxLength={50}
+                autoComplete="name"
                 className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
                 style={{
                   borderColor: "rgba(74, 59, 92, 0.2)",
@@ -256,6 +264,8 @@ export const ContactClient = () => {
                 value={formData.email}
                 onChange={handleFormChange}
                 placeholder="example@email.com"
+                maxLength={254}
+                autoComplete="email"
                 className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
                 style={{
                   borderColor: "rgba(74, 59, 92, 0.2)",
@@ -305,6 +315,8 @@ export const ContactClient = () => {
                 value={formData.title}
                 onChange={handleFormChange}
                 placeholder="문의 제목을 입력해주세요"
+                maxLength={100}
+                autoComplete="off"
                 className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
                 style={{
                   borderColor: "rgba(74, 59, 92, 0.2)",
@@ -316,22 +328,38 @@ export const ContactClient = () => {
 
             {/* 내용 */}
             <div>
-              <label
-                htmlFor="contact-content"
-                className="mb-2 block text-sm font-medium text-[#4A3B5C]"
-              >
-                내용 <span className="text-rose-400">*</span>
-              </label>
+              <div className="mb-2 flex items-center justify-between">
+                <label
+                  htmlFor="contact-content"
+                  className="text-sm font-medium text-[#4A3B5C]"
+                >
+                  내용 <span className="text-rose-400">*</span>
+                </label>
+                <span
+                  className="text-xs"
+                  style={{
+                    color: formData.content.length >= CONTENT_MAX
+                      ? "#EF4444"
+                      : "rgba(74, 59, 92, 0.45)",
+                  }}
+                >
+                  {formData.content.length.toLocaleString()} / {CONTENT_MAX.toLocaleString()}
+                </span>
+              </div>
               <textarea
                 id="contact-content"
                 name="content"
                 value={formData.content}
                 onChange={handleFormChange}
-                placeholder="자세한 내용을 입력해주세요 (최소 10자)"
+                placeholder="자세한 내용을 입력해주세요"
                 rows={6}
+                maxLength={CONTENT_MAX}
+                autoComplete="off"
                 className="w-full rounded-xl border px-4 py-3 text-sm text-[#4A3B5C] outline-none resize-none transition-colors focus-visible:ring-2 focus-visible:ring-[#4A3B5C]/40"
                 style={{
-                  borderColor: "rgba(74, 59, 92, 0.2)",
+                  borderColor: formData.content.length >= CONTENT_MAX
+                    ? "rgba(239, 68, 68, 0.4)"
+                    : "rgba(74, 59, 92, 0.2)",
                   backgroundColor: "rgba(255, 255, 255, 0.85)",
                 }}
                 required

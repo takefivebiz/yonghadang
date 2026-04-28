@@ -310,6 +310,8 @@ export const AnalyzeClient = () => {
 
   // 중복 제출 방지 (모바일 빠른 탭 연타 대응)
   const isSubmittingRef = useRef(false);
+  // 다음 버튼 연타 방지 — 질문 전환 애니메이션 중 중복 클릭 차단
+  const isNextProcessingRef = useRef(false);
   // handleBack 최신 참조 (브라우저 뒤로가기 이벤트 핸들러에서 사용)
   const handleBackRef = useRef<() => void>(() => {});
 
@@ -393,10 +395,19 @@ export const AnalyzeClient = () => {
   }, [router, answers, questions, category, subcategory, queryType]);
 
   const handleNext = useCallback(() => {
+    // 연타 방지: 이미 처리 중이면 무시
+    if (isNextProcessingRef.current || isSubmittingRef.current) return;
+
+    isNextProcessingRef.current = true;
+
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion((n) => n + 1);
+      // 다음 질문 렌더링 후 잠금 해제 (300ms — 빠른 탭 차단)
+      setTimeout(() => { isNextProcessingRef.current = false; }, 300);
     } else {
       handleSubmit();
+      // handleSubmit 내부에서 isSubmittingRef가 true로 전환되므로 별도 해제 불필요
+      isNextProcessingRef.current = false;
     }
   }, [currentQuestion, questions.length, handleSubmit]);
 

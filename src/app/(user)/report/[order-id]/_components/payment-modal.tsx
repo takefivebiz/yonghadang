@@ -1,12 +1,20 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { PendingOrderInput, GuestCheckoutInfo } from '@/types/payment';
 import { generateOrderId, clearPendingOrder } from '@/lib/payment';
 import { getPriceForQuantity, getFullBundlePrice } from '@/lib/pricing';
 import { isMemberLoggedIn, grantGuestAccess } from '@/lib/report-access';
 import { saveLocalOrder } from '@/lib/dummy-orders';
 import { GuestInfoForm } from '@/app/(user)/payments/_components/guest-info-form';
+
+/** 토스페이먼츠 사용자 취소 에러 코드 — 안내 없이 조용히 종료 */
+const TOSS_CANCEL_CODES = new Set([
+  'PAY_PROCESS_CANCELED',
+  'USER_CANCEL',
+  'ABORT',
+]);
 
 interface PaymentModalProps {
   pendingOrder: PendingOrderInput;
@@ -246,6 +254,17 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
           // 롤백 실패 시 무시
         }
         sessionStorage.removeItem(`payment_snapshot_${pendingOrder.sessionId}`);
+      }
+
+      // 사용자 취소는 조용히 종료, 그 외 오류(네트워크 단절, 서버 오류 등)는 toast 안내
+      const errorCode = (error as { code?: string })?.code ?? '';
+      if (!TOSS_CANCEL_CODES.has(errorCode)) {
+        const isNetworkError = !navigator.onLine || errorCode === 'NETWORK_ERROR';
+        toast.error(
+          isNetworkError
+            ? '네트워크 연결이 불안정해요. 연결 상태를 확인 후 다시 시도해주세요.'
+            : '결제 중 오류가 발생했어요. 다시 시도해주세요.',
+        );
       }
 
       setIsPaying(false);

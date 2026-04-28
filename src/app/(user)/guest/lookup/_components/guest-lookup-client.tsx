@@ -89,6 +89,9 @@ export const GuestLookupClient = () => {
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             placeholder="010-0000-0000"
+            maxLength={13}
+            autoComplete="tel"
+            inputMode="numeric"
             className="w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors"
             style={{
               borderColor: "rgba(230, 230, 250, 0.2)",
@@ -121,6 +124,7 @@ export const GuestLookupClient = () => {
             placeholder="숫자 4자리"
             maxLength={4}
             inputMode="numeric"
+            autoComplete="off"
             className="w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors"
             style={{
               borderColor: "rgba(230, 230, 250, 0.2)",

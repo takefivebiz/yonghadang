@@ -114,13 +114,18 @@ export const GuestInfoForm = ({
             id="guest-password"
             type="password"
             autoComplete="off"
-            placeholder="4자 이상 입력"
+            placeholder="숫자 4자리"
+            maxLength={4}
+            inputMode="numeric"
             value={value.password}
             aria-invalid={passwordError !== null}
             aria-describedby={
               passwordError ? "guest-password-error" : undefined
             }
-            onChange={(e) => onChange({ ...value, password: e.target.value })}
+            onChange={(e) => {
+              const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+              onChange({ ...value, password: v });
+            }}
             className="w-full rounded-xl border px-4 py-3 text-sm outline-none transition-colors duration-200"
             style={{
               borderColor: passwordError
