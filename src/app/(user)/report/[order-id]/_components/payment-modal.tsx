@@ -5,7 +5,7 @@ import { PendingOrderInput, GuestCheckoutInfo } from '@/types/payment';
 import { generateOrderId, clearPendingOrder } from '@/lib/payment';
 import { getPriceForQuantity, getFullBundlePrice } from '@/lib/pricing';
 import { isMemberLoggedIn, grantGuestAccess } from '@/lib/report-access';
-import { saveLocalOrder, verifyGuestOrder } from '@/lib/dummy-orders';
+import { saveLocalOrder } from '@/lib/dummy-orders';
 import { GuestInfoForm } from '@/app/(user)/payments/_components/guest-info-form';
 
 interface PaymentModalProps {
@@ -141,22 +141,15 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
 
   const handlePayment = async () => {
     if (!isLoggedIn && !validateGuest()) return;
-
-    // 비회원 결제 시 전화번호+비밀번호 검증
-    if (!isLoggedIn) {
-      const ok = verifyGuestOrder(pendingOrder.sessionId, guestInfo.phoneNumber, guestInfo.password);
-      if (!ok) {
-        setPasswordError('전화번호 또는 비밀번호가 일치하지 않아요.');
-        setIsPaying(false);
-        return;
-      }
-      // ✅ 결제 직전에 토큰 발급 (결제 후 본인확인 없이 리포트 접근)
-      grantGuestAccess(pendingOrder.sessionId);
-    }
-
     if (!widgetRef.current) return;
 
     setIsPaying(true);
+
+    // ✅ 비회원 결제 시: 결제 직전에 토큰 발급 (결제 후 본인확인 불필요)
+    // 실제 비밀번호 검증은 나중에 토큰 만료 후 본인확인 페이지에서 함
+    if (!isLoggedIn) {
+      grantGuestAccess(pendingOrder.sessionId);
+    }
 
     try {
       const orderId = pendingOrder.orderId ?? generateOrderId();
