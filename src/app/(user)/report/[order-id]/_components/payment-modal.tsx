@@ -171,10 +171,14 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
       const snapshotItems = sessionStorage.getItem(purchasedKey);
       const snapshotAxes = sessionStorage.getItem(axesKey);
 
-      // 📌 결제 전 구매 정보를 모두 sessionStorage에 저장 (redirect 후 복원)
+      // 📌 결제 전 구매 정보를 sessionStorage + localStorage 모두 저장 (redirect·재방문 후 복원)
       const existing = JSON.parse(snapshotItems || '[]') as string[];
       const merged = [...new Set([...existing, ...pendingOrder.paidQuestionIds])];
       sessionStorage.setItem(purchasedKey, JSON.stringify(merged));
+      // localStorage에도 저장 (탭 닫기·재방문 시 복원용)
+      try {
+        localStorage.setItem(`corelog:purchased_ids_${pendingOrder.sessionId}`, JSON.stringify(merged));
+      } catch { /* 쿼터 초과 무시 */ }
 
       // 📌 구매된 축 저장 (sessionStorage + localStorage 모두 저장)
       // sessionStorage는 redirect 후 초기화될 수 있으므로 localStorage에도 저장
@@ -201,6 +205,14 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
 
       // redirect 전에 미리 제거 (Toss 결제 성공 후 새 페이지 로드 시 모달이 다시 열리지 않도록)
       clearPendingOrder();
+
+      // 비회원 비밀번호 해시 저장 (토큰 만료 후 GuestAuthForm 재인증 시 사용)
+      // TODO: [백엔드 연동] 서버에서 bcrypt로 교체, 클라이언트 저장 제거
+      if (!isLoggedIn) {
+        try {
+          localStorage.setItem(`corelog:guest_pwd_${pendingOrder.sessionId}`, btoa(guestInfo.password));
+        } catch { /* 쿼터 초과 무시 */ }
+      }
 
       // 📌 결제 후 order 업데이트 (비회원은 anonymous 유지, paidQuestionIds만 저장)
       // grantGuestAccess로 30분 토큰 발급했으므로, 결제 직후 본인확인 불필요

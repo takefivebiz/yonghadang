@@ -76,13 +76,15 @@ export const ReportClient = ({ order: initialOrder, report, initialAnalysisSessi
     }
 
     const authed =
-      order.ownerType === 'anonymous'
-        ? true // 비회원 무료리포트는 인증 불필요
+      order.ownerType === 'anonymous' && !order.paid
+        ? true // 무료 비회원 — 인증 불필요 (URL 공유 시 누구나 열람 가능)
         : order.ownerType === 'member'
         // 로그인 여부 + memberId 일치 여부 동시 검증 (타인의 리포트 접근 차단)
         // TODO: [백엔드 연동] 서버에서 Supabase RLS로 소유권 검증
         ? isMemberLoggedIn() && getMemberProfile()?.memberId === order.memberId
-        : hasGuestAccess(order.id); // 'guest'는 전화번호+비밀번호 인증 필요
+        // 'guest' 또는 유료 결제한 anonymous — 30분 grantGuestAccess 토큰 필요
+        // 토큰 만료 후 재접근 시 GuestAuthForm(전화번호+비밀번호)으로 본인 확인
+        : hasGuestAccess(order.id);
 
     if (!authed) {
       setView('auth');

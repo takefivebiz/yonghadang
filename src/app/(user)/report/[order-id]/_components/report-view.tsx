@@ -26,17 +26,32 @@ export const ReportView = ({ report, order }: ReportViewProps) => {
   const [selectFullBundle, setSelectFullBundle] = useState(false);
   // 탭 재오픈 시 결제 진행 중이던 주문 복원
   const [pendingOrder, setPendingOrder] = useState<PendingOrderInput | null>(() => readPendingOrder());
+  /**
+   * 이미 열람한 리포트는 TypewriterText 애니메이션 없이 즉시 표시.
+   * localStorage 플래그로 판단하여 매 새로고침·재방문 시 재애니메이션 방지.
+   */
+  const [instantText, setInstantText] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return !!localStorage.getItem(`corelog:report_viewed_${report.sessionId}`);
+  });
   const { freeReport, paidQuestions, category, createdAt } = report;
 
-  // 결제 완료된 질문 ID (sessionStorage + localStorage + order 기반)
-  const [localPurchasedIds] = useState<string[]>(() => {
+  /**
+   * 결제 완료된 질문 ID (sessionStorage → localStorage → order 순서로 복원).
+   * 탭 닫기·재방문 후에도 localStorage에서 복원되도록 3단 fallback 구조.
+   */
+  const [localPurchasedIds, setLocalPurchasedIds] = useState<string[]>(() => {
     if (typeof window === 'undefined') return [];
     try {
-      // sessionStorage 우선
+      // 1. sessionStorage 우선 (동일 탭 결제 직후)
       const sessionIds = JSON.parse(sessionStorage.getItem(`purchased_${report.sessionId}`) || '[]') as string[];
       if (sessionIds.length > 0) return sessionIds;
 
-      // sessionStorage가 없으면 order.paidQuestionIds 확인 (비회원 재진입 시)
+      // 2. localStorage (탭 닫기·새 탭 재방문 시 복원)
+      const localIds = JSON.parse(localStorage.getItem(`corelog:purchased_ids_${report.sessionId}`) || '[]') as string[];
+      if (localIds.length > 0) return localIds;
+
+      // 3. order.paidQuestionIds fallback (report-client 폴링으로 주입된 경우)
       if (order?.paidQuestionIds && order.paidQuestionIds.length > 0) {
         return order.paidQuestionIds;
       }
@@ -61,6 +76,28 @@ export const ReportView = ({ report, order }: ReportViewProps) => {
       return [];
     }
   });
+
+  // 첫 열람 직후 localStorage에 플래그만 저장 → 다음 방문부터 instant=true 적용
+  // (현재 세션에는 setInstantText 하지 않아 첫 방문 애니메이션은 유지)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(`corelog:report_viewed_${report.sessionId}`, '1');
+  // 의도적으로 마운트 1회만 실행
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // report-client 폴링으로 order.paidQuestionIds가 갱신되면 localPurchasedIds에 병합
+  useEffect(() => {
+    if (!order?.paidQuestionIds || order.paidQuestionIds.length === 0) return;
+    setLocalPurchasedIds(prev => {
+      const merged = [...new Set([...prev, ...order.paidQuestionIds!])];
+      // localStorage에도 동기화 (재방문 시 복원용)
+      try {
+        localStorage.setItem(`corelog:purchased_ids_${report.sessionId}`, JSON.stringify(merged));
+      } catch { /* 쿼터 초과 무시 */ }
+      return merged;
+    });
+  }, [order?.paidQuestionIds, report.sessionId]);
 
   // 결제 성공 후 purchasedAxes 동기화 (localStorage 변경 감시)
   useEffect(() => {
@@ -146,12 +183,27 @@ export const ReportView = ({ report, order }: ReportViewProps) => {
   };
 
   const handlePaymentSuccess = () => {
+    if (typeof window === 'undefined') return;
+
     // 구매된 축 기록 (sessionStorage)
-    if (currentAxis && typeof window !== 'undefined') {
+    if (currentAxis) {
       const existing = JSON.parse(sessionStorage.getItem(`purchased_axes_${report.sessionId}`) || '[]') as number[];
       const newAxes = [...existing, currentAxis];
       sessionStorage.setItem(`purchased_axes_${report.sessionId}`, JSON.stringify(newAxes));
       setPurchasedAxes(newAxes);
+    }
+
+    // 결제 성공한 질문 IDs를 localPurchasedIds + localStorage에 즉시 반영
+    // (payment-modal이 Toss redirect 없이 resolve 되는 경우 sessionStorage만으로 동기화)
+    const purchased = pendingOrder?.paidQuestionIds ?? finalSelectedQuestions;
+    if (purchased.length > 0) {
+      setLocalPurchasedIds(prev => {
+        const merged = [...new Set([...prev, ...purchased])];
+        try {
+          localStorage.setItem(`corelog:purchased_ids_${report.sessionId}`, JSON.stringify(merged));
+        } catch { /* 쿼터 초과 무시 */ }
+        return merged;
+      });
     }
 
     setPendingOrder(null);
@@ -181,7 +233,7 @@ export const ReportView = ({ report, order }: ReportViewProps) => {
           <div className="mb-6">
             <span className="text-xs font-semibold" style={{ color: '#B0B0FF' }}>FREE INSIGHT</span>
             <h1 className="mt-2 text-2xl font-bold leading-relaxed md:text-3xl" style={{ color: '#F5F5F5' }}>
-              <TypewriterText text={freeReport.headline} speed={25} />
+              <TypewriterText text={freeReport.headline} speed={25} instant={instantText} />
             </h1>
           </div>
 
@@ -194,7 +246,7 @@ export const ReportView = ({ report, order }: ReportViewProps) => {
                 <div className="space-y-3">
                   {section.paragraphs.map((para, pIdx) => (
                     <p key={pIdx} className="text-sm leading-relaxed" style={{ color: '#D0D0D0' }}>
-                      <TypewriterText text={para} speed={20} />
+                      <TypewriterText text={para} speed={20} instant={instantText} />
                     </p>
                   ))}
                 </div>
@@ -205,7 +257,7 @@ export const ReportView = ({ report, order }: ReportViewProps) => {
           {/* 결핍 문장 */}
           <div className="mt-8 rounded-xl border-l-4 border-[#6495ED] bg-blue-500/20 p-4 backdrop-blur-sm" style={{ borderLeftColor: '#6495ED' }}>
             <p className="text-sm font-medium leading-relaxed" style={{ color: '#F5F5F5' }}>
-              <TypewriterText text={freeReport.deficitSentence} speed={25} />
+              <TypewriterText text={freeReport.deficitSentence} speed={25} instant={instantText} />
             </p>
           </div>
         </section>
@@ -230,7 +282,7 @@ export const ReportView = ({ report, order }: ReportViewProps) => {
                           <div className="space-y-3">
                             {section.paragraphs.map((para, pIdx) => (
                               <p key={pIdx} className="text-sm leading-relaxed" style={{ color: '#D0D0D0' }}>
-                                <TypewriterText text={para} speed={20} />
+                                <TypewriterText text={para} speed={20} instant={instantText} />
                               </p>
                             ))}
                           </div>

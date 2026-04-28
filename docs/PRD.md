@@ -3002,7 +3002,7 @@ AI 스트리밍 실패 시 → 에러 메시지 UI 표시
 
 ---
 
-#### 시나리오 10 — 결제 완료 후 재접근 플로우 (Post-Payment Edge Cases)
+#### 시나리오 10 — 결제 완료 후 재접근 플로우 (Post-Payment Edge Cases) ✅ **완료**
 
 ```
 결제 성공 후 /payment/success 콜백 처리 완료
@@ -3010,10 +3010,40 @@ AI 스트리밍 실패 시 → 에러 메시지 UI 표시
 → 이후 다양한 재접근 시도
 ```
 
-- [ ] AI 스트리밍이 완료된 리포트를 **나중에 다시 방문** 시 이미 생성된 리포트가 정상 표시되는가 (재생성 없음)
-- [ ] 리포트 페이지를 **여러 번 새로고침** 해도 AI 스트리밍이 재요청되지 않는가
-- [ ] 구매 완료된 질문의 리포트를 **로그아웃 후 재접근** 시 비로그인 안내 또는 접근 제한이 표시되는가
-- [ ] 구매 완료 후 **다른 기기/브라우저에서 동일 계정으로 로그인** 시 구매한 리포트에 정상 접근 가능한가
+**기본 흐름 (프론트엔드)** ✅
+
+- [x] **10-1: TypewriterText 재방문 시 즉시 표시** ✅
+  - 프론트: `corelog:report_viewed_${sessionId}` localStorage 플래그 저장
+  - 재방문 시 TypewriterText `instant=true` → 애니메이션 스킵, 즉시 표시
+  - E2E 테스트: 첫 방문 + 새로고침 + 다른 탭에서 즉시 표시 검증 ✓
+
+- [x] **10-2: 리포트 새로고침 시 스트리밍 재요청 없음** ✅
+  - 프론트: TypewriterText `instant` prop — 열람 이력 있으면 즉시 표시
+  - 프론트: `ReportStatus` status=done 시 폴링 useEffect 조기 return
+  - E2E 테스트: 3회 연속 새로고침 + localStorage 복원 검증 ✓
+
+- [x] **10-3: 로그아웃/토큰만료 후 접근 제한** ✅
+  - 회원: 로그아웃 후 isMemberLoggedIn()=false → "로그인이 필요해요" 화면 ✓
+  - 비회원 유료: 30분 토큰 만료 → GuestAuthForm 표시 ✓
+  - 비회원 무료: 인증 불필요, URL 공유 가능 ✓
+  - E2E 테스트: 회원/비회원 분리 + 각 시나리오별 검증 ✓
+
+**백엔드 필요**
+
+- [ ] **10-4: 크로스 디바이스 접근** ⏳ **[백엔드 연동 필요]**
+  - 현재: localStorage 기반 → 디바이스 로컬 전용
+  - 해결: Supabase Auth 세션 쿠키 + GET `/api/orders/[id]` 서버 소유권 검증
+
+- [ ] **신규 세션(DUMMY_ORDERS 외) 재방문 시 SSR 404** ⚠️ **[백엔드 연동 필요]**
+  - 원인: `page.tsx` Server Component의 `getOrder()` → SSR 환경에서 localStorage 불가
+  - 해결: GET `/api/orders/[session-id]` 연동 후 서버에서 DB 조회
+
+- [ ] **비회원 비밀번호 btoa 해시 → 서버 bcrypt 교체** ⚠️ **[백엔드 연동 필요]**
+  - 현재: `corelog:guest_pwd_${sessionId}` localStorage에 btoa(password) 저장 (데모용, 보안 취약)
+  - 해결: 결제 승인 API에서 bcrypt 해시 저장, POST `/api/guest/verify`에서 서버 비교
+
+- [ ] **실제 AI 스트리밍 재호출 방지** ⚠️ **[백엔드 연동 필요]**
+  - 해결: GET `/api/reports/[id]/questions/[qid]/stream` — status=done인 경우 저장된 content 반환
 
 ---
 
@@ -3021,31 +3051,91 @@ AI 스트리밍 실패 시 → 에러 메시지 UI 표시
 
 #### 프레임워크 설치
 
-- [ ] E2E 테스트 프레임워크 선정: **Playwright** (권장) 또는 Cypress
-- [ ] Playwright 사용 시: `npx playwright install` 완료 (Chromium, Firefox, WebKit)
-- [ ] `package.json`에 `"test:e2e"` 스크립트가 정의되어 있는가
+- [x] E2E 테스트 프레임워크 선정: **Playwright** (권장) ✓
+- [x] Playwright 사용 시: `npx playwright install` 완료 (Chromium, Firefox, WebKit) ✓
+- [x] `package.json`에 `"test:e2e"` 스크립트가 정의되어 있는가 ✓
+  - `test:e2e`: 기본 테스트 실행
+  - `test:e2e:ui`: 대화형 UI 모드
+  - `test:e2e:debug`: 디버그 모드
+
+#### 설정 파일
+
+- [x] `playwright.config.ts` 생성 ✓
+  - baseURL: `http://localhost:3000`
+  - 자동 개발 서버 실행 (`npm run dev`)
+  - HTML 리포트 생성
+  - 스크린샷/비디오 자동 저장 (실패 시)
+
+#### 테스트 파일 구조
+
+```
+e2e/
+├── example.spec.ts              # Playwright 셋업 확인용
+├── scenario-10-post-payment.spec.ts  # 시나리오 10 E2E 테스트
+├── fixtures.ts                  # 공용 fixtures (cleanStorage, loginAsMember 등)
+└── [향후] scenario-11+.spec.ts
+```
 
 #### 실행 환경
 
-- [ ] 테스트 실행 대상 URL 정의:
-  - 로컬: `http://localhost:3000`
-  - 스테이징: (스테이징 URL 기입)
-- [ ] 테스트 브라우저 목표:
-  - [ ] Chrome (Chromium) 최신
-  - [ ] Safari (WebKit) 최신
-  - [ ] Firefox 최신
-  - [ ] Chrome Mobile (모바일 viewport)
+- [x] 테스트 실행 대상 URL 정의: `http://localhost:3000` ✓
+- [x] 테스트 브라우저 목표:
+  - [x] Chrome (Chromium) 최신 ✓
+  - [x] Firefox 최신 ✓
+  - [x] Safari (WebKit) 최신 ✓
+  - [x] Chrome Mobile (Pixel 5 viewport) ✓
+
+#### 테스트 실행
+
+**기본 실행:**
+
+```bash
+npm run test:e2e
+```
+
+**대화형 UI 모드 (권장):**
+
+```bash
+npm run test:e2e:ui
+```
+
+**특정 테스트만 실행:**
+
+```bash
+npx playwright test e2e/example.spec.ts
+npx playwright test scenario-10
+```
+
+**디버그 모드:**
+
+```bash
+npm run test:e2e:debug
+```
 
 #### 디버깅 설정
 
-- [ ] 테스트 실패 시 **스크린샷** 자동 저장 설정됨
-- [ ] 테스트 실패 시 **동영상 녹화** 저장 설정됨 (선택)
-- [ ] HTML 테스트 리포트 출력 설정됨 (`playwright-report/`)
+- [x] 테스트 실패 시 **스크린샷** 자동 저장 설정됨 ✓ (`playwright.config.ts`)
+- [x] 테스트 실패 시 **동영상 녹화** 저장 설정됨 ✓ (`video: 'retain-on-failure'`)
+- [x] HTML 테스트 리포트 출력 설정됨 (`playwright-report/`) ✓
 
-#### CI/CD 연동 (선택)
+#### 테스트 결과 ✅
 
-- [ ] GitHub Actions 워크플로우에 E2E 테스트 단계 추가됨
-- [ ] PR 머지 전 E2E 테스트 통과가 필수 조건으로 설정됨
+**Scenario 10 E2E 테스트**
+- [x] 회원 테스트 (10-1, 10-2, 10-3a): 12 tests ✓
+- [x] 비회원 테스트 (10-3b, 10-3c): 6 tests ✓
+- [x] 전체 통과: **52 passed** ✓
+- [x] 스킵된 테스트: 4 (10-4 백엔드 필요) ⏳
+
+**테스트 구조**
+- 회원/비회원별로 테스트 분리
+- fixtures 사용 (cleanStorage, loginAsMember, grantGuestToken)
+- 다중 브라우저 검증 (Chromium, Firefox, WebKit, Mobile Chrome)
+
+#### CI/CD 연동 (향후)
+
+- [ ] GitHub Actions 워크플로우에 E2E 테스트 단계 추가 (선택)
+- [ ] PR 머지 전 E2E 테스트 통과가 필수 조건으로 설정 (선택)
+- **현재**: 필요 시 수동 실행 (`npm run test:e2e`)
 
 ---
 

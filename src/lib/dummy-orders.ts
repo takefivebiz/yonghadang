@@ -103,7 +103,9 @@ export const listAllOrders = (): Order[] => [
 
 /**
  * 전화번호 + 비밀번호 + session-id 로 비회원 주문 검증.
- * TODO: [백엔드 연동] POST /api/orders/verify 로 교체 (비밀번호 bcrypt 비교는 서버에서)
+ * - 'guest': DB 고정 ownerType (백엔드 연동 후 사용)
+ * - 'anonymous' + paid:true: 결제한 비회원 (프론트 더미 단계에서의 ownerType)
+ * TODO: [백엔드 연동] POST /api/orders/verify 로 교체 (bcrypt 비교는 서버에서)
  */
 export const verifyGuestOrder = (
   sessionId: string,
@@ -111,25 +113,41 @@ export const verifyGuestOrder = (
   password: string,
 ): boolean => {
   const order = getOrder(sessionId);
-  if (!order || order.ownerType !== 'guest') return false;
+  if (!order) return false;
 
-  // 유료 구매 여부 확인 — paid가 true여야만 guest 세션으로 인정
-  // TODO: [백엔드 연동] 서버에서 order.paid 필드 검증
-  if (!order.paid) {
-    return false;
-  }
+  // 유료 구매 여부 확인
+  if (!order.paid) return false;
 
-  // 데모용 비밀번호 매핑 (실제로는 DB에서 해시된 비밀번호를 비교해야 함)
+  // 'guest' 또는 결제한 'anonymous' 모두 본인확인 허용
+  // (백엔드 연동 전 프론트 단계에서는 anonymous+paid로 유지됨)
+  if (order.ownerType !== 'guest' && order.ownerType !== 'anonymous') return false;
+
+  const normalize = (v: string): string => v.replace(/\D/g, '');
+
+  // 전화번호 검증
+  if (normalize(order.phoneNumber ?? '') !== normalize(phoneNumber)) return false;
+
+  // 비밀번호 검증 — 데모 계정은 하드코딩, 로컬 생성 주문은 localStorage 해시로 검증
+  // TODO: [백엔드 연동] 서버에서 bcrypt 해시로 교체
   const demoPasswords: Record<string, string> = {
     'sess_demo_guest_love': '1234',
     'sess_demo_guest_emotion': '1234',
     'sess_demo_guest_relation': '1234',
   };
 
-  const normalize = (v: string): string => v.replace(/\D/g, '');
+  if (demoPasswords[sessionId] !== undefined) {
+    return demoPasswords[sessionId] === password;
+  }
 
-  return (
-    normalize(order.phoneNumber ?? '') === normalize(phoneNumber) &&
-    demoPasswords[sessionId] === password
-  );
+  // 로컬에서 결제된 주문 — payment-modal이 저장한 btoa 해시로 검증
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = window.localStorage.getItem(`corelog:guest_pwd_${sessionId}`);
+      return stored !== null && stored === btoa(password);
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
 };

@@ -1,0 +1,1094 @@
+
+> corelog@0.1.0 test:e2e
+> playwright test
+
+
+Running 52 tests using 4 workers
+
+  ✘   3 [chromium] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 (247ms)
+✓ chromium - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.15 Safari/537.36
+  ✓   1 [chromium] › e2e/example.spec.ts:23:3 › Playwright 셋업 확인 › Playwright 브라우저 정보 (1.1s)
+  ✓   4 [chromium] › e2e/example.spec.ts:8:3 › Playwright 셋업 확인 › localhost:3000 접근 가능 (1.1s)
+  ✘   7 [chromium] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 (4.7s)
+  ✘   8 [chromium] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 (707ms)
+  ✘   9 [chromium] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 (173ms)
+  ✘   6 [chromium] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 (6.6s)
+  ✘   2 [chromium] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 (7.8s)
+  ✘   5 [chromium] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 (6.6s)
+⚠️  백엔드 연동 필요: Supabase Auth 세션 쿠키 + 서버 DB 조회
+  ✘  10 [chromium] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 (278ms)
+  -  12 [chromium] › e2e/scenario-10-post-payment.spec.ts:245:3 › 시나리오 10-4: 크로스 디바이스 접근 (백엔드 필요) › ⚠️  백엔드 연동 필요: Supabase Auth 세션 쿠키 기반 접근
+✓ 비회원 무료 리포트: 인증 불필요 (URL 공유 가능)
+  ✓  11 [chromium] › e2e/scenario-10-post-payment.spec.ts:218:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원 무료 리포트: 로그아웃 불가(인증 자체 불필요) (2.2s)
+  ✓  14 [firefox] › e2e/example.spec.ts:8:3 › Playwright 셋업 확인 › localhost:3000 접근 가능 (2.2s)
+✓ firefox - Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0.2) Gecko/20100101 Firefox/148.0.2
+  ✘  17 [firefox] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 (685ms)
+  ✓  16 [firefox] › e2e/example.spec.ts:23:3 › Playwright 셋업 확인 › Playwright 브라우저 정보 (1.8s)
+  ✘  13 [chromium] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 (6.4s)
+  ✘  15 [firefox] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 (7.4s)
+  ✘  21 [firefox] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 (1.2s)
+  ✘  18 [firefox] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 (6.4s)
+  ✘  20 [firefox] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 (5.1s)
+  ✘  19 [firefox] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 (7.1s)
+  ✘  22 [firefox] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 (1.1s)
+  ✘  23 [firefox] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 (1.5s)
+⚠️  백엔드 연동 필요: Supabase Auth 세션 쿠키 + 서버 DB 조회
+  -  25 [firefox] › e2e/scenario-10-post-payment.spec.ts:245:3 › 시나리오 10-4: 크로스 디바이스 접근 (백엔드 필요) › ⚠️  백엔드 연동 필요: Supabase Auth 세션 쿠키 기반 접근
+✓ 비회원 무료 리포트: 인증 불필요 (URL 공유 가능)
+  ✓  24 [firefox] › e2e/scenario-10-post-payment.spec.ts:218:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원 무료 리포트: 로그아웃 불가(인증 자체 불필요) (4.1s)
+  ✓  27 [webkit] › e2e/example.spec.ts:8:3 › Playwright 셋업 확인 › localhost:3000 접근 가능 (1.8s)
+  ✘  29 [webkit] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 (359ms)
+✓ webkit - Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.4 Safari/605.1.15
+  ✓  30 [webkit] › e2e/example.spec.ts:23:3 › Playwright 셋업 확인 › Playwright 브라우저 정보 (1.7s)
+  ✘  26 [firefox] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 (8.0s)
+  ✘  28 [webkit] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 (7.0s)
+  ✘  32 [webkit] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 (6.6s)
+  ✘  31 [webkit] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 (7.4s)
+  ✘  34 [webkit] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 (1.3s)
+  ✘  35 [webkit] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 (745ms)
+  ✘  37 [webkit] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 (743ms)
+  ✘  33 [webkit] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 (4.8s)
+⚠️  백엔드 연동 필요: Supabase Auth 세션 쿠키 + 서버 DB 조회
+  -  38 [webkit] › e2e/scenario-10-post-payment.spec.ts:245:3 › 시나리오 10-4: 크로스 디바이스 접근 (백엔드 필요) › ⚠️  백엔드 연동 필요: Supabase Auth 세션 쿠키 기반 접근
+✓ 비회원 무료 리포트: 인증 불필요 (URL 공유 가능)
+  ✓  36 [webkit] › e2e/scenario-10-post-payment.spec.ts:218:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원 무료 리포트: 로그아웃 불가(인증 자체 불필요) (3.6s)
+  ✓  40 [Mobile Chrome] › e2e/example.spec.ts:8:3 › Playwright 셋업 확인 › localhost:3000 접근 가능 (1.3s)
+  ✘  42 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 (262ms)
+✓ chromium - Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.15 Mobile Safari/537.36
+  ✓  43 [Mobile Chrome] › e2e/example.spec.ts:23:3 › Playwright 셋업 확인 › Playwright 브라우저 정보 (863ms)
+  ✘  39 [webkit] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 (7.6s)
+  ✘  41 [Mobile Chrome] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 (6.8s)
+  ✘  44 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 (6.8s)
+  ✘  45 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 (6.4s)
+  ✘  47 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 (1.3s)
+  ✘  48 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 (243ms)
+  ✘  49 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 (210ms)
+⚠️  백엔드 연동 필요: Supabase Auth 세션 쿠키 + 서버 DB 조회
+  -  51 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:245:3 › 시나리오 10-4: 크로스 디바이스 접근 (백엔드 필요) › ⚠️  백엔드 연동 필요: Supabase Auth 세션 쿠키 기반 접근
+  ✘  46 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 (4.6s)
+✓ 비회원 무료 리포트: 인증 불필요 (URL 공유 가능)
+  ✓  50 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:218:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원 무료 리포트: 로그아웃 불가(인증 자체 불필요) (2.2s)
+  ✘  52 [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 (6.4s)
+
+
+  1) [chromium] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 ─────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=FREE INSIGHT')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=FREE INSIGHT')[22m
+
+
+      18 |     // 무료 리포트 섹션이 로드됨
+      19 |     const freeReport = page.locator('text=FREE INSIGHT');
+    > 20 |     await expect(freeReport).toBeVisible({ timeout: 5000 });
+         |                              ^
+      21 |   });
+      22 |
+      23 |   test('Playwright 브라우저 정보', async ({ page, browserName }) => {
+        at /Users/suyeon/Desktop/corelog/e2e/example.spec.ts:20:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/example-Playwright-셋업-확인-리포트-페이지-접근-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/example-Playwright-셋업-확인-리포트-페이지-접근-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/example-Playwright-셋업-확인-리포트-페이지-접근-chromium/error-context.md
+
+  2) [chromium] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:20:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-chromium/error-context.md
+
+  3) [chromium] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      44 |
+      45 |     const headline = page.locator('text=/당신의|연애/').first();
+    > 46 |     await expect(headline).toBeVisible();
+         |                            ^
+      47 |
+      48 |     // 2. 새로고침
+      49 |     const reloadStart = Date.now();
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:46:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-chromium/error-context.md
+
+  4) [chromium] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      68 |
+      69 |     const headline = page1.locator('text=/당신의|연애/').first();
+    > 70 |     await expect(headline).toBeVisible({ timeout: 5000 });
+         |                            ^
+      71 |
+      72 |     // 2. 두 번째 탭: 동일 URL로 새로 접근
+      73 |     const page2 = await context.newPage();
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:70:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-7d45c-에서-재접근-TypewriterText-즉시-표시-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-7d45c-에서-재접근-TypewriterText-즉시-표시-chromium/error-context.md
+
+  5) [chromium] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=FREE INSIGHT').first()
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for locator('text=FREE INSIGHT').first()[22m
+
+
+      94 |     // 1. 무료 리포트 섹션 확인 (status='done' → ReportStatus 폴링 스킵)
+      95 |     const freeReport = page.locator('text=FREE INSIGHT').first();
+    > 96 |     await expect(freeReport).toBeVisible({ timeout: 3000 });
+         |                              ^
+      97 |
+      98 |     // 2. 3회 연속 새로고침
+      99 |     for (let i = 1; i <= 3; i++) {
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:96:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-chromium/error-context.md
+
+  6) [chromium] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 
+
+    Error: page.evaluate: ReferenceError: DEMO_SESSION is not defined
+        at eval (eval at evaluate (:302:30), <anonymous>:3:53)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at eval (eval at evaluate (:302:30), <anonymous>:3:53)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:119:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-chromium/error-context.md
+
+  7) [chromium] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:140:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-chromium/error-context.md
+
+  8) [chromium] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'sessionStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:178:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-chromium/error-context.md
+
+  9) [chromium] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      275 |
+      276 |     const headline = page.locator('text=/당신의|연애/').first();
+    > 277 |     await expect(headline).toBeVisible({ timeout: 5000 });
+          |                            ^
+      278 |
+      279 |     // 2. 유료 질문 선택 시뮬레이션
+      280 |     const questionIds = ['q1_axis1', 'q2_axis1', 'q3_axis1'];
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:277:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-chromium/error-context.md
+
+  10) [firefox] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 ─────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=FREE INSIGHT')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=FREE INSIGHT')[22m
+
+
+      18 |     // 무료 리포트 섹션이 로드됨
+      19 |     const freeReport = page.locator('text=FREE INSIGHT');
+    > 20 |     await expect(freeReport).toBeVisible({ timeout: 5000 });
+         |                              ^
+      21 |   });
+      22 |
+      23 |   test('Playwright 브라우저 정보', async ({ page, browserName }) => {
+        at /Users/suyeon/Desktop/corelog/e2e/example.spec.ts:20:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/example-Playwright-셋업-확인-리포트-페이지-접근-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/example-Playwright-셋업-확인-리포트-페이지-접근-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/example-Playwright-셋업-확인-리포트-페이지-접근-firefox/error-context.md
+
+  11) [firefox] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 
+
+    Error: page.evaluate: The operation is insecure.
+    @debugger eval code line 302 > eval:2:7
+    evaluate@debugger eval code:304:16
+    @debugger eval code:1:44
+
+        at @debugger eval code line 302 > eval:2:7
+        at evaluate@debugger eval code:304:16
+        at @debugger eval code:1:44
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:20:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-firefox/error-context.md
+
+  12) [firefox] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      44 |
+      45 |     const headline = page.locator('text=/당신의|연애/').first();
+    > 46 |     await expect(headline).toBeVisible();
+         |                            ^
+      47 |
+      48 |     // 2. 새로고침
+      49 |     const reloadStart = Date.now();
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:46:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-firefox/error-context.md
+
+  13) [firefox] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      68 |
+      69 |     const headline = page1.locator('text=/당신의|연애/').first();
+    > 70 |     await expect(headline).toBeVisible({ timeout: 5000 });
+         |                            ^
+      71 |
+      72 |     // 2. 두 번째 탭: 동일 URL로 새로 접근
+      73 |     const page2 = await context.newPage();
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:70:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-7d45c-에서-재접근-TypewriterText-즉시-표시-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-7d45c-에서-재접근-TypewriterText-즉시-표시-firefox/error-context.md
+
+  14) [firefox] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=FREE INSIGHT').first()
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for locator('text=FREE INSIGHT').first()[22m
+
+
+      94 |     // 1. 무료 리포트 섹션 확인 (status='done' → ReportStatus 폴링 스킵)
+      95 |     const freeReport = page.locator('text=FREE INSIGHT').first();
+    > 96 |     await expect(freeReport).toBeVisible({ timeout: 3000 });
+         |                              ^
+      97 |
+      98 |     // 2. 3회 연속 새로고침
+      99 |     for (let i = 1; i <= 3; i++) {
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:96:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-firefox/error-context.md
+
+  15) [firefox] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 
+
+    Error: page.evaluate: DEMO_SESSION is not defined
+    @debugger eval code line 302 > eval:3:53
+    evaluate@debugger eval code:304:16
+    @debugger eval code:1:44
+
+        at @debugger eval code line 302 > eval:3:53
+        at evaluate@debugger eval code:304:16
+        at @debugger eval code:1:44
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:119:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-firefox/error-context.md
+
+  16) [firefox] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 
+
+    Error: page.evaluate: The operation is insecure.
+    @debugger eval code line 302 > eval:2:7
+    evaluate@debugger eval code:304:16
+    @debugger eval code:1:44
+
+        at @debugger eval code line 302 > eval:2:7
+        at evaluate@debugger eval code:304:16
+        at @debugger eval code:1:44
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:140:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-firefox/error-context.md
+
+  17) [firefox] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 
+
+    Error: page.evaluate: The operation is insecure.
+    @debugger eval code line 302 > eval:7:7
+    evaluate@debugger eval code:304:16
+    @debugger eval code:1:44
+
+        at @debugger eval code line 302 > eval:7:7
+        at evaluate@debugger eval code:304:16
+        at @debugger eval code:1:44
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:178:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-firefox/error-context.md
+
+  18) [firefox] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      275 |
+      276 |     const headline = page.locator('text=/당신의|연애/').first();
+    > 277 |     await expect(headline).toBeVisible({ timeout: 5000 });
+          |                            ^
+      278 |
+      279 |     // 2. 유료 질문 선택 시뮬레이션
+      280 |     const questionIds = ['q1_axis1', 'q2_axis1', 'q3_axis1'];
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:277:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-firefox/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-firefox/error-context.md
+
+  19) [webkit] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 ──────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=FREE INSIGHT')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=FREE INSIGHT')[22m
+
+
+      18 |     // 무료 리포트 섹션이 로드됨
+      19 |     const freeReport = page.locator('text=FREE INSIGHT');
+    > 20 |     await expect(freeReport).toBeVisible({ timeout: 5000 });
+         |                              ^
+      21 |   });
+      22 |
+      23 |   test('Playwright 브라우저 정보', async ({ page, browserName }) => {
+        at /Users/suyeon/Desktop/corelog/e2e/example.spec.ts:20:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/example-Playwright-셋업-확인-리포트-페이지-접근-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/example-Playwright-셋업-확인-리포트-페이지-접근-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/example-Playwright-셋업-확인-리포트-페이지-접근-webkit/error-context.md
+
+  20) [webkit] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 
+
+    Error: page.evaluate: SecurityError: The operation is insecure.
+
+      18 |     // 1. localStorage 초기화 (새 방문 시뮬레이션)
+      19 |     await page.context().clearCookies();
+    > 20 |     await page.evaluate(() => {
+         |                ^
+      21 |       localStorage.clear();
+      22 |       sessionStorage.clear();
+      23 |     });
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:20:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-webkit/error-context.md
+
+  21) [webkit] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      44 |
+      45 |     const headline = page.locator('text=/당신의|연애/').first();
+    > 46 |     await expect(headline).toBeVisible();
+         |                            ^
+      47 |
+      48 |     // 2. 새로고침
+      49 |     const reloadStart = Date.now();
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:46:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-webkit/error-context.md
+
+  22) [webkit] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      68 |
+      69 |     const headline = page1.locator('text=/당신의|연애/').first();
+    > 70 |     await expect(headline).toBeVisible({ timeout: 5000 });
+         |                            ^
+      71 |
+      72 |     // 2. 두 번째 탭: 동일 URL로 새로 접근
+      73 |     const page2 = await context.newPage();
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:70:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-7d45c-에서-재접근-TypewriterText-즉시-표시-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-7d45c-에서-재접근-TypewriterText-즉시-표시-webkit/error-context.md
+
+  23) [webkit] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=FREE INSIGHT').first()
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for locator('text=FREE INSIGHT').first()[22m
+
+
+      94 |     // 1. 무료 리포트 섹션 확인 (status='done' → ReportStatus 폴링 스킵)
+      95 |     const freeReport = page.locator('text=FREE INSIGHT').first();
+    > 96 |     await expect(freeReport).toBeVisible({ timeout: 3000 });
+         |                              ^
+      97 |
+      98 |     // 2. 3회 연속 새로고침
+      99 |     for (let i = 1; i <= 3; i++) {
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:96:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-webkit/error-context.md
+
+  24) [webkit] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 
+
+    Error: page.evaluate: ReferenceError: Can't find variable: DEMO_SESSION
+
+      117 |
+      118 |     // 1. 구매한 질문 ID를 localStorage에 저장 (결제 완료 상태 시뮬레이션)
+    > 119 |     await page.evaluate(() => {
+          |                ^
+      120 |       const purchasedIds = ['q1_axis1', 'q2_axis1'];
+      121 |       localStorage.setItem(
+      122 |         `corelog:purchased_ids_${DEMO_SESSION}`,
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:119:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-webkit/error-context.md
+
+  25) [webkit] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 
+
+    Error: page.evaluate: SecurityError: The operation is insecure.
+
+      138 |   test('회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시', async ({ page }) => {
+      139 |     // 1. 회원 로그인 상태 시뮬레이션
+    > 140 |     await page.evaluate(() => {
+          |                ^
+      141 |       localStorage.setItem('corelog:member_session', JSON.stringify({
+      142 |         memberId: 'user_demo',
+      143 |         name: '테스트 사용자',
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:140:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-webkit/error-context.md
+
+  26) [webkit] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 
+
+    Error: page.evaluate: SecurityError: The operation is insecure.
+
+      176 |     const guestReportUrl = '/report/sess_demo_guest_love';
+      177 |
+    > 178 |     await page.evaluate((sessionId) => {
+          |                ^
+      179 |       // grantGuestAccess 토큰 저장
+      180 |       const token = {
+      181 |         orderId: sessionId,
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:178:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-webkit/error-context.md
+
+  27) [webkit] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      275 |
+      276 |     const headline = page.locator('text=/당신의|연애/').first();
+    > 277 |     await expect(headline).toBeVisible({ timeout: 5000 });
+          |                            ^
+      278 |
+      279 |     // 2. 유료 질문 선택 시뮬레이션
+      280 |     const questionIds = ['q1_axis1', 'q2_axis1', 'q3_axis1'];
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:277:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-webkit/error-context.md
+
+  28) [Mobile Chrome] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 ───────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=FREE INSIGHT')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=FREE INSIGHT')[22m
+
+
+      18 |     // 무료 리포트 섹션이 로드됨
+      19 |     const freeReport = page.locator('text=FREE INSIGHT');
+    > 20 |     await expect(freeReport).toBeVisible({ timeout: 5000 });
+         |                              ^
+      21 |   });
+      22 |
+      23 |   test('Playwright 브라우저 정보', async ({ page, browserName }) => {
+        at /Users/suyeon/Desktop/corelog/e2e/example.spec.ts:20:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/example-Playwright-셋업-확인-리포트-페이지-접근-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/example-Playwright-셋업-확인-리포트-페이지-접근-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/example-Playwright-셋업-확인-리포트-페이지-접근-Mobile-Chrome/error-context.md
+
+  29) [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:20:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-2dbee--방문-TypewriterText-애니메이션-실행-Mobile-Chrome/error-context.md
+
+  30) [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      44 |
+      45 |     const headline = page.locator('text=/당신의|연애/').first();
+    > 46 |     await expect(headline).toBeVisible();
+         |                            ^
+      47 |
+      48 |     // 2. 새로고침
+      49 |     const reloadStart = Date.now();
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:46:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-f435c-문-새로고침-TypewriterText-즉시-표시-Mobile-Chrome/error-context.md
+
+  31) [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      68 |
+      69 |     const headline = page1.locator('text=/당신의|연애/').first();
+    > 70 |     await expect(headline).toBeVisible({ timeout: 5000 });
+         |                            ^
+      71 |
+      72 |     // 2. 두 번째 탭: 동일 URL로 새로 접근
+      73 |     const page2 = await context.newPage();
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:70:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-7d45c-에서-재접근-TypewriterText-즉시-표시-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-7d45c-에서-재접근-TypewriterText-즉시-표시-Mobile-Chrome/error-context.md
+
+  32) [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=FREE INSIGHT').first()
+    Expected: visible
+    Timeout: 3000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 3000ms[22m
+    [2m  - waiting for locator('text=FREE INSIGHT').first()[22m
+
+
+      94 |     // 1. 무료 리포트 섹션 확인 (status='done' → ReportStatus 폴링 스킵)
+      95 |     const freeReport = page.locator('text=FREE INSIGHT').first();
+    > 96 |     await expect(freeReport).toBeVisible({ timeout: 3000 });
+         |                              ^
+      97 |
+      98 |     // 2. 3회 연속 새로고침
+      99 |     for (let i = 1; i <= 3; i++) {
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:96:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-8e82d--연속-새로고침-ReportStatus-폴링-없음-Mobile-Chrome/error-context.md
+
+  33) [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 
+
+    Error: page.evaluate: ReferenceError: DEMO_SESSION is not defined
+        at eval (eval at evaluate (:302:30), <anonymous>:3:53)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at eval (eval at evaluate (:302:30), <anonymous>:3:53)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:119:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-bdf41--후-리포트-페이지-재방문-유료-콘텐츠-즉시-표시-Mobile-Chrome/error-context.md
+
+  34) [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:140:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-2dc18-원이-구매한-리포트-로그아웃-후-로그인-필요-표시-Mobile-Chrome/error-context.md
+
+  35) [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 
+
+    Error: page.evaluate: SecurityError: Failed to read the 'sessionStorage' property from 'Window': Access is denied for this document.
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:178:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-시-9f212-결제한-리포트-30분-토큰-만료-후-본인확인-필요-Mobile-Chrome/error-context.md
+
+  36) [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/당신의|연애/').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=/당신의|연애/').first()[22m
+
+
+      275 |
+      276 |     const headline = page.locator('text=/당신의|연애/').first();
+    > 277 |     await expect(headline).toBeVisible({ timeout: 5000 });
+          |                            ^
+      278 |
+      279 |     // 2. 유료 질문 선택 시뮬레이션
+      280 |     const questionIds = ['q1_axis1', 'q2_axis1', 'q3_axis1'];
+        at /Users/suyeon/Desktop/corelog/e2e/scenario-10-post-payment.spec.ts:277:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-Mobile-Chrome/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-Mobile-Chrome/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/scenario-10-post-payment-통-b3e64-무료-분석-→-유료-질문-선택-→-결제-→-재접근-Mobile-Chrome/error-context.md
+
+  36 failed
+    [chromium] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 ──────────────────────────
+    [chromium] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 
+    [chromium] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 
+    [chromium] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 
+    [chromium] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 
+    [chromium] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 
+    [chromium] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 
+    [chromium] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 
+    [chromium] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 
+    [firefox] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 ───────────────────────────
+    [firefox] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 
+    [firefox] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 
+    [firefox] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 
+    [firefox] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 
+    [firefox] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 
+    [firefox] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 
+    [firefox] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 
+    [firefox] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 
+    [webkit] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 ────────────────────────────
+    [webkit] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 
+    [webkit] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 
+    [webkit] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 
+    [webkit] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 
+    [webkit] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 
+    [webkit] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 
+    [webkit] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 
+    [webkit] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 
+    [Mobile Chrome] › e2e/example.spec.ts:14:3 › Playwright 셋업 확인 › 리포트 페이지 접근 ─────────────────────
+    [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:17:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 첫 방문: TypewriterText 애니메이션 실행 
+    [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:40:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 재방문(새로고침): TypewriterText 즉시 표시 
+    [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:61:3 › 시나리오 10-1: 재방문 시 TypewriterText 즉시 표시 › 다른 탭에서 재접근: TypewriterText 즉시 표시 
+    [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:90:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 3회 연속 새로고침: ReportStatus 폴링 없음 
+    [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:113:3 › 시나리오 10-2: 리포트 여러 번 새로고침해도 스트리밍 재요청 없음 › 결제 후 리포트 페이지 재방문: 유료 콘텐츠 즉시 표시 
+    [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:138:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 회원이 구매한 리포트: 로그아웃 후 "로그인 필요" 표시 
+    [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:174:3 › 시나리오 10-3: 구매 완료 후 로그아웃 시 접근 제한 › 비회원이 유료 결제한 리포트: 30분 토큰 만료 후 본인확인 필요 
+    [Mobile Chrome] › e2e/scenario-10-post-payment.spec.ts:268:3 › 통합 시나리오: 무료 → 유료 → 재접근 › 비회원 무료 분석 → 유료 질문 선택 → 결제 → 재접근 
+  4 skipped
+  12 passed (1.1m)
+
+[36m  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.[39m
