@@ -20,17 +20,17 @@ const AnalyzePage = () => {
       {/* 배경 장식 - blur 요소 */}
       <div
         className="pointer-events-none absolute left-1/4 top-0 h-80 w-80 rounded-full blur-3xl"
-        style={{ backgroundColor: "#6495ED", opacity: 0.15 }}
+        style={{ backgroundColor: "#6495ED", opacity: 0.15, willChange: 'transform' }}
         aria-hidden="true"
       />
       <div
         className="pointer-events-none absolute -bottom-20 -left-40 h-80 w-80 rounded-full blur-3xl"
-        style={{ backgroundColor: "#E6E6FA", opacity: 0.1 }}
+        style={{ backgroundColor: "#E6E6FA", opacity: 0.1, willChange: 'transform' }}
         aria-hidden="true"
       />
       <div
         className="pointer-events-none absolute top-1/2 right-1/4 h-72 w-72 rounded-full blur-3xl"
-        style={{ backgroundColor: "#A366FF", opacity: 0.12 }}
+        style={{ backgroundColor: "#A366FF", opacity: 0.12, willChange: 'transform' }}
         aria-hidden="true"
       />
 

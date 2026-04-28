@@ -657,26 +657,18 @@ export const AnalyzeClient = () => {
                 <button
                   key={cat}
                   onClick={() => handleCategorySelect(cat)}
-                  className="group relative overflow-hidden rounded-3xl p-6 text-left transition-all duration-300 active:scale-[0.95] md:p-8 hover:shadow-2xl"
+                  className="group relative overflow-hidden rounded-3xl p-6 text-left transition-all duration-300 active:scale-[0.95] md:p-8 hover:shadow-2xl hover:-translate-y-1.5"
                   style={{
                     background: `linear-gradient(135deg, ${categoryColor}35 0%, ${categoryColor}15 100%)`,
                     borderLeft: `5px solid ${categoryColor}`,
                     backdropFilter: 'blur(15px)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, ${categoryColor}45 0%, ${categoryColor}25 100%)`;
-                    e.currentTarget.style.transform = 'translateY(-6px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, ${categoryColor}35 0%, ${categoryColor}15 100%)`;
-                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   <div className="relative z-10 space-y-3">
                     <div className="flex items-start justify-between">
                       <div className="text-6xl">{info.icon}</div>
                       <div
-                        className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white transition-all duration-300 group-hover:scale-130"
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white transition-transform duration-300 group-hover:scale-125"
                         style={{ backgroundColor: categoryColor }}
                       >
                         →
@@ -684,8 +676,7 @@ export const AnalyzeClient = () => {
                     </div>
                     <div className="space-y-1">
                       <h3
-                        className="text-xl font-bold leading-tight md:text-2xl"
-                        style={{ color: '#FFFFFF' }}
+                        className="text-xl font-bold leading-tight md:text-2xl text-white"
                       >
                         {cat}
                       </h3>
@@ -737,34 +728,25 @@ export const AnalyzeClient = () => {
                 <button
                   key={rel}
                   onClick={() => handleRelationshipSelect(rel)}
-                  className="group relative overflow-hidden rounded-2xl p-3 text-left transition-all duration-300 active:scale-[0.95] md:p-4 hover:shadow-lg"
+                  className="group relative overflow-hidden rounded-2xl p-3 text-left transition-all duration-300 active:scale-[0.95] md:p-4 hover:shadow-lg hover:-translate-y-1"
                   style={{
-                    background: `linear-gradient(135deg, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.35) 0%, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.15) 100%)`,
+                    background: `linear-gradient(135deg, ${relColor}59 0%, ${relColor}26 100%)`,
                     borderLeft: `4px solid ${relColor}`,
                     backdropFilter: 'blur(15px)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.45) 0%, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.25) 100%)`;
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.35) 0%, rgba(${parseInt(relColor.slice(1, 3), 16)}, ${parseInt(relColor.slice(3, 5), 16)}, ${parseInt(relColor.slice(5, 7), 16)}, 0.15) 100%)`;
-                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   <div className="relative z-10 space-y-2">
                     <div className="flex items-start justify-between">
                       <div className="text-4xl">{icon}</div>
                       <div
-                        className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white transition-all duration-300 group-hover:scale-110"
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white transition-transform duration-300 group-hover:scale-110"
                         style={{ backgroundColor: relColor }}
                       >
                         →
                       </div>
                     </div>
                     <h3
-                      className="text-sm font-bold leading-tight md:text-base"
-                      style={{ color: '#FFFFFF' }}
+                      className="text-sm font-bold leading-tight md:text-base text-white"
                     >
                       {rel}
                     </h3>
@@ -809,26 +791,18 @@ export const AnalyzeClient = () => {
                 <button
                   key={cat}
                   onClick={() => handleCategorySelect(cat)}
-                  className="group relative overflow-hidden rounded-3xl p-6 text-left transition-all duration-300 active:scale-[0.95] md:p-8 hover:shadow-2xl"
+                  className="group relative overflow-hidden rounded-3xl p-6 text-left transition-all duration-300 active:scale-[0.95] md:p-8 hover:shadow-2xl hover:-translate-y-1.5"
                   style={{
                     background: `linear-gradient(135deg, ${categoryColor}35 0%, ${categoryColor}15 100%)`,
                     borderLeft: `5px solid ${categoryColor}`,
                     backdropFilter: 'blur(15px)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, ${categoryColor}45 0%, ${categoryColor}25 100%)`;
-                    e.currentTarget.style.transform = 'translateY(-6px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = `linear-gradient(135deg, ${categoryColor}35 0%, ${categoryColor}15 100%)`;
-                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
                   <div className="relative z-10 space-y-3">
                     <div className="flex items-start justify-between">
                       <div className="text-6xl">{info.icon}</div>
                       <div
-                        className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white transition-all duration-300 group-hover:scale-130"
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white transition-transform duration-300 group-hover:scale-125"
                         style={{ backgroundColor: categoryColor }}
                       >
                         →
@@ -836,8 +810,7 @@ export const AnalyzeClient = () => {
                     </div>
                     <div className="space-y-1">
                       <h3
-                        className="text-xl font-bold leading-tight md:text-2xl"
-                        style={{ color: '#FFFFFF' }}
+                        className="text-xl font-bold leading-tight md:text-2xl text-white"
                       >
                         {cat}
                       </h3>
@@ -877,22 +850,12 @@ export const AnalyzeClient = () => {
                 <button
                   key={sub}
                   onClick={() => handleSubcategorySelect(sub)}
-                  className="group flex min-h-[56px] w-full items-center justify-between rounded-xl border px-5 py-4 text-left text-sm font-medium transition-all active:scale-[0.98]"
+                  className="group flex min-h-[56px] w-full items-center justify-between rounded-xl border px-5 py-4 text-left text-sm font-medium transition-colors active:scale-[0.98] hover:border-opacity-100 hover:bg-opacity-15"
                   style={{
                     borderColor: 'rgba(255, 255, 255, 0.2)',
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     color: '#FFFFFF',
                     backdropFilter: 'blur(8px)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = categoryColor;
-                    e.currentTarget.style.backgroundColor =
-                      'rgba(255, 255, 255, 0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                    e.currentTarget.style.backgroundColor =
-                      'rgba(255, 255, 255, 0.1)';
                   }}
                 >
                   <span>{sub}</span>
@@ -935,48 +898,18 @@ export const AnalyzeClient = () => {
                 <button
                   key={option.id}
                   onClick={() => handleOptionToggle(option.id)}
-                  className="flex min-h-[52px] w-full items-center rounded-xl border px-5 py-3 text-left text-sm font-medium transition-all active:scale-[0.98]"
+                  className="flex min-h-[52px] w-full items-center rounded-xl border px-5 py-3 text-left text-sm font-medium transition-colors active:scale-[0.98]"
                   style={{
                     borderColor: isSelected
                       ? focusColor
                       : 'rgba(255, 255, 255, 0.2)',
                     backgroundColor: isSelected
                       ? `${focusColor}30`
-                      : 'rgba(255, 255, 255, 0.1)',
+                      : 'rgba(255, 255, 255, 0.08)',
                     color: '#FFFFFF',
                     backdropFilter: 'blur(8px)',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.borderColor = focusColor;
-                      e.currentTarget.style.backgroundColor =
-                        'rgba(255, 255, 255, 0.15)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                      e.currentTarget.style.backgroundColor =
-                        'rgba(255, 255, 255, 0.1)';
-                    }
-                  }}
-                  onFocus={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.borderColor = focusColor;
-                      e.currentTarget.style.backgroundColor =
-                        'rgba(255, 255, 255, 0.15)';
-                      e.currentTarget.style.outline = `2px solid ${focusColor}60`;
-                      e.currentTarget.style.outlineOffset = '2px';
-                    }
-                  }}
-                  onBlur={(e) => {
-                    if (!isSelected) {
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                      e.currentTarget.style.backgroundColor =
-                        'rgba(255, 255, 255, 0.1)';
-                      e.currentTarget.style.outline = 'none';
-                    }
-                  }}
+                    '--focus-color': focusColor,
+                  } as React.CSSProperties & { '--focus-color': string }}
                 >
                   {option.text}
                 </button>
@@ -987,18 +920,12 @@ export const AnalyzeClient = () => {
           <div className="mt-8 flex gap-3">
             <button
               onClick={handleBack}
-              className="flex-1 rounded-xl border py-3 text-sm font-medium transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              className="flex-1 rounded-xl border py-3 text-sm font-medium transition-colors active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 hover:bg-opacity-20"
               style={{
                 borderColor: 'rgba(255, 255, 255, 0.2)',
                 color: 'rgba(255, 255, 255, 0.8)',
                 backgroundColor: 'rgba(255, 255, 255, 0.05)',
                 backdropFilter: 'blur(8px)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
               }}
             >
               이전
@@ -1006,7 +933,7 @@ export const AnalyzeClient = () => {
             <button
               onClick={handleNext}
               disabled={!hasAnswer}
-              className="flex-[2] rounded-xl py-3 text-sm font-medium text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+              className="flex-[2] rounded-xl py-3 text-sm font-medium text-white transition-colors active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
               style={{
                 backgroundColor: hasAnswer
                   ? getAnalysisTypeColor(queryType)
