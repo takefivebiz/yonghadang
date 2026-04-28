@@ -162,12 +162,16 @@ export const PaymentModal = ({ pendingOrder, onClose, onSuccess }: PaymentModalP
       const merged = [...new Set([...existing, ...pendingOrder.paidQuestionIds])];
       sessionStorage.setItem(purchasedKey, JSON.stringify(merged));
 
-      // 📌 구매된 축 저장 (핵심!)
+      // 📌 구매된 축 저장 (sessionStorage + localStorage 모두 저장)
+      // sessionStorage는 redirect 후 초기화될 수 있으므로 localStorage에도 저장
       const existingAxes = JSON.parse(snapshotAxes || '[]') as number[];
       const currentAxis = existingAxes.length < 3 ? (existingAxes.length + 1) : null;
       if (currentAxis) {
         const newAxes = [...new Set([...existingAxes, currentAxis])];
         sessionStorage.setItem(axesKey, JSON.stringify(newAxes));
+        // localStorage에도 저장 (redirect 후 복원용)
+        const localAxesKey = `corelog:purchased_axes_${pendingOrder.sessionId}`;
+        localStorage.setItem(localAxesKey, JSON.stringify(newAxes));
       }
 
       // 롤백 정보를 sessionStorage에 저장 (redirect 후 결제 실패 시 payment-fail이 복원)

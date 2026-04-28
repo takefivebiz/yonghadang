@@ -24,13 +24,37 @@ type ViewState = 'checking' | 'auth' | 'status' | 'report';
  * - 인증 상태 확인 → 인증 통과 → AI 생성 상태 분기
  * TODO: [백엔드 연동] Server Component에서 Supabase 세션 기반으로 처리
  */
-export const ReportClient = ({ order, report, initialAnalysisSession }: ReportClientProps) => {
+export const ReportClient = ({ order: initialOrder, report, initialAnalysisSession }: ReportClientProps) => {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get('sessionId') || order.id;
+  const sessionId = searchParams.get('sessionId') || initialOrder.id;
   const [view, setView] = useState<ViewState>('checking');
+  // 비회원 결제 후 order 업데이트 감시
+  const [order, setOrder] = useState<Order>(initialOrder);
   // TODO: [기능 확장] 분석 세션 정보는 향후 재분석, 히스토리 추적 등에서 활용 예정
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [analysisSession, setAnalysisSession] = useState<AnalysisSession | null>(initialAnalysisSession ?? null);
+
+  // localStorage의 order 변경 감시 (비회원 결제 후 업데이트)
+  useEffect(() => {
+    const checkOrderUpdate = () => {
+      if (typeof window === 'undefined') return;
+      try {
+        const stored = localStorage.getItem('corelog:local_orders');
+        if (stored) {
+          const orders = JSON.parse(stored) as Order[];
+          const updated = orders.find(o => o.id === sessionId);
+          if (updated) {
+            setOrder(updated);
+          }
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    const interval = setInterval(checkOrderUpdate, 1000);
+    return () => clearInterval(interval);
+  }, [sessionId]);
 
   useEffect(() => {
     // 결제 실패 후 복귀 시 토스트 표시
@@ -277,7 +301,7 @@ export const ReportClient = ({ order, report, initialAnalysisSession }: ReportCl
   }
 
   if (view === 'report') {
-    return <ReportView report={report} />;
+    return <ReportView report={report} order={order} />;
   }
 
   return <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #1B003F 0%, #191970 100%)' }} />;

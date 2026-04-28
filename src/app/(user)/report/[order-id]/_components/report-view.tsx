@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FullReport } from '@/types/report';
+import { Order } from '@/types/order';
 import { savePendingOrder, readPendingOrder } from '@/lib/payment';
 import { PendingOrderInput } from '@/types/payment';
 import { getPriceForQuantity, getSavingsAmount, isBestDeal, getFullBundlePrice, PRICE_PER_QUESTION } from '@/lib/pricing';
@@ -11,6 +12,7 @@ import { ChevronDown } from 'lucide-react';
 
 interface ReportViewProps {
   report: FullReport;
+  order?: Order;
 }
 
 /**
@@ -18,7 +20,7 @@ interface ReportViewProps {
  * - 무료 리포트 표시
  * - 유료 질문 선택 (할인 구조 포함)
  */
-export const ReportView = ({ report }: ReportViewProps) => {
+export const ReportView = ({ report, order }: ReportViewProps) => {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [selectFullBundle, setSelectFullBundle] = useState(false);
@@ -26,32 +28,51 @@ export const ReportView = ({ report }: ReportViewProps) => {
   const [pendingOrder, setPendingOrder] = useState<PendingOrderInput | null>(() => readPendingOrder());
   const { freeReport, paidQuestions, category, createdAt } = report;
 
-  // 결제 완료된 질문 ID (sessionStorage 기반, Toss redirect 후에도 유지)
+  // 결제 완료된 질문 ID (sessionStorage + localStorage + order 기반)
   const [localPurchasedIds] = useState<string[]>(() => {
     if (typeof window === 'undefined') return [];
     try {
-      return JSON.parse(sessionStorage.getItem(`purchased_${report.sessionId}`) || '[]') as string[];
+      // sessionStorage 우선
+      const sessionIds = JSON.parse(sessionStorage.getItem(`purchased_${report.sessionId}`) || '[]') as string[];
+      if (sessionIds.length > 0) return sessionIds;
+
+      // sessionStorage가 없으면 order.paidQuestionIds 확인 (비회원 재진입 시)
+      if (order?.paidQuestionIds && order.paidQuestionIds.length > 0) {
+        return order.paidQuestionIds;
+      }
+
+      return [];
     } catch {
       return [];
     }
   });
 
-  // 구매 완료된 축 (1-3, sessionStorage 기반) — 결제 후 업데이트
+  // 구매 완료된 축 (1-3, sessionStorage + localStorage 병합) — 결제 후 업데이트
   const [purchasedAxes, setPurchasedAxes] = useState<number[]>(() => {
     if (typeof window === 'undefined') return [];
     try {
-      return JSON.parse(sessionStorage.getItem(`purchased_axes_${report.sessionId}`) || '[]') as number[];
+      // sessionStorage 우선, 없으면 localStorage에서 복원 (redirect 후 복구용)
+      const sessionAxes = JSON.parse(sessionStorage.getItem(`purchased_axes_${report.sessionId}`) || '[]') as number[];
+      if (sessionAxes.length > 0) return sessionAxes;
+
+      const localAxes = JSON.parse(localStorage.getItem(`corelog:purchased_axes_${report.sessionId}`) || '[]') as number[];
+      return localAxes;
     } catch {
       return [];
     }
   });
 
-  // 결제 성공 후 purchasedAxes 동기화
+  // 결제 성공 후 purchasedAxes 동기화 (localStorage 변경 감시)
   useEffect(() => {
     const checkPurchasedAxes = () => {
       if (typeof window === 'undefined') return;
       try {
-        const axes = JSON.parse(sessionStorage.getItem(`purchased_axes_${report.sessionId}`) || '[]') as number[];
+        // sessionStorage 확인
+        let axes = JSON.parse(sessionStorage.getItem(`purchased_axes_${report.sessionId}`) || '[]') as number[];
+        // sessionStorage가 없으면 localStorage에서 복원
+        if (axes.length === 0) {
+          axes = JSON.parse(localStorage.getItem(`corelog:purchased_axes_${report.sessionId}`) || '[]') as number[];
+        }
         setPurchasedAxes(axes);
       } catch {
         // ignore
@@ -59,6 +80,8 @@ export const ReportView = ({ report }: ReportViewProps) => {
     };
 
     checkPurchasedAxes();
+    const interval = setInterval(checkPurchasedAxes, 1000);
+    return () => clearInterval(interval);
   }, [report.sessionId]);
 
   // 현재 활성 축: 구매된 축이 없으면 1, 있으면 다음 축 표시
