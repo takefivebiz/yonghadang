@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, ChevronRight } from "lucide-react";
-import { DUMMY_ADMIN_USERS } from "@/lib/dummy-admin";
 import { AdminUser } from "@/types/admin";
 import { OrderOwnerType } from "@/types/order";
 
@@ -41,10 +40,9 @@ const AdminUserListPage = () => {
   const [search, setSearch] = useState("");
   const [userTypeFilter, setUserTypeFilter] = useState<UserTypeFilter>("all");
 
-  // TODO: [백엔드 연동] DUMMY_ADMIN_USERS를 /api/admin/users 실제 호출로 교체
-  const users: AdminUser[] = DUMMY_ADMIN_USERS;
-
   const filtered = useMemo(() => {
+    // TODO: [백엔드 연동] /api/admin/users에서 실제 데이터 조회
+    const users: AdminUser[] = [];
     const q = search.toLowerCase();
     return users.filter((u) => {
       if (userTypeFilter !== "all" && u.userType !== userTypeFilter) return false;
@@ -56,7 +54,7 @@ const AdminUserListPage = () => {
       }
       return true;
     });
-  }, [users, search, userTypeFilter]);
+  }, [search, userTypeFilter]);
 
   return (
     <div className="flex flex-col gap-6">

@@ -1,15 +1,33 @@
 'use client';
 
 import { WifiOff } from 'lucide-react';
-import { useNetworkStatus } from '@/hooks/use-network-status';
+import { useEffect, useState } from 'react';
 
 /**
  * 네트워크 오프라인 상태 감지 배너.
  * offline 이벤트 발생 시 화면 최상단에 고정 노출, 복귀 시 자동 사라짐.
  */
 export const OfflineBanner = () => {
-  const isOnline = useNetworkStatus();
+  const [isOnline, setIsOnline] = useState<boolean | null>(null);
 
+  useEffect(() => {
+    // 클라이언트 마운트 후 실제 네트워크 상태 확인
+    setIsOnline(navigator.onLine);
+
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // 마운트 전까지 렌더링하지 않음 (hydration mismatch 방지)
+  if (isOnline === null) return null;
   if (isOnline) return null;
 
   return (

@@ -1,39 +1,63 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 
-export const middleware = async (request: NextRequest) => {
-  const url = request.nextUrl.clone();
-  const pathname = request.nextUrl.pathname;
+export async function middleware(request: NextRequest) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // 관리자 경로 보호 (/login 제외)
-  if (pathname.startsWith('/admin') && !pathname.startsWith('/login')) {
-    const adminAuth = request.cookies.get('admin_auth');
-
-    if (!adminAuth) {
-      // admin_auth 쿠키 없으면: 일반 회원인지 비로그인인지 확인
-      // user_session 쿠키를 확인해서 회원 여부 판단
-      const userSession = request.cookies.get('user_session');
-
-      if (userSession) {
-        // 일반 회원이 /admin 접근 시도 → /my-page로 리다이렉트
-        url.pathname = '/my-page';
-        return NextResponse.redirect(url);
-      } else {
-        // 비로그인 → /login으로 리다이렉트
-        url.pathname = '/login';
-        return NextResponse.redirect(url);
-      }
-    }
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return NextResponse.next();
   }
 
-  // TODO: [백엔드 연동] Supabase JWT 세션 검증 로직
-  // - 쿠키값 존재 여부 → JWT 서명 검증으로 교체
-  // - 세션 만료 체크 (24h) 추가
-  // - 관리자 권한(role === 'admin') 검증 추가
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-  return NextResponse.next();
-};
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
+
+  // 현재 사용자 확인 (Supabase Auth 세션)
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+
+  // 회원 전용 라우트 (로그인 필수)
+  const memberOnlyRoutes = ['/my-page'];
+  const isMemberOnlyRoute = memberOnlyRoutes.some(route => pathname.startsWith(route));
+
+  // 관리자 전용 라우트 (로그인 필수)
+  const adminRoutes = ['/admin'];
+  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
+
+  // 회원 전용 경로 보호
+  if (isMemberOnlyRoute && !user) {
+    return NextResponse.redirect(new URL(`/auth?next=${encodeURIComponent(pathname)}`, request.url));
+  }
+
+  // 관리자 경로 보호
+  // TODO: [백엔드 연동] 관리자 라우트(/admin) 보호를 Supabase RLS + 역할 기반으로 전환
+  // user.user_metadata?.role === 'admin' 확인으로 관리자 판단
+  if (isAdminRoute && !user) {
+    return NextResponse.redirect(new URL('/auth', request.url));
+  }
+
+  // /analyze, /report는 비회원도 접근 가능 (로그인 요구 없음)
+
+  return response;
+}
 
 export const config = {
-  matcher: ['/admin/:path*', '/my-page/:path*'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

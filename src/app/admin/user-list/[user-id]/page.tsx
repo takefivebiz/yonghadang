@@ -1,9 +1,7 @@
 import { type Metadata } from "next";
-import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ChevronRight } from "lucide-react";
-import { getAdminUserDetail } from "@/lib/dummy-admin";
-import { AdminOrderSummary } from "@/types/admin";
+import { AdminOrderSummary, AdminUser } from "@/types/admin";
 import { OrderStatus } from "@/types/order";
 
 interface PageProps {
@@ -61,18 +59,18 @@ const formatDate = (iso: string) => {
 /** 주문 내역 행 */
 const OrderRow = ({ order }: { order: AdminOrderSummary }) => (
   <Link
-    href={`/admin/order-list/${order.id}`}
+    href={`/admin/order-list/${order!.id}`}
     className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b px-5 py-4 text-sm transition-colors last:border-b-0 hover:bg-blue-500/10"
     style={{ borderColor: 'rgba(230, 230, 250, 0.1)' }}
   >
     <div className="min-w-0">
-      <p className="font-medium" style={{ color: '#F0E6FA' }}>{order.category} 분석</p>
-      <p className="truncate text-xs" style={{ color: '#B8A8D8' }}>{order.id}</p>
+      <p className="font-medium" style={{ color: '#F0E6FA' }}>{order!.category} 분석</p>
+      <p className="truncate text-xs" style={{ color: '#B8A8D8' }}>{order!.id}</p>
     </div>
     <span className="hidden text-xs sm:block" style={{ color: '#B8A8D8' }}>{formatDate(order.createdAt)}</span>
-    <span className="font-semibold" style={{ color: '#F0E6FA' }}>{order.amount.toLocaleString()}원</span>
+    <span className="font-semibold" style={{ color: '#F0E6FA' }}>{order!.amount.toLocaleString()}원</span>
     <div className="flex items-center gap-1">
-      <StatusBadge status={order.status} />
+      <StatusBadge status={order!.status} />
       <ChevronRight size={14} style={{ color: 'rgba(255, 255, 255, 0.2)' }} />
     </div>
   </Link>
@@ -86,12 +84,14 @@ const OrderRow = ({ order }: { order: AdminOrderSummary }) => (
  * TODO: [백엔드 연동] /api/admin/users/[id] 실제 호출로 교체
  */
 const AdminUserDetailPage = async ({ params }: PageProps) => {
-  const { "user-id": userId } = await params;
+  await params;
 
-  // TODO: [백엔드 연동] 더미데이터를 /api/admin/users/[id] 실제 호출로 교체
-  const result = getAdminUserDetail(userId);
-  if (!result) notFound();
+  // TODO: [백엔드 연동] /api/admin/users/{userId}에서 실제 데이터 조회
+  const result = null;
 
+  if (!result) {
+    return <div style={{ color: "#D4C5E2" }}>사용자 정보를 불러올 수 없습니다. 백엔드 구현이 필요합니다.</div>;
+  }
   const { user, orders } = result;
 
   const PROVIDER_LABEL: Record<string, string> = {
@@ -115,12 +115,12 @@ const AdminUserDetailPage = async ({ params }: PageProps) => {
       {/* 유저 헤더 */}
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold" style={{ background: 'linear-gradient(90deg, #6495ED 0%, #A366FF 100%)', color: '#FFFFFF' }}>
-          {user.nickname.slice(0, 1)}
+          {(user as AdminUser).nickname.slice(0, 1)}
         </div>
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: '#F0E6FA' }}>{user.nickname}</h1>
-          <span className={`mt-0.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${user.userType === "member" ? "bg-purple-500/20 text-purple-300" : "bg-orange-500/20 text-orange-300"}`}>
-            {user.userType === "member" ? "회원" : "비회원"}
+          <h1 className="text-2xl font-bold" style={{ color: '#F0E6FA' }}>{(user as AdminUser).nickname}</h1>
+          <span className={`mt-0.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${(user as AdminUser).userType === "member" ? "bg-purple-500/20 text-purple-300" : "bg-orange-500/20 text-orange-300"}`}>
+            {(user as AdminUser).userType === "member" ? "회원" : "비회원"}
           </span>
         </div>
       </div>
@@ -129,12 +129,12 @@ const AdminUserDetailPage = async ({ params }: PageProps) => {
       <div className="flex flex-col gap-4 rounded-2xl p-6 shadow-sm" style={{ background: 'linear-gradient(135deg, rgba(100, 149, 237, 0.1), rgba(75, 0, 130, 0.08))', border: '1px solid rgba(230, 230, 250, 0.15)' }}>
         <h2 className="text-base font-semibold" style={{ color: '#F0E6FA' }}>기본 정보</h2>
         <div className="flex flex-col gap-3">
-          <InfoRow label="이메일" value={user.email} />
-          <InfoRow label="연락처" value={user.phone} />
-          <InfoRow label="가입 경로" value={PROVIDER_LABEL[user.provider ?? "guest"]} />
-          <InfoRow label="가입 일시" value={formatDateKo(user.joinedAt)} />
-          <InfoRow label="누적 주문" value={`${user.totalOrders}건`} />
-          <InfoRow label="결제 여부" value={user.hasPurchased ? "결제 완료" : "미결제"} />
+          <InfoRow label="이메일" value={(user as AdminUser).email} />
+          <InfoRow label="연락처" value={(user as AdminUser).phone} />
+          <InfoRow label="가입 경로" value={PROVIDER_LABEL[(user as AdminUser).provider ?? "guest"]} />
+          <InfoRow label="가입 일시" value={formatDateKo((user as AdminUser).joinedAt)} />
+          <InfoRow label="누적 주문" value={`${(user as AdminUser).totalOrders}건`} />
+          <InfoRow label="결제 여부" value={(user as AdminUser).hasPurchased ? "결제 완료" : "미결제"} />
         </div>
       </div>
 
@@ -143,11 +143,11 @@ const AdminUserDetailPage = async ({ params }: PageProps) => {
         <div className="border-b px-5 py-4" style={{ borderColor: 'rgba(230, 230, 250, 0.15)' }}>
           <h2 className="text-base font-semibold" style={{ color: '#F0E6FA' }}>
             전체 주문 내역
-            <span className="ml-2 text-sm font-normal" style={{ color: '#B8A8D8' }}>{orders.length}건</span>
+            <span className="ml-2 text-sm font-normal" style={{ color: '#B8A8D8' }}>{(orders as AdminOrderSummary[]).length}건</span>
           </h2>
         </div>
 
-        {orders.length === 0 ? (
+        {(orders as AdminOrderSummary[]).length === 0 ? (
           <p className="py-12 text-center text-sm" style={{ color: '#B8A8D8' }}>주문 내역이 없습니다.</p>
         ) : (
           <>
@@ -157,8 +157,8 @@ const AdminUserDetailPage = async ({ params }: PageProps) => {
               <span>금액</span>
               <span>상태</span>
             </div>
-            {orders.map((order) => (
-              <OrderRow key={order.id} order={order} />
+            {(orders as AdminOrderSummary[]).map((order) => (
+              <OrderRow key={order!.id} order={order} />
             ))}
           </>
         )}

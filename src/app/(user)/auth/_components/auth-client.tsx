@@ -4,9 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SocialProvider } from "@/types/member";
-import { loginAsMember, isMemberLoggedIn } from "@/lib/report-access";
-import { DUMMY_MEMBERS_BY_PROVIDER } from "@/lib/dummy-member";
 import { redirectToSite } from "@/lib/site-url";
+import { createClientComponentClient } from "@/lib/supabase/client";
 import { KakaoLoginButton } from "./kakao-login-button";
 import { GoogleLoginButton } from "./google-login-button";
 
@@ -48,54 +47,64 @@ export const AuthClient = () => {
 
   // 이미 로그인된 상태로 /auth 진입 시 즉시 목적지로 이동
   useEffect(() => {
-    if (isMemberLoggedIn()) {
-      redirectToSite(nextPath, (href) => router.replace(href));
-      return;
-    }
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/me", {
+          credentials: "include",
+        });
 
-    // OAuth 콜백 에러 파라미터 처리
-    const error = searchParams.get("error");
-    if (error) {
-      const errorMap: Record<string, string> = {
-        access_denied: "로그인이 거부되었어요. 다시 시도해주세요.",
-        server_error: "서버 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
-        invalid_request: "요청이 올바르지 않아요. 다시 시도해주세요.",
-      };
-      setErrorMessage(
-        errorMap[error] ?? "로그인에 실패했어요. 잠시 후 다시 시도해주세요.",
-      );
-    }
+        if (response.ok) {
+          // 이미 로그인된 상태 → 목적지로 리다이렉트
+          redirectToSite(nextPath, (href) => router.replace(href));
+          return;
+        }
+      } catch (error) {
+        console.error("[AuthClient] 인증 확인 실패:", error);
+      }
 
-    setIsRedirecting(false);
+      // OAuth 콜백 에러 파라미터 처리
+      const error = searchParams.get("error");
+      if (error) {
+        const errorMap: Record<string, string> = {
+          access_denied: "로그인이 거부되었어요. 다시 시도해주세요.",
+          server_error: "서버 오류가 발생했어요. 잠시 후 다시 시도해주세요.",
+          invalid_request: "요청이 올바르지 않아요. 다시 시도해주세요.",
+        };
+        setErrorMessage(
+          errorMap[error] ?? "로그인에 실패했어요. 잠시 후 다시 시도해주세요.",
+        );
+      }
+
+      setIsRedirecting(false);
+    };
+
+    checkAuth();
   }, [nextPath, router, searchParams]);
 
-  const handleSocialLogin = (provider: SocialProvider) => {
+  const handleSocialLogin = async (provider: SocialProvider) => {
     if (phase === "authenticating") return;
 
     setErrorMessage(null);
     setActiveProvider(provider);
     setPhase("authenticating");
 
-    // TODO: [백엔드 연동] supabase.auth.signInWithOAuth 호출로 교체
-    //   const { error } = await supabase.auth.signInWithOAuth({
-    //     provider,
-    //     options: { redirectTo: `${getSiteOrigin()}/api/auth/callback?next=${encodeURIComponent(nextPath)}` },
-    //   });
-    //   if (error) { setPhase("idle"); setErrorMessage(error.message); return; }
-    //
-    // 현재는 프론트엔드 데모 — 0.8초 후 DUMMY 회원으로 로그인 성공 처리
-    window.setTimeout(() => {
-      try {
-        const profile = DUMMY_MEMBERS_BY_PROVIDER[provider];
-        loginAsMember(profile);
-        redirectToSite(nextPath, (href) => router.replace(href));
-      } catch (err) {
-        console.error("[/auth] 소셜 로그인 시뮬레이션 실패", err);
-        setPhase("idle");
-        setActiveProvider(null);
-        setErrorMessage("로그인에 실패했어요. 잠시 후 다시 시도해주세요.");
-      }
-    }, 800);
+    try {
+      const supabase = createClientComponentClient();
+
+      // Supabase SSR이 PKCE를 자동으로 처리
+      // skipBrowserRedirect 제거하면 자동으로 OAuth 제공자로 리다이렉트
+      await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(nextPath)}`,
+        },
+      });
+    } catch (err) {
+      console.error(`[/auth] ${provider} 로그인 실패:`, err);
+      setPhase("idle");
+      setActiveProvider(null);
+      setErrorMessage("로그인에 실패했어요. 잠시 후 다시 시도해주세요.");
+    }
   };
 
   return (

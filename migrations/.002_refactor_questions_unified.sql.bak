@@ -1,0 +1,128 @@
+-- ============================================================================
+-- 질문 테이블 통합 리팩토링
+-- 무료(free) 질문과 유료(paid) 질문을 하나의 테이블로 관리
+-- 버전 관리 & A/B 테스트 확장성 고려
+-- ============================================================================
+
+-- ============================================================================
+-- 1. question_sets 확장 (무료/유료 통합)
+-- ============================================================================
+-- 기존 테이블에 컬럼 추가
+-- - type: 'free' | 'paid'
+-- - category: 무료 질문의 카테고리 (paid일 때 NULL)
+-- - version: 버전 관리 (기본값: '1.0')
+-- - variant_id: A/B 테스트용 variant (기본값: NULL)
+
+ALTER TABLE public.question_sets
+ADD COLUMN IF NOT EXISTS type text NOT NULL DEFAULT 'paid' CHECK (type IN ('free', 'paid')),
+ADD COLUMN IF NOT EXISTS category text CHECK (category IN ('love', 'emotion', 'relationship', 'career')),
+ADD COLUMN IF NOT EXISTS version text NOT NULL DEFAULT '1.0',
+ADD COLUMN IF NOT EXISTS variant_id text;
+
+-- 무료 질문 세트용 제약: category는 type='free'일 때만 필요
+ALTER TABLE public.question_sets
+ADD CONSTRAINT free_must_have_category
+  CHECK (
+    (type = 'free' AND category IS NOT NULL) OR
+    (type = 'paid' AND category IS NULL)
+  );
+
+-- 유료 질문 세트용 제약: session_id + loop_depth는 paid일 때만 필요
+-- (이미 UNIQUE(session_id, loop_depth) 있음 → paid만 해당)
+
+-- 인덱스 추가
+CREATE INDEX IF NOT EXISTS question_sets_type_idx ON public.question_sets(type);
+CREATE INDEX IF NOT EXISTS question_sets_category_version_idx ON public.question_sets(category, version)
+  WHERE type = 'free';
+CREATE INDEX IF NOT EXISTS question_sets_variant_id_idx ON public.question_sets(variant_id)
+  WHERE variant_id IS NOT NULL;
+
+-- ============================================================================
+-- 2. questions 확장 (무료/유료 통합)
+-- ============================================================================
+-- 기존 테이블에 컬럼 추가
+-- - type: 'free' | 'paid'
+-- - step: 무료 질문의 단계 (free일 때만)
+-- - version: 버전 관리
+-- - variant_id: A/B 테스트용
+
+ALTER TABLE public.questions
+ADD COLUMN IF NOT EXISTS type text NOT NULL DEFAULT 'paid' CHECK (type IN ('free', 'paid')),
+ADD COLUMN IF NOT EXISTS step text CHECK (step IN ('context', 'emotion', 'value', 'behavior', 'pattern', 'perception')),
+ADD COLUMN IF NOT EXISTS version text NOT NULL DEFAULT '1.0',
+ADD COLUMN IF NOT EXISTS variant_id text;
+
+-- 제약: step은 type='free'일 때만 필요
+ALTER TABLE public.questions
+ADD CONSTRAINT free_must_have_step
+  CHECK (
+    (type = 'free' AND step IS NOT NULL AND question_type = 'single') OR
+    (type = 'paid' AND step IS NULL)
+  );
+
+-- 제약: is_recommended, is_blacklisted는 paid일 때만 의미 있음
+-- (but 기존 컬럼이므로 그대로 유지, paid가 아닐 때는 무시)
+
+-- 인덱스 추가
+CREATE INDEX IF NOT EXISTS questions_type_idx ON public.questions(type);
+CREATE INDEX IF NOT EXISTS questions_type_set_idx ON public.questions(type, question_set_id);
+CREATE INDEX IF NOT EXISTS questions_variant_id_idx ON public.questions(variant_id)
+  WHERE variant_id IS NOT NULL;
+
+-- ============================================================================
+-- 3. question_options (새로 추가 또는 기존 옵션 구조 정규화)
+-- ============================================================================
+-- 기존 questions에 내장된 options를 별도 테이블로 정규화
+-- (현재 구조에서 options 저장 방식 확인 후 추가)
+
+CREATE TABLE IF NOT EXISTS public.question_options (
+  id uuid NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+  question_id uuid NOT NULL REFERENCES public.questions(id) ON DELETE CASCADE,
+  text text NOT NULL,
+  display_order int NOT NULL CHECK (display_order >= 1 AND display_order <= 4),
+  weights jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS question_options_question_id_idx ON public.question_options(question_id);
+
+-- ============================================================================
+-- 4. 초기 데이터 마이그레이션
+-- ============================================================================
+-- 기존 유료 question_sets: type을 'paid'로 설정 (이미 기본값)
+UPDATE public.question_sets SET type = 'paid' WHERE type IS NULL;
+
+-- 기존 유료 questions: type을 'paid'로 설정 (이미 기본값)
+UPDATE public.questions SET type = 'paid' WHERE type IS NULL;
+
+-- ============================================================================
+-- 5. 무료 질문 세트 초기 데이터 삽입
+-- ============================================================================
+-- 카테고리별 무료 분석 질문 세트 (1개씩)
+
+INSERT INTO public.question_sets (type, category, version, created_at, updated_at)
+VALUES
+  ('free', 'love', '1.0', now(), now()),
+  ('free', 'emotion', '1.0', now(), now()),
+  ('free', 'relationship', '1.0', now(), now()),
+  ('free', 'career', '1.0', now(), now())
+ON CONFLICT DO NOTHING;
+
+-- ============================================================================
+-- 6. RLS (Row Level Security) 정책
+-- ============================================================================
+-- 기존 정책 유지, 추가 정책 필요 시 추가
+
+-- 무료 질문: 모든 사용자가 읽을 수 있음
+CREATE POLICY question_sets_free_select ON public.question_sets
+  FOR SELECT USING (type = 'free' OR auth.jwt() IS NOT NULL);
+
+-- 유료 질문: 소유자 또는 구매자만 볼 수 있음 (기존 로직 유지)
+
+-- ============================================================================
+-- 7. 마이그레이션 검증
+-- ============================================================================
+-- 실행 후 확인:
+-- SELECT COUNT(*) FROM question_sets WHERE type = 'free'; -- 4개
+-- SELECT COUNT(*) FROM question_sets WHERE type = 'paid'; -- 기존 유료 질문 count
+-- SELECT * FROM question_sets WHERE type = 'free' ORDER BY category;

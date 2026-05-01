@@ -1,13 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { verifyGuestOrder, listAllOrders } from "@/lib/dummy-orders";
-import { grantGuestAccess } from "@/lib/report-access";
 
 /** PRD 5.3: 비회원 기록 조회 — 전화번호 + 비밀번호 조합으로 세션 찾기 */
 export const GuestLookupClient = () => {
-  const router = useRouter();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,31 +20,11 @@ export const GuestLookupClient = () => {
       setIsLoading(true);
 
       // TODO: [백엔드 연동] POST /api/guest/lookup 으로 교체 (비밀번호 bcrypt 검증은 서버에서)
+      // 현재는 백엔드 미구현으로 기능 비활성화
       await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const orders = listAllOrders().filter((o) => o.ownerType === "guest");
-      const matched = orders.find((o) =>
-        verifyGuestOrder(o.id, phoneNumber, password),
-      );
-
       setIsLoading(false);
 
-      if (matched) {
-        // 인증 성공 후 report 페이지에서 본인확인 폼이 안 나타나도록 토큰 저장
-        grantGuestAccess(matched.id);
-
-        // localStorage의 order에서 구매한 질문 데이터를 sessionStorage로 복사
-        if (matched.paidQuestionIds) {
-          sessionStorage.setItem(
-            `purchased_${matched.id}`,
-            JSON.stringify(matched.paidQuestionIds)
-          );
-        }
-
-        router.push(`/report/${matched.id}`);
-        return;
-      }
-
+      setError("기능이 준비 중입니다. 잠시 후 다시 시도해주세요.");
       const next = failCount + 1;
       setFailCount(next);
 
@@ -60,11 +36,9 @@ export const GuestLookupClient = () => {
           setFailCount(0);
           setError("");
         }, 60_000);
-      } else {
-        setError("일치하는 기록을 찾을 수 없어요.");
       }
     },
-    [phoneNumber, password, failCount, isLocked, router],
+    [failCount, isLocked],
   );
 
   return (

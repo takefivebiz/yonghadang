@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { AlertCircle, CheckCircle2, Copy, Trash2, Flag } from "lucide-react";
-import { DUMMY_QUESTION_LOGS } from "@/lib/dummy-admin";
 import type { QuestionLog } from "@/types/admin";
 
 // Note: 클라이언트 컴포넌트에서는 metadata를 내보낼 수 없으므로
@@ -48,7 +47,8 @@ const formatDate = (dateStr: string) => {
  * TODO: [백엔드 연동] /api/admin/question-logs 실제 호출로 교체
  */
 const QuestionLogsPage = () => {
-  const [logs, setLogs] = useState<QuestionLog[]>(DUMMY_QUESTION_LOGS);
+  // TODO: [백엔드 연동] /api/admin/question-logs에서 실제 데이터 조회
+  const [logs, setLogs] = useState<QuestionLog[]>([]);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 

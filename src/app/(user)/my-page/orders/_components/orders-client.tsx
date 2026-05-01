@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Order } from '@/types/order';
-import { getMemberProfile } from '@/lib/report-access';
-import { listAllOrders } from '@/lib/dummy-orders';
 
 type OrdersState =
   | { phase: 'loading' }
-  | { phase: 'ready'; orders: Order[] };
+  | { phase: 'ready'; orders: Order[] }
+  | { phase: 'error'; error: string };
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
   pending: { label: '결제 대기 중', color: '#F7A278' },
@@ -21,19 +20,34 @@ export const OrdersClient = () => {
   const [state, setState] = useState<OrdersState>({ phase: 'loading' });
 
   useEffect(() => {
-    const profile = getMemberProfile();
-    if (!profile) return;
+    const loadOrders = async () => {
+      try {
+        // 사용자 정보 조회
+        const userResponse = await fetch('/api/auth/me', {
+          credentials: 'include',
+        });
 
-    const myOrders = listAllOrders()
-      .filter(
-        (o) => o.ownerType === 'member' && o.memberId === profile!.memberId,
-      )
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+        if (!userResponse.ok) {
+          setState({ phase: 'error', error: '인증 정보를 조회할 수 없어요' });
+          return;
+        }
 
-    setState({ phase: 'ready', orders: myOrders });
+        // TODO: [백엔드 연동] Supabase orders 테이블에서 조회
+        // const { data: orders } = await supabase
+        //   .from('orders')
+        //   .select('*')
+        //   .eq('user_id', user.id)
+        //   .order('created_at', { ascending: false });
+        const myOrders: Order[] = [];
+
+        setState({ phase: 'ready', orders: myOrders });
+      } catch (error) {
+        console.error('[OrdersClient] 주문 로드 실패:', error);
+        setState({ phase: 'error', error: '주문 정보를 불러올 수 없어요' });
+      }
+    };
+
+    loadOrders();
   }, []);
 
   if (state.phase === 'loading') {
@@ -50,6 +64,14 @@ export const OrdersClient = () => {
           />
           <p className="text-sm" style={{ color: '#D4C5E2' }}>구매 내역을 불러오는 중...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (state.phase === 'error') {
+    return (
+      <div className="text-center">
+        <p className="mb-4" style={{ color: '#EF4444' }}>{state.error}</p>
       </div>
     );
   }

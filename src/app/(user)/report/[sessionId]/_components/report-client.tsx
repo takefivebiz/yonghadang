@@ -6,7 +6,14 @@ import { toast } from 'sonner';
 import { Order } from '@/types/order';
 import { FullReport } from '@/types/report';
 import { AnalysisSession } from '@/types/analysis';
-import { hasGuestAccess, isMemberLoggedIn, getMemberProfile } from '@/lib/report-access';
+import { hasGuestAccess } from '@/lib/report-access';
+
+interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  provider: string;
+}
 import { GuestAuthForm } from './guest-auth-form';
 import { ReportView } from './report-view';
 import { ReportStatus } from './report-status';
@@ -33,6 +40,7 @@ export const ReportClient = ({ order: initialOrder, report, initialAnalysisSessi
   // TODO: [기능 확장] 분석 세션 정보는 향후 재분석, 히스토리 추적 등에서 활용 예정
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [analysisSession, setAnalysisSession] = useState<AnalysisSession | null>(initialAnalysisSession ?? null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   // localStorage의 order 변경 감시 (비회원 결제 후 업데이트)
   useEffect(() => {
@@ -55,6 +63,29 @@ export const ReportClient = ({ order: initialOrder, report, initialAnalysisSessi
     const interval = setInterval(checkOrderUpdate, 1000);
     return () => clearInterval(interval);
   }, [sessionId]);
+
+  // 회원 인증 확인
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const userData = (await response.json()) as AuthUser;
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('[ReportClient] 인증 확인 실패:', error);
+        setUser(null);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     // 결제 실패 후 복귀 시 토스트 표시
@@ -81,7 +112,7 @@ export const ReportClient = ({ order: initialOrder, report, initialAnalysisSessi
         : order.ownerType === 'member'
         // 로그인 여부 + memberId 일치 여부 동시 검증 (타인의 리포트 접근 차단)
         // TODO: [백엔드 연동] 서버에서 Supabase RLS로 소유권 검증
-        ? isMemberLoggedIn() && getMemberProfile()?.memberId === order.memberId
+        ? user?.id === order.memberId
         // 'guest' 또는 유료 결제한 anonymous — 30분 grantGuestAccess 토큰 필요
         // 토큰 만료 후 재접근 시 GuestAuthForm(전화번호+비밀번호)으로 본인 확인
         : hasGuestAccess(order.id);
@@ -92,7 +123,7 @@ export const ReportClient = ({ order: initialOrder, report, initialAnalysisSessi
     }
 
     setView(order.status === 'done' ? 'report' : 'status');
-  }, [order, sessionId]);
+  }, [order, sessionId, user]);
 
   if (view === 'auth' && order.ownerType === 'member') {
     return (

@@ -1,6 +1,6 @@
 import { type Metadata } from "next";
 import { TrendingUp } from "lucide-react";
-import { DUMMY_QUESTION_ANALYTICS } from "@/lib/dummy-admin";
+import { QuestionAnalytic } from "@/types/admin";
 
 export const metadata: Metadata = {
   title: "질문 분석 | 코어로그 관리자",
@@ -16,7 +16,7 @@ const formatPercent = (value: number) => `${value.toFixed(1)}%`;
  * TODO: [백엔드 연동] /api/admin/analytics/questions 실제 호출로 교체
  */
 const QuestionAnalyticsPage = () => {
-  const analytics = DUMMY_QUESTION_ANALYTICS;
+  const analytics: QuestionAnalytic[] = []; // TODO: [백엔드 연동] /api/admin/analytics/questions
 
   return (
     <div className="flex flex-col gap-8">

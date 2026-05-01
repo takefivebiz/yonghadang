@@ -1,6 +1,5 @@
 import { type Metadata } from "next";
 import { TrendingUp, AlertCircle } from "lucide-react";
-import { DUMMY_LOOP_ANALYTICS } from "@/lib/dummy-admin";
 
 export const metadata: Metadata = {
   title: "탐색 루프 분석 | 코어로그 관리자",
@@ -16,7 +15,17 @@ const formatPercent = (value: number) => `${value.toFixed(1)}%`;
  * TODO: [백엔드 연동] /api/admin/analytics/loops 실제 호출로 교체
  */
 const LoopAnalyticsPage = () => {
-  const analytics = DUMMY_LOOP_ANALYTICS;
+  // TODO: [백엔드 연동] 실제 데이터는 /api/admin/analytics/loops에서 조회
+  const analytics = {
+    avgLoopDepth: 0,
+    depth1Users: 0,
+    depth2Users: 0,
+    depth3Users: 0,
+    depth1To2ConversionRate: 0,
+    depth2To3ConversionRate: 0,
+    dropoffPoint: 'depth1' as const,
+    avgQuestionsPerUser: 0,
+  };
   const totalUsers =
     analytics.depth1Users +
     analytics.depth2Users +

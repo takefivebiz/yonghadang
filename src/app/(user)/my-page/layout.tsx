@@ -2,8 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useEffect, useMemo } from 'react';
-import { isMemberLoggedIn } from '@/lib/report-access';
+import { useEffect, useMemo, useState } from 'react';
 
 const TABS = [
   { id: 'dashboard', label: '대시보드', href: '/my-page' },
@@ -15,12 +14,29 @@ const TABS = [
 const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 미로그인 시 /auth로 리다이렉트 (모든 my-page 하위 페이지 공통 가드)
+  // /api/auth/me로 인증 확인
   useEffect(() => {
-    if (!isMemberLoggedIn()) {
-      router.replace(`/auth?next=${encodeURIComponent(pathname)}`);
-    }
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          // 401: 미인증 → 로그인 페이지로 리다이렉트
+          router.replace(`/auth?next=${encodeURIComponent(pathname)}`);
+        }
+      } catch (error) {
+        console.error('[MyPageLayout] 인증 확인 실패:', error);
+        router.replace(`/auth?next=${encodeURIComponent(pathname)}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
   }, [pathname, router]);
 
   const activeTab = useMemo(() => {
@@ -30,6 +46,11 @@ const MyPageLayout = ({ children }: { children: React.ReactNode }) => {
     if (pathname === '/my-page/settings') return 'settings';
     return 'dashboard';
   }, [pathname]);
+
+  // 인증 확인 중일 때 빈 화면 표시
+  if (isLoading) {
+    return <div className="min-h-screen" />;
+  }
 
   return (
     <div

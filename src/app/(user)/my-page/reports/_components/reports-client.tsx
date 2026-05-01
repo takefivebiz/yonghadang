@@ -2,36 +2,46 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { cleanText } from '@/lib/actions/analysis';
 import { FullReport } from '@/types/report';
-import { getMemberProfile } from '@/lib/report-access';
-import { listAllOrders } from '@/lib/dummy-orders';
-import { DUMMY_REPORTS } from '@/lib/dummy-reports';
 
 type ReportsState =
   | { phase: 'loading' }
-  | { phase: 'ready'; reports: FullReport[] };
+  | { phase: 'ready'; reports: FullReport[] }
+  | { phase: 'error'; error: string };
 
 export const ReportsClient = () => {
   const [state, setState] = useState<ReportsState>({ phase: 'loading' });
 
   useEffect(() => {
-    const profile = getMemberProfile();
-    if (!profile) return;
+    const loadReports = async () => {
+      try {
+        // 사용자 정보 조회
+        const userResponse = await fetch('/api/auth/me', {
+          credentials: 'include',
+        });
 
-    const myOrders = listAllOrders()
-      .filter(
-        (o) => o.ownerType === 'member' && o.memberId === profile!.memberId,
-      )
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+        if (!userResponse.ok) {
+          setState({ phase: 'error', error: '인증 정보를 조회할 수 없어요' });
+          return;
+        }
 
-    const reports = myOrders
-      .map((order) => DUMMY_REPORTS[order.id])
-      .filter(Boolean);
+        // TODO: [백엔드 연동] Supabase에서 회원의 리포트 조회
+        // const { data: sessions } = await supabase
+        //   .from('analysis_sessions')
+        //   .select('*')
+        //   .eq('user_id', user.id)
+        //   .order('created_at', { ascending: false });
+        const reports: FullReport[] = [];
 
-    setState({ phase: 'ready', reports });
+        setState({ phase: 'ready', reports });
+      } catch (error) {
+        console.error('[ReportsClient] 리포트 로드 실패:', error);
+        setState({ phase: 'error', error: '리포트를 불러올 수 없어요' });
+      }
+    };
+
+    loadReports();
   }, []);
 
   if (state.phase === 'loading') {
@@ -48,6 +58,14 @@ export const ReportsClient = () => {
           />
           <p className="text-sm" style={{ color: '#D4C5E2' }}>리포트를 불러오는 중...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (state.phase === 'error') {
+    return (
+      <div className="text-center">
+        <p className="mb-4" style={{ color: '#EF4444' }}>{state.error}</p>
       </div>
     );
   }
@@ -96,7 +114,7 @@ export const ReportsClient = () => {
 
               {/* 제목 */}
               <p className="mb-2 font-semibold md:text-lg" style={{ color: '#F0E6FA' }}>
-                {report.freeReport?.headline || '분석 리포트'}
+                {cleanText(report.freeReport?.headline || '분석 리포트')}
               </p>
 
               {/* 메타 정보 */}

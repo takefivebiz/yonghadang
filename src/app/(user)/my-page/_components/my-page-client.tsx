@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { MemberProfile } from "@/types/member";
+import { MemberProfile, SocialProvider } from "@/types/member";
 import { FullReport } from "@/types/report";
-import { getMemberProfile } from "@/lib/report-access";
-import { listAllOrders } from "@/lib/dummy-orders";
-import { DUMMY_REPORTS } from "@/lib/dummy-reports";
 import { ProfileCard } from "./profile-card";
+
+interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  provider: string;
+}
 
 type DashboardState =
   | { phase: "loading" }
@@ -19,27 +23,48 @@ export const MyPageDashboardClient = () => {
   const [state, setState] = useState<DashboardState>({ phase: "loading" });
 
   useEffect(() => {
-    const profile = getMemberProfile();
+    const loadProfile = async () => {
+      try {
+        // /api/auth/me로 현재 사용자 정보 조회
+        const response = await fetch("/api/auth/me", {
+          credentials: "include",
+        });
 
-    // layout 가드에서 처리하므로 null이면 리다이렉트 중 — 로딩 유지
-    if (!profile) return;
+        if (!response.ok) {
+          // layout 가드에서 미인증은 리다이렉트하므로, 여기 도달하지 않음
+          setState({ phase: "ready", profile: {} as MemberProfile, recentReports: [] });
+          return;
+        }
 
-    // 회원의 리포트 필터
-    const myOrders = listAllOrders()
-      .filter(
-        (o) => o.ownerType === "member" && o.memberId === profile!.memberId,
-      )
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+        const user = (await response.json()) as AuthUser;
 
-    const recentReports = myOrders
-      .slice(0, 3)
-      .map((order) => DUMMY_REPORTS[order.id])
-      .filter(Boolean);
+        // AuthUser를 MemberProfile로 변환
+        const profile: MemberProfile = {
+          memberId: user.id,
+          nickname: user.name,
+          email: user.email,
+          provider: user.provider as SocialProvider,
+          joinedAt: new Date().toISOString(), // TODO: Supabase user.created_at 사용
+        };
 
-    setState({ phase: "ready", profile, recentReports });
+        // TODO: [백엔드 연동] Supabase에서 회원의 리포트 조회
+        // const recentReports = await supabase
+        //   .from('analysis_sessions')
+        //   .select('*')
+        //   .eq('user_id', profile.memberId)
+        //   .order('created_at', { ascending: false })
+        //   .limit(3);
+        const recentReports: FullReport[] = [];
+
+        setState({ phase: "ready", profile, recentReports });
+      } catch (error) {
+        console.error("[MyPageDashboardClient] 프로필 로드 실패:", error);
+        // 에러 발생해도 로딩 상태 벗어나기
+        setState({ phase: "ready", profile: {} as MemberProfile, recentReports: [] });
+      }
+    };
+
+    loadProfile();
   }, [router]);
 
   if (state.phase === "loading") {

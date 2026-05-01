@@ -2,30 +2,75 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { isMemberLoggedIn, AUTH_CHANGE_EVENT } from "@/lib/report-access";
 
 interface MobileDrawerAuthNavProps {
   onClose: () => void;
 }
 
+interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  provider: string;
+}
+
 /**
  * 모바일 드로어 내 인증 상태별 메뉴.
- * localStorage 기반 세션을 클라이언트에서 읽고, 로그인/로그아웃 커스텀 이벤트를 구독.
- *
- * TODO: [백엔드 연동] Supabase 세션 쿠키 기반으로 교체
+ * /api/auth/me에서 현재 사용자 정보를 조회.
  */
 export const MobileDrawerAuthNav = ({ onClose }: MobileDrawerAuthNavProps) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoggedIn(isMemberLoggedIn());
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/me", {
+          credentials: "include",
+        });
 
-    const sync = () => setIsLoggedIn(isMemberLoggedIn());
-    window.addEventListener(AUTH_CHANGE_EVENT, sync);
-    return () => window.removeEventListener(AUTH_CHANGE_EVENT, sync);
+        if (response.ok) {
+          const userData = (await response.json()) as AuthUser;
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("[MobileDrawerAuthNav] 세션 조회 실패:", error);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
-  if (isLoggedIn) {
+  // 로딩 중일 때는 로그인 버튼만 표시
+  if (isLoading) {
+    return (
+      <Link
+        href="/auth"
+        onClick={onClose}
+        className="mt-2 rounded-lg px-4 py-3 text-center text-sm font-medium transition-all"
+        style={{
+          background: "linear-gradient(135deg, #6495ED 0%, #A366FF 100%)",
+          color: "#FFFFFF",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(100, 149, 237, 0.3)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "";
+        }}
+      >
+        로그인
+      </Link>
+    );
+  }
+
+  // 회원 로그인 상태
+  if (user) {
     return (
       <Link
         href="/my-page"
@@ -48,6 +93,7 @@ export const MobileDrawerAuthNav = ({ onClose }: MobileDrawerAuthNavProps) => {
     );
   }
 
+  // 비회원 상태
   return (
     <>
       <Link

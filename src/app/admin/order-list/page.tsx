@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Search, ChevronRight } from 'lucide-react';
-import { DUMMY_ADMIN_ORDERS } from '@/lib/dummy-admin';
 import { AdminOrderSummary } from '@/types/admin';
 import { AnalysisCategory } from '@/types/analysis';
 import { OrderOwnerType, OrderStatus } from '@/types/order';
@@ -40,9 +39,9 @@ const AdminOrderListPage = () => {
   const [ownerFilter, setOwnerFilter] = useState<OwnerFilter>('all');
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
 
-  const orders: AdminOrderSummary[] = DUMMY_ADMIN_ORDERS;
-
+  // TODO: [백엔드 연동] /api/admin/orders에서 실제 데이터 조회
   const filtered = useMemo(() => {
+    const orders: AdminOrderSummary[] = [];
     const q = search.toLowerCase();
     return orders.filter((o) => {
       if (ownerFilter !== 'all' && o.ownerType !== ownerFilter) return false;
@@ -50,7 +49,7 @@ const AdminOrderListPage = () => {
       if (q && !o.id.toLowerCase().includes(q) && !o.nickname.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [orders, search, ownerFilter, categoryFilter]);
+  }, [search, ownerFilter, categoryFilter]);
 
   return (
     <div className="flex flex-col gap-6">

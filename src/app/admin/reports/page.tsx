@@ -1,6 +1,6 @@
+import { ReportAnalytic } from "@/types/admin";
 import { type Metadata } from "next";
 import { BarChart3, TrendingUp } from "lucide-react";
-import { DUMMY_REPORT_ANALYTICS } from "@/lib/dummy-admin";
 
 export const metadata: Metadata = {
   title: "리포트 분석 | 코어로그 관리자",
@@ -16,7 +16,15 @@ const formatPercent = (value: number) => `${value.toFixed(1)}%`;
  * TODO: [백엔드 연동] /api/admin/analytics/reports 실제 호출로 교체
  */
 const ReportAnalyticsPage = () => {
-  const analytics = DUMMY_REPORT_ANALYTICS;
+  const analytics: ReportAnalytic = {
+    freeReportCount: 0,
+    paidReportCount: 0,
+    freeTooltotal: "0%",
+    avgLength: 0,
+    successRate: 0,
+    failureRate: 0,
+    avgRetentionTime: 0,
+  }; // TODO: [백엔드 연동]
   const totalReports = analytics.freeReportCount + analytics.paidReportCount;
   const freePercent = (
     (analytics.freeReportCount / totalReports) *

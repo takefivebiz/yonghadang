@@ -1,6 +1,5 @@
 import { type Metadata } from "next";
 import { TrendingUp, TrendingDown, ShoppingCart, Users, FileText, DollarSign } from "lucide-react";
-import { DUMMY_SALES_SUMMARY } from "@/lib/dummy-admin";
 import { SalesSummary, MonthlySales } from "@/types/admin";
 
 export const metadata: Metadata = {
@@ -94,7 +93,17 @@ const SalesBarChart = ({ data }: { data: MonthlySales[] }) => {
  */
 const AdminDashboardPage = () => {
   // TODO: [백엔드 연동] 더미데이터를 /api/admin/sales 실제 호출로 교체
-  const summary: SalesSummary = DUMMY_SALES_SUMMARY;
+  const summary: SalesSummary = {
+    totalRevenue: 0,
+    totalOrders: 0,
+    newUsers: 0,
+    totalReports: 0,
+    revenueChangeRate: 0,
+    ordersChangeRate: 0,
+    usersChangeRate: 0,
+    reportsChangeRate: 0,
+    monthlySales: [],
+  };
 
   return (
     <div className="flex flex-col gap-8">

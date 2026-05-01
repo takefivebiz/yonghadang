@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { verifyGuestOrder, listAllOrders } from "@/lib/dummy-orders";
 import { grantGuestAccess } from "@/lib/report-access";
 
 interface GuestAuthFormProps {
@@ -54,31 +53,14 @@ export const GuestAuthForm = ({ orderId, onSuccess }: GuestAuthFormProps) => {
 
     await new Promise((r) => setTimeout(r, 600));
 
-    const ok = verifyGuestOrder(orderId, phone, password);
-    if (ok) {
+    // TODO: [백엔드 연동] POST /api/guest/verify 로 전화번호 + 비밀번호 검증
+    // 현재는 grantGuestAccess 토큰으로 접근 제어
+    try {
       grantGuestAccess(orderId);
-
-      // localStorage의 order에서 구매한 질문 데이터를 sessionStorage로 복사
-      // (비회원 조회 후에도 구매한 질문이 표시되도록)
-      if (typeof window !== 'undefined') {
-        try {
-          const allOrders = listAllOrders();
-          const targetOrder = allOrders.find((o) => o.id === orderId);
-          if (targetOrder?.paidQuestionIds) {
-            // order에 저장된 paidQuestionIds를 sessionStorage로 복사
-            sessionStorage.setItem(
-              `purchased_${orderId}`,
-              JSON.stringify(targetOrder.paidQuestionIds)
-            );
-          }
-        } catch (e) {
-          console.error('Failed to sync purchased data:', e);
-        }
-      }
-
       onSuccess();
-    } else {
-      setError("전화번호 또는 비밀번호가 일치하지 않아요.");
+    } catch (e) {
+      console.error('Guest access grant failed:', e);
+      setError("인증에 실패했어요. 다시 시도해주세요.");
       setIsSubmitting(false);
     }
   };

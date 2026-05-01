@@ -3,16 +3,20 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { MemberProfile } from '@/types/member';
-import {
-  getMemberProfile,
-  logoutMember,
-} from '@/lib/report-access';
+import { MemberProfile, SocialProvider } from '@/types/member';
 import { ProfileCard } from '../../_components/profile-card';
+
+interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  provider: string;
+}
 
 type SettingsState =
   | { phase: 'loading' }
-  | { phase: 'ready'; profile: MemberProfile };
+  | { phase: 'ready'; profile: MemberProfile }
+  | { phase: 'error'; error: string };
 
 export const SettingsClient = () => {
   const router = useRouter();
@@ -20,10 +24,36 @@ export const SettingsClient = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
-    const profile = getMemberProfile();
-    if (!profile) return;
+    const loadProfile = async () => {
+      try {
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include',
+        });
 
-    setState({ phase: 'ready', profile });
+        if (!response.ok) {
+          setState({ phase: 'error', error: '프로필을 불러올 수 없어요' });
+          return;
+        }
+
+        const user = (await response.json()) as AuthUser;
+
+        // AuthUser를 MemberProfile로 변환
+        const profile: MemberProfile = {
+          memberId: user.id,
+          nickname: user.name,
+          email: user.email,
+          provider: user.provider as SocialProvider,
+          joinedAt: new Date().toISOString(), // TODO: user.created_at 사용
+        };
+
+        setState({ phase: 'ready', profile });
+      } catch (error) {
+        console.error('[SettingsClient] 프로필 로드 실패:', error);
+        setState({ phase: 'error', error: '프로필을 불러올 수 없어요' });
+      }
+    };
+
+    loadProfile();
   }, []);
 
   if (state.phase === 'loading') {
@@ -44,6 +74,23 @@ export const SettingsClient = () => {
     );
   }
 
+  if (state.phase === 'error') {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <p className="mb-4" style={{ color: '#EF4444' }}>{state.error}</p>
+          <button
+            onClick={() => router.push('/my-page')}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-white"
+            style={{ background: 'linear-gradient(90deg, #6495ED 0%, #A366FF 100%)' }}
+          >
+            돌아가기
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const { profile } = state;
 
   const handleProfileChange = (next: MemberProfile) => {
@@ -52,18 +99,34 @@ export const SettingsClient = () => {
     );
   };
 
-  const handleLogout = () => {
-    logoutMember();
-    toast.success('로그아웃되었어요');
-    router.push('/');
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      toast.success('로그아웃되었어요');
+      router.push('/');
+    } catch (error) {
+      console.error('[SettingsClient] 로그아웃 실패:', error);
+      toast.error('로그아웃에 실패했어요');
+    }
   };
 
-  const handleDeleteAccount = () => {
-    // 더미: 세션 초기화 후 리다이렉트
-    // TODO: [백엔드 연동] DELETE /api/me 호출
-    logoutMember();
-    toast.success('계정이 삭제되었어요');
-    router.push('/');
+  const handleDeleteAccount = async () => {
+    try {
+      // TODO: [백엔드 연동] DELETE /api/me 호출
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      toast.success('계정이 삭제되었어요');
+      router.push('/');
+    } catch (error) {
+      console.error('[SettingsClient] 계정 삭제 실패:', error);
+      toast.error('계정 삭제에 실패했어요');
+      setShowDeleteModal(false);
+    }
   };
 
   return (
@@ -85,7 +148,7 @@ export const SettingsClient = () => {
           계정
         </h2>
         <div
-          className="space-y-3 rounded-2xl border p-6"
+          className="space-y-4 rounded-2xl border p-6"
           style={{
             background: "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
             borderColor: "rgba(230, 230, 250, 0.15)",
@@ -106,6 +169,21 @@ export const SettingsClient = () => {
               {new Date(profile.joinedAt).toLocaleDateString('ko-KR')}
             </p>
           </div>
+
+          {/* 로그아웃 버튼 */}
+          <div className="border-t pt-4" style={{ borderColor: 'rgba(230, 230, 250, 0.1)' }}>
+            <button
+              onClick={handleLogout}
+              className="w-full rounded-lg px-4 py-2 text-sm font-medium transition-all hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              style={{
+                borderColor: "rgba(230, 230, 250, 0.2)",
+                border: "1px solid rgba(230, 230, 250, 0.2)",
+                color: '#D4C5E2',
+              }}
+            >
+              로그아웃
+            </button>
+          </div>
         </div>
       </section>
 
@@ -114,33 +192,17 @@ export const SettingsClient = () => {
         <h2 className="mb-4 text-lg font-semibold" style={{ color: '#F0E6FA' }}>
           위험 영역
         </h2>
-        <div className="space-y-3">
-          {/* 로그아웃 */}
-          <button
-            onClick={handleLogout}
-            className="w-full rounded-2xl border px-6 py-3 text-sm font-medium transition-all hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
-            style={{
-              borderColor: "rgba(230, 230, 250, 0.15)",
-              background: "linear-gradient(135deg, rgba(100, 149, 237, 0.15), rgba(75, 0, 130, 0.1))",
-              color: '#F0E6FA',
-            }}
-          >
-            로그아웃
-          </button>
-
-          {/* 회원 탈퇴 */}
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="w-full rounded-2xl border px-6 py-3 text-sm font-medium transition-all hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
-            style={{
-              borderColor: "rgba(239, 68, 68, 0.3)",
-              backgroundColor: "rgba(239, 68, 68, 0.1)",
-              color: '#EF4444',
-            }}
-          >
-            회원 탈퇴
-          </button>
-        </div>
+        <button
+          onClick={() => setShowDeleteModal(true)}
+          className="w-full rounded-2xl border px-6 py-3 text-sm font-medium transition-all hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
+          style={{
+            borderColor: "rgba(239, 68, 68, 0.3)",
+            backgroundColor: "rgba(239, 68, 68, 0.1)",
+            color: '#EF4444',
+          }}
+        >
+          회원 탈퇴
+        </button>
       </section>
 
       {/* 탈퇴 확인 모달 */}

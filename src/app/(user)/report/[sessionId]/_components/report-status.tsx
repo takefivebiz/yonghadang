@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { getOrder } from "@/lib/dummy-orders";
 import { OrderStatus } from "@/types/order";
 
 interface ReportStatusProps {
@@ -35,10 +34,14 @@ export const ReportStatus = ({
   const [status, setStatus] = useState<OrderStatus>(initialStatus);
   const [progress, setProgress] = useState(8);
   const [elapsedMs, setElapsedMs] = useState(0);
-  /** 폴링 타임아웃(10분) 초과 여부 — 에러 UI 메시지 분기용 */
+  /** 폴링 타임아웃(10분) 초과 여부 */
   const [isTimeout, setIsTimeout] = useState(false);
   /** 네트워크 불안정으로 인한 에러 여부 */
   const [isNetworkError, setIsNetworkError] = useState(false);
+  /** 잘못된 세션(404) */
+  const [isInvalidSession, setIsInvalidSession] = useState(false);
+  /** 서버 에러(500) */
+  const [isServerError, setIsServerError] = useState(false);
   const consecutiveErrorsRef = useRef(0);
 
   // 3초 간격 폴링 — 서버에서 status=done 으로 전환되면 상위에 알림
@@ -47,24 +50,40 @@ export const ReportStatus = ({
 
     const start = Date.now();
 
-    // TODO: [백엔드 연동] getOrder → fetch("/api/orders/[id]") 로 교체
-    // 교체 시 try/catch로 감싸고 consecutiveErrorsRef 카운터 활용
-    const poll = window.setInterval(() => {
+    const poll = window.setInterval(async () => {
       try {
-        const updated = getOrder(orderId);
+        const response = await fetch(`/api/sessions/${orderId}/status`);
+
+        // 상태 코드별 처리
+        if (response.status === 404) {
+          setIsInvalidSession(true);
+          setStatus("error");
+          clearInterval(poll);
+          return;
+        }
+
+        if (response.status === 500) {
+          setIsServerError(true);
+          setStatus("error");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json() as { status: OrderStatus };
         // 성공 시 연속 에러 카운터 리셋
         consecutiveErrorsRef.current = 0;
 
-        if (!updated) return;
-
         setElapsedMs(Date.now() - start);
 
-        if (updated.status === "done") {
+        if (data.status === "done") {
           setStatus("done");
           onDone();
           return;
         }
-        if (updated.status === "error") {
+        if (data.status === "error") {
           setStatus("error");
           return;
         }
@@ -75,7 +94,7 @@ export const ReportStatus = ({
           setStatus("error");
         }
       } catch {
-        // 연속 실패 카운터 증가 — MAX_CONSECUTIVE_ERRORS 초과 시 네트워크 에러 처리
+        // 연속 실패 카운터 증가
         consecutiveErrorsRef.current += 1;
         if (consecutiveErrorsRef.current >= MAX_CONSECUTIVE_ERRORS) {
           setIsNetworkError(true);
@@ -103,6 +122,8 @@ export const ReportStatus = ({
     consecutiveErrorsRef.current = 0;
     setIsTimeout(false);
     setIsNetworkError(false);
+    setIsInvalidSession(false);
+    setIsServerError(false);
     setProgress(8);
     setElapsedMs(0);
     // status를 pending으로 되돌려 폴링 useEffect 재실행
@@ -110,13 +131,21 @@ export const ReportStatus = ({
   };
 
   // ── 에러 메시지 분기 ───────────────────────────────────────
-  const errorTitle = isTimeout
+  const errorTitle = isInvalidSession
+    ? "세션을 찾을 수 없어요"
+    : isServerError
+    ? "서버 오류가 발생했어요"
+    : isTimeout
     ? "리포트 생성 시간이 초과됐어요"
     : isNetworkError
     ? "네트워크 연결이 불안정해요"
     : "리포트 생성에 실패했어요";
 
-  const errorDesc = isTimeout
+  const errorDesc = isInvalidSession
+    ? "분석 세션을 찾을 수 없어요. 홈으로 돌아가 다시 분석해주세요."
+    : isServerError
+    ? "서버에 일시적인 오류가 발생했어요. 잠시 후 다시 시도해주세요."
+    : isTimeout
     ? "10분이 지나도 리포트가 완성되지 않았어요. 잠시 후 다시 시도하시거나 고객센터로 문의해주세요."
     : isNetworkError
     ? "서버와의 연결이 3회 이상 실패했어요. 네트워크 상태를 확인 후 다시 시도해주세요."

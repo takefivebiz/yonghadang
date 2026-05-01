@@ -21,10 +21,15 @@ export const GoogleLoginButton = ({
   disabled,
   loading,
 }: GoogleLoginButtonProps) => {
+  const handleClick = () => {
+    console.log('🔥 REAL GOOGLE BUTTON CLICKED');
+    onClick();
+  };
+
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled || loading}
       aria-label="Google로 로그인"
       className="group relative flex h-12 w-full items-center justify-center gap-2.5 rounded-xl border border-[#747775] bg-white px-4 text-[15px] font-semibold text-[#1F1F1F] transition-all duration-200 hover:bg-[#F8F9FA] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
