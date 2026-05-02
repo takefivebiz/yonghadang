@@ -1,3 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/**
+ * Veil 디자인 시스템 색상 팔레트 (PRD 4. 디자인 가이드)
+ * Tailwind v4 @theme 블록으로 CSS 변수 정의 → bg-*, text-*, border-* 유틸리티 자동 생성
+ */
+@theme {
+  --color-background: #141021;
+  --color-surface: #2F3159;
+  --color-accent: #D16DAC;
+  --color-secondary: #5E99AB;
+  --color-highlight: #F9F9E5;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-highlight);
+}

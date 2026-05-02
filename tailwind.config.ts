@@ -1,19 +1,9 @@
 import type { Config } from 'tailwindcss';
 
-const config: Config = {
-  theme: {
-    extend: {
-      colors: {
-        /** Veil 디자인 팔레트 */
-        cream: '#F5F0E8',
-        'deep-purple': '#4A3B5C',
-        'pastel-pink': '#F5D7E8',
-        lavender: '#E8D4F0',
-        'dusty-rose': '#D4A5A5',
-        peach: '#F5E8D7',
-      },
-    },
-  },
-};
+/**
+ * Tailwind v4: 색상 토큰은 globals.css @theme 블록으로 관리
+ * 이 파일은 v4에서 @config 지시어 없이는 자동으로 로드되지 않음
+ */
+const config: Config = {};
 
 export default config;
