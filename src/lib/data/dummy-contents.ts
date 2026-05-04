@@ -1,24 +1,24 @@
-import { Content } from "@/lib/types/content"
+import { Content } from "@/lib/types/content";
 
 // TODO: [백엔드 연동] 더미데이터를 /api/contents 실제 호출로 교체
 export const DUMMY_CONTENTS: Content[] = [
   // ── 연애 ──────────────────────────────────────────────────────
   {
     id: "love-1",
-    title: "지금 이 사람, 나를 진짜로 좋아하는 걸까?",
-    subtitle: "감정인지 착각인지, 지금 이 관계를 해석해드려요",
+    title: "연락 스타일 분석",
+    subtitle: "연락은 하는데, 왜 점점 멀어지는 느낌일까?",
     category: "love",
-    thumbnail_url: null,
+    thumbnail_url: "/img/love-1.png",
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
   },
   {
     id: "love-2",
-    title: "자꾸 내가 먼저 연락하게 되는 이유",
-    subtitle: "나만 더 좋아하는 건지, 관계의 구조를 들여다봐요",
+    title: "관계 지속 가능성",
+    subtitle: "이 관계, 계속 가도 되는걸까",
     category: "love",
-    thumbnail_url: null,
+    thumbnail_url: "/img/love-2.png",
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
@@ -59,7 +59,7 @@ export const DUMMY_CONTENTS: Content[] = [
     title: "왜 나는 항상 관계에서 을이 되는 걸까?",
     subtitle: "관계 패턴 속 숨겨진 나의 역할을 찾아요",
     category: "relationship",
-    thumbnail_url: null,
+    thumbnail_url: "/img/rel-1.png",
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
@@ -69,7 +69,7 @@ export const DUMMY_CONTENTS: Content[] = [
     title: "친한 척하지만 뭔가 이상한 그 사람",
     subtitle: "이 관계, 계속해도 되는 건지 파악해요",
     category: "relationship",
-    thumbnail_url: null,
+    thumbnail_url: "/img/rel-2.png",
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
@@ -110,7 +110,7 @@ export const DUMMY_CONTENTS: Content[] = [
     title: "지금 이 일이 나한테 맞는 건지 모르겠어",
     subtitle: "적성인지 환경 문제인지 구분해요",
     category: "career",
-    thumbnail_url: null,
+    thumbnail_url: "/img/career-1.png",
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
@@ -120,7 +120,7 @@ export const DUMMY_CONTENTS: Content[] = [
     title: "퇴사 vs 버티기, 지금 내 상황은?",
     subtitle: "지금 상황을 객관적으로 해석해드려요",
     category: "career",
-    thumbnail_url: null,
+    thumbnail_url: "/img/career-2.png",
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
@@ -161,7 +161,7 @@ export const DUMMY_CONTENTS: Content[] = [
     title: "이유 없이 공허한 이 감정의 정체",
     subtitle: "막연한 공허함의 실체를 찾아봐요",
     category: "emotion",
-    thumbnail_url: null,
+    thumbnail_url: "/img/emotion-1.png",
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
@@ -171,7 +171,7 @@ export const DUMMY_CONTENTS: Content[] = [
     title: "자꾸 남과 비교하는 내가 싫을 때",
     subtitle: "비교 감정 뒤에 숨은 욕구를 봐요",
     category: "emotion",
-    thumbnail_url: null,
+    thumbnail_url: "/img/emotion-2.png",
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
@@ -206,9 +206,9 @@ export const DUMMY_CONTENTS: Content[] = [
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
   },
-]
+];
 
 /** 트렌딩: 카테고리별 대표 콘텐츠 4장 */
 export const TRENDING_CONTENTS = DUMMY_CONTENTS.filter((c) =>
-  ["love-1", "rel-1", "career-2", "emotion-3"].includes(c.id)
-)
+  ["love-1", "rel-1", "career-2", "emotion-3"].includes(c.id),
+);

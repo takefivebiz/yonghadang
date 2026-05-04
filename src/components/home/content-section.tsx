@@ -14,7 +14,7 @@ const ContentSection = ({ category, contents }: ContentSectionProps) => {
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="h-4 w-1 rounded-full bg-secondary" />
-          <h2 className="text-base font-bold text-highlight">
+          <h2 className="text-base font-bold tracking-wider text-highlight">
             {CATEGORY_LABELS[category]}
           </h2>
         </div>

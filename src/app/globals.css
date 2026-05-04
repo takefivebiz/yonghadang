@@ -23,6 +23,8 @@ html {
 body {
   background-color: var(--color-background);
   color: var(--color-highlight);
+  /* 상단 secondary 미세 광원 — 야경 분위기 */
+  background-image: radial-gradient(ellipse 90% 35% at 50% -5%, rgba(94, 153, 171, 0.10) 0%, transparent 100%);
 }
 
 @utility scrollbar-hide {
