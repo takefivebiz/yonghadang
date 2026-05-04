@@ -76,16 +76,19 @@ const ContentCard = ({ content, showBadge = true }: ContentCardProps) => {
 
         {/* 텍스트 블록 — 좌하단 고정 */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
-          <p className="line-clamp-2 text-lg font-bold leading-tight text-white sm:text-xl">
+          <p className="line-clamp-2 whitespace-pre-line text-lg font-bold leading-tight text-white sm:text-xl">
             {content.title}
           </p>
           {/* 카테고리 액센트 라인 */}
           <div className={`mt-2.5 h-[2px] w-7 rounded-full ${config.accent}`} />
-          {content.subtitle && (
-            <p className="mt-2 line-clamp-2 text-xs leading-snug text-white/65">
-              {content.subtitle}
-            </p>
-          )}
+          {/* 서브텍스트는 항상 2줄 높이를 고정 확보 — 줄 수에 따라 제목 위치가 바뀌는 현상 방지 */}
+          <div className="mt-2 h-[2.0625rem] overflow-hidden">
+            {content.subtitle && (
+              <p className="line-clamp-2 text-xs leading-snug text-white/65">
+                {content.subtitle}
+              </p>
+            )}
+          </div>
         </div>
 
       </article>

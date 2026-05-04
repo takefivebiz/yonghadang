@@ -5,8 +5,8 @@ export const DUMMY_CONTENTS: Content[] = [
   // ── 연애 ──────────────────────────────────────────────────────
   {
     id: "love-1",
-    title: "연락 스타일 분석",
-    subtitle: "연락은 하는데, 왜 점점 멀어지는 느낌일까?",
+    title: "이 사람, \n 사랑일까 집착일까?",
+    subtitle: "이미 선을 넘고 있는 걸 수도 있어",
     category: "love",
     thumbnail_url: "/img/love-1.png",
     input_type: "free",
@@ -15,8 +15,8 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "love-2",
-    title: "관계 지속 가능성",
-    subtitle: "이 관계, 계속 가도 되는걸까",
+    title: "설렘 vs 외로움\n지금 내 상태는?",
+    subtitle: "설레는 게 아니라, 외로워서 붙잡고 있는 걸 수도 있어",
     category: "love",
     thumbnail_url: "/img/love-2.png",
     input_type: "choice",
@@ -25,8 +25,8 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "love-3",
-    title: "첫 만남인데 왜 이렇게 신경 쓰일까",
-    subtitle: "설레임인지 불안인지, 감정의 실체를 확인해요",
+    title: "왜 나만 항상\n더 좋아하게 될까?",
+    subtitle: "이미 기울어진 관계일 가능성이 높아",
     category: "love",
     thumbnail_url: null,
     input_type: "free",
@@ -35,7 +35,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "love-4",
-    title: "헤어지고 싶은 건지 지친 건지 모르겠어",
+    title: "헤어지고 싶은 걸까,\n 그냥 지친걸까?",
     subtitle: "관계의 끝인지 고비인지, 지금을 해석해요",
     category: "love",
     thumbnail_url: null,
@@ -45,7 +45,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "love-5",
-    title: "좋아하는 것 같은데 왜 자꾸 불안하지",
+    title: "좋아하는 것 같은데\n왜 자꾸 불안하지",
     subtitle: "애정 속 불안의 실제 구조를 분석해요",
     category: "love",
     thumbnail_url: null,
@@ -56,7 +56,7 @@ export const DUMMY_CONTENTS: Content[] = [
   // ── 인간관계 ──────────────────────────────────────────────────
   {
     id: "rel-1",
-    title: "왜 나는 항상 관계에서 을이 되는 걸까?",
+    title: "왜 나는 항상 관계에서 \n 을이 되는 걸까?",
     subtitle: "관계 패턴 속 숨겨진 나의 역할을 찾아요",
     category: "relationship",
     thumbnail_url: "/img/rel-1.png",
@@ -66,7 +66,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "rel-2",
-    title: "친한 척하지만 뭔가 이상한 그 사람",
+    title: "친한 척하지만 \n 뭔가 이상한 그 사람",
     subtitle: "이 관계, 계속해도 되는 건지 파악해요",
     category: "relationship",
     thumbnail_url: "/img/rel-2.png",
@@ -76,7 +76,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "rel-3",
-    title: "가족 중에 나만 힘든 것 같을 때",
+    title: "가족 중에 \n나만 힘든 것 같을 때",
     subtitle: "가족 역학 속 내 감정의 위치를 봐요",
     category: "relationship",
     thumbnail_url: null,
@@ -86,7 +86,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "rel-4",
-    title: "잘 지내는 척하지만 사실 지쳐있는 나",
+    title: "잘 지내는 척하지만\n 사실 지쳐있는 나",
     subtitle: "인간관계 소진의 원인을 분석해요",
     category: "relationship",
     thumbnail_url: null,
@@ -96,7 +96,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "rel-5",
-    title: "친구가 나를 이용하는 건지 헷갈려",
+    title: "친구가 나를 \n이용하는 건지 헷갈려",
     subtitle: "이 우정, 건강한 건지 점검해봐요",
     category: "relationship",
     thumbnail_url: null,
@@ -107,7 +107,7 @@ export const DUMMY_CONTENTS: Content[] = [
   // ── 직업·진로 ─────────────────────────────────────────────────
   {
     id: "career-1",
-    title: "지금 이 일이 나한테 맞는 건지 모르겠어",
+    title: "지금 이 일, \n나한테 맞는 걸까?",
     subtitle: "적성인지 환경 문제인지 구분해요",
     category: "career",
     thumbnail_url: "/img/career-1.png",
@@ -117,7 +117,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "career-2",
-    title: "퇴사 vs 버티기, 지금 내 상황은?",
+    title: "퇴사 vs 버티기, \n지금 내 상황은?",
     subtitle: "지금 상황을 객관적으로 해석해드려요",
     category: "career",
     thumbnail_url: "/img/career-2.png",
@@ -127,7 +127,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "career-3",
-    title: "번아웃인지 게으른 건지 구분이 안 돼",
+    title: "번아웃일까, \n 게으른 걸까?",
     subtitle: "의지 문제인지 신호인지 파악해요",
     category: "career",
     thumbnail_url: null,
@@ -137,7 +137,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "career-4",
-    title: "잘하고 있는 건지 확신이 없을 때",
+    title: "잘하고 있는 건지\n확신이 없을 때",
     subtitle: "성과보다 방향이 맞는지를 짚어봐요",
     category: "career",
     thumbnail_url: null,
@@ -147,7 +147,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "career-5",
-    title: "이직을 생각하는 이유가 진짜인지",
+    title: "이직을 생각하는 이유",
     subtitle: "충동인지 필연인지 지금을 정리해요",
     category: "career",
     thumbnail_url: null,
@@ -158,7 +158,7 @@ export const DUMMY_CONTENTS: Content[] = [
   // ── 감정 ──────────────────────────────────────────────────────
   {
     id: "emotion-1",
-    title: "이유 없이 공허한 이 감정의 정체",
+    title: "이유 없이 공허한 \n이 감정의 정체",
     subtitle: "막연한 공허함의 실체를 찾아봐요",
     category: "emotion",
     thumbnail_url: "/img/emotion-1.png",
@@ -168,7 +168,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "emotion-2",
-    title: "자꾸 남과 비교하는 내가 싫을 때",
+    title: "자꾸 남과 비교하는 \n 내가 싫을 때",
     subtitle: "비교 감정 뒤에 숨은 욕구를 봐요",
     category: "emotion",
     thumbnail_url: "/img/emotion-2.png",
@@ -178,7 +178,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "emotion-3",
-    title: "감정을 숨기는 게 습관이 된 나",
+    title: "감정을 숨기는 게 \n습관이 된 나",
     subtitle: "감정 억압의 구조와 원인을 분석해요",
     category: "emotion",
     thumbnail_url: null,
@@ -188,7 +188,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "emotion-4",
-    title: "왜 이렇게 예민해졌는지 모르겠어",
+    title: "왜 이렇게 \n예민해졌는지 모르겠어",
     subtitle: "예민함의 실제 신호와 의미를 파악해요",
     category: "emotion",
     thumbnail_url: null,
@@ -198,7 +198,7 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "emotion-5",
-    title: "무기력한 게 우울인지 슬럼프인지",
+    title: "무기력한 게 \n우울인지 슬럼프인지",
     subtitle: "지금 상태의 본질을 해석해드려요",
     category: "emotion",
     thumbnail_url: null,
