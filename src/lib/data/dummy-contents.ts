@@ -24,19 +24,27 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["지금 감정의 진짜 원인", "외로움이 만드는 착각", "이 관계에서 찾는 것"],
+    insights: [
+      "지금 감정의 진짜 원인",
+      "외로움이 만드는 착각",
+      "이 관계에서 찾는 것",
+    ],
     estimated_minutes: 3,
   },
   {
     id: "love-3",
-    title: "왜 나만 항상\n더 좋아하게 될까?",
+    title: "왜 항상 나만\n더 좋아하게 될까?",
     subtitle: "이미 기울어진 관계일 가능성이 높아",
     category: "love",
-    thumbnail_url: null,
+    thumbnail_url: "/img/love-3.png",
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["감정 불균형의 원인", "반복되는 관계 패턴", "기울어진 애정의 구조"],
+    insights: [
+      "감정 불균형의 원인",
+      "반복되는 관계 패턴",
+      "기울어진 애정의 구조",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -48,7 +56,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["이별 신호인지 고비인지", "관계 소진의 실제 원인", "지금 나에게 필요한 것"],
+    insights: [
+      "이별 신호인지 고비인지",
+      "관계 소진의 실제 원인",
+      "지금 나에게 필요한 것",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -60,7 +72,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["불안의 실제 원인", "애정과 불안이 공존하는 구조", "이 관계에서 원하는 것"],
+    insights: [
+      "불안의 실제 원인",
+      "애정과 불안이 공존하는 구조",
+      "이 관계에서 원하는 것",
+    ],
     estimated_minutes: 3,
   },
   // ── 인간관계 ──────────────────────────────────────────────────
@@ -73,7 +89,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["관계 역학 속 나의 역할", "을 패턴이 반복되는 이유", "관계에서 나의 실제 위치"],
+    insights: [
+      "관계 역학 속 나의 역할",
+      "을 패턴이 반복되는 이유",
+      "관계에서 나의 실제 위치",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -85,7 +105,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["이 관계의 실제 성질", "상대방 행동의 패턴", "계속해야 할지 판단 기준"],
+    insights: [
+      "이 관계의 실제 성질",
+      "상대방 행동의 패턴",
+      "계속해야 할지 판단 기준",
+    ],
     estimated_minutes: 3,
   },
   {
@@ -97,7 +121,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["가족 역학 속 내 위치", "이 감정이 생긴 구조", "나만 힘든 진짜 이유"],
+    insights: [
+      "가족 역학 속 내 위치",
+      "이 감정이 생긴 구조",
+      "나만 힘든 진짜 이유",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -109,7 +137,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["관계 소진의 실제 원인", "에너지가 빠지는 패턴", "지금 필요한 경계선"],
+    insights: [
+      "관계 소진의 실제 원인",
+      "에너지가 빠지는 패턴",
+      "지금 필요한 경계선",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -121,7 +153,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["이 우정의 균형 상태", "이용당하는 패턴의 구조", "건강한 관계의 기준"],
+    insights: [
+      "이 우정의 균형 상태",
+      "이용당하는 패턴의 구조",
+      "건강한 관계의 기준",
+    ],
     estimated_minutes: 3,
   },
   // ── 직업·진로 ─────────────────────────────────────────────────
@@ -134,7 +170,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["적성인지 환경 문제인지", "지금 힘든 이유의 실체", "이 일이 맞는지 판단 기준"],
+    insights: [
+      "적성인지 환경 문제인지",
+      "지금 힘든 이유의 실체",
+      "이 일이 맞는지 판단 기준",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -146,7 +186,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["떠나야 할 신호 vs 버텨야 할 신호", "지금 상황의 객관적 분석", "결정을 위한 핵심 질문"],
+    insights: [
+      "떠나야 할 신호 vs 버텨야 할 신호",
+      "지금 상황의 객관적 분석",
+      "결정을 위한 핵심 질문",
+    ],
     estimated_minutes: 3,
   },
   {
@@ -158,7 +202,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["번아웃 신호 vs 의지 문제", "지금 상태의 실제 원인", "회복을 위한 방향"],
+    insights: [
+      "번아웃 신호 vs 의지 문제",
+      "지금 상태의 실제 원인",
+      "회복을 위한 방향",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -170,7 +218,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["성과보다 방향이 맞는지", "불확실감의 실제 원인", "지금 있어야 할 위치"],
+    insights: [
+      "성과보다 방향이 맞는지",
+      "불확실감의 실제 원인",
+      "지금 있어야 할 위치",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -182,7 +234,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["이직 충동의 실제 원인", "충동인지 필연인지 구분", "지금 결정에 필요한 것"],
+    insights: [
+      "이직 충동의 실제 원인",
+      "충동인지 필연인지 구분",
+      "지금 결정에 필요한 것",
+    ],
     estimated_minutes: 3,
   },
   // ── 감정 ──────────────────────────────────────────────────────
@@ -195,7 +251,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["공허함의 실제 정체", "이 감정이 생긴 구조", "공허함이 원하는 것"],
+    insights: [
+      "공허함의 실제 정체",
+      "이 감정이 생긴 구조",
+      "공허함이 원하는 것",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -207,7 +267,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["비교 감정의 실제 원인", "비교 뒤에 숨은 욕구", "이 패턴이 반복되는 이유"],
+    insights: [
+      "비교 감정의 실제 원인",
+      "비교 뒤에 숨은 욕구",
+      "이 패턴이 반복되는 이유",
+    ],
     estimated_minutes: 3,
   },
   {
@@ -219,7 +283,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["감정 억압의 구조", "숨기는 습관이 생긴 이유", "억압된 감정이 원하는 것"],
+    insights: [
+      "감정 억압의 구조",
+      "숨기는 습관이 생긴 이유",
+      "억압된 감정이 원하는 것",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -231,7 +299,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "free",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["예민함의 실제 신호", "지금 상태가 보내는 메시지", "예민함의 구조적 원인"],
+    insights: [
+      "예민함의 실제 신호",
+      "지금 상태가 보내는 메시지",
+      "예민함의 구조적 원인",
+    ],
     estimated_minutes: 5,
   },
   {
@@ -243,7 +315,11 @@ export const DUMMY_CONTENTS: Content[] = [
     input_type: "choice",
     card_config: { free_card_count: 2, paid_card_count: 4, cards: [] },
     created_at: "2026-05-01T00:00:00Z",
-    insights: ["지금 상태의 정확한 성질", "우울과 슬럼프 구분 기준", "지금 가장 필요한 것"],
+    insights: [
+      "지금 상태의 정확한 성질",
+      "우울과 슬럼프 구분 기준",
+      "지금 가장 필요한 것",
+    ],
     estimated_minutes: 3,
   },
 ];

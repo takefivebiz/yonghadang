@@ -1,6 +1,6 @@
-import Link from "next/link"
-import Image from "next/image"
-import { Content, Category } from "@/lib/types/content"
+import Link from "next/link";
+import Image from "next/image";
+import { Content, Category } from "@/lib/types/content";
 
 const CATEGORY_CONFIG: Record<
   Category,
@@ -30,70 +30,79 @@ const CATEGORY_CONFIG: Record<
     accent: "bg-purple-400",
     ring: "border-purple-400/30",
   },
-}
+};
 
 interface ContentCardProps {
-  content: Content
-  showBadge?: boolean
+  content: Content;
+  showBadge?: boolean;
+  priority?: boolean;
 }
 
-const ContentCard = ({ content, showBadge = true }: ContentCardProps) => {
-  const config = CATEGORY_CONFIG[content.category]
+const ContentCard = ({
+  content,
+  showBadge = true,
+  priority = false,
+}: ContentCardProps) => {
+  const config = CATEGORY_CONFIG[content.category];
 
   return (
-    <Link href={`/content/${content.id}`} className="group block w-56 shrink-0 sm:w-64">
-      {/* 3:4 세로형 카드 */}
-      <article className="relative aspect-[3/4] overflow-hidden rounded-2xl transition-transform duration-300 group-hover:scale-[1.02]">
-
+    <Link
+      href={`/content/${content.id}`}
+      className="group block w-full shrink-0 sm:w-[520px]"
+    >
+      <article className="relative aspect-[16/9] overflow-hidden rounded-2xl transition-transform duration-300 group-hover:scale-[1.02]">
         {/* 배경 이미지 or 플레이스홀더 */}
         {content.thumbnail_url ? (
           <Image
             src={content.thumbnail_url}
             alt={content.title}
             fill
+            sizes="(max-width: 640px) 100vw, 520px"
+            priority={priority}
             className="object-cover"
           />
         ) : (
           <div className="absolute inset-0 bg-surface/60">
             {/* 우측 상단 동심원 패턴 */}
-            <div className={`absolute -right-6 -top-6 h-36 w-36 rounded-full border-2 ${config.ring}`} />
-            <div className={`absolute -right-2 -top-2 h-24 w-24 rounded-full border ${config.ring} opacity-50`} />
-            <div className={`absolute right-8 top-8 h-10 w-10 rounded-full border ${config.ring} opacity-30`} />
+            <div
+              className={`absolute -right-6 -top-6 h-36 w-36 rounded-full border-2 ${config.ring}`}
+            />
+            <div
+              className={`absolute -right-2 -top-2 h-24 w-24 rounded-full border ${config.ring} opacity-50`}
+            />
+            <div
+              className={`absolute right-8 top-8 h-10 w-10 rounded-full border ${config.ring} opacity-30`}
+            />
           </div>
         )}
-
-        {/* 하단 텍스트 가독성 오버레이 — 카드 하단 45% 영역 */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
 
         {/* 카테고리 배지 — 좌상단 */}
         {showBadge && (
           <div className="absolute left-3 top-3">
-            <span className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold backdrop-blur-sm ${config.badge}`}>
+            <span
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold backdrop-blur-sm ${config.badge}`}
+            >
               {config.label}
             </span>
           </div>
         )}
 
-        {/* 텍스트 블록 — 좌하단 고정 */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <p className="line-clamp-2 whitespace-pre-line text-lg font-bold leading-tight text-white sm:text-xl">
-            {content.title}
-          </p>
-          {/* 카테고리 액센트 라인 */}
-          <div className={`mt-2.5 h-[2px] w-7 rounded-full ${config.accent}`} />
-          {/* 서브텍스트는 항상 2줄 높이를 고정 확보 — 줄 수에 따라 제목 위치가 바뀌는 현상 방지 */}
-          <div className="mt-2 h-[2.0625rem] overflow-hidden">
-            {content.subtitle && (
-              <p className="line-clamp-2 text-xs leading-snug text-white/65">
-                {content.subtitle}
-              </p>
-            )}
+        <div className="absolute bottom-3 right-3 z-10">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm transition group-hover:bg-black/60">
+            <svg
+              className="h-4 w-4 text-white transition-transform group-hover:translate-x-0.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M9 5l7 7-7 7" />
+            </svg>
           </div>
         </div>
-
       </article>
     </Link>
-  )
-}
+  );
+};
 
-export default ContentCard
+export default ContentCard;
