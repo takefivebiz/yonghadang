@@ -6,7 +6,7 @@ export const DUMMY_CONTENTS: Content[] = [
   {
     id: "love-1",
     title: "사랑일까,\n집착일까?",
-    subtitle: "이미 선을 넘고 있는 걸 수도 있어",
+    subtitle: "집착인지 아닌지 판단하는 기준",
     category: "love",
     thumbnail_url: "/img/love-1.png",
     input_type: "free",
@@ -22,7 +22,7 @@ export const DUMMY_CONTENTS: Content[] = [
   {
     id: "love-2",
     title: "나는 진심일까, \n 그냥 외로운 걸까?",
-    subtitle: "설레는 게 아니라, 외로운 걸 수도 있어",
+    subtitle: "진심과 외로움을 구별하는 방법",
     category: "love",
     thumbnail_url: "/img/love-2.png",
     input_type: "choice",
@@ -38,7 +38,7 @@ export const DUMMY_CONTENTS: Content[] = [
   {
     id: "love-3",
     title: "왜 항상 나만 \n 더 좋아하게 될까?",
-    subtitle: "이미 기울어진 관계일 가능성이 높아",
+    subtitle: "나만 모르고 있던 관계의 흐름",
     category: "love",
     thumbnail_url: "/img/love-3.png",
     input_type: "free",
@@ -54,7 +54,7 @@ export const DUMMY_CONTENTS: Content[] = [
   {
     id: "love-4",
     title: "왜 항상 \n 썸에서 끝날까?",
-    subtitle: "시작 직전에 항상 멈추는 이유가 있어",
+    subtitle: "시작 직전에 항상 멈추는 이유",
     category: "love",
     thumbnail_url: "/img/love-4.png",
     input_type: "free",
@@ -70,7 +70,7 @@ export const DUMMY_CONTENTS: Content[] = [
   {
     id: "love-5",
     title: "이 사람,\n나 좋아하는 거 맞아?",
-    subtitle: "헷갈린다는 건 이미 신호가 있다는 뜻이야",
+    subtitle: "관계를 분명하게 만드는 방법",
     category: "love",
     thumbnail_url: null,
     input_type: "choice",
