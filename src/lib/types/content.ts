@@ -24,6 +24,9 @@ export interface Content {
   input_type: InputType;
   card_config: CardConfig;
   created_at: string;
+  // TODO: [백엔드 연동] 백엔드 스키마에 insights, estimated_minutes 컬럼 추가 필요
+  insights?: string[]; // 이걸 보면 알게 되는 것
+  estimated_minutes?: number; // 예상 소요 시간(분)
 }
 
 export const CATEGORY_LABELS: Record<Category, string> = {

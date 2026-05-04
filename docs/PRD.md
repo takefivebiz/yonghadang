@@ -183,11 +183,23 @@ MiniHero → TrendingSection → CategoryTabs → ContentSection
 
 #### 콘텐츠 진입 (`/content/[id]`)
 
-- 선택한 콘텐츠 질문 노출
-- "지금 상황을 적어줘" 또는 선택형 질문 시작
-- 콘텐츠의 `input_type`에 따라 입력 방식 분기
+- 메인 카드 클릭 시 해당 페이지로 이동.
+- 이 페이지는 긴 상세 설명이 아니라, 입력 전 몰입을 만드는 역할.
 
----
+**구성:**
+
+- 콘텐츠 제목
+- 서브 텍스트
+- 이 콘텐츠가 보는 것 2~3개
+- 예상 소요 시간
+- 시작 버튼
+
+**동작**:
+
+- 시작 버튼 클릭 시 세션을 생성한다.
+- 프론트 구현 단계에서는 mock session을 생성한다.
+- 이후 백엔드 연동 시 `POST /api/sessions`로 실제 session을 생성한다.
+- 세션 생성 후 `/analyze/[session_id]`로 이동한다.
 
 #### 입력 단계 (`/analyze/[session_id]`)
 
