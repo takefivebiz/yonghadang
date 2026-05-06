@@ -145,6 +145,38 @@ MiniHero → TrendingSection → CategoryTabs → ContentSection
 
 ---
 
+### 카테고리 전체보기 페이지
+
+각 ContentSection의 `전체보기` 클릭 시 해당 카테고리 콘텐츠 목록 페이지로 이동한다.
+
+**경로 예시:**
+
+- `/category/love`
+- `/category/relationship`
+- `/category/career`
+- `/category/emotion`
+
+**구성:**
+
+카테고리 제목  
+카테고리 설명  
+콘텐츠 카드 그리드
+
+**동작 방식:**
+
+- 선택한 카테고리에 해당하는 콘텐츠만 노출한다.
+- 메인 페이지와 달리 가로 스크롤이 아니라 그리드 카드 형태로 보여준다.
+- `GET /api/contents?category=love` 형태로 카테고리 필터를 적용한다.
+- 콘텐츠 클릭 시 `/content/[id]`로 이동한다.
+- 비활성 콘텐츠는 노출하지 않는다.
+
+**그리드 규칙:**
+
+- 모바일: 2열
+- 태블릿: 3열
+- 데스크톱: 4열
+- 카드 구조는 메인 ContentCard와 동일하게 사용한다.
+
 ### ContentCard
 
 **구조:**

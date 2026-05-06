@@ -18,9 +18,8 @@ const ContentSection = ({ category, contents }: ContentSectionProps) => {
             {CATEGORY_LABELS[category]}
           </h2>
         </div>
-        {/* TODO: [백엔드 연동] 전체보기 링크에 카테고리 필터 페이지 연결 */}
         <a
-          href="#"
+          href={`/category/${category}`}
           className="text-xs text-highlight/30 transition-colors hover:text-highlight/60"
         >
           전체보기 →
