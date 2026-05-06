@@ -2,13 +2,13 @@
 
 import { ResultScene } from '@/lib/types/result';
 
-interface ResultCardComponentProps {
+interface ResultSceneComponentProps {
   scene: ResultScene;
   onOpenScene: () => void;
 }
 
-// TODO: [미사용] 현재 result-card-modal.tsx(SceneViewer)로 대체됨. 추후 정리 예정.
-const ResultCardComponent = ({ scene, onOpenScene }: ResultCardComponentProps) => {
+// TODO: [미사용] 현재 result-scene-modal.tsx(SceneViewer)로 대체됨. 추후 정리 예정.
+const ResultSceneComponent = ({ scene, onOpenScene }: ResultSceneComponentProps) => {
   return (
     <div className="rounded-2xl border border-white/5 bg-surface/20 p-6 sm:p-8">
       <div className="mb-4">
@@ -34,4 +34,4 @@ const ResultCardComponent = ({ scene, onOpenScene }: ResultCardComponentProps) =
   );
 };
 
-export default ResultCardComponent;
+export default ResultSceneComponent;

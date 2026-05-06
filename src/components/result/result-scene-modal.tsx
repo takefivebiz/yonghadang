@@ -83,7 +83,7 @@ const renderMessage = (msg: SceneMessage, idx: number) => {
 };
 
 // ── 씬 뷰어: 카드 박스 없음 — 메시지 블록이 페이지 위에 직접 부유
-const ResultCardModal = ({
+const ResultSceneModal = ({
   scene,
   isUnlocked,
   onOpenScene,
@@ -175,4 +175,4 @@ const ResultCardModal = ({
   );
 };
 
-export default ResultCardModal;
+export default ResultSceneModal;
