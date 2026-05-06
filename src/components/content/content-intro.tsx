@@ -110,7 +110,9 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
             </div>
 
             <p className="text-center text-[15px] leading-relaxed text-white/72">
-              몇 가지 질문이면, <br />왜 이런지 바로 알 수 있어.
+              몇 가지만 보면
+              <br />
+              지금 상태가 바로 드러나
             </p>
 
             <div className="mt-6 space-y-3">
@@ -137,7 +139,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
               disabled={loading}
               className={`mt-7 w-full rounded-2xl py-4 text-base font-bold shadow-lg shadow-black/20 transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 ${config.button}`}
             >
-              {loading ? "준비 중..." : "지금 확인하기 →"}
+              {loading ? "준비 중..." : "지금 내 상태 확인하기 →"}
             </button>
           </div>
         </section>

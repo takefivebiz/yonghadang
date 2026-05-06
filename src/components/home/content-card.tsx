@@ -48,18 +48,18 @@ const ContentCard = ({
   return (
     <Link
       href={`/content/${content.id}`}
-      className="group block w-full shrink-0 sm:w-[520px]"
+      className="group block w-[88%] shrink-0 sm:w-[420px]"
     >
-      <article className="relative aspect-[16/9] overflow-hidden rounded-2xl transition-transform duration-300 group-hover:scale-[1.02]">
+      <article className="relative aspect-[3/2] overflow-hidden rounded-2xl transition-transform duration-300 group-hover:scale-[1.02]">
         {/* 배경 이미지 or 플레이스홀더 */}
         {content.thumbnail_url ? (
           <Image
             src={content.thumbnail_url}
             alt={content.title}
             fill
-            sizes="(max-width: 640px) 100vw, 520px"
+            sizes="(max-width: 640px) 88vw, 420px"
             priority={priority}
-            className="object-cover"
+            className="object-cover object-center"
           />
         ) : (
           <div className="absolute inset-0 bg-surface/60">
