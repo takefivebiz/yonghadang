@@ -1,33 +1,5 @@
+// ── 카테고리 ────────────────────────────────────────────────────────
 export type Category = "love" | "relationship" | "career" | "emotion";
-export type InputType = "free" | "choice";
-
-export interface CardConfigItem {
-  index: number;
-  title: string;
-  is_free: boolean;
-  prompt: string;
-}
-
-export interface CardConfig {
-  free_card_count: number;
-  paid_card_count: number;
-  cards: CardConfigItem[];
-}
-
-export interface Content {
-  id: string;
-  title: string;
-  // TODO: [백엔드 연동] 백엔드 스키마에 subtitle 컬럼 추가 필요
-  subtitle?: string;
-  category: Category;
-  thumbnail_url: string | null;
-  input_type: InputType;
-  card_config: CardConfig;
-  created_at: string;
-  // TODO: [백엔드 연동] 백엔드 스키마에 insights, estimated_minutes 컬럼 추가 필요
-  insights?: string[]; // 이걸 보면 알게 되는 것
-  estimated_minutes?: number; // 예상 소요 시간(분)
-}
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   love: "연애",
@@ -35,3 +7,57 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   career: "직업·진로",
   emotion: "감정",
 };
+
+// ── 입력 설정 (input_config JSONB) ──────────────────────────────────
+
+export interface InputConfigOption {
+  label: string;
+  value: string;
+  reaction?: string;
+}
+
+export interface InputConfigQuestion {
+  index: number;
+  text: string;
+  type: "single" | "multiple";
+  options: InputConfigOption[];
+}
+
+export interface InputConfig {
+  placeholder: string;
+  example_inputs: string[];
+  questions: InputConfigQuestion[];
+}
+
+// ── Scene 설정 (scene_config JSONB) ─────────────────────────────────
+
+export interface SceneConfigItem {
+  index: number;
+  title: string;
+  is_free: boolean;
+  prompt: string;
+}
+
+export interface SceneConfig {
+  free_scene_count: number;
+  paid_scene_count: number;
+  scenes: SceneConfigItem[];
+}
+
+// ── 콘텐츠 (API GET /api/contents 응답 타입과 일치) ──────────────────
+export interface Content {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  category: Category;
+  thumbnail_url: string | null;
+  estimated_minutes: number | null;
+  input_config: InputConfig;
+  scene_config: SceneConfig;
+  is_active: boolean;
+  sort_order: number | null;
+  created_at: string;
+  updated_at: string;
+  // TODO: [백엔드 연동] scene_config.scenes[].title에서 파생 예정. 현재는 프론트 전용 필드.
+  insights?: string[];
+}

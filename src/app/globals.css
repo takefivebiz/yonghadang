@@ -21,10 +21,15 @@ html {
 }
 
 body {
-  background-color: var(--color-background);
+  background-color: #0c0a16;
   color: var(--color-highlight);
-  /* 상단 secondary 미세 광원 — 야경 분위기 */
-  background-image: radial-gradient(ellipse 90% 35% at 50% -5%, rgba(94, 153, 171, 0.10) 0%, transparent 100%);
+  /* ambient bloom — 좌상단 보라, 우하단 핑크, 중앙 위 청록 */
+  background-image:
+    radial-gradient(ellipse 65% 55% at 15% 10%, rgba(140, 80, 210, 0.22) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 45% at 88% 82%, rgba(209, 109, 172, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 80% 30% at 55% -8%, rgba(94, 153, 171, 0.10) 0%, transparent 100%),
+    radial-gradient(ellipse 40% 40% at 50% 110%, rgba(100, 60, 180, 0.12) 0%, transparent 70%);
+  background-attachment: fixed;
 }
 
 @utility scrollbar-hide {
