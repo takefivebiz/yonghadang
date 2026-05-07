@@ -14,7 +14,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
     questions: [
       {
         index: 1,
-        text: "이런 행동이 얼마나 자주 일어나?",
+        text: "이런 행동이 \n 얼마나 자주 일어나?",
         type: "single",
         options: [
           { label: "거의 매일", value: "daily" },
@@ -25,7 +25,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 2,
-        text: "이 상황이 얼마나 오래됐어?",
+        text: "이 상황이 \n얼마나 오래됐어?",
         type: "single",
         options: [
           { label: "최근 몇 주", value: "recent" },
@@ -36,7 +36,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 3,
-        text: "상대의 반응은 어떤 편이야?",
+        text: "상대의 반응은 \n어떤 편이야?",
         type: "single",
         options: [
           { label: "잘 대응해줌", value: "responsive" },
@@ -47,7 +47,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 4,
-        text: "이런 마음이 들 때 너는 주로 어떻게 해?",
+        text: "이런 마음이 들 때 \n 주로 어떻게 해?",
         type: "multiple",
         options: [
           { label: "상대 확인하기 (연락, 위치 등)", value: "check" },
@@ -59,7 +59,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 5,
-        text: "이게 너한테 미치는 영향은?",
+        text: "이게 너한테 \n 미치는 영향은?",
         type: "multiple",
         options: [
           { label: "스트레스 많이 받음", value: "stress" },
@@ -71,7 +71,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 6,
-        text: "과거에 비슷한 관계 경험이 있었어?",
+        text: "과거에 비슷한 \n 경험이 있었어?",
         type: "single",
         options: [
           { label: "없음", value: "none" },
@@ -92,7 +92,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
     questions: [
       {
         index: 1,
-        text: "지금 이 감정이 언제부터 시작됐어?",
+        text: "지금 이 감정이 \n 언제부터 시작됐어?",
         type: "single",
         options: [
           { label: "처음부터 이런 마음이었어", value: "beginning" },
@@ -103,7 +103,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 2,
-        text: "상대와 있을 때 기분은 어때?",
+        text: "상대와 있을 때 \n 기분은 어때?",
         type: "multiple",
         options: [
           { label: "편하고 안정적임", value: "comfortable" },
@@ -115,7 +115,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 3,
-        text: "상대와 헤어질 때는 어떤 감정이 들어?",
+        text: "상대와 헤어질 때는 \n 어떤 감정이 들어?",
         type: "single",
         options: [
           { label: "한숨이 쉬어짐", value: "relief" },
@@ -126,7 +126,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 4,
-        text: "이 관계 없이 혼자 있는 시간은 어때?",
+        text: "혼자 있는 시간은 어때?",
         type: "single",
         options: [
           { label: "평화로움", value: "peaceful" },
@@ -149,7 +149,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 6,
-        text: "이 관계가 없어졌을 때를 상상해보면?",
+        text: "이 관계가 없어졌을 때를 \n 상상해보면?",
         type: "single",
         options: [
           { label: "정말 슬플 것 같음", value: "sad" },
@@ -170,7 +170,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
     questions: [
       {
         index: 1,
-        text: "이런 상황이 주로 어떤 관계에서 일어나?",
+        text: "이런 상황이 주로 \n 어떤 관계에서 일어나?",
         type: "multiple",
         options: [
           { label: "연애 관계", value: "romantic" },
@@ -182,7 +182,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 2,
-        text: "상대가 너를 무시한다고 느끼는 순간은?",
+        text: "상대가 너를 \n 무시한다고 느끼는 순간은?",
         type: "multiple",
         options: [
           { label: "내 의견을 무시할 때", value: "opinion" },
@@ -194,7 +194,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 3,
-        text: "이런 상황에서 너는 보통 어떻게 반응해?",
+        text: "이런 상황에서 \n 너는 보통 어떻게 반응해?",
         type: "single",
         options: [
           { label: "더 맞춰주려고 함", value: "comply" },
@@ -205,7 +205,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 4,
-        text: "이런 관계 패턴이 얼마나 오래됐어?",
+        text: "이렇게 느낀지는 \n 얼마나 오래됐어?",
         type: "single",
         options: [
           { label: "최근에 시작됐어", value: "recent" },
@@ -216,7 +216,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 5,
-        text: "이 상황을 바꾸려고 노력한 적이 있어?",
+        text: "이 상황을 바꾸려고 \n 노력한 적이 있어?",
         type: "single",
         options: [
           { label: "노력해본 적 없음", value: "never" },
@@ -248,7 +248,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 2,
-        text: "일이 힘들다면, 주된 이유는?",
+        text: "일이 힘들다면, \n 주된 이유는?",
         type: "multiple",
         options: [
           { label: "일의 난도나 양", value: "task" },
@@ -260,7 +260,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 3,
-        text: "이 회사에 들어오기 전에 기대했던 것과 현실은?",
+        text: "이 회사에 들어오기 전에 \n 기대했던 것과 현실은?",
         type: "single",
         options: [
           { label: "기대와 비슷함", value: "match" },
@@ -271,7 +271,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 4,
-        text: "월요일 아침이나 출근 생각이 들 때는?",
+        text: "월요일 아침이나 \n 출근 생각이 들 때는?",
         type: "single",
         options: [
           { label: "설렘", value: "excited" },
@@ -282,7 +282,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       },
       {
         index: 5,
-        text: "이 회사에서 계속 일하고 싶어?",
+        text: "여기서 계속 일하고 싶어?",
         type: "single",
         options: [
           { label: "계속하고 싶음", value: "yes" },

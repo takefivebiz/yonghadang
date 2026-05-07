@@ -97,7 +97,7 @@ const TypeAInput = ({
             </span>
             <br />
             <span style={{ color: "rgba(249, 249, 229, 0.85)" }}>
-              자유롭게 적어줘.
+              자유롭게 말해줘.
             </span>
           </h1>
           <p className="text-xs text-highlight/30">
