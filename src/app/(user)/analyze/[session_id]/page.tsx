@@ -39,6 +39,11 @@ const AnalyzePage = ({ params }: PageProps) => {
 
   // TODO: [백엔드 연동] content_id를 세션에서 가져와 input_config 로드
   const config = getInputConfig(analyzeState.content_id);
+  const totalSteps = 1 + config.questions.length;
+  const currentStep =
+    analyzeState.stage === 'free_input'
+      ? 1
+      : analyzeState.answers.length + 1;
 
   // 자유 입력 완료 → 보정 질문 단계로
   const handleFreeInputSubmit = (input: string) => {
@@ -47,6 +52,20 @@ const AnalyzePage = ({ params }: PageProps) => {
       free_input: input,
       stage: 'correction_questions',
     }));
+  };
+
+  const handleBack = () => {
+    if (analyzeState.stage === 'correction_questions') {
+      setAnalyzeState((prev) => ({
+        ...prev,
+        stage: 'free_input',
+        answers: [],
+      }));
+    }
+  };
+
+  const handleClose = () => {
+    router.push('/');
   };
 
   // 보정 질문 완료 → localStorage 저장 후 결과 페이지로
@@ -96,12 +115,23 @@ const AnalyzePage = ({ params }: PageProps) => {
       {!isCompleted && (
         <>
           {analyzeState.stage === 'free_input' && (
-            <TypeAInput config={config} onSubmit={handleFreeInputSubmit} />
+            <TypeAInput
+              config={config}
+              onSubmit={handleFreeInputSubmit}
+              totalSteps={totalSteps}
+              currentStep={currentStep}
+              onClose={handleClose}
+              onBack={handleBack}
+            />
           )}
           {analyzeState.stage === 'correction_questions' && (
             <CorrectionQuestions
               config={config}
               onSubmit={handleCorrectionSubmit}
+              totalSteps={totalSteps}
+              currentStep={currentStep}
+              onClose={handleClose}
+              onBack={handleBack}
             />
           )}
         </>

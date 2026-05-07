@@ -7,9 +7,20 @@ import { Answer } from '@/lib/types/analyze';
 interface CorrectionQuestionsProps {
   config: InputConfig;
   onSubmit: (answers: Answer[]) => void;
+  totalSteps?: number;
+  currentStep?: number;
+  onClose?: () => void;
+  onBack?: () => void;
 }
 
-const CorrectionQuestions = ({ config, onSubmit }: CorrectionQuestionsProps) => {
+const CorrectionQuestions = ({
+  config,
+  onSubmit,
+  totalSteps = 7,
+  currentStep = 2,
+  onClose,
+  onBack,
+}: CorrectionQuestionsProps) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [collectedAnswers, setCollectedAnswers] = useState<Answer[]>([]);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
@@ -53,7 +64,47 @@ const CorrectionQuestions = ({ config, onSubmit }: CorrectionQuestionsProps) => 
     ((currentQuestionIndex + 1) / questions.length) * 100;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background px-4 py-8 sm:px-6">
+    <div className="flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6">
+      {/* Progress indicator */}
+      <div className="mb-8 flex items-center gap-3 justify-center">
+        {/* Progress dots */}
+        <div className="flex items-center gap-1">
+            {Array.from({ length: totalSteps }).map((_, idx) => {
+              const isCompleted = idx < currentStep - 1;
+              const isCurrent = idx === currentStep - 1;
+
+              return (
+                <div key={idx} className="flex items-center gap-1">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full transition-all ${
+                      isCurrent ? "ring-1 ring-offset-1" : ""
+                    }`}
+                    style={{
+                      backgroundColor: isCompleted
+                        ? "rgba(209, 109, 172, 0.5)"
+                        : "rgba(255, 255, 255, 0.08)",
+                      boxShadow: isCurrent
+                        ? "0 0 0 2px rgba(0, 0, 0, 0.8), 0 0 0 3px rgba(209, 109, 172, 0.3)"
+                        : "none",
+                    }}
+                  />
+                  {idx < totalSteps - 1 && (
+                    <div
+                      className="h-px transition-colors"
+                      style={{
+                        width: "20px",
+                        backgroundColor: isCompleted
+                          ? "rgba(209, 109, 172, 0.2)"
+                          : "rgba(255, 255, 255, 0.04)",
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
+        </div>
+      </div>
+
       <div className="mx-auto w-full max-w-2xl flex-1">
         {/* 진행 상태 */}
         <div className="mb-8">
