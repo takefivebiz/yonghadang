@@ -162,7 +162,18 @@ const ResultPage = ({ params }: PageProps) => {
   const paidSceneCount = scenes.filter((s) => !s.is_free).length;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        background: `
+          radial-gradient(circle at 18% 12%, rgba(201, 139, 176, 0.14) 0%, rgba(201, 139, 176, 0.05) 22%, transparent 42%),
+          radial-gradient(circle at 82% 38%, rgba(158, 138, 201, 0.10) 0%, rgba(158, 138, 201, 0.04) 24%, transparent 46%),
+          radial-gradient(circle at 55% 78%, rgba(201, 139, 176, 0.09) 0%, rgba(201, 139, 176, 0.035) 28%, transparent 52%),
+          linear-gradient(180deg, #11111B 0%, #151222 42%, #1A1222 72%, #11111B 100%)
+        `,
+        backgroundAttachment: "fixed",
+      }}
+    >
       {/* ── 헤더 ──────────────────────────────────────── */}
       <header className="sticky top-0 z-40">
         <div className="h-6" />

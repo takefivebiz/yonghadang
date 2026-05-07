@@ -113,9 +113,9 @@ const FlowOverview = ({
               onClick={onUnlockAll}
               className="w-full rounded-2xl py-3.5 font-medium transition-all duration-200 hover:opacity-85 active:opacity-70"
               style={{
-                background: "rgba(209, 109, 172, 0.25)",
-                border: "1px solid rgba(209, 109, 172, 0.4)",
-                color: "rgba(209, 109, 172, 0.95)",
+                background: "rgba(170, 100, 150, 0.35)",
+                border: "1px solid rgba(170, 100, 150, 0.45)",
+                color: "rgba(240, 150, 200, 0.95)",
                 fontSize: "13px",
               }}
             >
@@ -125,10 +125,10 @@ const FlowOverview = ({
             <div
               className="absolute -top-2 right-6 px-2.5 py-1 rounded-full text-[11px] font-medium tracking-wide"
               style={{
-                background: "rgba(209, 109, 172, 0.8)",
-                color: "rgba(12, 10, 22, 1)",
-                border: "1px solid rgba(209, 109, 172, 0.6)",
-                boxShadow: "0 2px 8px rgba(209, 109, 172, 0.15)",
+                background: "rgba(180, 120, 220, 0.95)",
+                color: "rgba(255, 255, 255, 0.95)",
+                border: "1px solid rgba(180, 120, 220, 0.8)",
+                boxShadow: "0 4px 12px rgba(180, 120, 220, 0.35)",
               }}
             >
               ✨ 추천

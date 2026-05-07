@@ -23,12 +23,23 @@ html {
 body {
   background-color: #0c0a16;
   color: var(--color-highlight);
-  /* ambient bloom — 좌상단 보라, 우하단 핑크, 중앙 위 청록 */
+  /*
+    ambient narrative layer — 여러 개의 radial-gradient로
+    페이지 전체가 하나의 밤 공기 안에 존재하는 느낌 생성
+  */
   background-image:
-    radial-gradient(ellipse 65% 55% at 15% 10%, rgba(140, 80, 210, 0.22) 0%, transparent 65%),
-    radial-gradient(ellipse 50% 45% at 88% 82%, rgba(209, 109, 172, 0.18) 0%, transparent 65%),
-    radial-gradient(ellipse 80% 30% at 55% -8%, rgba(94, 153, 171, 0.10) 0%, transparent 100%),
-    radial-gradient(ellipse 40% 40% at 50% 110%, rgba(100, 60, 180, 0.12) 0%, transparent 70%);
+    /* 좌상단 subtle purple haze */
+    radial-gradient(ellipse 75% 60% at 12% 8%, rgba(140, 80, 210, 0.15) 0%, transparent 68%),
+    /* 중앙 상단 약한 청록 (opener 주변) */
+    radial-gradient(ellipse 85% 35% at 50% -5%, rgba(94, 153, 171, 0.10) 0%, transparent 100%),
+    /* 우하단 미세 pink glow */
+    radial-gradient(ellipse 55% 50% at 90% 85%, rgba(209, 109, 172, 0.12) 0%, transparent 70%),
+    /* punch line 주변 보라 */
+    radial-gradient(ellipse 45% 35% at 50% 45%, rgba(100, 60, 180, 0.08) 0%, transparent 75%),
+    /* 하단 좌측 purple depth */
+    radial-gradient(ellipse 60% 40% at 20% 95%, rgba(140, 80, 210, 0.06) 0%, transparent 80%),
+    /* 중앙 하단 ambient darkness */
+    radial-gradient(ellipse 70% 50% at 50% 110%, rgba(100, 60, 180, 0.10) 0%, transparent 75%);
   background-attachment: fixed;
 }
 

@@ -71,6 +71,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         preview_messages: [
           { type: "ai", text: "이 반응이 지금 이 사람 때문에 생긴 건지," },
           { type: "ai", text: "아니면 훨씬 오래전부터 있던 건지," },
+          { type: "ai", text: "한번쯤 생각해본 적 있어?" },
         ],
       },
       {
@@ -95,6 +96,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         preview_messages: [
           { type: "ai", text: "네가 더 많이 신경 쓸수록," },
           { type: "ai", text: "상대는 점점 가볍게 느낄 수 있어." },
+          { type: "ai", text: "온도 차이가 생기면, 뭔가 맞춰보려는 게 더 어색해져." },
         ],
       },
       {
@@ -123,6 +125,11 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
             type: "ai",
             text: "지금 이 패턴, 이 사람이 바뀌어도 사라지진 않을 거야.",
           },
+          {
+            type: "ai",
+            text: "다음 사람을 만나도, 비슷한 지점에서 다시 이 감정이 올라올 거야.",
+          },
+          { type: "ai", text: "그게 무섭게 들릴 수 있는데," },
         ],
       },
       {
@@ -149,6 +156,14 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "크게 바꾸려 하면 오래 못 가." },
+          {
+            type: "ai",
+            text: "다음번에 확인하고 싶어질 때, 딱 10분만 기다려봐.",
+          },
+          {
+            type: "ai",
+            text: "그 10분 동안 뭐가 두려운지 적어봐.",
+          },
         ],
       },
     ],
@@ -196,6 +211,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "진심과 외로움을 가르는 가장 간단한 방법이 있어." },
+          { type: "ai", text: "그 사람과 함께 있을 때 외로움이 채워지는가, 아니면 더 깊어지는가를 봐." },
+          { type: "punch", text: "함께 있어도 외롭다면, 그건 다른 차원의 외로움이야." },
         ],
       },
       {
@@ -211,6 +228,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "일방적인 감정은 자기 전에 더 크게 느껴져." },
+          { type: "ai", text: "상대가 너의 기대만큼 돌아주지 않으면, 밤은 그 간극을 더 크게 만들어." },
+          { type: "ai", text: "낮에는 바빠서 인식을 못 했던 것들이, 밤엔 뚜렷해져." },
         ],
       },
       {
@@ -226,6 +245,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "만나는 시간이 더 중요해져야 한다면," },
+          { type: "ai", text: "자기 전이 아닌 다른 시간에도 자연스럽게 생각나도록." },
+          { type: "ai", text: "그렇지 않다면, 이건 외로움일 가능성이 높아." },
         ],
       },
       {
@@ -245,6 +266,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "자기 전에 생각나는 그 사람이," },
+          { type: "ai", text: "진짜로 그 자리를 채워주기를 원하는 사람인가?" },
+          { type: "ai", text: "아니면 그냥 밤이 덜 외로우면 되는 건가?" },
         ],
       },
     ],
@@ -292,6 +315,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "우리는 상대의 행동을 원하는 대로 해석해." },
+          { type: "ai", text: "하나의 신호도 여러 의미로 읽힐 수 있거든." },
+          { type: "punch", text: "불확실성을 원하는 대로 채워버려." },
         ],
       },
       {
@@ -307,6 +332,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "관계에서 가장 필요한 건 명확함이야." },
+          { type: "ai", text: "불명확한 신호 속에서 우리는 자꾸 기대하게 되고," },
+          { type: "ai", text: "그 기대가 나를 더 묶어둬." },
         ],
       },
       {
@@ -321,6 +348,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "불확실성 속에서 얼마나 오래 기다릴 건가?" },
+          { type: "ai", text: "그건 너의 내구력이 아니라, 너의 가치와 관련된 문제야." },
+          { type: "ai", text: "비워둔 자리에서 기다리는 건, 약함이 아니야." },
         ],
       },
       {
@@ -339,6 +368,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "명확함을 요구하는 것도 사랑이야." },
+          { type: "ai", text: "상대가 명확해지지 않을 때, 그걸 받아주는 것만이 사랑은 아니거든." },
+          { type: "memo", text: "때론 경계를 긋는 것도\n자신을 소중히 여기는\n한 가지 방식이야." },
         ],
       },
     ],
@@ -387,6 +418,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "지금 나이가 늦다고 느끼는 건," },
+          { type: "ai", text: "실제 나이보다는 마음의 다급함 때문일 거야." },
+          { type: "punch", text: "다급함이 빨리 움직이게 만들고," },
         ],
       },
       {
@@ -402,6 +435,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "스펙이 없으면 전환이 어렵다는 게 사실이야." },
+          { type: "ai", text: "하지만 지금 이 불만족도 스펙이야." },
+          { type: "ai", text: "뭔가 바꾸고 싶은 절박함은, 배운 것보다 강한 동기가 돼." },
         ],
       },
       {
@@ -417,6 +452,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "전환은 한 번의 큰 점프가 아니라," },
+          { type: "ai", text: "작은 움직임들의 연결이야." },
+          { type: "ai", text: "지금 할 수 있는 게 뭔지를 먼저 보는 게 중요해." },
         ],
       },
       {
@@ -435,6 +472,8 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "지금 할 수 있는 첫 번째 움직임이 뭘까?" },
+          { type: "ai", text: "공부? 사이드 프로젝트? 아니면 다른 팀으로의 이동?" },
+          { type: "memo", text: "작은 경험이 모여서\n당신의 방향을 만들어." },
         ],
       },
     ],
@@ -506,6 +545,10 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
       preview_messages: [
         { type: "ai", text: "이 반응 방식이 처음 생긴 게," },
         { type: "ai", text: "이 관계에서가 아닐 수 있어." },
+        {
+          type: "ai",
+          text: "훨씬 오래된 곳에서 배운 반응이 지금 여기서 반복되고 있는 거야.",
+        },
       ],
     },
     {
