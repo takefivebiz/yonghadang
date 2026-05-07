@@ -177,7 +177,7 @@ const CorrectionQuestions = ({
                   : "none",
               }}
             >
-              {isLastQuestion ? "완료" : "다음"}
+              {isLastQuestion ? "완료" : "다음 →"}
             </button>
           </div>
         </div>

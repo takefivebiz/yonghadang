@@ -8,27 +8,27 @@ const CATEGORY_CONFIG: Record<
 > = {
   love: {
     label: "연애",
-    badge: "bg-accent/30 text-accent",
+    badge: "bg-accent/15 text-accent/70",
     accent: "bg-accent",
-    ring: "border-accent/30",
+    ring: "border-accent/15",
   },
   relationship: {
     label: "인간관계",
-    badge: "bg-secondary/50 text-white",
+    badge: "bg-secondary/25 text-white/70",
     accent: "bg-secondary",
-    ring: "border-secondary/30",
+    ring: "border-secondary/15",
   },
   career: {
     label: "직업·진로",
-    badge: "bg-white/15 text-white/80",
+    badge: "bg-white/8 text-white/60",
     accent: "bg-highlight/60",
-    ring: "border-highlight/20",
+    ring: "border-highlight/10",
   },
   emotion: {
     label: "감정",
-    badge: "bg-purple-400/30 text-purple-300",
+    badge: "bg-purple-400/15 text-purple-300/70",
     accent: "bg-purple-400",
-    ring: "border-purple-400/30",
+    ring: "border-purple-400/15",
   },
 };
 

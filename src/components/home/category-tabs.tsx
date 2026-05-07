@@ -4,10 +4,10 @@ const CATEGORIES: Category[] = ["love", "relationship", "career", "emotion"]
 
 /** 카테고리별 탭 색상 */
 const CATEGORY_TAB_STYLE: Record<Category, string> = {
-  love: "border-accent/40 bg-accent/10 text-accent hover:bg-accent/20",
-  relationship: "border-secondary/40 bg-secondary/10 text-secondary hover:bg-secondary/20",
-  career: "border-highlight/30 bg-highlight/8 text-highlight/70 hover:bg-highlight/15",
-  emotion: "border-purple-400/40 bg-purple-400/10 text-purple-300 hover:bg-purple-400/20",
+  love: "border-accent/15 bg-accent/6 text-accent/65 hover:bg-accent/10",
+  relationship: "border-secondary/15 bg-secondary/6 text-secondary/65 hover:bg-secondary/10",
+  career: "border-highlight/10 bg-highlight/4 text-highlight/55 hover:bg-highlight/8",
+  emotion: "border-purple-400/15 bg-purple-400/6 text-purple-300/65 hover:bg-purple-400/10",
 }
 
 /**
