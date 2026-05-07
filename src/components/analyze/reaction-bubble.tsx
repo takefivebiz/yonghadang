@@ -42,7 +42,7 @@ const ReactionBubble = ({
       clearTimeout(fadeOutTimer);
       clearTimeout(completeTimer);
     };
-  }, []);
+  }, [messages.length, onComplete]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6 relative">

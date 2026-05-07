@@ -105,12 +105,6 @@ const ResultPage = ({ params }: PageProps) => {
     return () => observer.disconnect();
   }, [scenes]);
 
-  // 마지막 무료 scene의 index 구하기
-  const lastFreeSceneIndex = scenes.reduce((max, scene) => {
-    if (scene.is_free) return Math.max(max, scene.scene_index);
-    return max;
-  }, 0);
-
   const handleUnlockScene = (sceneIndex: number) => {
     // TODO: [결제 구현] 개별 scene 구매 로직
     setUnlockedScenes((prev) => [...new Set([...prev, sceneIndex])]);
