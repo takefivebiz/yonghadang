@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import MiniHero from "@/components/home/mini-hero"
 import TrendingSection from "@/components/home/trending-section"
-import CategoryTabs from "@/components/home/category-tabs"
+import CategoryTabsSticky from "@/components/home/category-tabs-sticky"
 import ContentSection from "@/components/home/content-section"
 import { DUMMY_CONTENTS, TRENDING_CONTENTS } from "@/lib/data/dummy-contents"
 import { Category } from "@/lib/types/content"
@@ -35,12 +35,8 @@ const HomePage = () => {
       {/* 트렌딩 섹션 */}
       <TrendingSection contents={TRENDING_CONTENTS} />
 
-      {/* 카테고리 탭 — Navbar 바로 아래 고정 */}
-      <div className="sticky top-14 z-30 mb-8 bg-background/95 backdrop-blur-sm">
-        <div className="px-4 py-3">
-          <CategoryTabs />
-        </div>
-      </div>
+      {/* 카테고리 탭 — Navbar 바로 아래 고정 (스크롤 감지로 배경 동적 변경) */}
+      <CategoryTabsSticky />
 
       {/* 카테고리별 콘텐츠 섹션 */}
       {CATEGORY_ORDER.map((category) => (
