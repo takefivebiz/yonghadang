@@ -105,42 +105,58 @@ const FlowOverview = ({
       </div>
 
       {/* CTA */}
+      <p
+        className="text-center text-xs leading-relaxed mb-4"
+        style={{ color: "rgba(249, 249, 229, 0.25)" }}
+      >
+        여기서부터는 더 깊어져
+      </p>
       {!allPaidUnlocked && (
         <div className="max-w-sm mx-auto">
           {/* Primary CTA with badge */}
           <div className="relative mb-4">
             <button
               onClick={onUnlockAll}
-              className="w-full rounded-2xl py-3.5 font-medium transition-all duration-200 hover:opacity-85 active:opacity-70"
+              className="w-full rounded-[14px] py-3 transition-all duration-200 hover:opacity-90 active:opacity-80 flex flex-col items-center justify-center gap-1"
               style={{
-                background: "rgba(170, 100, 150, 0.35)",
-                border: "1px solid rgba(170, 100, 150, 0.45)",
-                color: "rgba(240, 150, 200, 0.95)",
-                fontSize: "13px",
+                background:
+                  "linear-gradient(135deg, rgba(180, 110, 160, 0.75) 0%, rgba(155, 95, 140, 0.75) 100%)",
+                border: "1px solid rgba(220, 150, 200, 0.4)",
+                boxShadow: "0 4px 16px rgba(180, 110, 160, 0.2)",
               }}
             >
-              전체 이어보기 · 2,900원
+              <span
+                style={{
+                  color: "rgba(255, 245, 250, 0.88)",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                }}
+              >
+                전체 흐름 보기
+              </span>
+              <span
+                style={{
+                  color: "rgba(255, 200, 230, 0.85)",
+                  fontSize: "12px",
+                  fontWeight: "400",
+                }}
+              >
+                2,900원
+              </span>
             </button>
-            {/* 추천 뱃지 */}
+            {/* 추천 뱃지
             <div
               className="absolute -top-2 right-6 px-2.5 py-1 rounded-full text-[11px] font-medium tracking-wide"
               style={{
-                background: "rgba(180, 120, 220, 0.95)",
+                background: "rgba(155, 105, 145, 0.9)",
                 color: "rgba(255, 255, 255, 0.95)",
-                border: "1px solid rgba(180, 120, 220, 0.8)",
-                boxShadow: "0 4px 12px rgba(180, 120, 220, 0.35)",
+                border: "1px solid rgba(155, 105, 145, 0.8)",
+                boxShadow: "0 4px 12px rgba(155, 105, 145, 0.35)",
               }}
             >
               ✨ 추천
-            </div>
+            </div> */}
           </div>
-
-          <p
-            className="text-center text-xs leading-relaxed"
-            style={{ color: "rgba(249, 249, 229, 0.25)" }}
-          >
-            여기서부터는 더 깊어져
-          </p>
         </div>
       )}
 

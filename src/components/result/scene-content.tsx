@@ -227,7 +227,7 @@ const SceneContent = ({
         // Locked scene: preview 메시지가 자연스럽게 희미해지면서 잠기는 방식
         <div>
           {/* Preview messages with gradual fade — lock CTA가 중간에 끼어 있음 */}
-          <div className="relative space-y-1 pb-32 mt-6">
+          <div className="relative mt-6 space-y-1 pb-16">
             {(scene.preview_messages ?? []).map((msg, idx) => {
               // 모든 preview message에 동일한 opacity와 blur 적용
               const opacity = 0.5;
@@ -248,48 +248,57 @@ const SceneContent = ({
             {/* Message Bubble Style Lock CTA — preview 흐름 위에 overlay */}
             <button
               onClick={onUnlockScene}
-              className="absolute left-4 right-4 flex items-center gap-3 transition-all duration-200 hover:opacity-85 active:opacity-70"
+              className="absolute  left-1/2 w-[78%] max-w-[420px] -translate-x-1/2 transition-all duration-200 hover:opacity-85 active:opacity-70"
               style={{
-                bottom: "140px",
-                background: "rgba(170, 100, 150, 0.35)",
-                border: "1px solid rgba(170, 100, 150, 0.45)",
+                bottom: "120px",
+                background:
+                  "linear-gradient(180deg, rgba(140, 80, 130, 0.65) 0%, rgba(110, 60, 105, 0.58) 100%)",
+                border: "1.5px solid rgba(200, 120, 180, 0.5)",
                 borderRadius: "3px 14px 14px 14px",
-                padding: "20px 16px",
+                padding: "20px 20px",
+                boxShadow:
+                  "0 0 10px rgba(180, 120, 200, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
                 pointerEvents: "auto",
               }}
             >
-              {/* Lock icon */}
+              {/* Lock icon - layout에서 제외 */}
               <div
-                className="flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0"
-                style={{ background: "rgba(180, 120, 220, 0.3)" }}
+                className="absolute left-6 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full"
+                style={{
+                  background: "rgba(180, 110, 160, 0.35)",
+                  boxShadow: "inset 0 1px 2px rgba(255, 255, 255, 0.12)",
+                }}
               >
                 <svg
-                  className="w-6 h-6"
-                  style={{ color: "rgba(180, 120, 220, 0.95)" }}
-                  fill="currentColor"
+                  className="h-5 w-5"
+                  style={{ color: "rgba(230, 170, 210, 0.8)" }}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
                   viewBox="0 0 24 24"
                 >
-                  <path d="M12 1C6.477 1 2 5.477 2 11v8c0 1.105.895 2 2 2h16c1.105 0 2-.895 2-2v-8c0-5.523-4.477-10-10-10zm0 2c4.418 0 8 3.582 8 8v8H4v-8c0-4.418 3.582-8 8-8zm1 7h-2v4h2v-4z" />
+                  <path d="M7 10V8a5 5 0 0 1 10 0v2" />
+                  <rect x="5" y="10" width="14" height="10" rx="2" />
                 </svg>
               </div>
-
-              {/* CTA text */}
-              <div className="flex flex-col items-center justify-center gap-0">
+              {/* Text는 CTA 전체 기준 중앙 */}
+              <div className="flex w-full flex-col items-center justify-center text-center">
                 <p
-                  className="font-normal text-center"
                   style={{
-                    color: "rgba(240, 150, 200, 0.95)",
+                    color: "rgba(245, 180, 220, 0.92)",
+                    fontSize: "16px",
                     letterSpacing: "-0.01em",
-                    fontSize: "14px",
+                    fontWeight: "600",
                   }}
                 >
-                  계속 읽기
+                  이 부분만 보기
                 </p>
                 <p
-                  className="font-normal text-[11px] text-center"
                   style={{
-                    color: "rgba(240, 150, 200, 0.95)",
+                    color: "rgba(255, 200, 230, 0.85)",
+                    fontSize: "12px",
                     letterSpacing: "-0.01em",
+                    fontWeight: "400",
                   }}
                 >
                   900원
