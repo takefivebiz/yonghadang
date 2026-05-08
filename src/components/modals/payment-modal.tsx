@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { loadPaymentWidget, ANONYMOUS } from "@tosspayments/payment-widget-sdk";
+import {
+  loadPaymentWidget,
+  ANONYMOUS,
+  type PaymentWidgetInstance,
+} from "@tosspayments/payment-widget-sdk";
 
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (paymentKey: string, orderId: string) => Promise<void>;
   paymentType: "single" | "all";
   sceneIndex?: number;
   cardTitle?: string;
@@ -15,14 +18,13 @@ interface PaymentModalProps {
 const PaymentModal = ({
   isOpen,
   onClose,
-  onSuccess,
   paymentType,
   sceneIndex,
   cardTitle,
 }: PaymentModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const widgetRef = useRef<any>(null);
+  const widgetRef = useRef<PaymentWidgetInstance | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isSingle = paymentType === "single";
@@ -94,12 +96,15 @@ const PaymentModal = ({
 
       // successUrl로 리다이렉트되므로 이 코드는 실행되지 않음
       // 결제 완료 후 페이지 리로드 시 URL 파라미터에서 처리
-    } catch (err: any) {
+    } catch (err) {
       // 결제 취소 또는 실패 (드물게 발생)
-      if (err?.code === "USER_CANCEL") {
+      const error = err as { code?: string; message?: string } | Error | null;
+      if (error && "code" in error && error.code === "USER_CANCEL") {
         setError("결제가 취소되었어요");
-      } else if (err?.code) {
-        setError(`결제 오류: ${err.message || err.code}`);
+      } else if (error && "code" in error && error.code) {
+        const message =
+          "message" in error ? error.message : "알 수 없는 오류";
+        setError(`결제 오류: ${message}`);
       } else {
         setError("결제 처리 중 오류가 발생했어요");
       }

@@ -19,7 +19,8 @@ export async function confirmPayment(
   request: PaymentConfirmRequest,
 ): Promise<PaymentConfirmResponse> {
   try {
-    const { payment_key, order_id, amount } = request;
+    // TODO: [백엔드 연동] payment_key, order_id, amount 사용하여 Toss API 호출
+    void request;
 
     // TODO: [Toss API] Toss Payments 결제 승인 API 호출
     // POST https://api.tosspayments.com/v1/payments/confirm

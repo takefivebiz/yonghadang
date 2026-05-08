@@ -105,12 +105,14 @@ const FlowOverview = ({
       </div>
 
       {/* CTA */}
-      <p
-        className="text-center text-xs leading-relaxed mb-4"
-        style={{ color: "rgba(249, 249, 229, 0.25)" }}
-      >
-        여기서부터는 더 깊어져
-      </p>
+      {!allPaidUnlocked && (
+        <p
+          className="text-center text-xs leading-relaxed mb-4"
+          style={{ color: "rgba(249, 249, 229, 0.25)" }}
+        >
+          여기서부터는 더 깊어져
+        </p>
+      )}
       {!allPaidUnlocked && (
         <div className="max-w-sm mx-auto">
           {/* Primary CTA with badge */}
@@ -165,7 +167,7 @@ const FlowOverview = ({
           className="text-center text-xs py-3"
           style={{ color: "rgba(209, 109, 172, 0.5)" }}
         >
-          전체 흐름이 열렸어. 계속 읽어봐 →
+          전체 흐름이 열렸어. 계속 읽어봐
         </p>
       )}
     </div>

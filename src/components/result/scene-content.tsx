@@ -144,19 +144,6 @@ const SceneContent = ({
         borderTop: isFirst ? "none" : "1px solid rgba(255, 255, 255, 0.03)",
       }}
     >
-      {/* Subtle scene marker */}
-      {!isFirst && (
-        <p
-          className="text-[10px] font-light tracking-widest mb-2.5"
-          style={{
-            color: "rgba(209, 109, 172, 0.392)",
-            letterSpacing: "0.08em",
-          }}
-        >
-          {String(scene.scene_index).padStart(2, "0")}
-        </p>
-      )}
-
       {/* Scene 제목 및 상태 */}
       <div className="mb-4 flex gap-3">
         {/* Subtle vertical marker */}
@@ -164,23 +151,38 @@ const SceneContent = ({
           className="w-px flex-shrink-0 self-start"
           style={{
             background: "rgba(209, 109, 172, 0.392)",
-            minHeight: "55px",
+            minHeight: "80px",
           }}
         />
 
         {/* Scene header content */}
         <div className="flex-1">
-          {scene.is_free && scene.scene_index !== 2 && (
-            <div
-              className="inline-block px-2 py-0.5 rounded-md text-[9px] font-medium mb-2 tracking-wide uppercase"
-              style={{
-                background: "rgba(209, 109, 172, 0.08)",
-                color: "rgba(209, 109, 172, 0.5)",
-              }}
-            >
-              무료
-            </div>
-          )}
+          {/* Scene marker + 무료 배지 (같은 라인) */}
+          <div className="flex items-center gap-2 mb-2">
+            {(!isFirst || scene.is_free) && (
+              <p
+                className="text-[10px] font-light tracking-widest"
+                style={{
+                  color: "rgba(209, 109, 172, 0.392)",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                {String(scene.scene_index).padStart(2, "0")}
+              </p>
+            )}
+
+            {scene.is_free && scene.scene_index !== 2 && (
+              <div
+                className="px-2 py-0.5 rounded-md text-[9px] font-medium tracking-wide uppercase"
+                style={{
+                  background: "rgba(209, 109, 172, 0.08)",
+                  color: "rgba(209, 109, 172, 0.5)",
+                }}
+              >
+                무료
+              </div>
+            )}
+          </div>
 
           <h2
             className="text-xl font-normal leading-relaxed"

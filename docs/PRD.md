@@ -938,6 +938,66 @@ preview에서는:
 
 ---
 
+### 결과 페이지 하단 액션
+
+결과 페이지 마지막에는 다음 액션을 제공한다.
+
+- 다른 콘텐츠 보기
+- 공유하기
+
+---
+
+### 다른 콘텐츠 보기
+
+- 클릭 시 메인 페이지(`/`) 또는 콘텐츠 목록 영역으로 이동한다.
+- 문구는 `다른 콘텐츠 보기`를 사용한다.
+- 메인 CTA가 아니라 결과를 마친 뒤의 secondary action으로 처리한다.
+
+---
+
+### 공유하기
+
+공유 시에는 현재 결과의 공유용 페이지를 생성한다.
+
+공유 페이지에서는:
+
+- 무료 scene만 전체 노출
+- 유료 scene은 잠금 상태로 표시
+- 핵심 유료 내용은 노출하지 않음
+- 잠금 영역은 preview + lock CTA 형태 유지
+
+---
+
+### 공유 페이지 접근 권한
+
+공유 링크를 받은 사용자는 무료 scene만 확인할 수 있다.
+
+잠긴 scene을 열람하려면 다음 중 하나가 필요하다.
+
+#### 비회원
+
+- 전화번호 입력
+- 비밀번호 4자리 입력
+- 결제 또는 기존 구매 내역 확인 후 열람 가능
+
+#### 회원
+
+- 로그인 필요
+- 구매 권한이 있는 경우 열람 가능
+- 구매 권한이 없는 경우 결제 후 열람 가능
+
+---
+
+### 공유 UX 원칙
+
+- 공유는 “결과 전체 공개”가 아니다.
+- 무료로 공개 가능한 일부 장면만 보여준다.
+- 유료 scene의 핵심 해석은 반드시 숨긴다.
+- 공유 페이지에서도 VEIL 결과페이지와 동일한 톤을 유지한다.
+- 공유 CTA가 과하게 바이럴처럼 보이면 안 된다.
+
+---
+
 ### 결제 및 노출 방식
 
 - 무료 scene은 전체 노출된다.
@@ -1052,16 +1112,16 @@ CTA 예시:
 
 // TODO: [DB 스키마] Supabase purchases 테이블 생성
 // CREATE TABLE purchases (
-//   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-//   session_id VARCHAR NOT NULL,
-//   purchase_type VARCHAR NOT NULL CHECK (purchase_type IN ('scene', 'full')),
-//   scene_id INTEGER,
-//   amount INTEGER NOT NULL,
-//   order_id VARCHAR NOT NULL UNIQUE,
-//   payment_key VARCHAR NOT NULL,
-//   purchased_at TIMESTAMP NOT NULL DEFAULT NOW(),
-//   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-//   FOREIGN KEY (session_id) REFERENCES sessions(session_id) ON DELETE CASCADE
+// id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+// session_id VARCHAR NOT NULL,
+// purchase_type VARCHAR NOT NULL CHECK (purchase_type IN ('scene', 'full')),
+// scene_id INTEGER,
+// amount INTEGER NOT NULL,
+// order_id VARCHAR NOT NULL UNIQUE,
+// payment_key VARCHAR NOT NULL,
+// purchased_at TIMESTAMP NOT NULL DEFAULT NOW(),
+// created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+// FOREIGN KEY (session_id) REFERENCES sessions(session_id) ON DELETE CASCADE
 // );
 
 ---

@@ -154,10 +154,19 @@ export default function GuestPage() {
           JSON.stringify(analyzeData),
         );
         sessionStorage.setItem("guest_token", guestId);
+
+        // redirect_to가 있으면 그곳으로, 없으면 /share로 이동
+        // /share에서 권한 검증 후 /result로 리다이렉트됨
+        const redirectTo = sessionStorage.getItem("redirect_to");
+        if (redirectTo) {
+          sessionStorage.removeItem("redirect_to");
+          window.location.href = redirectTo;
+        } else {
+          // redirect_to가 없으면 /share로 이동 (권한 검증을 받기 위해)
+          window.location.href = `/share/${sessionId}`;
+        }
       }
     }
-
-    router.push(`/result/${sessionId}`);
   };
 
   const handleBack = () => {
@@ -494,7 +503,7 @@ function StepTwo({
             className="text-xs font-normal transition-colors duration-200"
             style={{ color: "rgba(249, 249, 229, 0.3)" }}
           >
-            다시 입력
+            로그아웃
           </button>
         </div>
       </div>

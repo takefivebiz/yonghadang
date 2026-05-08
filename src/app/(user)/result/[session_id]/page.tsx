@@ -2,13 +2,16 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { generateMockResultScenes } from "@/lib/data/dummy-result-scenes";
 import { ResultScene } from "@/lib/types/result";
 import { AnalyzeAnswers } from "@/lib/types/analyze";
+import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
 import SceneContent from "@/components/result/scene-content";
 import FlowOverview from "@/components/result/flow-overview";
 import ProgressIndicator from "@/components/result/progress-indicator";
 import PaymentModal from "@/components/modals/payment-modal";
+import ResultActions from "@/components/result/result-actions";
 
 interface PageProps {
   params: Promise<{ session_id: string }>;
@@ -54,13 +57,14 @@ const ResultPage = ({ params }: PageProps) => {
           if (searchParams.get("payment_success") === "true") {
             // 결제 성공
             const paymentType = searchParams.get("paymentType");
-            const sceneIndex = parseInt(searchParams.get("sceneIndex") || "0", 10);
+            const sceneIndex = parseInt(
+              searchParams.get("sceneIndex") || "0",
+              10,
+            );
 
             if (paymentType === "single" && sceneIndex > 0) {
               // 개별 scene 구매
-              setUnlockedScenes((prev) => [
-                ...new Set([...prev, sceneIndex]),
-              ]);
+              setUnlockedScenes((prev) => [...new Set([...prev, sceneIndex])]);
             } else if (paymentType === "all") {
               // 전체 구매
               const allPaidIndices = mockScenes
@@ -138,13 +142,13 @@ const ResultPage = ({ params }: PageProps) => {
 
   const [paymentModal, setPaymentModal] = useState({
     isOpen: false,
-    type: 'single' as 'single' | 'all',
+    type: "single" as "single" | "all",
     sceneIndex: 0,
-    cardTitle: '',
+    cardTitle: "",
   });
 
   const handleOpenPaymentModal = (
-    type: 'single' | 'all',
+    type: "single" | "all",
     sceneIndex?: number,
     cardTitle?: string,
   ) => {
@@ -152,7 +156,7 @@ const ResultPage = ({ params }: PageProps) => {
       isOpen: true,
       type,
       sceneIndex: sceneIndex || 0,
-      cardTitle: cardTitle || '',
+      cardTitle: cardTitle || "",
     });
   };
 
@@ -160,42 +164,21 @@ const ResultPage = ({ params }: PageProps) => {
     setPaymentModal((prev) => ({ ...prev, isOpen: false }));
   };
 
-  // TODO: [결제 성공] Server Action으로 결제 검증 후 unlock
-  const handlePaymentSuccess = async (paymentKey: string, orderId: string) => {
-    try {
-      // TODO: [백엔드 연동] confirmPayment Server Action 호출로 서버 검증
-      // const result = await confirmPayment({
-      //   payment_key: paymentKey,
-      //   order_id: orderId,
-      //   amount: paymentModal.type === 'single' ? 900 : 2900,
-      // });
-
-      // 현재는 결제 성공 시 임시로 unlock 처리 (나중에 서버 응답으로 대체)
-      if (paymentModal.type === 'single' && paymentModal.sceneIndex) {
-        setUnlockedScenes((prev) => [
-          ...new Set([...prev, paymentModal.sceneIndex]),
-        ]);
-      } else if (paymentModal.type === 'all') {
-        const allPaidIndices = scenes
-          .filter((s) => !s.is_free)
-          .map((s) => s.scene_index);
-        setUnlockedScenes((prev) => [...new Set([...prev, ...allPaidIndices])]);
-      }
-    } catch (err) {
-      console.error('결제 검증 실패:', err);
-      throw err;
-    }
-  };
+  // TODO: [결제 성공] URL 파라미터로 결제 완료 처리 (위의 useEffect 참고)
 
   const handleUnlockScene = (sceneIndex: number, cardTitle?: string) => {
     const scene = scenes.find((s) => s.scene_index === sceneIndex);
     if (scene) {
-      handleOpenPaymentModal('single', sceneIndex, cardTitle || scene.scene_title);
+      handleOpenPaymentModal(
+        "single",
+        sceneIndex,
+        cardTitle || scene.scene_title,
+      );
     }
   };
 
   const handleUnlockAll = () => {
-    handleOpenPaymentModal('all');
+    handleOpenPaymentModal("all");
   };
 
   // ── 로딩 ──────────────────────────────────────────────────────
@@ -248,13 +231,8 @@ const ResultPage = ({ params }: PageProps) => {
         backgroundAttachment: "fixed",
       }}
     >
-      {/* ── 헤더 ──────────────────────────────────────── */}
-      <header className="sticky top-0 z-40">
-        <div className="h-6" />
-      </header>
-
-      {/* ── Progress Indicator Area ─────────────────── */}
-      <div className="sticky top-12 z-40 h-10 flex items-center justify-center">
+      {/* ── Progress Indicator (navbar 아래) ──────────────────────── */}
+      <div className="sticky top-13 z-40 h-10 flex items-center justify-center">
         <ProgressIndicator
           scenes={scenes}
           unlockedScenes={unlockedScenes}
@@ -265,6 +243,61 @@ const ResultPage = ({ params }: PageProps) => {
       {/* ── 메인 콘텐츠 영역 ──────────────────────────── */}
       <main className="flex-1 overflow-y-auto">
         <div className="w-full max-w-2xl mx-auto">
+          {/* 콘텐츠 헤더 */}
+          {analyzeData &&
+            (() => {
+              const content = DUMMY_CONTENTS.find(
+                (c) => c.id === analyzeData.content_id,
+              );
+              return content ? (
+                <div className="px-6 py-3 space-y-4">
+                  {/* 썸네일 이미지 */}
+                  {content.thumbnail_url && (
+                    <div className="relative h-48 overflow-hidden rounded-2xl">
+                      <Image
+                        src={content.thumbnail_url}
+                        alt={content.title}
+                        fill
+                        className="object-cover"
+                        style={{
+                          filter: "brightness(0.85) saturate(0.9)",
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* 제목 */}
+                  <div className="space-y-2">
+                    <h1
+                      className="text-xl font-medium"
+                      style={{ color: "rgba(249,249,229,0.9)" }}
+                    >
+                      {content.title}
+                    </h1>
+                    <p
+                      className="mb-5 text-sm"
+                      style={{ color: "rgba(249,249,229,0.5)" }}
+                    >
+                      {content.subtitle}
+                    </p>
+                  </div>
+                </div>
+              ) : null;
+            })()}
+
+          {/* 씬 시작 구분점 */}
+          <div className="px-3 py-3 text-center">
+            <span
+              style={{
+                color: "rgba(209, 109, 172, 0.25)",
+                fontSize: "16px",
+                letterSpacing: "0.7em",
+              }}
+            >
+              ◇
+            </span>
+          </div>
+
           {/* 첫 무료 scene 감지 */}
           {(() => {
             const freeScenes = scenes.filter((s) => s.is_free);
@@ -293,7 +326,10 @@ const ResultPage = ({ params }: PageProps) => {
                         scene={scene}
                         isUnlocked={isUnlocked}
                         onUnlockScene={() =>
-                          handleUnlockScene(scene.scene_index, scene.scene_title)
+                          handleUnlockScene(
+                            scene.scene_index,
+                            scene.scene_title,
+                          )
                         }
                         isFirst={isFirst}
                       />
@@ -329,7 +365,10 @@ const ResultPage = ({ params }: PageProps) => {
                         scene={scene}
                         isUnlocked={isUnlocked}
                         onUnlockScene={() =>
-                          handleUnlockScene(scene.scene_index, scene.scene_title)
+                          handleUnlockScene(
+                            scene.scene_index,
+                            scene.scene_title,
+                          )
                         }
                         isFirst={false}
                       />
@@ -339,17 +378,19 @@ const ResultPage = ({ params }: PageProps) => {
               </>
             );
           })()}
-
-          {/* 페이지 끝 spacing */}
-          <div className="h-20" />
         </div>
+
+        {/* 결과 페이지 하단 액션 */}
+        <ResultActions
+          sessionId={analyzeData.session_id}
+          contentId={analyzeData.content_id}
+        />
       </main>
 
       {/* 결제 모달 */}
       <PaymentModal
         isOpen={paymentModal.isOpen}
         onClose={handleClosePaymentModal}
-        onSuccess={handlePaymentSuccess}
         paymentType={paymentModal.type}
         sceneIndex={paymentModal.sceneIndex}
         cardTitle={paymentModal.cardTitle}

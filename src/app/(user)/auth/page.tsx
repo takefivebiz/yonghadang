@@ -8,7 +8,11 @@ const AuthPage = () => {
     if (typeof window !== "undefined") {
       localStorage.setItem("veil_user_id", "user-1");
       localStorage.setItem("veil_user_provider", provider);
-      window.location.href = "/";
+
+      // sessionStorage의 redirect_to를 읽어서 이동, 없으면 "/"
+      const redirectTo = sessionStorage.getItem("redirect_to");
+      sessionStorage.removeItem("redirect_to");
+      window.location.href = redirectTo || "/";
     }
   };
 
