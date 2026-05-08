@@ -17,7 +17,10 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-40 h-13 border-b border-surface bg-background/20 backdrop-blur-sm">
+      <header
+        className="fixed left-0 right-0 top-0 z-40 h-13 border-b border-surface backdrop-blur-sm"
+        style={{ backgroundColor: "rgba(20, 16, 33, 0.2)" }}
+      >
         <nav className="mx-auto flex h-full max-w-screen-lg items-center px-4">
           {/* 홈 로고 */}
           <Link
@@ -35,18 +38,22 @@ const Navbar = () => {
             aria-label={isMobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
           >
             <span
-              className={`absolute h-px w-4 bg-highlight/70 transition-all duration-200 ${
-                isMobileMenuOpen ? "rotate-45" : "-translate-y-1.5"
+              className={`absolute h-px w-4 transition-all duration-200 ${
+                isMobileMenuOpen
+                  ? "rotate-45 bg-accent"
+                  : "-translate-y-1.5 bg-highlight/70"
               }`}
             />
             <span
-              className={`absolute h-px w-4 bg-highlight/70 transition-all duration-200 ${
-                isMobileMenuOpen ? "opacity-0" : ""
+              className={`absolute h-px w-4 transition-all duration-200 ${
+                isMobileMenuOpen ? "opacity-0 bg-accent" : "bg-highlight/70"
               }`}
             />
             <span
-              className={`absolute h-px w-4 bg-highlight/70 transition-all duration-200 ${
-                isMobileMenuOpen ? "-rotate-45" : "translate-y-1.5"
+              className={`absolute h-px w-4 transition-all duration-200 ${
+                isMobileMenuOpen
+                  ? "-rotate-45 bg-accent"
+                  : "translate-y-1.5 bg-highlight/70"
               }`}
             />
           </button>
@@ -82,28 +89,31 @@ const Navbar = () => {
 
         {/* 모바일 드롭다운 메뉴 */}
         {isMobileMenuOpen && (
-          <div className="border-b border-surface bg-background/95 px-4 py-4 sm:hidden">
+          <div
+            className="border-b border-surface/20 px-4 py-4 backdrop-blur-sm sm:hidden"
+            style={{ backgroundColor: "#1e1b30fa" }}
+          >
             {isLoggedIn ? (
               <Link
                 href="/my-page"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full rounded-lg border border-surface py-3 text-center text-[0.75rem] text-highlight/70 transition-colors hover:border-highlight/30 hover:text-highlight"
+                className="block w-full rounded-lg border border-accent/30 bg-accent/8 py-3 text-center text-sm font-medium text-accent transition-all hover:border-accent/60 hover:bg-accent/15"
               >
                 마이페이지
               </Link>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 items-center">
                 <Link
                   href="/auth"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full rounded-lg border border-surface py-3 text-center text-[0.75rem] text-highlight/70 transition-colors hover:border-highlight/30 hover:text-highlight"
+                  className="block w-[80%] rounded-lg border border-accent/30 bg-accent/8 py-4 text-center text-sm font-medium text-accent transition-all hover:border-accent/60 hover:bg-accent/15"
                 >
                   로그인
                 </Link>
                 <Link
                   href="/guest"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full rounded-lg border border-surface py-3 text-center text-[0.75rem] text-highlight/70 transition-colors hover:border-accent hover:text-accent"
+                  className="block w-[80%] rounded-lg border border-surface/70 bg-surface/20 py-4 text-center text-sm font-medium text-highlight/70 transition-all hover:border-surface/70 hover:bg-surface/30 hover:text-highlight"
                 >
                   비회원 조회
                 </Link>
