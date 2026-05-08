@@ -2,25 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import GuestVerifyModal from "@/components/modals/guest-verify-modal";
 
 /**
  * 상단 네비게이션 바 (고정, 전체 너비)
  * - 공통: 홈 로고
- * - 비회원: 로그인 버튼 + 조회 버튼 (GuestVerifyModal 트리거)
+ * - 비회원: 로그인 버튼 + 조회 버튼 (/guest 페이지로 이동)
  * - 회원: 마이페이지 버튼
  * - 모바일: 햄버거 메뉴로 우측 메뉴 통합
  */
 const Navbar = () => {
   // TODO: [백엔드 연동] Supabase useUser() 훅으로 실제 로그인 상태 교체
   const isLoggedIn = false;
-  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const handleGuestModalOpen = () => {
-    setIsMobileMenuOpen(false);
-    setIsGuestModalOpen(true);
-  };
 
   return (
     <>
@@ -69,12 +62,12 @@ const Navbar = () => {
               </Link>
             ) : (
               <>
-                <button
-                  onClick={() => setIsGuestModalOpen(true)}
+                <Link
+                  href="/guest"
                   className="text-sm text-highlight/50 transition-colors hover:text-highlight/80"
                 >
                   비회원 조회
-                </button>
+                </Link>
                 <div className="h-3.5 w-px bg-surface" />
                 <Link
                   href="/auth"
@@ -107,22 +100,18 @@ const Navbar = () => {
                 >
                   로그인
                 </Link>
-                <button
-                  onClick={handleGuestModalOpen}
-                  className="w-full rounded-lg border border-surface py-3 text-center text-[0.75rem] text-highlight/70 transition-colors hover:border-accent hover:text-accent"
+                <Link
+                  href="/guest"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full rounded-lg border border-surface py-3 text-center text-[0.75rem] text-highlight/70 transition-colors hover:border-accent hover:text-accent"
                 >
-                  비회원 주문조회
-                </button>
+                  비회원 조회
+                </Link>
               </div>
             )}
           </div>
         )}
       </header>
-
-      <GuestVerifyModal
-        isOpen={isGuestModalOpen}
-        onClose={() => setIsGuestModalOpen(false)}
-      />
     </>
   );
 };

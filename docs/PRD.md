@@ -41,107 +41,85 @@
 
 ### Theme
 
-**Emotional Narrative, Midnight Diary, Quiet Conversation**
+Quiet Immersion, Cinematic Minimal, Narrative Interface
 
-**핵심 키워드:**
+핵심 키워드:
 
-- midnight
-- diary
-- faded emotion
-- emotional archive
-- quiet conversation
-- blurred memory
-- secret message
-- emotional depth
+- quiet immersion
+- restrained emotion
+- cinematic pacing
+- subtle tension
+- narrative transition
+- modern dark UI
+- controlled density
+- emotional clarity
 
 ---
 
 ### Interaction Principles
 
-- 감정 흐름 중심 UX
-- 조용하고 부드러운 인터랙션
-- 과한 motion보다 리듬 우선
-- 화면 전환은 “장면 전환”처럼 느껴져야 함
+- 감정보다 immersion 우선
+- 설명보다 체감 중심
+- interaction보다 pacing 우선
+- 화면 전환은 장면처럼 자연스럽게 이어져야 함
+- 사용자가 “읽는다”보다 “지나간다”에 가까운 감각 유지
 
 ---
 
 ### Motion
 
 - 최소 애니메이션 원칙 유지
-- fade / opacity / soft transition 중심
+- fade / opacity / subtle transition 중심
+- easing 과장 금지
 - spring animation 과다 사용 금지
-- 과한 parallax, 3D motion 금지
+- parallax / 3D motion 금지
+
+---
 
 ### Color System
 
 #### 방향성
 
-- 감정의 온도 중심
-- muted color 우선
-- deep midnight tone 유지
-- neon / cyberpunk 느낌 지양
-
----
-
-#### Core Palette
-
-| 역할              | 색상      |
-| ----------------- | --------- |
-| Background        | `#11111B` |
-| Surface           | `#1C1B2D` |
-| Surface Secondary | `#23213A` |
-| Emotional Accent  | `#C98BB0` |
-| Soft Lavender     | `#9E8AC9` |
-| Dusty Blue        | `#7C95B8` |
-| Primary Text      | `#F3EFE7` |
-| Secondary Text    | `#A8A1B5` |
-| Muted Text        | `#6E6880` |
-
----
-
-#### Color Usage Rules
-
-- 강조색 최소 사용
-- CTA / 감정 포인트에만 accent 사용
-- dark background 유지
+- deep dark tone 유지
+- muted accent 사용
+- contrast는 유지하되 자극적이지 않게
+- 감성 표현보다 공기감 우선
 - colorful UI 지양
-- quiet mood 우선
 
 ---
 
-#### Texture & Visual Elements
+### Texture & Visual Elements
 
 사용 가능:
 
-- subtle gradient haze
-- blurred light
-- faded glow
-- noise texture
-- paper texture
-- soft shadow
-- emotional fade
+- subtle haze
+- minimal blur
+- muted gradient
+- soft noise
+- subtle divider
+- low-contrast glow
 
 규칙:
 
-- 효과는 “느껴질 정도”만 사용
-- 과한 장식 금지
+- 효과보다 spacing과 rhythm 우선
+- 존재감이 아니라 공기감 수준으로만 사용
+- UI 장식 목적 사용 금지
 
 ---
 
 ### 절대 금지
 
+- 감성앱 느낌
+- 명상앱 느낌
+- 자기계발앱 느낌
+- 상담챗봇 느낌
 - cyberpunk 스타일
 - neon glow 남용
-- RGB 계열 색상
 - glassmorphism 과다 사용
-- 과한 gradient
-- 밝은 배경
 - dashboard 스타일 UI
-- AI SaaS 느낌
+- AI SaaS 랜딩 느낌
 - 과한 floating animation
-- 무거운 particle effect
-
----
+- heavy particle effect
 
 ## 5. 프론트엔드 요구사항
 
@@ -992,13 +970,21 @@ CTA 예시:
 
 ---
 
-#### 비회원 조회 모달
+#### 비회원 조회
 
-네비게이션 바 "조회" 버튼 클릭 시 표시
+네비게이션 바 "비회원 조회" 버튼 클릭 시 `/guest` 페이지로 이동한다.
+
+비회원 조회는 독립 페이지 기반으로 동작하며, 단계별 step 전환 방식으로 구성된다.
+
+---
+
+### `/guest`
+
+비회원 인증 및 결과 조회 페이지
 
 **Step 1 — 인증**
 
-```
+```txt
 ┌──────────────────────────┐
 │ 비회원 조회               │
 ├──────────────────────────┤
@@ -1012,25 +998,67 @@ CTA 예시:
 └──────────────────────────┘
 ```
 
-- [확인] → `POST /api/guest/verify` 호출
-- 실패 시 → "일치하는 기록이 없습니다" 에러 표시 (모달 유지)
+- [확인] 클릭 시 `POST /api/guest/verify` 호출
+- 실패 시 페이지 유지, 인라인 에러 메시지 표시
+- 성공 시: Step 2로 이동
 
-**Step 2 — 세션 목록 선택**
+**Step 2 — 결과 목록 선택**
 
-인증 성공 시, 동일 모달 내에서 보유한 결과 목록을 표시한다.
+사용자가 조회 가능한 결과 세션 목록을 표시한다.
 
-- 목록에는 `content_title`, `category`, `created_at`, `has_purchase` 표시
-- 항목 클릭 시 → 해당 세션의 `guest_token`을 저장 후 `/result/[session_id]`로 이동
-- 세션이 1개뿐인 경우 목록 화면 없이 바로 해당 `/result/[session_id]`로 이동
+- 표시 정보: `content_title`, `category`, `created_at`, `has_purchase`
+- UI: 결과 페이지와 동일한 톤의 조용한 리스트 형태 (과한 카드 디자인 금지)
+- 항목 클릭 시: `guest_token` 저장 후 `/result/[session_id]` 이동
+
+**UX 원칙**
+
+- VEIL 세계관 내에서 동작하는 기능으로 유지
+- "결과를 다시 확인한다"보다 "이전에 열어본 감정 흐름으로 다시 들어간다"는 톤 유지
 
 ---
 
 #### 마이페이지 (`/my-page`)
 
-- 회원만 접근 가능
-- 닉네임 (수정 가능), 소셜 서비스 로고 (구글/카카오), 이메일, 로그아웃
-- 나의 결과 목록
-- 구매 내역
+회원만 접근 가능. VEIL 전체 톤과 동일한 dark / minimal UI 유지.
+
+---
+
+### 프로필
+
+표시 정보:
+
+- 닉네임 (수정 가능)
+- 소셜 로그인 서비스 아이콘 (Google / Kakao)
+- 이메일
+
+UI: 정보 밀도 낮게, 과한 카드/박스 UI 금지
+
+---
+
+### 지난 기록
+
+사용자가 이전에 생성하거나 열람한 결과 목록 표시.
+
+표시 정보:
+
+- `content_title`
+- `category`
+- `created_at`
+- 열람 상태 (예: `scene 3까지 열람`, `전체 열람 완료`)
+
+동작:
+
+- 항목 클릭 시 `/result/[session_id]` 이동
+
+UI: 결과 페이지와 동일한 spacing 유지, 리스트 기반 구조, "기록을 다시 열어보는 느낌"
+
+---
+
+### 설정
+
+- 로그아웃
+- 계정 관리
+- 결제 관리 (추후 추가 예정)
 
 ---
 

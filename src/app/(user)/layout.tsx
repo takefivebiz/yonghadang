@@ -1,5 +1,5 @@
-import Navbar from "@/components/layout/navbar"
-import Footer from "@/components/layout/footer"
+import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 
 /**
  * 유저 UX 레이아웃 - Navbar (고정 h-14) + main 콘텐츠 + Footer
@@ -7,15 +7,13 @@ import Footer from "@/components/layout/footer"
  */
 const UserLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Navbar />
       {/* pt-14: 고정 Navbar 높이만큼 상단 여백 */}
-      <main className="min-h-screen pt-14">
-        {children}
-      </main>
+      <main className="flex-1 pt-14">{children}</main>
       <Footer />
-    </>
-  )
-}
+    </div>
+  );
+};
 
-export default UserLayout
+export default UserLayout;
