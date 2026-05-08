@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import MyPageContent from "@/components/my-page/my-page-content";
-import {
-  DUMMY_PROFILES,
-  getCurrentUserProfile,
-} from "@/lib/data/dummy-profiles";
+import { getCurrentUserProfile } from "@/lib/data/dummy-profiles";
 import { getUserSessions } from "@/lib/data/dummy-sessions";
 
 export const metadata: Metadata = {

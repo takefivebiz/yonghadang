@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 /**
@@ -12,8 +12,15 @@ import Link from "next/link";
  */
 const Navbar = () => {
   // TODO: [백엔드 연동] Supabase useUser() 훅으로 실제 로그인 상태 교체
-  const isLoggedIn = false;
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userId = localStorage.getItem("veil_user_id");
+      setIsLoggedIn(!!userId);
+    }
+  }, []);
 
   return (
     <>

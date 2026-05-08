@@ -1,18 +1,17 @@
+"use client";
+
 import Link from "next/link";
-import { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "로그인",
-  description: "VEIL 로그인 페이지",
-};
-
-/**
- * 로그인 페이지 (/auth)
- * - Google / Kakao 소셜 로그인만 지원
- * - 미니멀 + 현실적인 dark UI 스타일
- * - Navbar/Footer는 (user) 레이아웃에서 자동 적용
- */
 const AuthPage = () => {
+  const handleSocialLogin = (provider: string) => {
+    // TODO: [백엔드 연동] 실제 OAuth 플로우로 교체
+    if (typeof window !== "undefined") {
+      localStorage.setItem("veil_user_id", "user-1");
+      localStorage.setItem("veil_user_provider", provider);
+      window.location.href = "/";
+    }
+  };
+
   return (
     <div className="flex min-h-[calc(100vh-60px)] flex-col items-center justify-start px-4 pt-25">
       {/* 메인 카피 + 서브텍스트 */}
@@ -29,7 +28,7 @@ const AuthPage = () => {
       </div>
 
       {/* 소셜 로그인 섹션 */}
-      <div className="w-full max-w-[85%] space-y-4">
+      <div className="w-full max-w-[85%] sm:max-w-xs space-y-4">
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-surface/100" />
           <p className="text-center text-[0.7rem] text-highlight/40">
@@ -38,7 +37,7 @@ const AuthPage = () => {
           <div className="h-px flex-1 bg-surface/100" />
         </div>
         {/* Google 로그인 */}
-        <button className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]">
+        <button onClick={() => handleSocialLogin("google")} className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]">
           <svg
             className="h-4 w-4"
             viewBox="0 0 24 24"
@@ -69,7 +68,7 @@ const AuthPage = () => {
         </button>
 
         {/* Kakao 로그인 */}
-        <button className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]">
+        <button onClick={() => handleSocialLogin("kakao")} className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]">
           <svg
             className="h-4 w-4"
             viewBox="0 0 24 24"

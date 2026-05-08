@@ -1,14 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { UserProfile } from "@/lib/types/user";
 import AccountManagementModal from "./account-management-modal";
 
-interface SettingsSectionProps {
-  profile: UserProfile;
-}
-
-const SettingsSection = ({ profile }: SettingsSectionProps) => {
+const SettingsSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogout = () => {
@@ -85,7 +80,6 @@ const SettingsSection = ({ profile }: SettingsSectionProps) => {
 
       {/* 계정 관리 모달 */}
       <AccountManagementModal
-        profile={profile}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

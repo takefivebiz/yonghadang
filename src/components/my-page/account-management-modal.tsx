@@ -2,16 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { UserProfile } from "@/lib/types/user";
 
 interface AccountManagementModalProps {
-  profile: UserProfile;
   isOpen: boolean;
   onClose: () => void;
 }
 
 const AccountManagementModal = ({
-  profile,
   isOpen,
   onClose,
 }: AccountManagementModalProps) => {

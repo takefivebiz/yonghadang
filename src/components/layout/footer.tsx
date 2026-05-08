@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useState } from "react";
@@ -130,8 +131,8 @@ const TermsContent = () => (
     <section className="space-y-2 border-b border-surface/20 pb-4">
       <p className="text-sm text-highlight">여러분을 환영합니다.</p>
       <p>
-        VEIL(이하 "서비스")을 이용해 주셔서 감사합니다.
-        본 약관은 VEIL(이하 "회사")이 제공하는 서비스의 이용과 관련하여 회사와
+        VEIL(이하 &quot;서비스&quot;)을 이용해 주셔서 감사합니다.
+        본 약관은 VEIL(이하 &quot;회사&quot;)이 제공하는 서비스의 이용과 관련하여 회사와
         이용자 간의 권리, 의무 및 책임 사항을 규정합니다.
       </p>
       <p>

@@ -92,6 +92,34 @@ export const DUMMY_SESSIONS: Record<string, AnalysisSession> = {
     created_at: "2026-05-03T13:20:00Z",
     updated_at: "2026-05-03T14:00:00Z",
   },
+  "session-guest-1": {
+    id: "session-guest-1",
+    content_id: "love-1",
+    user_id: null,
+    guest_id: "guest-1",
+    inferred_user_type: {
+      tendency: "anxious_attachment",
+      intensity: "high",
+      pattern: "checking_behavior",
+    },
+    status: "completed" as SessionStatus,
+    created_at: "2026-05-04T10:00:00Z",
+    updated_at: "2026-05-04T10:45:00Z",
+  },
+  "session-guest-2": {
+    id: "session-guest-2",
+    content_id: "career-1",
+    user_id: null,
+    guest_id: "guest-1",
+    inferred_user_type: {
+      tendency: "career_confusion",
+      intensity: "medium",
+      pattern: "lack_of_direction",
+    },
+    status: "completed" as SessionStatus,
+    created_at: "2026-04-30T14:30:00Z",
+    updated_at: "2026-04-30T15:10:00Z",
+  },
 };
 
 // ── 세션별 답변 더미 데이터 ────────────────────────────────────────
@@ -212,6 +240,52 @@ export const DUMMY_SESSION_ANSWERS: Record<string, Answer[]> = {
       question_index: 3,
       question_text: "이 상황이 모든 관계에 해당돼?",
       answer_options: ["specific_relationships"],
+    },
+  ],
+  "session-guest-1": [
+    {
+      question_index: 1,
+      question_text: "지금 상황을 편하게 적어줘",
+      answer_text:
+        "사귀는 사람이 있는데 자꾸 의심이 생겨. 핸드폰을 자주 확인하게 되고, SNS에서 상대 활동을 체크하는 습관이 있어. 이게 정상인지 모르겠고 내 집착이 문제라고 생각해",
+    },
+    {
+      question_index: 2,
+      question_text: "이런 행동이 얼마나 자주 일어나?",
+      answer_options: ["daily"],
+    },
+    {
+      question_index: 3,
+      question_text: "이 상황이 얼마나 오래됐어?",
+      answer_options: ["months"],
+    },
+    {
+      question_index: 4,
+      question_text: "상대의 반응은 어떤 편이야?",
+      answer_options: ["frustrated"],
+    },
+    {
+      question_index: 5,
+      question_text: "이런 마음이 들 때 너는 주로 어떻게 해?",
+      answer_options: ["check_sns"],
+    },
+  ],
+  "session-guest-2": [
+    {
+      question_index: 1,
+      question_text: "지금 상황을 편하게 적어줘",
+      answer_text:
+        "지금 하는 일에 만족이 안 되는데, 뭘 해야 할지 몰라. 이미 이 일 경력이 3년이 되었는데 지금 바꿔도 될까 싶고, 다른 분야는 자신이 없어",
+    },
+    {
+      question_index: 2,
+      question_text: "직장에서 가장 불만족한 부분은?",
+      answer_options: ["growth"],
+    },
+    {
+      question_index: 3,
+      question_text: "전환 생각은 얼마나 자주 해?",
+      answer_options: ["weekly"],
     },
   ],
 };

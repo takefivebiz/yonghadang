@@ -54,7 +54,7 @@ const MyPageContent = ({ profile, sessions }: MyPageContentProps) => {
         <div className="space-y-8">
           <ProfileSection profile={profile} />
           <SessionList sessions={sessions} />
-          <SettingsSection profile={profile} />
+          <SettingsSection />
         </div>
       </div>
     </div>

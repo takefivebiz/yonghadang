@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   getUserSessions,
@@ -32,6 +32,20 @@ export default function GuestPage() {
   const [sessions, setSessions] = useState<GuestSessionInfo[]>([]);
   const [guestId, setGuestId] = useState<string>("");
   const [fadeOut, setFadeOut] = useState(false);
+
+  // 비회원 인증 상태를 sessionStorage에서 복원
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedGuestId = sessionStorage.getItem("guest_id");
+      const savedSessions = sessionStorage.getItem("guest_sessions");
+
+      if (savedGuestId && savedSessions) {
+        setGuestId(savedGuestId);
+        setSessions(JSON.parse(savedSessions));
+        setStep(2);
+      }
+    }
+  }, []);
 
   // 전화번호 포맷팅 (010-1234-5678)
   const formatPhoneNumber = (value: string) => {
@@ -101,6 +115,12 @@ export default function GuestPage() {
 
       setSessions(sessionInfos);
 
+      // sessionStorage에 비회원 정보 저장
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("guest_id", verifiedGuestId);
+        sessionStorage.setItem("guest_sessions", JSON.stringify(sessionInfos));
+      }
+
       // Step 2로 fade 전환
       setFadeOut(true);
       setTimeout(() => {
@@ -141,6 +161,13 @@ export default function GuestPage() {
   };
 
   const handleBack = () => {
+    // sessionStorage에서 비회원 정보 삭제
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("guest_id");
+      sessionStorage.removeItem("guest_sessions");
+      sessionStorage.removeItem("guest_token");
+    }
+
     setFadeOut(true);
     setTimeout(() => {
       setStep(1);
