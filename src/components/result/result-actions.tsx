@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { DUMMY_CONTENTS } from '@/lib/data/dummy-contents';
 
 interface ResultActionsProps {
   sessionId: string;
@@ -8,24 +10,78 @@ interface ResultActionsProps {
 }
 
 const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
-  // TODO: [공유 기능] 실제 공유 URL 생성 로직 구현
+  const [copyToast, setCopyToast] = useState(false);
+
+  // 공유 URL 생성 (현재: session_id = share_id)
+  const shareId = sessionId;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL_PRODUCTION || 'https://veil.app';
+  const shareUrl = `${baseUrl}/share/${shareId}`;
+
+  // 카카오 공유
   const handleShareKakao = () => {
-    console.log('카카오 공유:', { sessionId, contentId });
-    // TODO: [공유 기능] 카카오 공유 API 연동
+    // TODO: [공유 기능] 카카오 SDK 연동
+    // if (window.Kakao) {
+    //   window.Kakao.Share.sendDefault({
+    //     objectType: 'feed',
+    //     content: {
+    //       title: '내 에너지 분석 결과',
+    //       imageUrl: `${baseUrl}/api/og/share/${shareId}`,
+    //       link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
+    //     },
+    //   });
+    // } else {
+    // 현재는 공유 URL로 대체
+    window.open(shareUrl, '_blank');
+    // }
   };
 
+  // X 공유
   const handleShareX = () => {
-    console.log('X 공유:', { sessionId, contentId });
-    // TODO: [공유 기능] X 공유 API 연동
+    const content = DUMMY_CONTENTS.find((c) => c.id === contentId);
+    const shareText = content
+      ? `${content.title.replace(/\n/g, ' ')} ${content.subtitle}`
+      : '내 에너지를 분석해봤어요';
+    const xUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+    window.open(xUrl, '_blank', 'width=550,height=420');
   };
 
-  const handleCopyLink = () => {
-    console.log('링크 복사:', { sessionId, contentId });
-    // TODO: [공유 기능] 공유 링크 생성 및 복사
+  // 링크 복사
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopyToast(true);
+      setTimeout(() => setCopyToast(false), 2000);
+    } catch {
+      // 클립보드 복사 실패 시 임시 input으로 복사
+      const input = document.createElement('input');
+      input.value = shareUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      setCopyToast(true);
+      setTimeout(() => setCopyToast(false), 2000);
+    }
   };
 
   return (
     <div className="w-full max-w-2xl mx-auto px-6 py-12 space-y-8">
+      {/* 복사 완료 토스트 */}
+      {copyToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+          <div
+            className="px-4 py-2 rounded-lg text-xs font-medium"
+            style={{
+              background: 'rgba(209,109,172,0.2)',
+              color: 'rgba(209,109,172,0.9)',
+              border: '1px solid rgba(209,109,172,0.3)',
+            }}
+          >
+            링크가 복사되었어요
+          </div>
+        </div>
+      )}
+
       {/* 공유 버튼들 */}
       <div className="flex items-center justify-center gap-2">
         {/* 카카오 */}

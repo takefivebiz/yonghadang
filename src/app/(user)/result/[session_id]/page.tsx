@@ -242,7 +242,7 @@ const ResultPage = ({ params }: PageProps) => {
 
       {/* ── 메인 콘텐츠 영역 ──────────────────────────── */}
       <main className="flex-1 overflow-y-auto">
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full max-w-lg mx-auto">
           {/* 콘텐츠 헤더 */}
           {analyzeData &&
             (() => {
@@ -253,15 +253,13 @@ const ResultPage = ({ params }: PageProps) => {
                 <div className="px-6 py-3 space-y-4">
                   {/* 썸네일 이미지 */}
                   {content.thumbnail_url && (
-                    <div className="relative h-48 overflow-hidden rounded-2xl">
+                    <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-white/[0.04] shadow-2xl shadow-black/40">
                       <Image
                         src={content.thumbnail_url}
                         alt={content.title}
                         fill
-                        className="object-cover"
-                        style={{
-                          filter: "brightness(0.85) saturate(0.9)",
-                        }}
+                        priority
+                        className="object-cover object-center"
                       />
                     </div>
                   )}

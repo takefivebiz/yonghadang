@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { generateMockResultScenes } from "@/lib/data/dummy-result-scenes";
 import { ResultScene } from "@/lib/types/result";
 import { AnalyzeAnswers } from "@/lib/types/analyze";
+import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
 import SceneContent from "@/components/result/scene-content";
-import ProgressIndicator from "@/components/result/progress-indicator";
 
 interface PageProps {
   params: Promise<{ share_id: string }>;
@@ -15,12 +16,8 @@ interface PageProps {
 const ShareResultPage = ({ params }: PageProps) => {
   const [analyzeData, setAnalyzeData] = useState<AnalyzeAnswers | null>(null);
   const [scenes, setScenes] = useState<ResultScene[]>([]);
-  const [unlockedScenes, setUnlockedScenes] = useState<number[]>([]);
-  const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [shareId, setShareId] = useState<string>("");
 
   const sceneRefsMap = useRef<Record<number, HTMLDivElement | null>>({});
 
@@ -72,7 +69,6 @@ const ShareResultPage = ({ params }: PageProps) => {
     const initData = async () => {
       try {
         const param = await params;
-        setShareId(param.share_id);
 
         if (typeof window !== "undefined") {
           // TODO: [백엔드 연동] share_id로 결과 데이터 조회 API 호출
@@ -90,16 +86,6 @@ const ShareResultPage = ({ params }: PageProps) => {
           const mockScenes = generateMockResultScenes(data.content_id);
           setScenes(mockScenes);
 
-          // 공유 페이지에서는 무료 scene만 자동 unlock
-          const freeIndices = mockScenes
-            .filter((s) => s.is_free)
-            .map((s) => s.scene_index);
-          setUnlockedScenes(freeIndices);
-
-          // TODO: [인증] 로그인 상태 확인
-          // 실제 로그인 상태는 서버사이드 세션/토큰으로 확인해야 함
-          const isUserLoggedIn = !!localStorage.getItem("veil_user_id");
-          setIsLoggedIn(isUserLoggedIn);
         }
         setLoading(false);
       } catch {
@@ -115,29 +101,8 @@ const ShareResultPage = ({ params }: PageProps) => {
     if (scenes.length === 0) return;
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        let maxVisibility = 0;
-        let activeSceneIdx = 0;
-
-        entries.forEach((entry) => {
-          const ratio = entry.intersectionRatio;
-          const dataIndex = (entry.target as HTMLElement).getAttribute(
-            "data-scene-idx",
-          );
-          if (dataIndex === null) return;
-
-          const sceneIdx = parseInt(dataIndex, 10);
-          if (sceneIdx < 0 || sceneIdx >= scenes.length) return;
-
-          if (ratio > maxVisibility) {
-            maxVisibility = ratio;
-            activeSceneIdx = sceneIdx;
-          }
-        });
-
-        if (maxVisibility >= 0.2) {
-          setCurrentSceneIndex(activeSceneIdx);
-        }
+      () => {
+        // IntersectionObserver for scene tracking (currently unused)
       },
       {
         threshold: [0.2, 0.4, 0.6, 0.8],
@@ -205,18 +170,62 @@ const ShareResultPage = ({ params }: PageProps) => {
         <div className="h-6" />
       </header>
 
-      {/* ── Progress Indicator Area ─────────────────── */}
-      <div className="sticky top-12 z-40 h-10 flex items-center justify-center">
-        <ProgressIndicator
-          scenes={scenes}
-          unlockedScenes={unlockedScenes}
-          currentSceneIndex={currentSceneIndex}
-        />
-      </div>
-
       {/* ── 메인 콘텐츠 영역 ──────────────────────────── */}
       <main className="flex-1 overflow-y-auto">
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full max-w-lg mx-auto">
+          {/* 콘텐츠 헤더 */}
+          {analyzeData &&
+            (() => {
+              const content = DUMMY_CONTENTS.find(
+                (c) => c.id === analyzeData.content_id,
+              );
+              return content ? (
+                <div className="px-6 py-3 space-y-4">
+                  {/* 썸네일 이미지 */}
+                  {content.thumbnail_url && (
+                    <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-white/[0.04] shadow-2xl shadow-black/40">
+                      <Image
+                        src={content.thumbnail_url}
+                        alt={content.title}
+                        fill
+                        priority
+                        className="object-cover object-center"
+                      />
+                    </div>
+                  )}
+
+                  {/* 제목 */}
+                  <div className="space-y-2">
+                    <h1
+                      className="text-xl font-medium"
+                      style={{ color: "rgba(249,249,229,0.9)" }}
+                    >
+                      {content.title}
+                    </h1>
+                    <p
+                      className="mb-5 text-sm"
+                      style={{ color: "rgba(249,249,229,0.5)" }}
+                    >
+                      {content.subtitle}
+                    </p>
+                  </div>
+                </div>
+              ) : null;
+            })()}
+
+          {/* 씬 시작 구분점 */}
+          <div className="px-3 py-3 text-center">
+            <span
+              style={{
+                color: "rgba(209, 109, 172, 0.25)",
+                fontSize: "16px",
+                letterSpacing: "0.7em",
+              }}
+            >
+              ◇
+            </span>
+          </div>
+
           {/* 무료 Scene 렌더링 */}
           {scenes.map((scene, sceneIdx) => {
             if (!scene.is_free) return null;
@@ -280,7 +289,7 @@ const ShareResultPage = ({ params }: PageProps) => {
 
               {/* CTA 섹션 */}
               <div className="px-6 py-5 mb-15">
-                <div className="space-y-6">
+                <div className="space-y-6 max-w-sm mx-auto">
                   {/* 문구 */}
                   <div className="text-center">
                     <p
