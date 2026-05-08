@@ -69,7 +69,7 @@ export default function GuestPage() {
       const result = simulateGuestVerification(phoneDigits, pin);
 
       if (!result.success) {
-        setError("전화번호 또는 비밀번호가 일치하지 않습니다.");
+        setError("전화번호 또는 비밀번호가 일치하지 않아.");
         setIsLoading(false);
         return;
       }
@@ -81,7 +81,7 @@ export default function GuestPage() {
       const userSessions = getUserSessions(null, verifiedGuestId);
 
       if (userSessions.length === 0) {
-        setError("조회 가능한 기록이 없습니다.");
+        setError("조회 가능한 기록이 없어.");
         setIsLoading(false);
         return;
       }
@@ -108,7 +108,7 @@ export default function GuestPage() {
         setFadeOut(false);
       }, 300);
     } catch {
-      setError("오류가 발생했습니다. 다시 시도해주세요.");
+      setError("오류가 발생했어. 다시 시도해줘.");
     } finally {
       setIsLoading(false);
     }
@@ -175,6 +175,7 @@ export default function GuestPage() {
               sessions={sessions}
               onSelectSession={handleSelectSession}
               onBack={handleBack}
+              router={router}
             />
           )}
         </div>
@@ -249,7 +250,7 @@ function StepOne({
             <br />
           </h1>
           <p className="text-sm leading-relaxed" style={{ color: "#f9f9e57a" }}>
-            이전에 입력했던 정보로 확인할 수 있어요
+            이전에 입력했던 정보로 확인할 수 있어
           </p>
         </div>
 
@@ -311,8 +312,8 @@ function StepOne({
         {/* 에러 메시지 */}
         {error && (
           <div
-            className="text-sm leading-relaxed"
-            style={{ color: "rgba(249, 249, 229, 0.6)" }}
+            className="text-xs leading-relaxed text-center"
+            style={{ color: "rgba(249, 249, 229, 0.5)" }}
           >
             {error}
           </div>
@@ -348,71 +349,128 @@ function StepTwo({
   sessions,
   onSelectSession,
   onBack,
+  router,
 }: {
   sessions: GuestSessionInfo[];
   onSelectSession: (sessionId: string) => void;
   onBack: () => void;
+  router: ReturnType<typeof useRouter>;
 }) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* 헤더 */}
-      <div className="space-y-2">
+      <div className="space-y-2 sm:space-y-3 text-center">
+        {/* 아이콘 */}
+        <div className="flex justify-center mb-3">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M 8 10 L 16 4 L 24 10 L 24 26 Q 24 27 23 27 L 9 27 Q 8 27 8 26 Z"
+              stroke="rgba(209, 109, 172, 0.6)"
+              strokeWidth="1.5"
+              fill="none"
+            />
+            <line
+              x1="16"
+              y1="14"
+              x2="16"
+              y2="22"
+              stroke="rgba(209, 109, 172, 0.6)"
+              strokeWidth="1.5"
+            />
+          </svg>
+        </div>
         <h2
-          className="text-2xl font-semibold leading-tight"
-          style={{ color: "rgba(249, 249, 229, 0.85)" }}
+          className="text-2xl sm:text-3xl font-semibold leading-tight"
+          style={{ color: "#d16daccc" }}
         >
-          지난 기록
+          지난 <span style={{ color: "#f9f9e5d8" }}>기록</span>
+          <br />
         </h2>
+        <p className="text-sm leading-relaxed" style={{ color: "#f9f9e57a" }}>
+          입력했던 정보로 확인된 결과야
+        </p>
       </div>
 
       {/* 기록 목록 */}
-      <div className="space-y-5">
+      <div className="space-y-2 mx-auto w-[95%]">
         {sessions.map((session) => (
           <div
             key={session.session_id}
             onClick={() => onSelectSession(session.session_id)}
-            className="group cursor-pointer transition-opacity duration-200 hover:opacity-70"
+            className="cursor-pointer transition-all duration-200 rounded-lg px-3 py-4"
+            style={{
+              backgroundColor: "rgba(209, 109, 172, 0.06)",
+              border: "1px solid rgba(209, 109, 172, 0.10)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "rgba(209, 109, 172, 0.12)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "rgba(209, 109, 172, 0.06)";
+            }}
           >
-            <div
-              className="space-y-2 pb-5"
-              style={{ borderBottom: "1px solid rgba(209, 109, 172, 0.15)" }}
+            <h3
+              className="text-sm font-normal leading-snug line-clamp-2 mb-3"
+              style={{ color: "rgba(249, 249, 229, 0.85)" }}
             >
-              <h3
-                className="text-sm font-normal leading-snug whitespace-pre-wrap"
-                style={{ color: "rgba(249, 249, 229, 0.85)" }}
-              >
-                {session.content_title}
-              </h3>
-              <div className="flex items-center justify-between">
-                <div className="space-x-3 flex items-center text-xs">
-                  <span style={{ color: "rgba(249, 249, 229, 0.5)" }}>
-                    {formatCategoryName(session.category)}
-                  </span>
-                  <span style={{ color: "rgba(249, 249, 229, 0.3)" }}>•</span>
-                  <span style={{ color: "rgba(249, 249, 229, 0.5)" }}>
-                    {formatDate(session.created_at)}
-                  </span>
-                </div>
-              </div>
-              <p
-                className="text-xs font-normal"
-                style={{ color: "rgba(249, 249, 229, 0.4)" }}
-              >
+              {session.content_title}
+            </h3>
+            <div className="flex items-center gap-2 text-xs">
+              <span style={{ color: "rgba(249, 249, 229, 0.4)" }}>
+                {formatCategoryName(session.category)}
+              </span>
+              <span style={{ color: "rgba(249, 249, 229, 0.2)" }}>•</span>
+              <span style={{ color: "rgba(249, 249, 229, 0.4)" }}>
+                {formatDate(session.created_at)}
+              </span>
+              <span style={{ color: "rgba(249, 249, 229, 0.2)" }}>•</span>
+              <span style={{ color: "rgba(249, 249, 229, 0.3)" }}>
                 {session.view_state}
-              </p>
+              </span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* 뒤로가기 버튼 */}
-      <button
-        onClick={onBack}
-        className="w-full py-3 px-4 text-sm font-normal transition-colors duration-200"
-        style={{ color: "rgba(249, 249, 229, 0.4)" }}
-      >
-        다시 입력
-      </button>
+      {/* 액션 버튼들 */}
+      <div className="space-y-3 mx-auto w-[95%]">
+        <button
+          onClick={() => router.push("/")}
+          className="w-full cursor-pointer transition-all duration-200 rounded-lg px-3 py-3 text-center text-xs font-normal"
+          style={{
+            backgroundColor: "transparent",
+            border: "1px solid rgba(209, 109, 172, 0.25)",
+            color: "rgba(209, 109, 172, 0.638)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "rgba(209, 109, 172, 0.497)";
+            e.currentTarget.style.color = "rgba(209, 109, 172, 0.821)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "rgba(209, 109, 172, 0.25)";
+            e.currentTarget.style.color = "rgba(209, 109, 172, 0.6)";
+          }}
+        >
+          다른 콘텐츠 보기
+        </button>
+        <div className="text-center">
+          <button
+            onClick={onBack}
+            className="text-xs font-normal transition-colors duration-200"
+            style={{ color: "rgba(249, 249, 229, 0.3)" }}
+          >
+            다시 입력
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
