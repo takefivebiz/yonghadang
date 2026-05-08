@@ -25,7 +25,7 @@ export const DUMMY_SESSIONS: Record<string, AnalysisSession> = {
   "session-2": {
     id: "session-2",
     content_id: "love-2",
-    user_id: "user-2",
+    user_id: "user-1",
     guest_id: null,
     inferred_user_type: {
       tendency: "confused_emotion",
@@ -39,8 +39,8 @@ export const DUMMY_SESSIONS: Record<string, AnalysisSession> = {
   "session-3": {
     id: "session-3",
     content_id: "love-5",
-    user_id: null,
-    guest_id: "guest-1",
+    user_id: "user-1",
+    guest_id: null,
     inferred_user_type: {
       tendency: "uncertainty",
       intensity: "medium",
@@ -53,7 +53,7 @@ export const DUMMY_SESSIONS: Record<string, AnalysisSession> = {
   "session-4": {
     id: "session-4",
     content_id: "career-1",
-    user_id: "user-3",
+    user_id: "user-1",
     guest_id: null,
     inferred_user_type: {
       tendency: "career_confusion",
@@ -63,6 +63,34 @@ export const DUMMY_SESSIONS: Record<string, AnalysisSession> = {
     status: "completed" as SessionStatus,
     created_at: "2026-05-02T11:00:00Z",
     updated_at: "2026-05-02T11:45:00Z",
+  },
+  "session-5": {
+    id: "session-5",
+    content_id: "emotion-2",
+    user_id: "user-1",
+    guest_id: null,
+    inferred_user_type: {
+      tendency: "emotional_numbness",
+      intensity: "medium",
+      pattern: "avoidance",
+    },
+    status: "completed" as SessionStatus,
+    created_at: "2026-04-20T16:15:00Z",
+    updated_at: "2026-04-20T17:00:00Z",
+  },
+  "session-6": {
+    id: "session-6",
+    content_id: "relationship-1",
+    user_id: "user-1",
+    guest_id: null,
+    inferred_user_type: {
+      tendency: "interpersonal_anxiety",
+      intensity: "medium",
+      pattern: "boundary_issue",
+    },
+    status: "completed" as SessionStatus,
+    created_at: "2026-05-03T13:20:00Z",
+    updated_at: "2026-05-03T14:00:00Z",
   },
 };
 
@@ -150,6 +178,42 @@ export const DUMMY_SESSION_ANSWERS: Record<string, Answer[]> = {
       answer_options: ["daily"],
     },
   ],
+  "session-5": [
+    {
+      question_index: 1,
+      question_text: "지금 상황을 편하게 적어줘",
+      answer_text:
+        "요즘 뭘 해도 감정이 안 느껴져. 좋은 일이 생겨도 별로고, 나쁜 일이 있어도 뭔가 멀게만 느껴져. 이 상태가 며칠째 계속되고 있어",
+    },
+    {
+      question_index: 2,
+      question_text: "이 감정이 얼마나 오래됐어?",
+      answer_options: ["weeks"],
+    },
+    {
+      question_index: 3,
+      question_text: "이런 느낌이 들 때 너는 주로 뭘 하고 싶어?",
+      answer_options: ["avoid_interaction"],
+    },
+  ],
+  "session-6": [
+    {
+      question_index: 1,
+      question_text: "지금 상황을 편하게 적어줘",
+      answer_text:
+        "친구들과의 관계에서 자꾸 밀려나는 기분이 들어. 나만 노력하는 것 같고, 상대들은 나한테 관심이 없는 것 같아. 어떻게 해야 할지 모르겠어",
+    },
+    {
+      question_index: 2,
+      question_text: "이 상황이 얼마나 오래됐어?",
+      answer_options: ["months"],
+    },
+    {
+      question_index: 3,
+      question_text: "이 상황이 모든 관계에 해당돼?",
+      answer_options: ["specific_relationships"],
+    },
+  ],
 };
 
 // 세션과 답변을 함께 조회하는 헬퍼 함수
@@ -170,4 +234,35 @@ export const getUserSessions = (userId: string | null, guestId: string | null) =
       (userId && s.user_id === userId) ||
       (guestId && s.guest_id === guestId)
   );
+};
+
+// 세션 ID로 content 정보 조회 (더미)
+export const getContentTitle = (contentId: string): string => {
+  const contentTitles: Record<string, { title: string; category: string }> = {
+    "love-1": { title: "사랑일까, 집착일까?", category: "love" },
+    "love-2": { title: "나는 진심일까, 그냥 외로운 걸까?", category: "love" },
+    "love-3": { title: "왜 항상 나만 더 좋아하게 될까?", category: "love" },
+    "love-4": { title: "왜 항상 썸에서 끝날까?", category: "love" },
+    "love-5": { title: "이 사람, 나 좋아하는 거 맞아?", category: "love" },
+    "relationship-1": { title: "나만 노력하는 건 아닐까?", category: "relationship" },
+    "career-1": { title: "지금 내 커리어가 맞나?", category: "career" },
+    "emotion-2": { title: "요즘 왜 이럴까?", category: "emotion" },
+  };
+
+  return contentTitles[contentId]?.title || "알 수 없는 콘텐츠";
+};
+
+export const getContentCategory = (contentId: string): string => {
+  const contentTitles: Record<string, { title: string; category: string }> = {
+    "love-1": { title: "사랑일까, 집착일까?", category: "love" },
+    "love-2": { title: "나는 진심일까, 그냥 외로운 걸까?", category: "love" },
+    "love-3": { title: "왜 항상 나만 더 좋아하게 될까?", category: "love" },
+    "love-4": { title: "왜 항상 썸에서 끝날까?", category: "love" },
+    "love-5": { title: "이 사람, 나 좋아하는 거 맞아?", category: "love" },
+    "relationship-1": { title: "나만 노력하는 건 아닐까?", category: "relationship" },
+    "career-1": { title: "지금 내 커리어가 맞나?", category: "career" },
+    "emotion-2": { title: "요즘 왜 이럴까?", category: "emotion" },
+  };
+
+  return contentTitles[contentId]?.category || "general";
 };
