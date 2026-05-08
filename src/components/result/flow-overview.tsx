@@ -132,7 +132,7 @@ const FlowOverview = ({
                   fontWeight: "600",
                 }}
               >
-                전체 흐름 보기
+                전체 흐름 열기
               </span>
               <span
                 style={{

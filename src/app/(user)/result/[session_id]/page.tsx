@@ -8,6 +8,7 @@ import { AnalyzeAnswers } from "@/lib/types/analyze";
 import SceneContent from "@/components/result/scene-content";
 import FlowOverview from "@/components/result/flow-overview";
 import ProgressIndicator from "@/components/result/progress-indicator";
+import PaymentModal from "@/components/modals/payment-modal";
 
 interface PageProps {
   params: Promise<{ session_id: string }>;
@@ -47,6 +48,36 @@ const ResultPage = ({ params }: PageProps) => {
             .filter((s) => s.is_free)
             .map((s) => s.scene_index);
           setUnlockedScenes(freeIndices);
+
+          // 결제 완료 여부 확인 (URL 파라미터에서)
+          const searchParams = new URLSearchParams(window.location.search);
+          if (searchParams.get("payment_success") === "true") {
+            // 결제 성공
+            const paymentType = searchParams.get("paymentType");
+            const sceneIndex = parseInt(searchParams.get("sceneIndex") || "0", 10);
+
+            if (paymentType === "single" && sceneIndex > 0) {
+              // 개별 scene 구매
+              setUnlockedScenes((prev) => [
+                ...new Set([...prev, sceneIndex]),
+              ]);
+            } else if (paymentType === "all") {
+              // 전체 구매
+              const allPaidIndices = mockScenes
+                .filter((s) => !s.is_free)
+                .map((s) => s.scene_index);
+              setUnlockedScenes((prev) => [
+                ...new Set([...prev, ...allPaidIndices]),
+              ]);
+            }
+            // URL 파라미터 제거
+            window.history.replaceState({}, "", window.location.pathname);
+          } else if (searchParams.get("payment_failed") === "true") {
+            // 결제 실패
+            console.log("결제 실패");
+            // URL 파라미터 제거
+            window.history.replaceState({}, "", window.location.pathname);
+          }
         }
         setLoading(false);
       } catch {
@@ -105,17 +136,66 @@ const ResultPage = ({ params }: PageProps) => {
     return () => observer.disconnect();
   }, [scenes]);
 
-  const handleUnlockScene = (sceneIndex: number) => {
-    // TODO: [결제 구현] 개별 scene 구매 로직
-    setUnlockedScenes((prev) => [...new Set([...prev, sceneIndex])]);
+  const [paymentModal, setPaymentModal] = useState({
+    isOpen: false,
+    type: 'single' as 'single' | 'all',
+    sceneIndex: 0,
+    cardTitle: '',
+  });
+
+  const handleOpenPaymentModal = (
+    type: 'single' | 'all',
+    sceneIndex?: number,
+    cardTitle?: string,
+  ) => {
+    setPaymentModal({
+      isOpen: true,
+      type,
+      sceneIndex: sceneIndex || 0,
+      cardTitle: cardTitle || '',
+    });
+  };
+
+  const handleClosePaymentModal = () => {
+    setPaymentModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  // TODO: [결제 성공] Server Action으로 결제 검증 후 unlock
+  const handlePaymentSuccess = async (paymentKey: string, orderId: string) => {
+    try {
+      // TODO: [백엔드 연동] confirmPayment Server Action 호출로 서버 검증
+      // const result = await confirmPayment({
+      //   payment_key: paymentKey,
+      //   order_id: orderId,
+      //   amount: paymentModal.type === 'single' ? 900 : 2900,
+      // });
+
+      // 현재는 결제 성공 시 임시로 unlock 처리 (나중에 서버 응답으로 대체)
+      if (paymentModal.type === 'single' && paymentModal.sceneIndex) {
+        setUnlockedScenes((prev) => [
+          ...new Set([...prev, paymentModal.sceneIndex]),
+        ]);
+      } else if (paymentModal.type === 'all') {
+        const allPaidIndices = scenes
+          .filter((s) => !s.is_free)
+          .map((s) => s.scene_index);
+        setUnlockedScenes((prev) => [...new Set([...prev, ...allPaidIndices])]);
+      }
+    } catch (err) {
+      console.error('결제 검증 실패:', err);
+      throw err;
+    }
+  };
+
+  const handleUnlockScene = (sceneIndex: number, cardTitle?: string) => {
+    const scene = scenes.find((s) => s.scene_index === sceneIndex);
+    if (scene) {
+      handleOpenPaymentModal('single', sceneIndex, cardTitle || scene.scene_title);
+    }
   };
 
   const handleUnlockAll = () => {
-    // TODO: [결제 구현] 전체 scene 구매 로직
-    const allPaidIndices = scenes
-      .filter((s) => !s.is_free)
-      .map((s) => s.scene_index);
-    setUnlockedScenes((prev) => [...new Set([...prev, ...allPaidIndices])]);
+    handleOpenPaymentModal('all');
   };
 
   // ── 로딩 ──────────────────────────────────────────────────────
@@ -213,7 +293,7 @@ const ResultPage = ({ params }: PageProps) => {
                         scene={scene}
                         isUnlocked={isUnlocked}
                         onUnlockScene={() =>
-                          handleUnlockScene(scene.scene_index)
+                          handleUnlockScene(scene.scene_index, scene.scene_title)
                         }
                         isFirst={isFirst}
                       />
@@ -249,7 +329,7 @@ const ResultPage = ({ params }: PageProps) => {
                         scene={scene}
                         isUnlocked={isUnlocked}
                         onUnlockScene={() =>
-                          handleUnlockScene(scene.scene_index)
+                          handleUnlockScene(scene.scene_index, scene.scene_title)
                         }
                         isFirst={false}
                       />
@@ -264,6 +344,16 @@ const ResultPage = ({ params }: PageProps) => {
           <div className="h-20" />
         </div>
       </main>
+
+      {/* 결제 모달 */}
+      <PaymentModal
+        isOpen={paymentModal.isOpen}
+        onClose={handleClosePaymentModal}
+        onSuccess={handlePaymentSuccess}
+        paymentType={paymentModal.type}
+        sceneIndex={paymentModal.sceneIndex}
+        cardTitle={paymentModal.cardTitle}
+      />
     </div>
   );
 };

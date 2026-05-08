@@ -291,7 +291,7 @@ const SceneContent = ({
                     fontWeight: "600",
                   }}
                 >
-                  이 부분만 보기
+                  이 흐름만 열기
                 </p>
                 <p
                   style={{
