@@ -17,7 +17,7 @@ const CategoryTabsSticky = () => {
         // 마커가 화면 상단을 벗어나면 배경 표시
         setIsScrolled(!entry.isIntersecting);
       },
-      { threshold: 0 }
+      { threshold: 0 },
     );
 
     observer.observe(marker);
@@ -30,9 +30,9 @@ const CategoryTabsSticky = () => {
       <div ref={markerRef} className="h-px" aria-hidden="true" />
 
       <div
-        className={`sticky top-14 z-30 mb-8 transition-all duration-200 ${
+        className={`sticky top-13 z-30 mb-8 transition-all duration-200 ${
           isScrolled
-            ? "bg-background/55 backdrop-blur-md"
+            ? "bg-background/70 backdrop-blur-md"
             : "bg-transparent backdrop-blur-none"
         }`}
       >
