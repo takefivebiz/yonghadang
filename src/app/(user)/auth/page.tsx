@@ -14,15 +14,17 @@ export const metadata: Metadata = {
  */
 const AuthPage = () => {
   return (
-    <div className="flex min-h-[calc(100vh-56px-120px)] flex-col items-center justify-center px-4">
+    <div className="flex min-h-[calc(100vh-60px)] flex-col items-center justify-start px-4 pt-25">
       {/* 메인 카피 + 서브텍스트 */}
-      <div className="mb-17 flex max-w-md flex-col items-center gap-4 text-center">
+      <div className="mb-14 flex max-w-md flex-col items-center gap-4 text-center">
         <div className="space-y-3">
-          <h2 className="text-lg font-light leading-relaxed text-highlight">
-            <span className="text-accent">지금, 나를 이해하는 흐름에</span>
-            <br />
-            들어서봐
+          <h2 className="text-4xl font-nomal mb-5 tracking-[0.2em] text-highlight">
+            VEIL
           </h2>
+          <h3 className="mb-8 text-sm font-light leading-snug text-highlight">
+            나만의 <span className="text-accent">흐름</span> 속에서, <br />
+            나를 <span className="text-accent">이해</span>하는 시간
+          </h3>
         </div>
       </div>
 
@@ -35,9 +37,8 @@ const AuthPage = () => {
           </p>
           <div className="h-px flex-1 bg-surface/100" />
         </div>
-
-        {/* Google 로그인 - 공식 스타일 */}
-        <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-2.5 transition-all hover:bg-gray-50 active:bg-gray-100">
+        {/* Google 로그인 */}
+        <button className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]">
           <svg
             className="h-4 w-4"
             viewBox="0 0 24 24"
@@ -61,13 +62,14 @@ const AuthPage = () => {
               fill="#EA4335"
             />
           </svg>
-          <span className="text-[0.8rem] font-medium text-gray-900">
+
+          <span className="text-sm font-normal text-highlight/85 transition-colors duration-200 group-hover:text-highlight">
             Google로 계속하기
           </span>
         </button>
 
-        {/* Kakao 로그인 - 공식 스타일 */}
-        <button className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#FFE812] px-4 py-2.5 transition-all hover:bg-[#FFF1A8] active:bg-[#FFE000]">
+        {/* Kakao 로그인 */}
+        <button className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]">
           <svg
             className="h-4 w-4"
             viewBox="0 0 24 24"
@@ -78,10 +80,11 @@ const AuthPage = () => {
               fillRule="evenodd"
               clipRule="evenodd"
               d="M12 1C5.925 1 1 4.82 1 9.5c0 3.12 2.003 5.843 5.03 7.282l-1.207 4.397c-.113.412.268.781.654.56l3.868-2.343c.506.038 1.022.104 1.655.104 6.075 0 11-3.82 11-8.5S18.075 1 12 1z"
-              fill="#3C1E1E"
+              fill="#FEE500"
             />
           </svg>
-          <span className="text-[0.8rem] font-medium text-[#3C1E1E]">
+
+          <span className="text-sm font-normal text-highlight/85 transition-colors duration-200 group-hover:text-highlight">
             Kakao로 계속하기
           </span>
         </button>
