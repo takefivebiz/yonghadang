@@ -305,10 +305,14 @@ const ResultPage = ({ params }: PageProps) => {
             return (
               <>
                 {/* 무료 Scene 렌더링 */}
+                {/* sceneIdx는 scenes 배열의 실제 index (0, 1, 2, ...)
+                    DOM 순서 = scenes 배열 순서 = data-scene-idx 순서
+                    IntersectionObserver도 같은 sceneIdx로 currentSceneIndex 추적 */}
                 {scenes.map((scene, sceneIdx) => {
                   if (!scene.is_free) return null;
                   const isUnlocked = unlockedScenes.includes(scene.scene_index);
                   const isFirst = scene.id === firstFreeSceneId;
+                  const isCurrent = currentSceneIndex === sceneIdx;
 
                   return (
                     <div
@@ -330,6 +334,7 @@ const ResultPage = ({ params }: PageProps) => {
                           )
                         }
                         isFirst={isFirst}
+                        isCurrent={isCurrent}
                       />
                     </div>
                   );
@@ -346,9 +351,12 @@ const ResultPage = ({ params }: PageProps) => {
                 )}
 
                 {/* 유료 Scene 렌더링 */}
+                {/* sceneIdx는 scenes 배열 index 유지
+                    무료/유료 섞여 있어도 scenes 배열 순서 기반이므로 안전 */}
                 {scenes.map((scene, sceneIdx) => {
                   if (scene.is_free) return null;
                   const isUnlocked = unlockedScenes.includes(scene.scene_index);
+                  const isCurrent = currentSceneIndex === sceneIdx;
 
                   return (
                     <div
@@ -370,6 +378,7 @@ const ResultPage = ({ params }: PageProps) => {
                           )
                         }
                         isFirst={false}
+                        isCurrent={isCurrent}
                       />
                     </div>
                   );

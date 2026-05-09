@@ -1,12 +1,14 @@
 "use client";
 
 import { ResultScene, SceneMessage } from "@/lib/types/result";
+import { useEffect, useRef, useState } from "react";
 
 interface SceneContentProps {
   scene: ResultScene;
   isUnlocked: boolean;
   onUnlockScene: () => void;
   isFirst?: boolean;
+  isCurrent?: boolean;
 }
 
 // AI 메시지 블록
@@ -134,14 +136,50 @@ const SceneContent = ({
   isUnlocked,
   onUnlockScene,
   isFirst,
+  isCurrent = false,
 }: SceneContentProps) => {
   const isLocked = !scene.is_free && !isUnlocked;
 
+  // MVP: body section visibility (한 번만 reveal)
+  const [isBodyVisible, setIsBodyVisible] = useState(false);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+
+  // Body section fade-in: 한 번 reveal되면 유지
+  // TODO: [UX 실험] 나중에 opening_messages/body_messages를 서버에서 명시적으로 내려주는 구조로 변경
+  useEffect(() => {
+    if (isLocked || !bodyRef.current || isBodyVisible) return;
+
+    const element = bodyRef.current;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsBodyVisible(true);
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -40px 0px",
+      }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [isLocked, isBodyVisible]);
+
+  // MVP 임시 규칙: Opening = 첫 1개 message
+  // 향후: opening_messages / body_messages를 서버에서 분리 제공
+  const messages = scene.messages ?? [];
+  const openingMessages = messages.slice(0, 1);
+  const bodyMessages = messages.slice(1);
+
   return (
     <div
-      className="px-6 py-8"
+      className="px-6 py-8 transition-opacity duration-300"
       style={{
         borderTop: isFirst ? "none" : "1px solid rgba(255, 255, 255, 0.03)",
+        opacity: isCurrent ? 1 : 0.5, // Scene dim 처리
       }}
     >
       {/* Scene 제목 및 상태 */}
@@ -211,19 +249,27 @@ const SceneContent = ({
 
       {/* Scene 콘텐츠 */}
       {!isLocked ? (
-        // 무료 또는 unlocked scene: 전체 메시지 노출
+        // 무료 또는 unlocked scene
         <div data-testid="scene-messages" className="space-y-1 mt-6">
-          {(scene.messages ?? []).map((msg, idx) => (
+          {/* Opening: 항상 visible */}
+          {openingMessages.map((msg, idx) => renderMessage(msg, idx))}
+
+          {/* Body sections: scroll-driven fade-in (MVP 실험) */}
+          {bodyMessages.length > 0 && (
             <div
-              key={idx}
+              ref={bodyRef}
+              data-body-section="true"
+              data-visible={isBodyVisible ? "true" : "false"}
+              className="transition-opacity duration-[600ms]"
               style={{
-                // 첫 message를 살짝 강조 (opener 역할)
-                opacity: idx === 0 ? 1 : 1,
+                opacity: isBodyVisible ? 1 : 0,
               }}
             >
-              {renderMessage(msg, idx)}
+              {bodyMessages.map((msg, idx) =>
+                renderMessage(msg, idx + openingMessages.length)
+              )}
             </div>
-          ))}
+          )}
         </div>
       ) : (
         // Locked scene: preview 메시지가 자연스럽게 희미해지면서 잠기는 방식
