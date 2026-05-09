@@ -29,7 +29,7 @@ const HomePage = () => {
   )
 
   return (
-    <div className="mx-auto max-w-screen-lg pb-20">
+    <div className="w-full max-w-full overflow-x-hidden mx-auto max-w-screen-lg pb-20">
       <MiniHero />
 
       {/* 트렌딩 섹션 */}

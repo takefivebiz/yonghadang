@@ -90,15 +90,43 @@
 
 html {
   scroll-behavior: smooth;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 /* iOS Safari auto-zoom 방지: form control은 최소 16px */
 input,
 textarea,
-select,
+select {
+  font-size: 16px !important;
+}
+
 input:focus,
 textarea:focus,
 select:focus {
+  font-size: 16px !important;
+}
+
+/* tel, password input 명시적 설정 */
+input[type="tel"],
+input[type="password"],
+input[type="email"],
+input[type="number"] {
+  font-size: 16px !important;
+}
+
+input[type="tel"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus {
   font-size: 16px !important;
 }
 

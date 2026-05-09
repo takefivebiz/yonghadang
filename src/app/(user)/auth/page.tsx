@@ -38,7 +38,7 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-60px)] flex-col items-center justify-start px-4 pt-25">
+    <div className="w-full max-w-full overflow-x-hidden flex min-h-[calc(100vh-60px)] flex-col items-center justify-start px-4 pt-25">
       {/* 메인 카피 + 서브텍스트 */}
       <div className="mb-14 flex max-w-md flex-col items-center gap-4 text-center">
         <div className="space-y-3">

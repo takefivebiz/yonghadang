@@ -42,7 +42,7 @@ const TypeAInput = ({
   const maxChars = 500;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6">
+    <div className="w-full max-w-full overflow-x-hidden flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6">
       <style>{placeholderStyles}</style>
 
       {/* Progress indicator */}

@@ -56,24 +56,24 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
 
   const handleStart = async () => {
     setLoading(true);
-    const mockSessionId = crypto.randomUUID();
+    const mockSessionId = crypto.randomUUID?.() || `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     router.push(`/analyze/${mockSessionId}`);
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden">
+    <div className="w-full max-w-full relative min-h-[calc(100vh-3.5rem)] overflow-x-hidden overflow-y-visible">
       {/* SEO / 접근성용 제목 */}
       <h1 className="sr-only">{content.title}</h1>
       {content.subtitle && <p className="sr-only">{content.subtitle}</p>}
 
       {/* 전체 블러 배경 */}
       {content.thumbnail_url && (
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 w-full overflow-hidden">
           <Image
             src={content.thumbnail_url}
             alt=""
             fill
-            sizes="100vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1024px"
             className="scale-125 object-cover opacity-15 blur-3xl"
             priority
           />
@@ -81,7 +81,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
       )}
 
       <div
-        className={`absolute inset-0 bg-gradient-to-b ${config.glow} via-background/80 to-background`}
+        className={`absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-b ${config.glow} via-background/80 to-background`}
       />
 
       <main className="relative z-10 mx-auto max-w-lg px-5 pb-12 pt-8">

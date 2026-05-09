@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { ViewportMeta } from "@/components/layout/viewport-meta";
 import "./globals.css";
 
 /**
@@ -9,6 +10,10 @@ import "./globals.css";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  minimumScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
@@ -34,6 +39,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko">
       <body>
+        <ViewportMeta />
         {children}
         {/* TODO: [GA4 연동] NEXT_PUBLIC_GA_ID 환경변수 설정 후 자동 활성화 */}
         {process.env.NEXT_PUBLIC_GA_ID && (

@@ -189,7 +189,7 @@ export default function GuestPage() {
   };
 
   return (
-    <div className="flex min-h-[750px] items-start justify-center px-6 pt-17 pb-32">
+    <div className="w-full max-w-full overflow-x-hidden flex min-h-[750px] items-start justify-center px-6 pt-17 pb-32">
       <div className="w-full max-w-md">
         <div
           className={`transition-opacity duration-300 ${
