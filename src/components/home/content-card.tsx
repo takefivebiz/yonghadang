@@ -143,7 +143,7 @@ const ListCard = ({ content, priority }: Omit<ContentCardProps, "variant">) => {
         {/* 텍스트 영역 */}
         <div className="flex flex-col gap-2.5 px-4 py-4 sm:gap-3 sm:px-5 sm:py-5">
           {/* 제목 */}
-          <h2 className="text-base font-nomal leading-snug tracking-tight text-highlight transition-colors group-hover:text-white sm:text-lg">
+          <h2 className="text-base font-nomal leading-snug tracking-tight text-highlight transition-colors group-hover:text-white sm:text-lg font-content-card">
             {content.title}
           </h2>
 

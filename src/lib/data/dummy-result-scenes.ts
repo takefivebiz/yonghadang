@@ -20,7 +20,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
           },
           {
             type: "punch",
-            text: "불안을 잠재우려는 건데, 오히려 불안을 키우고 있어.",
+            text: "불안을 잠재우려는 건데, \n 오히려 불안을 키우고 있어.",
           },
           {
             type: "ai",
@@ -96,7 +96,10 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         preview_messages: [
           { type: "ai", text: "네가 더 많이 신경 쓸수록," },
           { type: "ai", text: "상대는 점점 가볍게 느낄 수 있어." },
-          { type: "ai", text: "온도 차이가 생기면, 뭔가 맞춰보려는 게 더 어색해져." },
+          {
+            type: "ai",
+            text: "온도 차이가 생기면, 뭔가 맞춰보려는 게 더 어색해져.",
+          },
         ],
       },
       {
@@ -176,7 +179,10 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_unlocked: true,
         messages: [
           { type: "ai", text: "자기 전에만 생각난다는 건, 뭔가 의미가 있어." },
-          { type: "ai", text: "그게 진심의 신호일 수도, 외로움의 신호일 수도 있어." },
+          {
+            type: "ai",
+            text: "그게 진심의 신호일 수도, 외로움의 신호일 수도 있어.",
+          },
           { type: "punch", text: "핵심은, 언제 그 감정이 오는지 보는 거야." },
         ],
         preview_messages: null,
@@ -188,9 +194,18 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_free: true,
         is_unlocked: true,
         messages: [
-          { type: "ai", text: "만날 땐 별로 특별하지 않은데 자기 전엔 자꾸 생각난다면," },
-          { type: "ai", text: "그건 그 사람과의 감정이 아니라, 고독과의 관계일 수도 있어." },
-          { type: "ai", text: "외로워서 그리워하는 건지, 정말 그 사람이 그리운 건지를 구분하기가 쉽지 않을 때가 있지." },
+          {
+            type: "ai",
+            text: "만날 땐 별로 특별하지 않은데 자기 전엔 자꾸 생각난다면,",
+          },
+          {
+            type: "ai",
+            text: "그건 그 사람과의 감정이 아니라, 고독과의 관계일 수도 있어.",
+          },
+          {
+            type: "ai",
+            text: "외로워서 그리워하는 건지, 정말 그 사람이 그리운 건지를 구분하기가 쉽지 않을 때가 있지.",
+          },
         ],
         preview_messages: null,
       },
@@ -201,18 +216,36 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_free: false,
         is_unlocked: false,
         messages: [
-          { type: "ai", text: "진심과 외로움을 가르는 가장 간단한 방법이 있어." },
-          { type: "ai", text: "그 사람과 함께 있을 때 외로움이 채워지는가, 아니면 더 깊어지는가를 봐." },
-          { type: "punch", text: "함께 있어도 외롭다면, 그건 다른 차원의 외로움이야." },
+          {
+            type: "ai",
+            text: "진심과 외로움을 가르는 가장 간단한 방법이 있어.",
+          },
+          {
+            type: "ai",
+            text: "그 사람과 함께 있을 때 외로움이 채워지는가, 아니면 더 깊어지는가를 봐.",
+          },
+          {
+            type: "punch",
+            text: "함께 있어도 외롭다면, 그건 다른 차원의 외로움이야.",
+          },
           {
             type: "memo",
             text: "진심은 함께할 때 따뜻해져.\n외로움은 함께 있어도 추워.",
           },
         ],
         preview_messages: [
-          { type: "ai", text: "진심과 외로움을 가르는 가장 간단한 방법이 있어." },
-          { type: "ai", text: "그 사람과 함께 있을 때 외로움이 채워지는가, 아니면 더 깊어지는가를 봐." },
-          { type: "punch", text: "함께 있어도 외롭다면, 그건 다른 차원의 외로움이야." },
+          {
+            type: "ai",
+            text: "진심과 외로움을 가르는 가장 간단한 방법이 있어.",
+          },
+          {
+            type: "ai",
+            text: "그 사람과 함께 있을 때 외로움이 채워지는가, 아니면 더 깊어지는가를 봐.",
+          },
+          {
+            type: "punch",
+            text: "함께 있어도 외롭다면, 그건 다른 차원의 외로움이야.",
+          },
         ],
       },
       {
@@ -223,13 +256,25 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_unlocked: false,
         messages: [
           { type: "ai", text: "일방적인 감정은 자기 전에 더 크게 느껴져." },
-          { type: "ai", text: "상대가 너의 기대만큼 돌아주지 않으면, 밤은 그 간극을 더 크게 만들어." },
-          { type: "ai", text: "낮에는 바빠서 인식을 못 했던 것들이, 밤엔 뚜렷해져." },
+          {
+            type: "ai",
+            text: "상대가 너의 기대만큼 돌아주지 않으면, 밤은 그 간극을 더 크게 만들어.",
+          },
+          {
+            type: "ai",
+            text: "낮에는 바빠서 인식을 못 했던 것들이, 밤엔 뚜렷해져.",
+          },
         ],
         preview_messages: [
           { type: "ai", text: "일방적인 감정은 자기 전에 더 크게 느껴져." },
-          { type: "ai", text: "상대가 너의 기대만큼 돌아주지 않으면, 밤은 그 간극을 더 크게 만들어." },
-          { type: "ai", text: "낮에는 바빠서 인식을 못 했던 것들이, 밤엔 뚜렷해져." },
+          {
+            type: "ai",
+            text: "상대가 너의 기대만큼 돌아주지 않으면, 밤은 그 간극을 더 크게 만들어.",
+          },
+          {
+            type: "ai",
+            text: "낮에는 바빠서 인식을 못 했던 것들이, 밤엔 뚜렷해져.",
+          },
         ],
       },
       {
@@ -240,12 +285,18 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_unlocked: false,
         messages: [
           { type: "ai", text: "만나는 시간이 더 중요해져야 한다면," },
-          { type: "ai", text: "자기 전이 아닌 다른 시간에도 자연스럽게 생각나도록." },
+          {
+            type: "ai",
+            text: "자기 전이 아닌 다른 시간에도 자연스럽게 생각나도록.",
+          },
           { type: "ai", text: "그렇지 않다면, 이건 외로움일 가능성이 높아." },
         ],
         preview_messages: [
           { type: "ai", text: "만나는 시간이 더 중요해져야 한다면," },
-          { type: "ai", text: "자기 전이 아닌 다른 시간에도 자연스럽게 생각나도록." },
+          {
+            type: "ai",
+            text: "자기 전이 아닌 다른 시간에도 자연스럽게 생각나도록.",
+          },
           { type: "ai", text: "그렇지 않다면, 이건 외로움일 가능성이 높아." },
         ],
       },
@@ -280,7 +331,10 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_unlocked: true,
         messages: [
           { type: "ai", text: "상대의 행동만 봐서는 알 수 없는 게 많아." },
-          { type: "ai", text: "친절한지 관심인지, 호의인지 습관인지를 구분하기가 정말 어렵거든." },
+          {
+            type: "ai",
+            text: "친절한지 관심인지, 호의인지 습관인지를 구분하기가 정말 어렵거든.",
+          },
           { type: "punch", text: "명확한 신호는 많지 않아." },
         ],
         preview_messages: null,
@@ -327,12 +381,18 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_unlocked: false,
         messages: [
           { type: "ai", text: "관계에서 가장 필요한 건 명확함이야." },
-          { type: "ai", text: "불명확한 신호 속에서 우리는 자꾸 기대하게 되고," },
+          {
+            type: "ai",
+            text: "불명확한 신호 속에서 우리는 자꾸 기대하게 되고,",
+          },
           { type: "ai", text: "그 기대가 나를 더 묶어둬." },
         ],
         preview_messages: [
           { type: "ai", text: "관계에서 가장 필요한 건 명확함이야." },
-          { type: "ai", text: "불명확한 신호 속에서 우리는 자꾸 기대하게 되고," },
+          {
+            type: "ai",
+            text: "불명확한 신호 속에서 우리는 자꾸 기대하게 되고,",
+          },
           { type: "ai", text: "그 기대가 나를 더 묶어둬." },
         ],
       },
@@ -344,11 +404,17 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_unlocked: false,
         messages: [
           { type: "ai", text: "불확실성 속에서 얼마나 오래 기다릴 건가?" },
-          { type: "ai", text: "그건 너의 내구력이 아니라, 너의 가치와 관련된 문제야." },
+          {
+            type: "ai",
+            text: "그건 너의 내구력이 아니라, 너의 가치와 관련된 문제야.",
+          },
         ],
         preview_messages: [
           { type: "ai", text: "불확실성 속에서 얼마나 오래 기다릴 건가?" },
-          { type: "ai", text: "그건 너의 내구력이 아니라, 너의 가치와 관련된 문제야." },
+          {
+            type: "ai",
+            text: "그건 너의 내구력이 아니라, 너의 가치와 관련된 문제야.",
+          },
           { type: "ai", text: "비워둔 자리에서 기다리는 건, 약함이 아니야." },
         ],
       },
@@ -360,7 +426,10 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_unlocked: false,
         messages: [
           { type: "ai", text: "명확함을 요구하는 것도 사랑이야." },
-          { type: "ai", text: "상대가 명확해지지 않을 때, 그걸 받아주는 것만이 사랑은 아니거든." },
+          {
+            type: "ai",
+            text: "상대가 명확해지지 않을 때, 그걸 받아주는 것만이 사랑은 아니거든.",
+          },
           {
             type: "memo",
             text: "때론 경계를 긋는 것도\n자신을 소중히 여기는\n한 가지 방식이야.",
@@ -368,8 +437,14 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "명확함을 요구하는 것도 사랑이야." },
-          { type: "ai", text: "상대가 명확해지지 않을 때, 그걸 받아주는 것만이 사랑은 아니거든." },
-          { type: "memo", text: "때론 경계를 긋는 것도\n자신을 소중히 여기는\n한 가지 방식이야." },
+          {
+            type: "ai",
+            text: "상대가 명확해지지 않을 때, 그걸 받아주는 것만이 사랑은 아니거든.",
+          },
+          {
+            type: "memo",
+            text: "때론 경계를 긋는 것도\n자신을 소중히 여기는\n한 가지 방식이야.",
+          },
         ],
       },
     ],
@@ -381,7 +456,10 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_free: true,
         is_unlocked: true,
         messages: [
-          { type: "ai", text: "직장에서 느끼는 불만족이 정확히 뭔지 보는 것부터 시작해야 해." },
+          {
+            type: "ai",
+            text: "직장에서 느끼는 불만족이 정확히 뭔지 보는 것부터 시작해야 해.",
+          },
           { type: "ai", text: "월급? 커리어 성장? 인간관계? 자아 실현?" },
           { type: "punch", text: "명확해야 다음이 보여." },
         ],
@@ -394,8 +472,14 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_free: true,
         is_unlocked: true,
         messages: [
-          { type: "ai", text: "지금 직장이 문제인가, 아니면 아무것도 아닌 것 같은 불안감이 문제인가?" },
-          { type: "ai", text: "둘은 다른 문제야. 하나를 해결해도 다른 하나가 남을 수 있어." },
+          {
+            type: "ai",
+            text: "지금 직장이 문제인가, 아니면 아무것도 아닌 것 같은 불안감이 문제인가?",
+          },
+          {
+            type: "ai",
+            text: "둘은 다른 문제야. 하나를 해결해도 다른 하나가 남을 수 있어.",
+          },
           { type: "ai", text: "둘 다 챙겨야 한다는 게 지금의 복잡함이야." },
         ],
         preview_messages: null,
@@ -431,12 +515,18 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         messages: [
           { type: "ai", text: "스펙이 없으면 전환이 어렵다는 게 사실이야." },
           { type: "ai", text: "하지만 지금 이 불만족도 스펙이야." },
-          { type: "ai", text: "뭔가 바꾸고 싶은 절박함은, 배운 것보다 강한 동기가 돼." },
+          {
+            type: "ai",
+            text: "뭔가 바꾸고 싶은 절박함은, 배운 것보다 강한 동기가 돼.",
+          },
         ],
         preview_messages: [
           { type: "ai", text: "스펙이 없으면 전환이 어렵다는 게 사실이야." },
           { type: "ai", text: "하지만 지금 이 불만족도 스펙이야." },
-          { type: "ai", text: "뭔가 바꾸고 싶은 절박함은, 배운 것보다 강한 동기가 돼." },
+          {
+            type: "ai",
+            text: "뭔가 바꾸고 싶은 절박함은, 배운 것보다 강한 동기가 돼.",
+          },
         ],
       },
       {
@@ -448,12 +538,18 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         messages: [
           { type: "ai", text: "전환은 한 번의 큰 점프가 아니라," },
           { type: "ai", text: "작은 움직임들의 연결이야." },
-          { type: "ai", text: "지금 할 수 있는 게 뭔지를 먼저 보는 게 중요해." },
+          {
+            type: "ai",
+            text: "지금 할 수 있는 게 뭔지를 먼저 보는 게 중요해.",
+          },
         ],
         preview_messages: [
           { type: "ai", text: "전환은 한 번의 큰 점프가 아니라," },
           { type: "ai", text: "작은 움직임들의 연결이야." },
-          { type: "ai", text: "지금 할 수 있는 게 뭔지를 먼저 보는 게 중요해." },
+          {
+            type: "ai",
+            text: "지금 할 수 있는 게 뭔지를 먼저 보는 게 중요해.",
+          },
         ],
       },
       {
@@ -464,7 +560,10 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         is_unlocked: false,
         messages: [
           { type: "ai", text: "지금 할 수 있는 첫 번째 움직임이 뭘까?" },
-          { type: "ai", text: "공부? 사이드 프로젝트? 아니면 다른 팀으로의 이동?" },
+          {
+            type: "ai",
+            text: "공부? 사이드 프로젝트? 아니면 다른 팀으로의 이동?",
+          },
           {
             type: "memo",
             text: "작은 경험이 모여서\n당신의 방향을 만들어.\n지금 정해지지 않아도 괜찮아.",
@@ -472,7 +571,10 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
         ],
         preview_messages: [
           { type: "ai", text: "지금 할 수 있는 첫 번째 움직임이 뭘까?" },
-          { type: "ai", text: "공부? 사이드 프로젝트? 아니면 다른 팀으로의 이동?" },
+          {
+            type: "ai",
+            text: "공부? 사이드 프로젝트? 아니면 다른 팀으로의 이동?",
+          },
           { type: "memo", text: "작은 경험이 모여서\n당신의 방향을 만들어." },
         ],
       },
@@ -589,9 +691,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
           text: "지금 이걸 알고 있다는 게, 오히려 달라질 수 있는 기회야.",
         },
       ],
-      preview_messages: [
-        { type: "ai", text: "이 패턴이 바뀌지 않으면," },
-      ],
+      preview_messages: [{ type: "ai", text: "이 패턴이 바뀌지 않으면," }],
     },
     {
       id: `mock-${contentId}-scene-6`,

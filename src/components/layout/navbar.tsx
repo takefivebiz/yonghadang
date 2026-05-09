@@ -33,7 +33,7 @@ const Navbar = () => {
           {/* 홈 로고 */}
           <Link
             href="/"
-            className="text-sm font-bold tracking-widest text-highlight transition-opacity hover:opacity-80"
+            className="text-sm font-medium tracking-[0.2em] text-highlight transition-opacity hover:opacity-80 font-header"
           >
             VEIL
           </Link>
@@ -86,7 +86,7 @@ const Navbar = () => {
                 <div className="h-3.5 w-px bg-surface" />
                 <Link
                   href="/auth"
-                  className="rounded-full border border-highlight/30 px-4 py-1.5 text-sm text-highlight transition-colors hover:border-highlight hover:bg-highlight/5"
+                  className="rounded-full rounded-lg border border-accent/30 bg-accent/8 text-accent px-4 py-1.5 text-sm  text-accent transition-all hover:border-accent/60 hover:bg-accent/15"
                 >
                   로그인
                 </Link>

@@ -39,19 +39,34 @@ const AuthPage = () => {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden flex min-h-[calc(100vh-60px)] flex-col items-center justify-start px-4 pt-25">
+      {/* 배경 원형 glow */}
+      <div
+        className="
+      absolute
+      left-1/2 top-1/4
+      -translate-x-1/2 -translate-y-1/2
+      h-[200px] w-[200px]
+      rounded-full
+      blur-3xl
+      pointer-events-none
+    "
+        style={{
+          background:
+            "radial-gradient(circle, rgba(209, 109, 172, 0.129) 0%, rgba(209, 109, 172, 0.262) 35%, rgba(209,109,172,0) 62%)",
+        }}
+      />
       {/* 메인 카피 + 서브텍스트 */}
       <div className="mb-14 flex max-w-md flex-col items-center gap-4 text-center">
         <div className="space-y-3">
-          <h2 className="text-4xl font-nomal mb-5 tracking-[0.2em] text-highlight">
+          <h2 className="text-[45px] font-light mb-2 tracking-[0.2em] font-header text-highlight">
             VEIL
           </h2>
-          <h3 className="mb-8 text-sm font-light leading-snug text-highlight">
+          <h3 className="mb-8 text-sm font-light leading-snug text-highlight font-hero">
             나만의 <span className="text-accent">흐름</span> 속에서, <br />
             나를 <span className="text-accent">이해</span>하는 시간
           </h3>
         </div>
       </div>
-
       {/* 소셜 로그인 섹션 */}
       <div className="w-full max-w-[85%] sm:max-w-xs space-y-4">
         <div className="flex items-center gap-3">
@@ -62,7 +77,10 @@ const AuthPage = () => {
           <div className="h-px flex-1 bg-surface/100" />
         </div>
         {/* Google 로그인 */}
-        <button onClick={() => handleSocialLogin("google")} className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]">
+        <button
+          onClick={() => handleSocialLogin("google")}
+          className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]"
+        >
           <svg
             className="h-4 w-4"
             viewBox="0 0 24 24"
@@ -93,7 +111,10 @@ const AuthPage = () => {
         </button>
 
         {/* Kakao 로그인 */}
-        <button onClick={() => handleSocialLogin("kakao")} className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]">
+        <button
+          onClick={() => handleSocialLogin("kakao")}
+          className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]"
+        >
           <svg
             className="h-4 w-4"
             viewBox="0 0 24 24"
@@ -113,7 +134,6 @@ const AuthPage = () => {
           </span>
         </button>
       </div>
-
       {/* 하단 약관 안내 */}
       <div className="mt-6 flex items-center justify-center gap-1 text-center text-xs text-highlight/40">
         <svg
@@ -143,7 +163,6 @@ const AuthPage = () => {
           에 동의하게 됩니다
         </p>
       </div>
-
       {/* 이용약관 모달 */}
       {openModal === "terms" && (
         <Modal
@@ -153,7 +172,6 @@ const AuthPage = () => {
           content={<TermsContent />}
         />
       )}
-
       {/* 개인정보처리방침 모달 */}
       {openModal === "privacy" && (
         <Modal
@@ -226,8 +244,8 @@ const TermsContent = () => (
     <section className="space-y-2 border-b border-surface/20 pb-4">
       <p className="text-sm text-highlight">여러분을 환영합니다.</p>
       <p>
-        VEIL(이하 &quot;서비스&quot;)을 이용해 주셔서 감사합니다.
-        본 약관은 VEIL(이하 &quot;회사&quot;)이 제공하는 서비스의 이용과 관련하여 회사와
+        VEIL(이하 &quot;서비스&quot;)을 이용해 주셔서 감사합니다. 본 약관은
+        VEIL(이하 &quot;회사&quot;)이 제공하는 서비스의 이용과 관련하여 회사와
         이용자 간의 권리, 의무 및 책임 사항을 규정합니다.
       </p>
       <p>
@@ -243,8 +261,8 @@ const TermsContent = () => (
         <li className="flex gap-2">
           <span className="text-highlight/40">•</span>
           <span>
-            "회원"이란 회사의 서비스에 접속하여 본 약관에 따라 이용계약을 체결하고
-            서비스를 이용하는 자를 의미합니다.
+            "회원"이란 회사의 서비스에 접속하여 본 약관에 따라 이용계약을
+            체결하고 서비스를 이용하는 자를 의미합니다.
           </span>
         </li>
         <li className="flex gap-2">
@@ -286,10 +304,18 @@ const TermsContent = () => (
     </section>
 
     <section className="space-y-2">
-      <h3 className="font-semibold text-highlight">제2조 (약관의 효력 및 변경)</h3>
+      <h3 className="font-semibold text-highlight">
+        제2조 (약관의 효력 및 변경)
+      </h3>
       <ol className="space-y-1 pl-4 list-decimal">
-        <li>본 약관은 서비스 화면 또는 기타 방법을 통해 공지함으로써 효력이 발생합니다.</li>
-        <li>회사는 관련 법령을 위반하지 않는 범위에서 본 약관을 변경할 수 있습니다.</li>
+        <li>
+          본 약관은 서비스 화면 또는 기타 방법을 통해 공지함으로써 효력이
+          발생합니다.
+        </li>
+        <li>
+          회사는 관련 법령을 위반하지 않는 범위에서 본 약관을 변경할 수
+          있습니다.
+        </li>
         <li>약관이 변경되는 경우 적용일 및 변경 사유를 사전에 공지합니다.</li>
         <li>
           이용자가 변경된 약관 시행 이후에도 서비스를 계속 이용하는 경우 변경
@@ -306,11 +332,14 @@ const TermsContent = () => (
       <h3 className="font-semibold text-highlight">제3조 (이용계약의 성립)</h3>
       <ol className="space-y-1 pl-4 list-decimal">
         <li>
-          서비스 이용계약은 이용자가 본 약관에 동의하고 서비스를 이용하거나 회원가입을
-          완료한 시점에 성립합니다.
+          서비스 이용계약은 이용자가 본 약관에 동의하고 서비스를 이용하거나
+          회원가입을 완료한 시점에 성립합니다.
         </li>
         <li>회사는 특별한 사정이 없는 한 회원가입 신청을 승인합니다.</li>
-        <li>다만 다음의 경우 회원가입 또는 서비스 이용을 제한하거나 거부할 수 있습니다.</li>
+        <li>
+          다만 다음의 경우 회원가입 또는 서비스 이용을 제한하거나 거부할 수
+          있습니다.
+        </li>
       </ol>
       <ul className="space-y-1 pl-8">
         <li className="flex gap-2">
@@ -337,7 +366,9 @@ const TermsContent = () => (
     </section>
 
     <section className="space-y-2">
-      <h3 className="font-semibold text-highlight">제4조 (개인정보의 수집 및 보호)</h3>
+      <h3 className="font-semibold text-highlight">
+        제4조 (개인정보의 수집 및 보호)
+      </h3>
       <ol className="space-y-1 pl-4 list-decimal">
         <li>
           회사는 서비스 제공에 필요한 범위 내에서 이용자의 개인정보를 수집 및
@@ -348,7 +379,9 @@ const TermsContent = () => (
           회사는 이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다. 단,
           관련 법령에 따른 요청이 있는 경우 예외로 합니다.
         </li>
-        <li>이용자는 언제든지 개인정보 수집 및 이용 동의를 철회할 수 있습니다.</li>
+        <li>
+          이용자는 언제든지 개인정보 수집 및 이용 동의를 철회할 수 있습니다.
+        </li>
       </ol>
     </section>
 
@@ -364,20 +397,26 @@ const PrivacyContent = () => (
     <section className="space-y-2 border-b border-surface/20 pb-4">
       <p className="text-sm text-highlight">VEIL 개인정보처리방침</p>
       <p>
-        VEIL(이하 "회사")은 이용자의 개인정보를 중요하게 생각하며, 「개인정보 보호법」 등 관련 법령을 준수합니다.
+        VEIL(이하 "회사")은 이용자의 개인정보를 중요하게 생각하며, 「개인정보
+        보호법」 등 관련 법령을 준수합니다.
       </p>
       <p>
-        본 개인정보처리방침은 회사가 어떤 정보를 수집하고, 어떻게 이용 및 보호하는지 안내하기 위한 내용입니다.
+        본 개인정보처리방침은 회사가 어떤 정보를 수집하고, 어떻게 이용 및
+        보호하는지 안내하기 위한 내용입니다.
       </p>
     </section>
 
     <section className="space-y-2">
-      <h3 className="font-semibold text-highlight">1. 개인정보의 수집 및 이용 목적</h3>
+      <h3 className="font-semibold text-highlight">
+        1. 개인정보의 수집 및 이용 목적
+      </h3>
       <p>회사는 다음 목적을 위해 개인정보를 수집 및 이용합니다.</p>
 
       <div className="space-y-2.5 pl-4">
         <div className="rounded-lg border border-surface/20 bg-surface/5 p-2">
-          <p className="font-medium text-highlight text-xs">회원가입 및 서비스 이용</p>
+          <p className="font-medium text-highlight text-xs">
+            회원가입 및 서비스 이용
+          </p>
           <div className="text-xs text-highlight/65 space-y-1 mt-1 pl-2">
             <p>수집 항목: 소셜 로그인 정보, 이메일, 닉네임</p>
             <p>이용 목적: 회원 식별, 서비스 제공, 기록 저장 및 다시보기</p>
@@ -386,7 +425,9 @@ const PrivacyContent = () => (
         </div>
 
         <div className="rounded-lg border border-surface/20 bg-surface/5 p-2">
-          <p className="font-medium text-highlight text-xs">비회원 서비스 이용</p>
+          <p className="font-medium text-highlight text-xs">
+            비회원 서비스 이용
+          </p>
           <div className="text-xs text-highlight/65 space-y-1 mt-1 pl-2">
             <p>수집 항목: 휴대전화 번호, 비밀번호(4자리)</p>
             <p>이용 목적: 비회원 결과 조회, 결과 다시 확인</p>
@@ -395,7 +436,9 @@ const PrivacyContent = () => (
         </div>
 
         <div className="rounded-lg border border-surface/20 bg-surface/5 p-2">
-          <p className="font-medium text-highlight text-xs">문의 및 고객 응대</p>
+          <p className="font-medium text-highlight text-xs">
+            문의 및 고객 응대
+          </p>
           <div className="text-xs text-highlight/65 space-y-1 mt-1 pl-2">
             <p>수집 항목: 이메일, 문의 내용, 서비스 이용 정보</p>
             <p>이용 목적: 문의 응대, 오류 확인 및 서비스 개선</p>
@@ -415,8 +458,13 @@ const PrivacyContent = () => (
     </section>
 
     <section className="space-y-2">
-      <h3 className="font-semibold text-highlight">2. 개인정보의 보유 및 이용 기간</h3>
-      <p>회사는 개인정보 수집 및 이용 목적이 달성된 후 지체 없이 개인정보를 삭제합니다.</p>
+      <h3 className="font-semibold text-highlight">
+        2. 개인정보의 보유 및 이용 기간
+      </h3>
+      <p>
+        회사는 개인정보 수집 및 이용 목적이 달성된 후 지체 없이 개인정보를
+        삭제합니다.
+      </p>
       <p>다만 관련 법령에 따라 일정 기간 보관이 필요한 경우:</p>
       <ul className="space-y-1 pl-4">
         <li className="flex gap-2">
@@ -460,24 +508,33 @@ const PrivacyContent = () => (
 
     <section className="space-y-2">
       <h3 className="font-semibold text-highlight">4. 개인정보 처리 위탁</h3>
-      <p>회사는 원활한 서비스 제공을 위해 일부 업무를 외부 업체에 위탁할 수 있습니다.</p>
+      <p>
+        회사는 원활한 서비스 제공을 위해 일부 업무를 외부 업체에 위탁할 수
+        있습니다.
+      </p>
 
       <div className="space-y-1.5 pl-4">
         <div className="rounded-lg border border-surface/20 bg-surface/5 p-2">
           <p className="font-medium text-highlight text-xs">결제 처리</p>
-          <p className="text-xs text-highlight/65 mt-1">수탁 업체: 결제대행사(PG사) | 위탁 업무: 결제 처리 및 환불 지원</p>
+          <p className="text-xs text-highlight/65 mt-1">
+            수탁 업체: 결제대행사(PG사) | 위탁 업무: 결제 처리 및 환불 지원
+          </p>
         </div>
 
         <div className="rounded-lg border border-surface/20 bg-surface/5 p-2">
           <p className="font-medium text-highlight text-xs">서비스 분석</p>
-          <p className="text-xs text-highlight/65 mt-1">수탁 업체: Google Analytics | 위탁 업무: 서비스 이용 통계 및 분석</p>
+          <p className="text-xs text-highlight/65 mt-1">
+            수탁 업체: Google Analytics | 위탁 업무: 서비스 이용 통계 및 분석
+          </p>
         </div>
       </div>
     </section>
 
     <section className="space-y-2">
       <h3 className="font-semibold text-highlight">5. 이용자의 권리</h3>
-      <p>이용자는 언제든지 자신의 개인정보에 대해 다음 권리를 행사할 수 있습니다:</p>
+      <p>
+        이용자는 언제든지 자신의 개인정보에 대해 다음 권리를 행사할 수 있습니다:
+      </p>
       <ul className="space-y-1 pl-4">
         <li className="flex gap-2">
           <span className="text-highlight/40">•</span>
@@ -500,12 +557,20 @@ const PrivacyContent = () => (
 
     <section className="space-y-2">
       <h3 className="font-semibold text-highlight">6. 개인정보의 파기</h3>
-      <p>회사는 개인정보 보유 기간이 종료되거나 처리 목적이 달성된 경우 지체 없이 개인정보를 삭제합니다.</p>
-      <p>전자적 파일은 복구가 불가능한 방식으로 삭제되며, 출력물은 분쇄 또는 소각 처리됩니다.</p>
+      <p>
+        회사는 개인정보 보유 기간이 종료되거나 처리 목적이 달성된 경우 지체 없이
+        개인정보를 삭제합니다.
+      </p>
+      <p>
+        전자적 파일은 복구가 불가능한 방식으로 삭제되며, 출력물은 분쇄 또는 소각
+        처리됩니다.
+      </p>
     </section>
 
     <section className="space-y-2">
-      <h3 className="font-semibold text-highlight">7. 개인정보 보호를 위한 조치</h3>
+      <h3 className="font-semibold text-highlight">
+        7. 개인정보 보호를 위한 조치
+      </h3>
       <p>회사는 개인정보 보호를 위해 다음과 같은 조치를 적용합니다:</p>
       <ul className="space-y-1 pl-4">
         <li className="flex gap-2">
@@ -530,20 +595,31 @@ const PrivacyContent = () => (
     <section className="space-y-2">
       <h3 className="font-semibold text-highlight">8. AI 서비스 관련 안내</h3>
       <p>VEIL은 생성형 인공지능(AI)을 기반으로 콘텐츠 및 결과를 제공합니다.</p>
-      <p>서비스 품질 개선 및 안정적인 운영을 위해 이용자가 입력한 일부 데이터가 비식별화된 형태로 분석 및 활용될 수 있습니다.</p>
+      <p>
+        서비스 품질 개선 및 안정적인 운영을 위해 이용자가 입력한 일부 데이터가
+        비식별화된 형태로 분석 및 활용될 수 있습니다.
+      </p>
     </section>
 
     <section className="space-y-2">
       <h3 className="font-semibold text-highlight">9. 개인정보 보호책임자</h3>
-      <p>회사는 개인정보 보호 및 관련 문의 대응을 위해 다음과 같이 개인정보 보호책임자를 지정합니다.</p>
+      <p>
+        회사는 개인정보 보호 및 관련 문의 대응을 위해 다음과 같이 개인정보
+        보호책임자를 지정합니다.
+      </p>
       <div className="rounded-lg border border-surface/20 bg-surface/5 p-2.5">
         <p className="text-xs text-highlight/65">이메일: support@veil.xxx</p>
       </div>
     </section>
 
     <section className="space-y-2">
-      <h3 className="font-semibold text-highlight">10. 개인정보처리방침의 변경</h3>
-      <p>본 개인정보처리방침은 관련 법령 또는 서비스 변경에 따라 수정될 수 있습니다.</p>
+      <h3 className="font-semibold text-highlight">
+        10. 개인정보처리방침의 변경
+      </h3>
+      <p>
+        본 개인정보처리방침은 관련 법령 또는 서비스 변경에 따라 수정될 수
+        있습니다.
+      </p>
       <p>변경 사항은 서비스 내 공지사항 또는 화면을 통해 안내합니다.</p>
     </section>
 

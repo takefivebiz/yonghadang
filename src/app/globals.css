@@ -72,6 +72,73 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "MaruBuri";
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-ExtraLight.woff2);
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaruBuri";
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Light.woff2);
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaruBuri";
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2);
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "MaruBuri";
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2);
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "MaruBuri";
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2);
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "MaruBuri";
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Light.woff2);
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "MaruBuri";
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-ExtraLight.woff2);
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaruBuri";
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2);
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MaruBuri";
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2);
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Dooneun";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2205@1.0/Donoun-Medium.woff2")
+    format("woff2");
+  font-weight: normal;
+  font-display: swap;
+}
+
 /**
  * Veil 디자인 시스템 색상 팔레트 (PRD 4. 디자인 가이드)
  * Tailwind v4 @theme 블록으로 CSS 변수 정의 → bg-*, text-*, border-* 유틸리티 자동 생성
@@ -86,6 +153,16 @@
 
 :root {
   color-scheme: dark;
+
+  /* 폰트 테스트용 변수: 각 섹션별로 폰트패밀리 교체 가능 */
+  --font-header: "Suit"; /* Navbar, 헤더 */
+  --font-hero: "MaruBuri"; /* MiniHero, 히어로 섹션 */
+  --font-content-card: "Suit"; /* 콘텐츠 카드 제목 */
+  --font-category: "Suit"; /* 카테고리 탭 */
+  --font-body: "Suit"; /* 본문 텍스트 */
+  --font-punch: "Suit"; /* Punch line */
+  --font-result: "Suit"; /* 결과페이지 */
+  --font-memo: "Dooneun"; /* 메모 텍스트 */
 }
 
 html {
@@ -199,4 +276,37 @@ body {
 
 @utility animate-fade-in {
   animation: fade-in-down 0.3s ease-out;
+}
+
+/* 폰트 변수 적용 유틸리티 클래스 */
+@utility font-header {
+  font-family: var(--font-header);
+}
+
+@utility font-hero {
+  font-family: var(--font-hero);
+}
+
+@utility font-content-card {
+  font-family: var(--font-content-card);
+}
+
+@utility font-category {
+  font-family: var(--font-category);
+}
+
+@utility font-body {
+  font-family: var(--font-body);
+}
+
+@utility font-punch {
+  font-family: var(--font-punch);
+}
+
+@utility font-result {
+  font-family: var(--font-result);
+}
+
+@utility font-memo {
+  font-family: var(--font-memo);
 }

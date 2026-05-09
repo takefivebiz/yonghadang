@@ -1,6 +1,7 @@
 "use client";
 
 import { ResultScene, SceneMessage } from "@/lib/types/result";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 interface SceneContentProps {
@@ -37,7 +38,7 @@ const AiBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
   return (
     <div className={`${marginBottom} flex justify-start`}>
       <div
-        className={maxWidth}
+        className={`${maxWidth} font-body`}
         style={{
           /* 배경과 자연스럽게 blend되는 bubble */
           background: "rgba(255, 255, 255, 0.04)",
@@ -69,13 +70,16 @@ const PunchBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
   return (
     <div className={`${verticalMargin} px-4 text-center`}>
       <p
+        className="font-punch "
         style={{
           /* 충분한 가독성과 배경과의 조화 */
-          color: "rgba(209, 109, 172, 0.58)",
-          fontSize: "14px",
-          lineHeight: "1.75",
-          fontWeight: "400",
+          color: "rgba(209, 109, 172, 0.653)",
+          whiteSpace: "pre-line",
+          fontSize: "15px",
+          lineHeight: "1.6",
+          fontWeight: "500",
           letterSpacing: "0",
+          fontStyle: "italic",
         }}
       >
         {text}
@@ -86,24 +90,34 @@ const PunchBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
 
 // 메모 쪽지
 const MemoBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
-  const verticalMargin = index % 2 === 0 ? "my-5" : "my-6";
+  // const verticalMargin = index % 2 === 0 ? "my-5" : "my-6";
   const rotation = index % 2 === 0 ? "-1.2deg" : "-1.4deg";
-
   return (
-    <div
-      className={`${verticalMargin} mx-2`}
-      style={{
-        background: "rgba(245, 239, 220, 0.88)",
-        color: "#3A2A18",
-        padding: "12px 16px",
-        borderRadius: "4px",
-        transform: `rotate(${rotation})`,
-        fontSize: "13px",
-        lineHeight: "1.95",
-        whiteSpace: "pre-line",
-      }}
-    >
-      {text}
+    <div className="relative w-full max-w-[300px] mb-3 rotate-[-1deg] opacity-80">
+      <Image
+        src="/texture/memo-paper1.png"
+        alt=""
+        width={320}
+        height={110}
+        className="w-full h-auto select-none pointer-events-none"
+      />
+
+      <div className="absolute inset-0 flex items-center px-8 py-6">
+        <p
+          className="font-memo"
+          style={{
+            color: "#3A2A18",
+            padding: "17px 16px",
+            borderRadius: "4px",
+            transform: `rotate(${rotation})`,
+            fontSize: "16px",
+            lineHeight: "1.5",
+            whiteSpace: "pre-line",
+          }}
+        >
+          {text}
+        </p>
+      </div>
     </div>
   );
 };
@@ -160,7 +174,7 @@ const SceneContent = ({
       {
         threshold: 0.15,
         rootMargin: "0px 0px -40px 0px",
-      }
+      },
     );
 
     observer.observe(element);
@@ -267,7 +281,7 @@ const SceneContent = ({
               }}
             >
               {bodyMessages.map((msg, idx) =>
-                renderMessage(msg, idx + openingMessages.length)
+                renderMessage(msg, idx + openingMessages.length),
               )}
             </div>
           )}
@@ -276,7 +290,10 @@ const SceneContent = ({
         // Locked scene: preview 메시지가 자연스럽게 희미해지면서 잠기는 방식
         <div>
           {/* Preview messages with gradual fade — lock CTA가 중간에 끼어 있음 */}
-          <div data-testid="scene-preview-messages" className="relative mt-6 space-y-1 pb-16">
+          <div
+            data-testid="scene-preview-messages"
+            className="relative mt-6 space-y-1 pb-16"
+          >
             {(scene.preview_messages ?? []).map((msg, idx) => {
               // 모든 preview message에 동일한 opacity와 blur 적용
               const opacity = 0.5;
