@@ -92,53 +92,59 @@ const ResultPage = ({ params }: PageProps) => {
     initData();
   }, [params]);
 
-  // IntersectionObserver로 현재 활성 scene 추적
+  // Scroll 기반으로 현재 활성 scene 추적 (viewport center 기준)
   useEffect(() => {
     if (scenes.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        let maxVisibility = 0;
-        let activeSceneIdx = 0;
+    let rafId: number | null = null;
+    let lastSceneIdx = currentSceneIndex;
 
-        // 모든 entries를 순회해서 가장 높은 visibility를 가진 scene 찾기
-        entries.forEach((entry) => {
-          const ratio = entry.intersectionRatio;
+    const handleScroll = () => {
+      // Viewport center 기준 (sticky header 고려)
+      const viewportCenter = window.innerHeight * 0.5;
+      let closestSceneIdx = 0;
+      let closestDistance = Infinity;
 
-          // data-index attribute에서 배열 index 읽기
-          const dataIndex = (entry.target as HTMLElement).getAttribute(
-            "data-scene-idx",
-          );
-          if (dataIndex === null) return;
+      scenes.forEach((_, idx) => {
+        const element = sceneRefsMap.current[idx];
+        if (!element) return;
 
-          const sceneIdx = parseInt(dataIndex, 10);
-          if (sceneIdx < 0 || sceneIdx >= scenes.length) return;
+        const rect = element.getBoundingClientRect();
+        const sceneCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(sceneCenter - viewportCenter);
 
-          // 현재 scene의 visibility가 최대값보다 크면 업데이트
-          if (ratio > maxVisibility) {
-            maxVisibility = ratio;
-            activeSceneIdx = sceneIdx;
-          }
-        });
-
-        // 최소 20% 이상 보이는 scene만 active로 설정
-        if (maxVisibility >= 0.2) {
-          setCurrentSceneIndex(activeSceneIdx);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestSceneIdx = idx;
         }
-      },
-      {
-        threshold: 0.4,
-        rootMargin: "0px 0px -30% 0px",
-      },
-    );
+      });
 
-    // 모든 scene ref에 observer 적용
-    Object.values(sceneRefsMap.current).forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
+      // State 변경은 실제로 바뀔 때만
+      if (closestSceneIdx !== lastSceneIdx) {
+        setCurrentSceneIndex(closestSceneIdx);
+        lastSceneIdx = closestSceneIdx;
+      }
+    };
 
-    return () => observer.disconnect();
-  }, [scenes]);
+    // RequestAnimationFrame으로 throttle
+    const throttledScroll = () => {
+      if (rafId === null) {
+        rafId = requestAnimationFrame(() => {
+          handleScroll();
+          rafId = null;
+        });
+      }
+    };
+
+    window.addEventListener("scroll", throttledScroll);
+
+    return () => {
+      window.removeEventListener("scroll", throttledScroll);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+    };
+  }, [scenes, currentSceneIndex]);
 
   const [paymentModal, setPaymentModal] = useState({
     isOpen: false,
