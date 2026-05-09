@@ -13,8 +13,8 @@ test.describe('C: 카테고리 전체보기 (`/category/[category]`)', () => {
       test(`C-0${index + 1}: 유효한 카테고리('${path}') 접근`, async ({ page }) => {
         await page.goto(`/category/${path}`);
         
-        // heading으로 카테고리 제목 확인 (strict mode 회피)
-        await expect(page.getByRole('heading', { name: new RegExp(label) })).toBeVisible();
+        // h1 (카테고리 페이지 타이틀)로만 확인하여 strict mode 위반 회피
+        await expect(page.locator('h1', { hasText: new RegExp(label) })).toBeVisible();
         
         // 콘텐츠 그리드 확인
         const grid = page.locator('[data-testid="category-grid"]');

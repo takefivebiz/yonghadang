@@ -117,7 +117,7 @@ const PaymentModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+    <div data-testid="payment-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
       <div
         ref={containerRef}
         className="w-full max-w-md rounded-2xl bg-background border border-white/10 flex flex-col max-h-[90vh]"
@@ -128,6 +128,7 @@ const PaymentModal = ({
           <button
             onClick={onClose}
             disabled={isProcessing}
+            data-testid="payment-modal-close-btn"
             className="mb-6 text-highlight/40 transition-colors hover:text-highlight/70 disabled:opacity-50"
           >
             ✕
@@ -136,7 +137,7 @@ const PaymentModal = ({
           {/* 결제 정보 */}
           {!error ? (
             <div>
-              <h2 className="mb-2 text-xl font-bold text-highlight sm:text-2xl">
+              <h2 data-testid="payment-modal-title" className="mb-2 text-xl font-bold text-highlight sm:text-2xl">
                 {title}
               </h2>
               <p className="mb-8 text-sm text-highlight/50">
@@ -150,7 +151,7 @@ const PaymentModal = ({
                 <p className="mb-2 text-xs font-semibold text-highlight/60">
                   결제 금액
                 </p>
-                <p className="text-sm font-bold text-secondary">
+                <p data-testid="payment-modal-price" className="text-sm font-bold text-secondary">
                   {amount.toLocaleString()}
                   <span className="text-sm text-highlight/60">원</span>
                 </p>
@@ -161,6 +162,7 @@ const PaymentModal = ({
 
               {/* 결제 버튼 */}
               <button
+                data-testid="payment-modal-pay-btn"
                 onClick={handlePayment}
                 disabled={isProcessing}
                 className="w-full text-sm rounded-lg bg-secondary px-4 py-3 font-medium text-white transition-all hover:bg-secondary/90 disabled:opacity-50"
@@ -170,6 +172,7 @@ const PaymentModal = ({
 
               {/* 취소 버튼 */}
               <button
+                data-testid="payment-modal-cancel-btn"
                 onClick={onClose}
                 disabled={isProcessing}
                 className="mt-3 w-full text-sm rounded-lg border border-white/10 bg-white/5 px-4 py-3 font-medium text-highlight/70 transition-all hover:bg-white/10 disabled:opacity-50"
@@ -179,7 +182,7 @@ const PaymentModal = ({
 
               {/* 로딩 상태 */}
               {isProcessing && (
-                <div className="mt-4 flex justify-center">
+                <div data-testid="payment-modal-spinner" className="mt-4 flex justify-center">
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-secondary/30 border-t-secondary" />
                 </div>
               )}
@@ -187,8 +190,9 @@ const PaymentModal = ({
           ) : (
             // 에러 상태
             <div className="text-center py-6">
-              <p className="mb-6 text-sm text-red-400">{error}</p>
+              <p data-testid="payment-modal-error-msg" className="mb-6 text-sm text-red-400">{error}</p>
               <button
+                data-testid="payment-modal-error-close-btn"
                 onClick={onClose}
                 className="w-full rounded-lg bg-secondary px-4 py-3 font-semibold text-white transition-all hover:bg-secondary/90"
               >

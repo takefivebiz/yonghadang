@@ -274,6 +274,7 @@ const ShareResultPage = ({ params }: PageProps) => {
                   return (
                     <p
                       key={scene.id}
+                      data-testid="share-paid-teaser-item"
                       className="text-sm cursor-default"
                       style={{
                         color: "rgba(249,249,229,0.6)",
@@ -288,7 +289,7 @@ const ShareResultPage = ({ params }: PageProps) => {
               </div>
 
               {/* CTA 섹션 */}
-              <div className="px-6 py-5 mb-15">
+              <div data-testid="share-cta-section" className="px-6 py-5 mb-15">
                 <div className="space-y-6 max-w-sm mx-auto">
                   {/* 문구 */}
                   <div className="text-center">
@@ -304,6 +305,7 @@ const ShareResultPage = ({ params }: PageProps) => {
                   <div className="space-y-3">
                     {/* 로그인 하기 */}
                     <button
+                      data-testid="share-cta-login-btn"
                       onClick={() => handleNavigateWithRedirect("/auth")}
                       className="w-full py-3 px-4 rounded-lg text-sm font-medium text-center transition-all duration-200 cursor-pointer"
                       style={{
@@ -325,6 +327,7 @@ const ShareResultPage = ({ params }: PageProps) => {
 
                     {/* 비회원 조회하기 */}
                     <button
+                      data-testid="share-cta-guest-btn"
                       onClick={() => handleNavigateWithRedirect("/guest")}
                       className="w-full py-3 px-8 rounded-lg text-sm font-medium text-center transition-all duration-200 cursor-pointer"
                       style={{

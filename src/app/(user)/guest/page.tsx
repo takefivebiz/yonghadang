@@ -438,6 +438,7 @@ function StepTwo({
         {sessions.map((session) => (
           <div
             key={session.session_id}
+            data-testid="guest-session-item"
             onClick={() => onSelectSession(session.session_id)}
             className="cursor-pointer transition-all duration-200 rounded-lg px-3 py-4"
             style={{

@@ -341,6 +341,7 @@ const ResultPage = ({ params }: PageProps) => {
                     scenes={scenes}
                     unlockedScenes={unlockedScenes}
                     onUnlockAll={handleUnlockAll}
+                    onUnlockScene={handleUnlockScene}
                   />
                 )}
 

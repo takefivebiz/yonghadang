@@ -25,6 +25,9 @@ const ProgressIndicator = ({
             <div key={scene.id} className="flex items-center gap-0">
               {/* Dot indicator */}
               <div
+                data-testid="progress-dot"
+                data-active={isActive}
+                data-unlocked={isUnlocked}
                 className={`w-2 h-2 rounded-full flex-shrink-0 transition-all duration-300 ${
                   isActive ? "ring-1 ring-offset-1" : ""
                 }`}

@@ -68,7 +68,7 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
     <div className="w-full max-w-2xl mx-auto px-6 py-12 space-y-8">
       {/* 복사 완료 토스트 */}
       {copyToast && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+        <div data-testid="copy-toast" className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
           <div
             className="px-4 py-2 rounded-lg text-xs font-medium"
             style={{
@@ -86,6 +86,7 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
       <div className="flex items-center justify-center gap-2">
         {/* 카카오 */}
         <button
+          data-testid="share-btn-kakao"
           onClick={handleShareKakao}
           className="p-3 transition-opacity duration-200 opacity-50 hover:opacity-80"
         >
@@ -101,6 +102,7 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
 
         {/* X */}
         <button
+          data-testid="share-btn-x"
           onClick={handleShareX}
           className="p-3 transition-opacity duration-200 opacity-50 hover:opacity-80"
         >
@@ -116,6 +118,7 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
 
         {/* 링크 복사 */}
         <button
+          data-testid="share-btn-copy"
           onClick={handleCopyLink}
           className="p-3 transition-opacity duration-200 opacity-50 hover:opacity-80"
         >
@@ -136,6 +139,7 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
       {/* 다른 콘텐츠 보기 */}
       <div>
         <Link
+          data-testid="other-contents-link"
           href="/"
           className="text-center block py-3 text-xs transition-opacity duration-200 opacity-40 hover:opacity-70"
           style={{ color: 'rgba(249,249,229,0.6)' }}

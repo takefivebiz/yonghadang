@@ -5,7 +5,7 @@ test.describe('I: 콘텐츠 진입 (`/content/[id]`)', () => {
     await page.goto('/content/love-1');
     
     // 제목 확인 (main 내의 h2, 큰 텍스트)
-    const heading = page.locator('main h2');
+    const heading = page.locator('main h2').first();
     await expect(heading).toBeVisible();
     const title = await heading.textContent();
     expect(title).toBeTruthy();
@@ -64,7 +64,7 @@ test.describe('I: 콘텐츠 진입 (`/content/[id]`)', () => {
   test('I-05: 페이지 새로고침 시 콘텐츠 유지', async ({ page }) => {
     await page.goto('/content/love-1');
     
-    const heading = page.locator('main h2');
+    const heading = page.locator('main h2').first();
     const originalTitle = await heading.textContent();
     
     // 페이지 새로고침
@@ -97,28 +97,20 @@ test.describe('I: 콘텐츠 진입 (`/content/[id]`)', () => {
   test('I-07: 뒤로가기 후 재진입', async ({ page }) => {
     // 직접 콘텐츠 페이지로 접근
     await page.goto('/content/love-1');
-    
-    const heading = page.locator('main h2');
+
+    const heading = page.locator('main h2').first();
     const originalTitle = await heading.textContent();
     expect(originalTitle).toBeTruthy();
-    
-    // 홈으로 이동
+
+    // 홈으로 이동 후 다시 동일 콘텐츠로 직접 재진입
     await page.goto('/');
-    
-    // 첫 번째 콘텐츠로 다시 진입
-    const firstLink = page.locator('[data-testid="content-section"]').first().locator('a').first();
-    if (await firstLink.isVisible()) {
-      await firstLink.click();
-    } else {
-      // 콘텐츠 링크가 없으면 직접 진입
-      await page.goto('/content/love-1');
-    }
-    
+    await page.goto('/content/love-1');
+
     // 동일한 콘텐츠가 로드됨
-    const newTitle = await heading.textContent();
+    const newTitle = await page.locator('main h2').first().textContent();
     expect(newTitle).toBe(originalTitle);
-    
-    // CTA 버튼이 활성화 상태
+
+    // CTA 버튼이 활성화 상태 (텍스트: "시작하기 →")
     const ctaButton = page.getByRole('button', { name: /시작하기/ });
     await expect(ctaButton).toBeEnabled();
   });

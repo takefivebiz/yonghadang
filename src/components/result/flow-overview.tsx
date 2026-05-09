@@ -6,12 +6,14 @@ interface FlowOverviewProps {
   scenes: ResultScene[];
   unlockedScenes: number[];
   onUnlockAll: () => void;
+  onUnlockScene?: (sceneIndex: number) => void;
 }
 
 const FlowOverview = ({
   scenes,
   unlockedScenes,
   onUnlockAll,
+  onUnlockScene,
 }: FlowOverviewProps) => {
   const paidScenes = scenes.filter((s) => !s.is_free);
   const allPaidUnlocked = paidScenes.every((s) =>
@@ -20,6 +22,7 @@ const FlowOverview = ({
 
   return (
     <div
+      data-testid="flow-overview"
       className="px-6 py-16 border-t border-b border-white/10"
       style={{
         background: "rgba(209, 109, 172, 0.04)",
@@ -45,17 +48,22 @@ const FlowOverview = ({
           return (
             <div
               key={scene.id}
+              data-testid="flow-overview-scene-item"
+              data-unlocked={isUnlocked}
               className="flex items-center gap-2.5 p-2.5 rounded-lg text-sm"
               style={{
                 background: isUnlocked
                   ? "rgba(209, 109, 172, 0.1)"
                   : "rgba(255, 255, 255, 0.02)",
+                cursor: !isUnlocked && onUnlockScene ? "pointer" : "default",
               }}
+              onClick={() => !isUnlocked && onUnlockScene?.(scene.scene_index)}
             >
               {/* Status icon */}
               <div className="flex-shrink-0">
                 {isUnlocked ? (
                   <div
+                    data-testid="flow-overview-unlocked-icon"
                     className="w-4 h-4 rounded-full flex items-center justify-center"
                     style={{ background: "rgba(209, 109, 172, 0.4)" }}
                   >
@@ -74,6 +82,7 @@ const FlowOverview = ({
                   </div>
                 ) : (
                   <div
+                    data-testid="flow-overview-locked-icon"
                     className="w-4 h-4 rounded-full flex items-center justify-center"
                     style={{ background: "rgba(255, 255, 255, 0.08)" }}
                   >
@@ -118,6 +127,7 @@ const FlowOverview = ({
           {/* Primary CTA with badge */}
           <div className="relative mb-4">
             <button
+              data-testid="flow-overview-unlock-all-btn"
               onClick={onUnlockAll}
               className="w-full rounded-[14px] py-3 transition-all duration-200 hover:opacity-90 active:opacity-80 flex flex-col items-center justify-center gap-1"
               style={{

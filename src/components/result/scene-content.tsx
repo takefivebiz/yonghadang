@@ -212,7 +212,7 @@ const SceneContent = ({
       {/* Scene 콘텐츠 */}
       {!isLocked ? (
         // 무료 또는 unlocked scene: 전체 메시지 노출
-        <div className="space-y-1 mt-6">
+        <div data-testid="scene-messages" className="space-y-1 mt-6">
           {(scene.messages ?? []).map((msg, idx) => (
             <div
               key={idx}
@@ -229,7 +229,7 @@ const SceneContent = ({
         // Locked scene: preview 메시지가 자연스럽게 희미해지면서 잠기는 방식
         <div>
           {/* Preview messages with gradual fade — lock CTA가 중간에 끼어 있음 */}
-          <div className="relative mt-6 space-y-1 pb-16">
+          <div data-testid="scene-preview-messages" className="relative mt-6 space-y-1 pb-16">
             {(scene.preview_messages ?? []).map((msg, idx) => {
               // 모든 preview message에 동일한 opacity와 blur 적용
               const opacity = 0.5;
@@ -249,6 +249,7 @@ const SceneContent = ({
 
             {/* Message Bubble Style Lock CTA — preview 흐름 위에 overlay */}
             <button
+              data-testid="scene-unlock-btn"
               onClick={onUnlockScene}
               className="absolute  left-1/2 w-[78%] max-w-[420px] -translate-x-1/2 transition-all duration-200 hover:opacity-85 active:opacity-70"
               style={{

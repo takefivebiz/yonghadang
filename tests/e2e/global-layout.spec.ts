@@ -60,18 +60,18 @@ test.describe('G: 글로벌 레이아웃 / 네비게이션', () => {
     test('G-07: Footer 렌더링', async ({ page }) => {
       await page.goto('/');
       const footer = page.locator('footer');
-      
-      // footer 영역에서 요소 찾기
-      await expect(footer.getByRole('link', { name: /이용약관/ })).toBeVisible();
-      await expect(footer.getByRole('link', { name: /개인정보처리방침/ })).toBeVisible();
+
+      // footer 영역에서 요소 찾기 (이용약관·개인정보처리방침은 button)
+      await expect(footer.getByRole('button', { name: /이용약관/ })).toBeVisible();
+      await expect(footer.getByRole('button', { name: /개인정보처리방침/ })).toBeVisible();
       await expect(footer.getByRole('button', { name: /문의하기/ })).toBeVisible();
     });
 
     test('G-08: Footer 이용약관 클릭', async ({ page }) => {
       await page.goto('/');
       const footer = page.locator('footer');
-      
-      await footer.getByRole('link', { name: /이용약관/ }).click();
+
+      await footer.getByRole('button', { name: /이용약관/ }).click();
       // 모달 열림 확인 (모달 내의 제목으로 확인)
       await expect(page.locator('h2', { hasText: /이용약관/ })).toBeVisible();
     });
@@ -79,8 +79,8 @@ test.describe('G: 글로벌 레이아웃 / 네비게이션', () => {
     test('G-09: Footer 개인정보처리방침 클릭', async ({ page }) => {
       await page.goto('/');
       const footer = page.locator('footer');
-      
-      await footer.getByRole('link', { name: /개인정보처리방침/ }).click();
+
+      await footer.getByRole('button', { name: /개인정보처리방침/ }).click();
       await expect(page.locator('h2', { hasText: /개인정보처리방침/ })).toBeVisible();
     });
 
@@ -134,25 +134,18 @@ test.describe('G: 글로벌 레이아웃 / 네비게이션', () => {
       await expect(page.locator('h3', { hasText: /자주 묻는 질문/ })).not.toBeVisible();
     });
 
-    test('G-14: 모달 열린 상태에서 배경 스크롤 시도', async ({ page }) => {
+    test('G-14: 모달 열린 상태에서 배경 스크롤 차단 확인', async ({ page }) => {
       await page.goto('/');
       const footer = page.locator('footer');
-      
-      const initialScroll = await page.evaluate(() => window.scrollY);
-      
+
       await footer.getByRole('button', { name: /문의하기/ }).click();
-      
+
       // 모달 열림 확인
       await expect(page.locator('h3', { hasText: /자주 묻는 질문/ })).toBeVisible();
-      
-      // 배경 스크롤 시도 (실제 스크롤 동작 확인)
-      // 모달이 body에 overflow:hidden을 적용하면 스크롤 차단
-      const finalScroll = await page.evaluate(() => window.scrollY);
-      
-      // 모달이 열려있으면 스크롤이 거의 없어야 함 (tolerance 10px)
-      if (await page.locator('[data-testid="modal-overlay"]').isVisible()) {
-        expect(Math.abs(finalScroll - initialScroll)).toBeLessThan(10);
-      }
+
+      // body.style.overflow = 'hidden' 으로 스크롤이 차단됐는지 직접 확인
+      const bodyOverflow = await page.evaluate(() => document.body.style.overflow);
+      expect(bodyOverflow).toBe('hidden');
     });
 
     test('G-15: 존재하지 않는 경로 직접 접근', async ({ page }) => {

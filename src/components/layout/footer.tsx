@@ -1,12 +1,31 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Footer = () => {
   const [openModal, setOpenModal] = useState<
     "terms" | "privacy" | "contact" | null
   >(null);
+
+  // ESC 키 처리 및 배경 스크롤 차단
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && openModal) {
+        setOpenModal(null);
+      }
+    };
+
+    if (openModal) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [openModal]);
 
   return (
     <>
@@ -93,8 +112,15 @@ const Modal = ({ isOpen, onClose, title, content }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" data-testid="modal-overlay">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-surface/30 bg-background flex flex-col">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+      data-testid="modal-overlay"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-surface/30 bg-background flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* 헤더 */}
         <div className="sticky top-0 border-b border-surface/30 bg-background/95 backdrop-blur-sm px-6 py-4">
           <div className="flex items-center justify-between">
