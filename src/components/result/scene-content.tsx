@@ -176,10 +176,11 @@ const SceneContent = ({
 
   return (
     <div
-      className="px-6 py-8 transition-opacity duration-300"
+      className="px-6 py-8 transition-opacity duration-500"
       style={{
         borderTop: isFirst ? "none" : "1px solid rgba(255, 255, 255, 0.03)",
         opacity: isCurrent ? 1 : 0.5, // Scene dim 처리
+        transitionTimingFunction: "ease-out",
       }}
     >
       {/* Scene 제목 및 상태 */}

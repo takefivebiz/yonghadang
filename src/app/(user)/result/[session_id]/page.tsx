@@ -127,8 +127,8 @@ const ResultPage = ({ params }: PageProps) => {
         }
       },
       {
-        threshold: [0.2, 0.4, 0.6, 0.8],
-        rootMargin: "-68px 0px -200px 0px",
+        threshold: 0.4,
+        rootMargin: "0px 0px -30% 0px",
       },
     );
 
