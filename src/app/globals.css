@@ -77,7 +77,7 @@
  * Tailwind v4 @theme 블록으로 CSS 변수 정의 → bg-*, text-*, border-* 유틸리티 자동 생성
  */
 @theme {
-  --color-background: #141021;
+  --color-background: #1d192b;
   --color-surface: #2f3159;
   --color-accent: #d16dac;
   --color-secondary: #5e99ab;
