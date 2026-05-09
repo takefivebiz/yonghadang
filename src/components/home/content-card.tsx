@@ -143,7 +143,7 @@ const ListCard = ({ content, priority }: Omit<ContentCardProps, "variant">) => {
         {/* 텍스트 영역 */}
         <div className="flex flex-col gap-2.5 px-4 py-4 sm:gap-3 sm:px-5 sm:py-5">
           {/* 제목 */}
-          <h2 className="text-base font-bold leading-snug tracking-tight text-highlight transition-colors group-hover:text-white sm:text-lg">
+          <h2 className="text-base font-nomal leading-snug tracking-tight text-highlight transition-colors group-hover:text-white sm:text-lg">
             {content.title}
           </h2>
 
@@ -154,10 +154,10 @@ const ListCard = ({ content, priority }: Omit<ContentCardProps, "variant">) => {
             </p>
           )}
 
-          {/* 메타 정보 — 카테고리 · 소요시간 */}
+          {/* 메타 정보 — 카테고리 · 소요시간
           <div className="flex items-center gap-2.5 pt-1">
             <span
-              className={`rounded-md px-2.5 py-1 text-[10px] font-semibold leading-none sm:text-[11px] ${config.badge}`}
+              className={`rounded-md px-2.5 py-1 text-[11px] font-semibold leading-none sm:text-[11px] ${config.badge}`}
             >
               {config.label}
             </span>
@@ -169,7 +169,7 @@ const ListCard = ({ content, priority }: Omit<ContentCardProps, "variant">) => {
                 </span>
               </>
             )}
-          </div>
+          </div> */}
         </div>
       </article>
     </Link>

@@ -1,6 +1,6 @@
-import type { Metadata } from "next"
-import Script from "next/script"
-import "./globals.css"
+import type { Metadata } from "next";
+import Script from "next/script";
+import "./globals.css";
 
 /**
  * Root Layout: html/body 래퍼 + SEO 메타데이터 + GA4
@@ -12,18 +12,18 @@ export const metadata: Metadata = {
     default: "VEIL — 베일에 가려진 진짜 나",
   },
   description:
-    "콘텐츠와 간단한 입력을 통해 현재 상황, 감정, 관계를 해석하는 AI 자기 해석 서비스",
+    "콘텐츠 기반으로 현재 상황, 감정, 관계를 해석하는 AI 자기 해석 서비스",
   openGraph: {
     title: "VEIL — 베일에 가려진 진짜 나",
     description:
-      "콘텐츠와 간단한 입력을 통해 현재 상황, 감정, 관계를 해석하는 AI 자기 해석 서비스",
+      "콘텐츠 기반으로 현재 상황, 감정, 관계를 해석하는 AI 자기 해석 서비스",
     type: "website",
     locale: "ko_KR",
     // TODO: [배포 연동] 실제 서비스 URL로 교체
     url: "https://veil.app",
     siteName: "VEIL",
   },
-}
+};
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -49,7 +49,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         )}
       </body>
     </html>
-  )
-}
+  );
+};
 
-export default RootLayout
+export default RootLayout;

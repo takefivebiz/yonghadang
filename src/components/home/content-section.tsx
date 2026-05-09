@@ -1,9 +1,9 @@
-import { Content, Category, CATEGORY_LABELS } from "@/lib/types/content"
-import ContentCard from "@/components/home/content-card"
+import { Content, Category, CATEGORY_LABELS } from "@/lib/types/content";
+import ContentCard from "@/components/home/content-card";
 
 interface ContentSectionProps {
-  category: Category
-  contents: Content[]
+  category: Category;
+  contents: Content[];
 }
 
 const ContentSection = ({ category, contents }: ContentSectionProps) => {
@@ -14,7 +14,7 @@ const ContentSection = ({ category, contents }: ContentSectionProps) => {
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="h-4 w-1 rounded-full bg-secondary" />
-          <h2 className="text-base font-bold tracking-wider text-highlight">
+          <h2 className="text-base font-nomal tracking-wider text-highlight">
             {CATEGORY_LABELS[category]}
           </h2>
         </div>
@@ -27,13 +27,13 @@ const ContentSection = ({ category, contents }: ContentSectionProps) => {
       </div>
 
       {/* 가로 스크롤 카드 목록 */}
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
         {contents.map((content) => (
           <ContentCard key={content.id} content={content} showBadge={false} />
         ))}
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default ContentSection
+export default ContentSection;

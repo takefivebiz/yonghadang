@@ -11,10 +11,8 @@ const CategoryTabsSticky = () => {
     const marker = markerRef.current;
     if (!marker) return;
 
-    // Intersection Observer로 마커 요소 감지
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // 마커가 화면 상단을 벗어나면 배경 표시
         setIsScrolled(!entry.isIntersecting);
       },
       { threshold: 0 },
@@ -26,18 +24,21 @@ const CategoryTabsSticky = () => {
 
   return (
     <>
-      {/* 스크롤 감지용 마커 */}
       <div ref={markerRef} className="h-px" aria-hidden="true" />
 
-      <div
-        className={`sticky top-13 z-30 mb-8 transition-all duration-200 ${
-          isScrolled
-            ? "bg-background/70 backdrop-blur-md"
-            : "bg-transparent backdrop-blur-none"
-        }`}
-      >
-        <div className="px-4 py-3">
-          <CategoryTabs />
+      <div className="sticky top-12 z-30 mb-8">
+        {/* 전체 화면 배경 */}
+        <div
+          className="absolute inset-y-0 left-1/2 w-screen -translate-x-1/2 pointer-events-none"
+          style={{ backgroundColor: isScrolled ? "#232035" : "transparent" }}
+          aria-hidden="true"
+        />
+
+        {/* 실제 탭 영역 */}
+        <div className="relative mx-auto max-w-screen-lg px-4 py-3">
+          <div className="flex justify-center">
+            <CategoryTabs />
+          </div>
         </div>
       </div>
     </>

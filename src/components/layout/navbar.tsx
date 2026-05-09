@@ -25,8 +25,8 @@ const Navbar = () => {
   return (
     <>
       <header
-        className="fixed left-0 right-0 top-0 z-40 h-13 border-b border-surface backdrop-blur-sm"
-        style={{ backgroundColor: "rgba(20, 16, 33, 0.2)" }}
+        className="fixed left-0 right-0 top-0 z-40 h-13 border-b border-surface"
+        style={{ backgroundColor: "#232035" }}
       >
         <nav className="mx-auto flex h-full max-w-screen-lg items-center px-4">
           {/* 홈 로고 */}
@@ -97,8 +97,8 @@ const Navbar = () => {
         {/* 모바일 드롭다운 메뉴 */}
         {isMobileMenuOpen && (
           <div
-            className="border-b border-surface/20 px-4 py-4 backdrop-blur-sm sm:hidden"
-            style={{ backgroundColor: "#1e1b30fa" }}
+            className="border-b border-surface/20 px-4 py-4 sm:hidden"
+            style={{ backgroundColor: "#232035" }}
           >
             {isLoggedIn ? (
               <Link

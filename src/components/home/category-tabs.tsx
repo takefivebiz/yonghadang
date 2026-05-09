@@ -19,12 +19,12 @@ const CATEGORY_TAB_STYLE: Record<Category, string> = {
  */
 const CategoryTabs = () => {
   return (
-    <div className="flex justify-center gap-2.5 overflow-x-auto pb-1">
+    <div className="flex justify-center gap-2 overflow-x-auto pb-1">
       {CATEGORIES.map((category) => (
         <a
           key={category}
           href={`#${category}`}
-          className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium tracking-wide transition-all duration-150 sm:px-5 sm:py-2 sm:text-base ${CATEGORY_TAB_STYLE[category]}`}
+          className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium tracking-wide transition-all duration-150 sm:px-5 sm:py-2 sm:text-sm ${CATEGORY_TAB_STYLE[category]}`}
         >
           {CATEGORY_LABELS[category]}
         </a>

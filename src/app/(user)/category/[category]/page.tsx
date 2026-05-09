@@ -67,7 +67,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
   const contents = DUMMY_CONTENTS.filter((c) => c.category === cat);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 pb-28 pt-8">
+    <div className="mx-auto max-w-3xl px-4 pb-28 pt-8">
       {/* 뒤로가기 */}
       <Link
         href="/"
@@ -89,7 +89,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
       <header className="mb-12 border-b border-white/5 pb-8">
         <div className="mb-3 flex items-center gap-2.5">
           <span className="h-5 w-1 rounded-full bg-secondary" />
-          <h1 className="text-2xl font-bold tracking-wide text-highlight sm:text-3xl">
+          <h1 className="text-2xl font-nomal tracking-wide text-highlight sm:text-3xl">
             {label}
           </h1>
         </div>
@@ -103,7 +103,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
       {/* 콘텐츠 그리드 — 모바일 1열 / 데스크톱 2열 */}
       {contents.length > 0 ? (
-        <ul className="grid gap-5 lg:grid-cols-2 lg:gap-6">
+        <ul className="grid gap-8 lg:grid-cols-2 lg:gap-6">
           {contents.map((content, index) => (
             <li key={content.id}>
               <ContentCard

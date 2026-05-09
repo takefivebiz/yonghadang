@@ -1,15 +1,87 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Suit";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Thin.woff2")
+    format("woff2");
+  font-weight: 100;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suit";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraLight.woff2")
+    format("woff2");
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suit";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Light.woff2")
+    format("woff2");
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suit";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2")
+    format("woff2");
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suit";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Medium.woff2")
+    format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suit";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-SemiBold.woff2")
+    format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suit";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suit";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraBold.woff2")
+    format("woff2");
+  font-weight: 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Suit";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Heavy.woff2")
+    format("woff2");
+  font-weight: 900;
+  font-display: swap;
+}
+
 /**
  * Veil 디자인 시스템 색상 팔레트 (PRD 4. 디자인 가이드)
  * Tailwind v4 @theme 블록으로 CSS 변수 정의 → bg-*, text-*, border-* 유틸리티 자동 생성
  */
 @theme {
   --color-background: #141021;
-  --color-surface: #2F3159;
-  --color-accent: #D16DAC;
-  --color-secondary: #5E99AB;
-  --color-highlight: #F9F9E5;
+  --color-surface: #2f3159;
+  --color-accent: #d16dac;
+  --color-secondary: #5e99ab;
+  --color-highlight: #f9f9e5;
 }
 
 :root {
@@ -21,6 +93,7 @@ html {
 }
 
 body {
+  font-family: "Suit";
   background-color: #1a1828;
   color: var(--color-highlight);
   /*
@@ -30,17 +103,41 @@ body {
   */
   background-image:
     /* 좌상단 subtle purple haze — contrast 완화 */
-    radial-gradient(ellipse 85% 70% at 12% 8%, rgba(140, 80, 210, 0.08) 0%, transparent 72%),
+    radial-gradient(
+      ellipse 85% 70% at 12% 8%,
+      rgba(140, 80, 210, 0.08) 0%,
+      transparent 72%
+    ),
     /* 중앙 상단 약한 청록 (opener 주변) — 더 부드럽게 */
-    radial-gradient(ellipse 95% 45% at 50% -8%, rgba(94, 153, 171, 0.05) 0%, transparent 100%),
+    radial-gradient(
+        ellipse 95% 45% at 50% -8%,
+        rgba(94, 153, 171, 0.05) 0%,
+        transparent 100%
+      ),
     /* 우하단 미세 pink glow — saturation 낮춤 */
-    radial-gradient(ellipse 65% 60% at 90% 85%, rgba(209, 109, 172, 0.06) 0%, transparent 75%),
+    radial-gradient(
+        ellipse 65% 60% at 90% 85%,
+        rgba(209, 109, 172, 0.06) 0%,
+        transparent 75%
+      ),
     /* punch line 주변 보라 — breathing space */
-    radial-gradient(ellipse 55% 45% at 50% 45%, rgba(100, 60, 180, 0.04) 0%, transparent 80%),
+    radial-gradient(
+        ellipse 55% 45% at 50% 45%,
+        rgba(100, 60, 180, 0.04) 0%,
+        transparent 80%
+      ),
     /* 하단 좌측 purple depth — 미세하게 */
-    radial-gradient(ellipse 70% 50% at 20% 95%, rgba(140, 80, 210, 0.04) 0%, transparent 85%),
+    radial-gradient(
+        ellipse 70% 50% at 20% 95%,
+        rgba(140, 80, 210, 0.04) 0%,
+        transparent 85%
+      ),
     /* 중앙 하단 ambient darkness — 열린 공기감 */
-    radial-gradient(ellipse 80% 60% at 50% 115%, rgba(100, 60, 180, 0.05) 0%, transparent 80%);
+    radial-gradient(
+        ellipse 80% 60% at 50% 115%,
+        rgba(100, 60, 180, 0.05) 0%,
+        transparent 80%
+      );
   background-attachment: fixed;
 }
 

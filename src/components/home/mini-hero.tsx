@@ -5,7 +5,7 @@
 const MiniHero = () => {
   return (
     <section className="px-4 pb-14 pt-13 text-center sm:pb-12 sm:pt-20">
-      <h1 className="mt-1 text-2xl font-bold leading-snug tracking-tight text-highlight sm:text-[2.6rem] sm:leading-tight">
+      <h1 className="mt-1 text-2xl font-nomal leading-snug tracking-tight text-highlight sm:text-[2.6rem] sm:leading-tight">
         {/* 네온 글로우 — City Pop 간판 느낌 */}
         <span
           className="text-accent"
