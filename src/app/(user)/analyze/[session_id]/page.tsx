@@ -25,6 +25,11 @@ const AnalyzePage = ({ params }: PageProps) => {
   useEffect(() => {
     params.then((resolved) => {
       setSessionId(resolved.session_id);
+      // analyzeData.session_id도 함께 동기화해야 localStorage 키와 결과 URL이 올바르게 설정됨
+      setAnalyzeData((prev) => ({
+        ...prev,
+        session_id: resolved.session_id,
+      }));
     });
   }, [params]);
 

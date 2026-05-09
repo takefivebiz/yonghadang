@@ -203,6 +203,81 @@
 
 ---
 
+---
+
+## Phase 2-B: E2E 테스트 실행 및 안정화 (2026-05-09)
+
+### 개요
+`/analyze/[session_id]` 페이지의 전체 플로우 (A-01 ~ A-26) E2E 테스트 실행 및 문제 해결
+
+### 발견된 이슈
+
+#### [실제 UX 버그]
+- **`analyzeData.session_id` 미싱크**: URL params(`test-session-001`)가 resolve된 후에도 `analyzeData`의 session_id가 초기값(`mock-session-001`)으로 고정
+  - localStorage 키가 잘못된 값으로 저장됨
+  - 결과 페이지 URL이 잘못된 session_id로 이동
+  - **영향**: A-25 (localStorage 검증), A-26 (URL 검증)
+
+#### [테스트 셀렉터 문제]
+| 테스트 | 원인 | 해결 |
+|---|---|---|
+| A-12 ~ A-20 | `button[role="radio"]` 셀렉터 미매칭 — 옵션 버튼에 role 속성 없음 | `div.space-y-2 > button`으로 스코프 한정 |
+| A-13 | `div.filter({ hasText })` strict mode — 6개 요소 매칭 | 더 정확한 컨테이너 로케이터 사용 |
+| A-16, A-17, A-19, A-20 | **False Positive** — 옵션 클릭이 `if` 가드 안에서 skip됨 | 헬퍼 함수로 강제 실행 |
+
+### 수정 사항
+
+#### 코드 수정
+- `src/app/(user)/analyze/[session_id]/page.tsx`:
+  - `useEffect`에서 params resolve 시 `setAnalyzeData(prev => ({ ...prev, session_id }))`로 동기화 추가
+  - localStorage 키 및 결과 URL이 올바른 session_id로 저장/이동하게 됨
+
+#### 테스트 파일 전면 재작성
+- `tests/e2e/analyze-page.spec.ts`:
+  - **헬퍼 함수 추출**:
+    - `submitFreeInputAndWaitForQuestions()` — 자유입력 제출 → 반응 완료 → 첫 보정 질문 표시까지 대기
+    - `completeAllQuestions()` — 6개 질문 순회 완료 (사용자 상호작용 자동화)
+  - **셀렉터 개선**:
+    - `optionButtons` → `page.locator("div.space-y-2").locator("button")` (헤더 모바일 메뉴 충돌 회피)
+    - `nextButton` → `page.locator('button').filter({ hasText: /다음|완료/ })` (명확한 텍스트 기반)
+  - **타이밍 개선**:
+    - 반응 버블 auto-advance 4000ms → timeout 6000ms로 충분한 여유
+    - completing 화면 관점 URL 이동 → waitForURL timeout 8000ms로 상향
+    - 전체 플로우 (반응 + 6문제 + completing) → 총 ~11초
+  - **False Positive 제거**:
+    - 기존: 옵션 클릭이 `if` 가드 안에서 조건부 실행 → skip 시 test pass
+    - 신규: 헬퍼로 강제 실행 → 실제 상호작용 검증
+
+### 테스트 결과
+
+**Chromium (Desktop)**
+| 항목 | 결과 |
+|---|---|
+| 통과 | **26/26 (100%)** |
+| 실패 | 0 |
+| 실행시간 | ~33.5초 |
+
+**테스트 커버리지**
+- ✅ A-01 ~ A-11: 자유입력 단계 (입력, 유효성, 제출) — 모두 통과
+- ✅ A-12 ~ A-13: 반응 버블 (자동 완료, 타이밍) — 통과
+- ✅ A-14 ~ A-20: 보정 질문 (렌더링, 선택, 전환) — 모두 통과
+- ✅ A-21 ~ A-23: completing 화면 (진입, UI 요소) — 모두 통과
+- ✅ A-24 ~ A-26: 결과 페이지 (이동, localStorage, session_id) — 모두 통과
+
+### 수정된 파일
+
+| 파일 | 내용 |
+|---|---|
+| `src/app/(user)/analyze/[session_id]/page.tsx` | params 해석 후 analyzeData.session_id 동기화 |
+| `tests/e2e/analyze-page.spec.ts` | 전면 재작성: 헬퍼 추출, 셀렉터 개선, 타이밍 조정, False Positive 제거 |
+
+### 다음 단계
+
+- [ ] 4개 브라우저(Chromium, Firefox, WebKit, Mobile Chrome) 전체 실행 검증
+- [ ] 필요시 브라우저별 타이밍/셀렉터 조정
+
+---
+
 ## 다음 작업 예정
 
 ### 6단계: E2E 테스트 시나리오 6 — 관리자 플로우
