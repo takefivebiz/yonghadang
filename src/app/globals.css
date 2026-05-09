@@ -92,6 +92,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* iOS Safari auto-zoom 방지: form control은 최소 16px */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
 body {
   font-family: "Suit";
   background-color: #1a1828;

@@ -27,6 +27,7 @@ const Navbar = () => {
       <header
         className="fixed left-0 right-0 top-0 z-40 h-13 border-b border-surface"
         style={{ backgroundColor: "#232035" }}
+        data-mobile-menu-open={isMobileMenuOpen}
       >
         <nav className="mx-auto flex h-full max-w-screen-lg items-center px-4">
           {/* 홈 로고 */}
@@ -97,7 +98,7 @@ const Navbar = () => {
         {/* 모바일 드롭다운 메뉴 */}
         {isMobileMenuOpen && (
           <div
-            className="border-b border-surface/20 px-4 py-4 sm:hidden"
+            className="z-50 border-b border-surface/20 px-4 py-4 sm:hidden"
             style={{ backgroundColor: "#232035" }}
           >
             {isLoggedIn ? (

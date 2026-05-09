@@ -24,6 +24,7 @@ const ResultPage = ({ params }: PageProps) => {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const sceneRefsMap = useRef<Record<number, HTMLDivElement | null>>({});
 
@@ -91,6 +92,24 @@ const ResultPage = ({ params }: PageProps) => {
     };
     initData();
   }, [params]);
+
+  // 네비게이션 메뉴 열림 상태 감지 (Progress Indicator 숨기기)
+  useEffect(() => {
+    const header = document.querySelector("header");
+    if (!header) return;
+
+    const checkMenuState = () => {
+      const isOpen = header.getAttribute("data-mobile-menu-open") === "true";
+      setMobileMenuOpen(isOpen);
+    };
+
+    checkMenuState();
+
+    const observer = new MutationObserver(checkMenuState);
+    observer.observe(header, { attributes: true, attributeFilter: ["data-mobile-menu-open"] });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Scroll 기반으로 현재 활성 scene 추적 (viewport center 기준)
   useEffect(() => {
@@ -238,7 +257,13 @@ const ResultPage = ({ params }: PageProps) => {
       }}
     >
       {/* ── Progress Indicator (navbar 아래) ──────────────────────── */}
-      <div className="sticky top-13 z-40 h-10 flex items-center justify-center">
+      <div
+        className="sticky top-13 z-40 h-10 flex items-center justify-center"
+        style={{
+          opacity: mobileMenuOpen ? 0 : 1,
+          pointerEvents: mobileMenuOpen ? "none" : "auto",
+        }}
+      >
         <ProgressIndicator
           scenes={scenes}
           unlockedScenes={unlockedScenes}
