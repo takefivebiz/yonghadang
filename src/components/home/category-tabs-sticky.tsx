@@ -26,7 +26,7 @@ const CategoryTabsSticky = () => {
     <>
       <div ref={markerRef} className="h-px" aria-hidden="true" />
 
-      <div className="sticky top-12 z-30 mb-8">
+      <div className="sticky top-12 z-30 mb-8" data-testid="category-tabs-sticky">
         {/* 전체 화면 배경 */}
         <div
           className="absolute inset-y-0 left-1/2 w-screen -translate-x-1/2 pointer-events-none"

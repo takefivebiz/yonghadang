@@ -14,7 +14,7 @@ const TrendingSection = ({ contents }: TrendingSectionProps) => {
           지금 많이 보는
         </h2>
       </div>
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" data-testid="trending-scroll-container">
         {contents.map((content) => (
           <ContentCard key={content.id} content={content} />
         ))}

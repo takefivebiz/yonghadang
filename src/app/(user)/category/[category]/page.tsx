@@ -103,7 +103,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
       {/* 콘텐츠 그리드 — 모바일 1열 / 데스크톱 2열 */}
       {contents.length > 0 ? (
-        <ul className="grid gap-8 lg:grid-cols-2 lg:gap-6">
+        <ul className="grid gap-8 lg:grid-cols-2 lg:gap-6" data-testid="category-grid">
           {contents.map((content, index) => (
             <li key={content.id}>
               <ContentCard

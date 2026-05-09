@@ -93,7 +93,7 @@ const Modal = ({ isOpen, onClose, title, content }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" data-testid="modal-overlay">
       <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-surface/30 bg-background flex flex-col">
         {/* 헤더 */}
         <div className="sticky top-0 border-b border-surface/30 bg-background/95 backdrop-blur-sm px-6 py-4">

@@ -9,7 +9,7 @@ interface ContentSectionProps {
 const ContentSection = ({ category, contents }: ContentSectionProps) => {
   return (
     /* scroll-mt: 고정 Navbar(56px) + 고정 CategoryTabs(~48px) 높이 합산 */
-    <section id={category} className="mb-12 scroll-mt-28 px-4">
+    <section id={category} className="mb-12 scroll-mt-28 px-4" data-testid="content-section">
       {/* 섹션 헤더 */}
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
