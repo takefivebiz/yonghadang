@@ -306,7 +306,7 @@ function StepOne({
               onChange={onPhoneChange}
               placeholder="010-0000-0000"
               disabled={isLoading}
-              className="veil-guest-input w-full rounded px-4 py-3 text-sm transition-colors duration-200 focus:outline-none"
+              className="veil-guest-input w-full rounded px-4 py-3 text-[16px] transition-colors duration-200 focus:outline-none"
               style={{
                 backgroundColor: "rgba(209, 109, 172, 0.08)",
                 border: "1px solid rgba(209, 109, 172, 0.285)",
@@ -333,7 +333,7 @@ function StepOne({
               inputMode="numeric"
               disabled={isLoading}
               maxLength={4}
-              className="veil-guest-input w-full rounded px-4 py-3 text-sm transition-colors duration-200 focus:outline-none"
+              className="veil-guest-input w-full rounded px-4 py-3 text-[16px] transition-colors duration-200 focus:outline-none"
               style={{
                 backgroundColor: "rgba(209, 109, 172, 0.08)",
                 border: "1px solid rgba(209, 109, 172, 0.285)",

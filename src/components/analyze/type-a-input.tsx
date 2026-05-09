@@ -117,7 +117,7 @@ const TypeAInput = ({
             value={input}
             onChange={(e) => setInput(e.target.value.slice(0, maxChars))}
             placeholder={config.placeholder}
-            className="veil-textarea w-full resize-none bg-transparent text-base text-highlight outline-none leading-relaxed h-32 sm:h-40"
+            className="veil-textarea w-full resize-none bg-transparent text-[16px] text-highlight outline-none leading-relaxed h-32 sm:h-40"
             style={{
               color: "rgba(249, 249, 229, 0.85)",
               caretColor: "rgba(209, 109, 172, 0.5)",

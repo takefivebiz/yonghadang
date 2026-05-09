@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 
@@ -6,6 +6,11 @@ import "./globals.css";
  * Root Layout: html/body 래퍼 + SEO 메타데이터 + GA4
  * 하위 레이아웃: (user)/layout.tsx (Navbar/Footer), (admin)/layout.tsx (사이드바)
  */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   title: {
     template: "%s | VEIL",
