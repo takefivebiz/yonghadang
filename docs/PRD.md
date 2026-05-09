@@ -2992,13 +2992,61 @@ app/api/
 
 ---
 
+### Phase 2-B 실행 결과 (2026-05-09)
+
+**대상:** `/analyze/[session_id]` 페이지 전체 플로우 (A-01 ~ A-26)  
+**환경:** Chromium (Desktop) 단일 브라우저 안정화
+
+#### 발견된 이슈 및 수정
+
+| 유형 | 이슈 | 영향 | 해결 방법 |
+|---|---|---|---|
+| **UX 버그** | `analyzeData.session_id`가 URL params 해석 후에도 초기값 고정 | localStorage 키 & 결과 URL 오류 | useEffect에서 params 해석 후 setAnalyzeData로 session_id 동기화 |
+| 테스트 셀렉터 | `button[role="radio"]` 미매칭 — 옵션 버튼에 role 속성 없음 | A-12~20 실패 | `div.space-y-2 > button` 으로 스코프 한정 |
+| 테스트 셀렉터 | `div.filter({ hasText })` strict mode (6개 매칭) | A-13 strict violation | 더 정확한 컨테이너 로케이터 사용 |
+| 테스트 로직 | 옵션 클릭이 `if` 가드 내 조건부 실행 (False Positive) | A-16, 17, 19, 20 무의미한 통과 | 헬퍼 함수로 강제 실행 |
+
+#### 테스트 파일 개선사항
+
+- **헬퍼 함수 추출**:
+  - `submitFreeInputAndWaitForQuestions()` — 자유입력 → 반응 완료 → 첫 보정질문
+  - `completeAllQuestions()` — 6개 질문 순회 완료 자동화
+  
+- **타이밍 조정**:
+  - 반응 버블 auto-advance: 4000ms → waitForURL timeout 6000ms (여유 충분)
+  - completing → 결과 이동: waitForURL timeout 8000ms (전체 플로우 ~11초)
+
+#### 최종 테스트 결과
+
+**Chromium (Desktop)**
+| 항목 | 수치 |
+|---|---|
+| 총 테스트 | 26 |
+| 통과 | **26 (100%)** |
+| 실패 | 0 |
+| 실행 시간 | ~33.5초 |
+
+**커버리지**
+- ✅ A-01~11: 자유입력 단계 (입력, 유효성, 제출)
+- ✅ A-12~13: 반응 버블 (자동 완료, 타이밍)
+- ✅ A-14~20: 보정 질문 (렌더링, 선택, 전환)
+- ✅ A-21~23: completing 화면 (진입, UI 요소)
+- ✅ A-24~26: 결과 페이지 (이동, localStorage, session_id)
+
+#### 수정된 파일
+
+- `src/app/(user)/analyze/[session_id]/page.tsx` — params resolve 후 analyzeData.session_id 동기화
+- `tests/e2e/analyze-page.spec.ts` — 전면 재작성 (헬퍼 추출, 셀렉터 개선, 타이밍 조정, False Positive 제거)
+
+---
+
 ## 결론
 
 **현재 완료된 E2E 테스트**
 - Phase 1: 37 tests ✅ 100% 통과
 - Phase 2A: 7 tests ✅ 100% 통과  
-- Phase 2B: 26 tests ✅ 100% 통과
-- **총 70 tests** ✅ **100% 통과** (280 test runs × 4 browsers)
+- Phase 2B: 26 tests ✅ 100% 통과 (2026-05-09 Chromium 안정화)
+- **총 70 tests** ✅ **100% 통과**
 
 **테스트 커버리지**
 - 글로벌 레이아웃 및 네비게이션 ✅
