@@ -38,6 +38,7 @@ const HomePage = () => {
 
   return (
     <div className="w-full max-w-full overflow-x-hidden mx-auto max-w-screen-lg pb-20">
+      {/* 미니히어로 */}
       <MiniHero />
 
       {/* 트렌딩 섹션 */}
