@@ -45,7 +45,7 @@ const CategoryTabsSticky = () => {
       <div
         data-testid="category-tabs-sticky"
         className={[
-          "fixed left-0 right-0 top-[52px] z-30",
+          "fixed left-0 right-0 top-[51px] z-30",
 
           isScrolled ? "block" : "hidden",
         ].join(" ")}
