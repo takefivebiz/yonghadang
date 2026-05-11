@@ -8,34 +8,50 @@ const CategoryTabsSticky = () => {
   const markerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const marker = markerRef.current;
-    if (!marker) return;
+    const handleScroll = () => {
+      const marker = markerRef.current;
+      if (!marker) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsScrolled(!entry.isIntersecting);
-      },
-      { threshold: 0 },
-    );
+      const rect = marker.getBoundingClientRect();
+      setIsScrolled(rect.top <= 60); // top 값이 fixed 위치에 닿기 전 바로 전환
+    };
 
-    observer.observe(marker);
-    return () => observer.disconnect();
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
       <div ref={markerRef} className="h-px" aria-hidden="true" />
 
-      <div className="sticky top-12 z-30 mb-8" data-testid="category-tabs-sticky">
-        {/* 전체 화면 배경 */}
+      <div className="relative mb-8">
         <div
-          className="absolute inset-y-0 left-1/2 w-screen -translate-x-1/2 pointer-events-none"
-          style={{ backgroundColor: isScrolled ? "#232035" : "transparent" }}
-          aria-hidden="true"
-        />
+          className={[
+            "mx-auto max-w-screen-lg px-4 py-3",
 
-        {/* 실제 탭 영역 */}
-        <div className="relative mx-auto max-w-screen-lg px-4 py-3">
+            isScrolled ? "invisible" : "visible",
+          ].join(" ")}
+        >
+          <div className="flex justify-center">
+            <CategoryTabs />
+          </div>
+        </div>
+      </div>
+
+      {/* fixed 탭: 스크롤 후만 보임 */}
+
+      <div
+        data-testid="category-tabs-sticky"
+        className={[
+          "fixed left-0 right-0 top-[52px] z-30",
+
+          isScrolled ? "block" : "hidden",
+        ].join(" ")}
+        style={{ backgroundColor: "#232035" }}
+      >
+        <div className="mx-auto max-w-screen-lg px-4 py-3">
           <div className="flex justify-center">
             <CategoryTabs />
           </div>
