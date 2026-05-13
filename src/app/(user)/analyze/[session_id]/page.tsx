@@ -157,16 +157,23 @@ const AnalyzePage = ({ params }: PageProps) => {
       return; // 여기서 종료 (실제 flow는 실행하지 않음)
     }
 
-    // ── Generate Progress: 바로 bubble progression 시작 (Phase 1 제거) ────────────
+    // ── Generate Progress: 즉시 generating 시작 + progress 병렬 진행 ─────────────
+    const loadingStartTime = Date.now();
+    console.log("[analyze] Loading 시작", new Date(loadingStartTime).toISOString());
+
     setStage("completing");
     setProgress(0);
     setCurrentBubbleIndex(0);
 
+    // ✅ 핵심 1: 생성 즉시 호출 (progress 대기 안 함!)
+    console.log("[analyze] generateScenes 호출 시작", new Date().toISOString());
+    generateScenes(finalData, loadingStartTime);
+
+    // ✅ 핵심 2: 동시에 progress 병렬 진행 (0% → 90%만)
     const progressStages = [
       { range: [0, 60], speed: 1200 },
       { range: [60, 85], speed: 1800 },
-      { range: [85, 96], speed: 2500 },
-      { range: [96, 96], speed: 4000 },
+      { range: [85, 90], speed: 2500 }, // 90%까지만 빠르게 진행
     ];
 
     let currentProgress = 0;
@@ -200,8 +207,9 @@ const AnalyzePage = ({ params }: PageProps) => {
         const nextSpeed = progressStages[stageIndex]?.speed || 2500;
         progressIntervalRef.current = setTimeout(simulateProgress, nextSpeed);
       } else {
-        // 96% 도달. 실제 API 완료 대기
-        generateScenes(finalData);
+        // ✅ 핵심 3: 90% 도달. 이 후부터는 API 응답까지만 대기 (generateScenes가 진행 중)
+        // progress는 일단 멈추고, generateScenes 완료 시 100%로 점프
+        console.log("[analyze] Progress 90% 도달. API 응답 대기 중...", new Date().toISOString());
       }
     };
 
@@ -210,8 +218,14 @@ const AnalyzePage = ({ params }: PageProps) => {
   };
 
   // ── Generate API 호출 및 장면 캐싱 ──────────────────────────────────────
-  const generateScenes = async (finalData: AnalyzeAnswers) => {
+  const generateScenes = async (finalData: AnalyzeAnswers, loadingStartTime: number) => {
     try {
+      const generateStartTime = Date.now();
+      console.log(
+        "[analyze] Generate API 호출 시작",
+        new Date(generateStartTime).toISOString(),
+        `(Loading 시작 후 ${generateStartTime - loadingStartTime}ms)`,
+      );
       const content = DUMMY_CONTENTS.find((c) => c.id === finalData.content_id);
       if (!content)
         throw new Error(`콘텐츠를 찾을 수 없어: ${finalData.content_id}`);
@@ -289,13 +303,31 @@ const AnalyzePage = ({ params }: PageProps) => {
         }
       }
 
-      // API 완료 → progress 100%로 진행
+      // ✅ API 응답 완료 로그
+      const generateEndTime = Date.now();
+      const totalLoadingTime = generateEndTime - loadingStartTime;
+      console.log(
+        "[analyze] Generate API 응답 완료",
+        new Date(generateEndTime).toISOString(),
+        {
+          apiResponseTime: `${generateEndTime - generateStartTime}ms`,
+          totalLoadingTime: `${totalLoadingTime}ms`,
+        },
+      );
+
+      // Progress를 100%로 설정 (API 완료)
       setProgress(100);
 
       // 짧은 딜레이 후 result page로 이동
       setTimeout(() => {
+        const navigateTime = Date.now();
+        console.log(
+          "[analyze] Result page 이동",
+          new Date(navigateTime).toISOString(),
+          `(총 Loading 시간: ${navigateTime - loadingStartTime}ms)`,
+        );
         router.push(`/result/${finalData.session_id}`);
-      }, 500);
+      }, 300);
     } catch (err) {
       console.error("Generate 실패:", err);
       // 에러 처리 (현재는 간단히 진행)
