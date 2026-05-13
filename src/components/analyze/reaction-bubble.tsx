@@ -95,10 +95,11 @@ const ReactionBubble = ({
             }}
           >
             <div
-              className="rounded-2xl px-5 py-4 sm:px-6 sm:py-5"
+              className="px-5 py-4 sm:px-6 sm:py-5"
               style={{
                 background: "rgba(255, 255, 255, 0.04)",
                 border: "1px solid rgba(255, 255, 255, 0.06)",
+                borderRadius: "14px 14px 14px 0px",
                 maxWidth: "320px",
               }}
             >

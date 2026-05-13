@@ -61,7 +61,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
           { type: "ai", text: "한번쯤 생각해본 적 있어?" },
           {
             type: "memo",
-            text: "뇌는 한 번 새긴 위협 패턴을\n쉽게 지우지 않아",
+            text: "반복된 경험은 자동으로 저장돼",
           },
           {
             type: "ai",

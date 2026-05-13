@@ -106,21 +106,32 @@ const CorrectionQuestions = ({
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-2xl flex-1 flex flex-col">
+      <div className="w-full flex-1 flex flex-col px-4 sm:px-6">
         {/* 질문 화면 */}
-        <div>
-          {/* 질문 */}
-          <div className="mb-10 ml-4">
+        <div className="w-full">
+          {/* 질문 버블 */}
+          <div
+            className="mb-10 p-5 sm:p-6"
+            style={{
+              background: "rgba(255, 255, 255, 0.04)",
+              border: "1px solid rgba(255, 255, 255, 0.015)",
+              borderRadius: "14px 14px 14px 0px",
+              maxWidth: "220px",
+            }}
+          >
             <p
               className="text-xs mb-4"
               style={{ color: "rgba(255, 255, 255, 0.25)" }}
             >
               질문 {currentQuestionIndex + 1}
             </p>
-            <h1 className="text-2xl sm:text-3xl font-semibold leading-tight mb-3 whitespace-pre-line">
+            <h1 className="text-xl sm:text-2xl font-semibold leading-tight mb-4 whitespace-pre-line">
               {currentQuestion.text}
             </h1>
-            <p className="text-xs text-highlight/30 mt-3">
+            <p
+              className="text-xs"
+              style={{ color: "rgba(249, 249, 229, 0.5)" }}
+            >
               {currentQuestion.type === "multiple"
                 ? "여러 개 선택할 수 있어"
                 : "하나를 선택해줘"}
@@ -128,7 +139,7 @@ const CorrectionQuestions = ({
           </div>
 
           {/* 선택지 */}
-          <div className="mb-12 space-y-2">
+          <div className="mb-12 space-y-2 flex flex-col items-end">
             {currentQuestion.options.map((option) => {
               const isSelected = selectedValues.includes(option.value);
 
@@ -136,7 +147,7 @@ const CorrectionQuestions = ({
                 <button
                   key={option.value}
                   onClick={() => handleSelectOption(option.value)}
-                  className="w-full text-left px-4 py-3 sm:px-5 sm:py-4 rounded-xl transition-all"
+                  className="text-right px-4 py-3 sm:px-5 sm:py-4 transition-all max-w-xs"
                   style={{
                     background: isSelected
                       ? "rgba(209, 109, 172, 0.15)"
@@ -147,6 +158,7 @@ const CorrectionQuestions = ({
                     color: isSelected
                       ? "rgba(249, 249, 229, 0.85)"
                       : "rgba(249, 249, 229, 0.60)",
+                    borderRadius: "14px 14px 0px 14px",
                   }}
                 >
                   <span className="text-sm sm:text-base">{option.label}</span>
@@ -156,28 +168,35 @@ const CorrectionQuestions = ({
           </div>
 
           {/* 다음 버튼 */}
-          <div className="mt-auto">
+          <div
+            className="mt-auto flex justify-end"
+            style={{ maxWidth: "310px" }}
+          >
             <button
               onClick={handleNext}
               disabled={!isAnswered}
-              className="w-full rounded-[16px] px-6 py-4 font-medium transition-all sm:py-5"
+              className="text-sm transition-all"
               style={{
-                background: isAnswered
-                  ? "linear-gradient(135deg, rgba(180, 110, 160, 0.75) 0%, rgba(155, 95, 140, 0.75) 100%)"
-                  : "rgba(255, 255, 255, 0.03)",
-                border: isAnswered
-                  ? "1px solid rgba(220, 150, 200, 0.35)"
-                  : "1px solid rgba(255, 255, 255, 0.05)",
-                color: isAnswered
-                  ? "rgba(255, 245, 250, 0.88)"
-                  : "rgba(255, 255, 255, 0.2)",
+                background: "none",
+                border: "none",
                 cursor: isAnswered ? "pointer" : "not-allowed",
-                boxShadow: isAnswered
-                  ? "0 4px 16px rgba(180, 110, 160, 0.15)"
-                  : "none",
+                color: isAnswered
+                  ? "rgba(209, 109, 172, 0.8)"
+                  : "rgba(255, 255, 255, 0.15)",
+                padding: "0",
+              }}
+              onMouseEnter={(e) => {
+                if (isAnswered) {
+                  e.currentTarget.style.color = "rgba(209, 109, 172, 1)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (isAnswered) {
+                  e.currentTarget.style.color = "rgba(209, 109, 172, 0.8)";
+                }
               }}
             >
-              {isLastQuestion ? "완료" : "다음 →"}
+              계속 {">"}
             </button>
           </div>
         </div>

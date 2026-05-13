@@ -273,8 +273,8 @@ export const DUMMY_CONTENTS: Content[] = [
   },
   {
     id: "career-2",
-    title: "퇴사 vs 버티기, \n지금 내 상황은?",
-    subtitle: "지금 상황을 객관적으로 해석해드려요",
+    title: "퇴사 vs 버티기, \n 지금 나는?",
+    subtitle: "계속 망설이게 되는 이유",
     category: "career",
     thumbnail_url: "/img/career-2.png",
     estimated_minutes: 3,
@@ -285,9 +285,12 @@ export const DUMMY_CONTENTS: Content[] = [
     created_at: "2026-05-01T00:00:00Z",
     updated_at: "2026-05-01T00:00:00Z",
     insights: [
-      "떠나야 할 신호 vs 버텨야 할 신호",
-      "지금 상황의 객관적 분석",
-      "결정을 위한 핵심 질문",
+      "출근 전부터 지쳐버리는 이유",
+      "계속 참고 버티게 되는 순간",
+      "회사가 안 맞는 건지, 내가 지친 건지",
+      "결정을 미루는 진짜 이유",
+      "지금 이 상태가 계속된다면?",
+      "딱 하나만 먼저 바꿔야 하는 것",
     ],
   },
   {
@@ -447,5 +450,5 @@ export const DUMMY_CONTENTS: Content[] = [
 
 /** 트렌딩: 카테고리별 대표 콘텐츠 4장 */
 export const TRENDING_CONTENTS = DUMMY_CONTENTS.filter((c) =>
-  ["love-1", "rel-1", "career-2", "emotion-3"].includes(c.id)
+  ["love-1", "rel-1", "career-2", "emotion-3"].includes(c.id),
 );

@@ -321,7 +321,7 @@ const SceneContent = ({
                 background:
                   "linear-gradient(180deg, rgba(140, 80, 130, 0.65) 0%, rgba(110, 60, 105, 0.58) 100%)",
                 border: "1.5px solid rgba(200, 120, 180, 0.5)",
-                borderRadius: "3px 14px 14px 14px",
+                borderRadius: "14px 14px 14px 0px",
                 padding: "20px 20px",
                 boxShadow:
                   "0 0 10px rgba(180, 120, 200, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",

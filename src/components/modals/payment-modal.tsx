@@ -78,11 +78,14 @@ const PaymentModal = ({
       const orderId = `order_${Date.now()}_${Math.random().toString(36).slice(2)}`;
       const orderName = isSingle ? `${cardTitle} 열기` : "전체 흐름 열기";
 
-      // 현재 페이지 URL에 쿼리 파라미터 추가 (결제 타입 포함)
+      // 현재 페이지 URL (쿼리 제거)
       const baseUrl =
         typeof window !== "undefined" ? window.location.href.split("?")[0] : "";
-      const successUrl = `${baseUrl}?payment_success=true&paymentType=${paymentType}&sceneIndex=${sceneIndex || 0}&orderId=${orderId}`;
-      const failUrl = `${baseUrl}?payment_failed=true`;
+
+      // successUrl: 우리의 파라미터 + Toss가 추가할 paymentKey/orderId/amount
+      // Toss는 자동으로 paymentKey, orderId, amount를 query에 추가함
+      const successUrl = `${baseUrl}?_payment_type=${paymentType}&_scene_index=${sceneIndex || 0}&_unlock=true`;
+      const failUrl = `${baseUrl}?_payment_failed=true`;
 
       // 결제 요청 (필수: successUrl, failUrl)
       await widgetRef.current.requestPayment({

@@ -26,8 +26,13 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
     const mockSessionId =
       crypto.randomUUID?.() ||
       `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    router.push(`/analyze/${mockSessionId}`);
+    router.push(`/analyze/${mockSessionId}?content_id=${content.id}`);
   };
+
+  // Flow preview: 최대 4개까지만 노출
+  const MAX_PREVIEW_FLOWS = 4;
+  const previewFlows = content.insights?.slice(0, MAX_PREVIEW_FLOWS) || [];
+  const remainingCount = (content.insights?.length || 0) - previewFlows.length;
 
   return (
     <div className="w-full max-w-full relative overflow-x-hidden">
@@ -109,7 +114,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                     {content.title}
                   </h1>
                   {content.subtitle && (
-                    <p className="text-[12px] lg:text-[12px] leading-[1.4] text-white/55 line-clamp-2">
+                    <p className="text-[12px] lg:text-[12px] leading-[1.4] text-white/55 line-clamp-2 text-left">
                       {content.subtitle}
                     </p>
                   )}
@@ -202,9 +207,9 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
               }}
             >
               {/* Teaser — 티켓 정보 영역 */}
-              {content.insights && content.insights.length > 0 && (
+              {previewFlows && previewFlows.length > 0 && (
                 <div className="space-y-5 pt-4 pb-3">
-                  {content.insights.map((insight, i) => (
+                  {previewFlows.map((insight, i) => (
                     <div key={i} className="flex flex-col gap-2 pl-2">
                       <span className="text-[9px] font-semibold text-white/30 uppercase tracking-[0.18em]">
                         FLOW {String(i + 1).padStart(2, "0")}
@@ -214,6 +219,12 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                       </p>
                     </div>
                   ))}
+                  {/* 남은 흐름 표시 */}
+                  {remainingCount > 0 && (
+                    <p className="pl-2 mt-6 text-[12px] text-white/35">
+                      + {remainingCount}개의 흐름이 더 있어
+                    </p>
+                  )}
                 </div>
               )}
             </div>
