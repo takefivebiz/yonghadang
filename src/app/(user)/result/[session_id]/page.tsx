@@ -29,6 +29,7 @@ const ResultPage = ({ params }: PageProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const sceneRefsMap = useRef<Record<number, HTMLDivElement | null>>({});
+  const flowOverviewRef = useRef<HTMLDivElement | null>(null);
 
   // ── Phase 1: 초기 데이터 및 scene 생성 또는 복원 ──────────────────────────
   // 리다이렉트 후 다시 로드되었을 때, generateCalledRef가 reset되지 않도록
@@ -40,7 +41,9 @@ const ResultPage = ({ params }: PageProps) => {
 
         if (typeof window === "undefined") return;
 
-        const stored = localStorage.getItem(`veil_analysis_${param.session_id}`);
+        const stored = localStorage.getItem(
+          `veil_analysis_${param.session_id}`,
+        );
         if (!stored) {
           setError("결과를 찾을 수 없어");
           setLoading(false);
@@ -69,7 +72,9 @@ const ResultPage = ({ params }: PageProps) => {
             resultScenes = generateMockResultScenes(data.content_id);
           } else {
             // ── 실제 Claude generate 호출 (free + paid 전체 생성) ────────────────────────────
-            const content = DUMMY_CONTENTS.find((c) => c.id === data.content_id);
+            const content = DUMMY_CONTENTS.find(
+              (c) => c.id === data.content_id,
+            );
             if (!content) {
               throw new Error(`콘텐츠를 찾을 수 없어: ${data.content_id}`);
             }
@@ -82,14 +87,17 @@ const ResultPage = ({ params }: PageProps) => {
             const userAnswers = data.answers
               .filter(
                 (a: Answer) =>
-                  Array.isArray(a.answer_options) && a.answer_options.length > 0,
+                  Array.isArray(a.answer_options) &&
+                  a.answer_options.length > 0,
               )
               .map((a: Answer) => {
                 const question = inputConfig?.questions.find(
                   (q) => q.index === a.question_index,
                 );
                 const labels = (a.answer_options ?? []).map((value) => {
-                  const option = question?.options.find((o) => o.value === value);
+                  const option = question?.options.find(
+                    (o) => o.value === value,
+                  );
                   return option?.label ?? value;
                 });
                 return {
@@ -233,7 +241,9 @@ const ResultPage = ({ params }: PageProps) => {
           const allPaidIndices = prevScenes
             .filter((s) => !s.is_free)
             .map((s) => s.scene_index);
-          const newUnlocked = [...new Set([...unlockedScenes, ...allPaidIndices])];
+          const newUnlocked = [
+            ...new Set([...unlockedScenes, ...allPaidIndices]),
+          ];
           console.log("[all unlock]", allPaidIndices, newUnlocked);
           setUnlockedScenes(newUnlocked);
 
@@ -252,6 +262,16 @@ const ResultPage = ({ params }: PageProps) => {
       // URL 정리 (히스토리에 결제 파라미터 남지 않게)
       // replace로 history stack 변경
       window.history.replaceState({}, "", window.location.pathname);
+
+      // 결제 완료 후 FlowOverview로 스크롤
+      setTimeout(() => {
+        if (flowOverviewRef.current) {
+          flowOverviewRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }, 300);
     } else if (searchParams.get("_payment_failed") === "true") {
       console.log("[payment failed]");
       window.history.replaceState({}, "", window.location.pathname);
@@ -271,7 +291,10 @@ const ResultPage = ({ params }: PageProps) => {
     checkMenuState();
 
     const observer = new MutationObserver(checkMenuState);
-    observer.observe(header, { attributes: true, attributeFilter: ["data-mobile-menu-open"] });
+    observer.observe(header, {
+      attributes: true,
+      attributeFilter: ["data-mobile-menu-open"],
+    });
 
     return () => observer.disconnect();
   }, []);
@@ -417,23 +440,23 @@ const ResultPage = ({ params }: PageProps) => {
         backgroundAttachment: "fixed",
       }}
     >
-      {/* ── Progress Indicator (navbar 아래) ──────────────────────── */}
-      <div
-        className="sticky top-13 z-40 h-10 flex items-center justify-center"
-        style={{
-          opacity: mobileMenuOpen ? 0 : 1,
-          pointerEvents: mobileMenuOpen ? "none" : "auto",
-        }}
-      >
-        <ProgressIndicator
-          scenes={scenes}
-          unlockedScenes={unlockedScenes}
-          currentSceneIndex={currentSceneIndex}
-        />
-      </div>
-
       {/* ── 메인 콘텐츠 영역 ──────────────────────────── */}
       <main className="flex-1 overflow-y-auto">
+        {/* ── Progress Indicator (fixed) ──────────────────────── */}
+        <div
+          className="fixed left-0 right-0 top-13 z-40 h-10 flex items-center justify-center"
+          style={{
+            opacity: mobileMenuOpen ? 0 : 1,
+            pointerEvents: mobileMenuOpen ? "none" : "auto",
+          }}
+        >
+          <ProgressIndicator
+            scenes={scenes}
+            unlockedScenes={unlockedScenes}
+            currentSceneIndex={currentSceneIndex}
+          />
+        </div>
+
         <div className="w-full max-w-lg mx-auto">
           {/* 콘텐츠 헤더 */}
           {analyzeData &&
@@ -442,10 +465,10 @@ const ResultPage = ({ params }: PageProps) => {
                 (c) => c.id === analyzeData.content_id,
               );
               return content ? (
-                <div className="px-6 py-3 space-y-4">
+                <div className="px-6 py-3 space-y-4 mt-10 flex flex-col items-center text-center">
                   {/* 썸네일 이미지 */}
                   {content.thumbnail_url && (
-                    <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-white/[0.04] shadow-2xl shadow-black/40">
+                    <div className="relative w-65 h-65 overflow-hidden rounded-[14px] bg-white/[0.04] shadow-2xl shadow-black/40">
                       <Image
                         src={content.thumbnail_url}
                         alt={content.title}
@@ -534,12 +557,14 @@ const ResultPage = ({ params }: PageProps) => {
 
                 {/* 무료 Scene 이후 Flow Overview */}
                 {paidSceneCount > 0 && (
-                  <FlowOverview
-                    scenes={scenes}
-                    unlockedScenes={unlockedScenes}
-                    onUnlockAll={handleUnlockAll}
-                    onUnlockScene={handleUnlockScene}
-                  />
+                  <div ref={flowOverviewRef}>
+                    <FlowOverview
+                      scenes={scenes}
+                      unlockedScenes={unlockedScenes}
+                      onUnlockAll={handleUnlockAll}
+                      onUnlockScene={handleUnlockScene}
+                    />
+                  </div>
                 )}
 
                 {/* 유료 Scene 렌더링 */}

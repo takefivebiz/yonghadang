@@ -25,16 +25,17 @@ type Stage =
 // ── Debug flag: generate loading 화면만 고정으로 보기 (개발용) ──────────────────
 // .env.local에 NEXT_PUBLIC_FORCE_GENERATE_LOADING=true로 설정하면 활성화
 // 실제 generate 호출 없이 loading 화면만 표시함
-const FORCE_GENERATE_LOADING = process.env.NEXT_PUBLIC_FORCE_GENERATE_LOADING === "true";
+const FORCE_GENERATE_LOADING =
+  process.env.NEXT_PUBLIC_FORCE_GENERATE_LOADING === "true";
 
 // ── Loading Bubbles: 결과 생성 흐름의 단계별 버블 메시지 ────────────────────────
 const LOADING_BUBBLES = [
   "모든 질문이 끝났어",
   "이제 네 이야기를 정리할게",
-  "반복되는 흐름을 읽는 중",
+  "흐름을 읽는 중",
   "흔들리는 지점을 찾는 중",
   "감정의 결을 읽는 중",
-  "결과 장면을 구성하는 중",
+  "결과를 구성하는 중",
   "마지막 흐름을 정리하는 중",
   "곧 결과가 나와",
 ];
@@ -203,16 +204,21 @@ const AnalyzePage = ({ params }: PageProps) => {
   const generateScenes = async (finalData: AnalyzeAnswers) => {
     try {
       const content = DUMMY_CONTENTS.find((c) => c.id === finalData.content_id);
-      if (!content) throw new Error(`콘텐츠를 찾을 수 없어: ${finalData.content_id}`);
+      if (!content)
+        throw new Error(`콘텐츠를 찾을 수 없어: ${finalData.content_id}`);
 
       const inputConfig = DUMMY_INPUT_CONFIGS[finalData.content_id];
       const sceneConfig = getSceneConfig(finalData.content_id);
 
       // Answer → {values, labels} 변환
       const userAnswers = finalData.answers
-        .filter((a) => Array.isArray(a.answer_options) && a.answer_options.length > 0)
+        .filter(
+          (a) => Array.isArray(a.answer_options) && a.answer_options.length > 0,
+        )
         .map((a) => {
-          const question = inputConfig?.questions.find((q) => q.index === a.question_index);
+          const question = inputConfig?.questions.find(
+            (q) => q.index === a.question_index,
+          );
           const labels = (a.answer_options ?? []).map((value) => {
             const option = question?.options.find((o) => o.value === value);
             return option?.label ?? value;
@@ -290,9 +296,18 @@ const AnalyzePage = ({ params }: PageProps) => {
   const getBubbleState = (index: number) => {
     const diff = index - currentBubbleIndex;
 
-    if (diff < -1 || diff > 1) return null; // 보이지 않음
+    if (diff < -2 || diff > 2) return null; // 보이지 않음
 
     switch (diff) {
+      case -2: // 먼 과거
+        return {
+          status: "past" as const,
+          opacity: 0.05,
+          scale: 0.90,
+          translateY: -12,
+          filter: "blur(2px)",
+          animation: "none",
+        };
       case -1: // 과거
         return {
           status: "past" as const,
@@ -320,14 +335,23 @@ const AnalyzePage = ({ params }: PageProps) => {
           filter: "blur(1px)",
           animation: "none",
         };
+      case 2: // 먼 미래
+        return {
+          status: "future" as const,
+          opacity: 0.03,
+          scale: 0.90,
+          translateY: 16,
+          filter: "blur(2px)",
+          animation: "none",
+        };
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex justify-center">
       {/* 완료 화면: Bubble Progression */}
       {stage === "completing" && (
-        <div className="flex min-h-screen flex-col items-center justify-start pt-40 px-4 transition-all duration-700">
+        <div className="flex min-h-screen w-full max-w-lg flex-col items-center justify-start pt-40 px-4 transition-all duration-700">
           <div
             style={{
               animation: "fadeIn 600ms ease-out",
@@ -349,7 +373,8 @@ const AnalyzePage = ({ params }: PageProps) => {
                       transform: `scale(${state.scale}) translateY(${state.translateY}px)`,
                       filter: state.filter,
                       animation: state.animation,
-                      transition: "all 600ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+                      transition:
+                        "all 1200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
                     }}
                     className="flex justify-start"
                   >
@@ -359,7 +384,9 @@ const AnalyzePage = ({ params }: PageProps) => {
                         borderRadius: "14px 14px 14px 0px",
                         padding: "12px 16px",
                         border: "1px solid rgba(255, 255, 255, 0.015)",
-                        boxShadow: isCurrent ? "0 0 16px rgba(209, 109, 172, 0.12)" : "none",
+                        boxShadow: isCurrent
+                          ? "0 0 16px rgba(209, 109, 172, 0.12)"
+                          : "none",
                       }}
                     >
                       <p

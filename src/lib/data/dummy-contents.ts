@@ -20,8 +20,8 @@ export const DUMMY_CONTENTS: Content[] = [
   // ── 연애 ──────────────────────────────────────────────────────
   {
     id: "love-1",
-    title: "사랑일까,\n집착일까?",
-    subtitle: "집착인지 아닌지 판단하는 기준",
+    title: "이 사람, \n 저를 좋아하는 걸까요?",
+    subtitle: "사소한 반응에도 마음이 흔들린다면",
     category: "love",
     thumbnail_url: "/img/love-1.png",
     estimated_minutes: 5,
@@ -32,12 +32,12 @@ export const DUMMY_CONTENTS: Content[] = [
     created_at: "2026-05-01T00:00:00Z",
     updated_at: "2026-05-01T00:00:00Z",
     insights: [
-      "지금 집착에 가까운 상태인지",
-      "왜 계속 확인하게 되는지",
-      "어디까지가 집착인지",
-      "집착이 생긴 근본 원인",
-      "집착에서 벗어나기 위한 방법",
-      "지금 필요한 조치가 뭔지",
+      "왜 자꾸 마음을 확인하고 싶어지는지",
+      "사소한 반응 하나에도 의미를 찾게 되는 이유",
+      "확신이 없는데도 계속 기대하게 되는 이유",
+      "지금처럼 기다리기만 하면 어떻게 될지",
+      "내가 원하는 게 이 사람인지, 확신받는 감정인지",
+      "결국 선택해야 하는 순간이 온다면",
     ],
   },
   {
@@ -138,7 +138,7 @@ export const DUMMY_CONTENTS: Content[] = [
   // ── 인간관계 ──────────────────────────────────────────────────
   {
     id: "rel-1",
-    title: "왜 나는 항상 관계에서 \n 을이 되는 걸까?",
+    title: "이제 사람 만나는 게 지쳐요",
     subtitle: "주도권을 계속 뺏기는 이유",
     category: "relationship",
     thumbnail_url: "/img/rel-1.png",
@@ -254,7 +254,7 @@ export const DUMMY_CONTENTS: Content[] = [
   // ── 직업·진로 ─────────────────────────────────────────────────
   {
     id: "career-1",
-    title: "지금 이 일, \n나한테 맞는 걸까?",
+    title: "퇴사 vs 버티기, \n 어떻게 해야 할까요?",
     subtitle: "적성인지 환경 문제인지 구분해요",
     category: "career",
     thumbnail_url: "/img/career-1.png",
@@ -353,7 +353,7 @@ export const DUMMY_CONTENTS: Content[] = [
   // ── 감정 ──────────────────────────────────────────────────────
   {
     id: "emotion-1",
-    title: "이유 없이 공허한 \n이 감정의 정체",
+    title: "내가 게으른 건지, 지친 건지 모르겠어요",
     subtitle: "막연한 공허함의 실체를 찾아봐요",
     category: "emotion",
     thumbnail_url: "/img/emotion-1.png",

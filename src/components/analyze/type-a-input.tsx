@@ -42,7 +42,7 @@ const TypeAInput = ({
   const maxChars = 500;
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6">
+    <div className="w-full max-w-lg mx-auto overflow-x-hidden flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6">
       <style>{placeholderStyles}</style>
 
       {/* Progress indicator */}
@@ -97,7 +97,7 @@ const TypeAInput = ({
             maxWidth: "220px",
           }}
         >
-          <h1 className="text-xl sm:text-2xl font-semibold leading-tight mb-3">
+          <h1 className="text-lg sm:text-xl font-semibold leading-tight mb-3">
             <span style={{ color: "rgba(249, 249, 229, 0.85)" }}>먼저,</span>
             <br />
             <span style={{ color: "rgba(209, 109, 172, 0.8)" }}>
@@ -167,7 +167,7 @@ const TypeAInput = ({
         </p>
 
         {/* 다음 버튼 */}
-        <div className="flex justify-end mt-8" style={{ maxWidth: "310px" }}>
+        <div className="flex justify-end mt-8 w-full">
           <button
             onClick={handleSubmit}
             disabled={isSubmitDisabled}

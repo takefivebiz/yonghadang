@@ -62,7 +62,7 @@ const CorrectionQuestions = ({
 
   return (
     <div
-      className="flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6 relative transition-opacity duration-300"
+      className="w-full max-w-lg mx-auto flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6 relative transition-opacity duration-300"
       style={{
         opacity: isVisible && !isExiting ? 1 : 0,
       }}
@@ -125,7 +125,7 @@ const CorrectionQuestions = ({
             >
               질문 {currentQuestionIndex + 1}
             </p>
-            <h1 className="text-xl sm:text-2xl font-semibold leading-tight mb-4 whitespace-pre-line">
+            <h1 className="text-lg sm:text-xl font-semibold leading-tight mb-4 whitespace-pre-line">
               {currentQuestion.text}
             </h1>
             <p
@@ -161,17 +161,14 @@ const CorrectionQuestions = ({
                     borderRadius: "14px 14px 0px 14px",
                   }}
                 >
-                  <span className="text-sm sm:text-base">{option.label}</span>
+                  <span className="text-xs sm:text-sm">{option.label}</span>
                 </button>
               );
             })}
           </div>
 
           {/* 다음 버튼 */}
-          <div
-            className="mt-auto flex justify-end"
-            style={{ maxWidth: "310px" }}
-          >
+          <div className="mt-auto flex justify-end w-full">
             <button
               onClick={handleNext}
               disabled={!isAnswered}

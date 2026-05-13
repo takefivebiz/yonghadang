@@ -5,157 +5,99 @@ import { InputConfig } from "@/lib/types/content";
 
 export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
   "love-1": {
-    placeholder: "지금 상황을 편하게 적어줘",
+    placeholder: "그 사람 이야기를 편하게 적어줘",
     example_inputs: [
-      "자꾸 상대가 의심되고, 확인하면 안 되는 걸 알면서도 휴대폰이나 SNS를 보게 돼.",
-      "상대에게서 연락이 오지 않으면 불안해서 자꾸 먼저 찾아가거나 연락해.",
-      "이 사람 없이는 불안하고, 그래서 매번 상대의 행동을 확인하고 싶은 마음이 커.",
+      "연락은 계속 하는데 이 사람이 나를 좋아하는 건지 잘 모르겠어",
+      "둘이 있으면 분위기는 좋은데, 관계를 확실히 하려는 말은 없어",
     ],
     questions: [
       {
         index: 1,
-        text: "이런 행동이 \n 얼마나 자주 일어나?",
+        text: "그 사람 태도는 \n어떤 느낌이야?",
         type: "single",
         options: [
-          { label: "거의 매일", value: "daily" },
-          { label: "주 3-4회 이상", value: "frequent" },
-          { label: "주 1-2회 정도", value: "sometimes" },
-          { label: "가끔씩", value: "rarely" },
+          {
+            label: "다정하긴 한데 확실한 말은 안 해",
+            value: "kind_but_unclear",
+          },
+          {
+            label: "잘해줄 때도 있고 갑자기 멀어질 때도 있어",
+            value: "hot_and_cold",
+          },
+          {
+            label: "연락은 계속하는데 관계는 그대로야",
+            value: "contact_no_progress",
+          },
+          { label: "나만 더 기다리고 있는 느낌이야", value: "waiting_more" },
         ],
       },
-      {
-        index: 2,
-        text: "이 상황이 \n얼마나 오래됐어?",
-        type: "single",
-        options: [
-          { label: "최근 몇 주", value: "recent" },
-          { label: "수 개월", value: "months" },
-          { label: "1년 이상", value: "year" },
-          { label: "처음부터", value: "longterm" },
-        ],
-      },
-      {
-        index: 3,
-        text: "상대의 반응은 \n어떤 편이야?",
-        type: "single",
-        options: [
-          { label: "잘 대응해줌", value: "responsive" },
-          { label: "가끔 대응해줌", value: "sometimes_responsive" },
-          { label: "짜증내거나 피함", value: "frustrated" },
-          { label: "잘 모르겠음", value: "unclear" },
-        ],
-      },
-      {
-        index: 4,
-        text: "이런 마음이 들 때 \n 주로 어떻게 해?",
-        type: "multiple",
-        options: [
-          { label: "상대 확인하기 (연락, 위치 등)", value: "check" },
-          { label: "마음을 참으려고 함", value: "suppress" },
-          { label: "상대에게 바로 말함", value: "confront" },
-          { label: "다른 걸 하면서 참음", value: "distract" },
-          { label: "혼자 있으려고 함", value: "withdraw" },
-        ],
-      },
-      {
-        index: 5,
-        text: "이게 너한테 \n 미치는 영향은?",
-        type: "multiple",
-        options: [
-          { label: "스트레스 많이 받음", value: "stress" },
-          { label: "자신감 떨어짐", value: "doubt" },
-          { label: "미안한 마음 생김", value: "guilt" },
-          { label: "관계가 좋지 않음", value: "conflict" },
-          { label: "잠을 못 자거나 불규칙함", value: "sleep" },
-        ],
-      },
-      {
-        index: 6,
-        text: "과거에 비슷한 \n 경험이 있었어?",
-        type: "single",
-        options: [
-          { label: "없음", value: "none" },
-          { label: "한두 번 있었음", value: "once" },
-          { label: "여러 번 반복됨", value: "frequent" },
-          { label: "패턴으로 반복되는 것 같음", value: "pattern" },
-        ],
-      },
-    ],
-  },
 
-  "love-2": {
-    placeholder: "지금 상황을 편하게 적어줘",
-    example_inputs: [
-      "좋아하는지 외로워하는지 헷갈려. 이 사람과 함께하고 싶은 건지, 아니면 혼자가 싫어서인지 모르겠어.",
-      "상대가 좋아서 시작했는데, 요즘은 관계 자체가 내 정서를 채워주기 위한 수단 같은 기분이 들어.",
-    ],
-    questions: [
-      {
-        index: 1,
-        text: "지금 이 감정이 \n 언제부터 시작됐어?",
-        type: "single",
-        options: [
-          { label: "처음부터 이런 마음이었어", value: "beginning" },
-          { label: "점점 이렇게 변했어", value: "gradual" },
-          { label: "최근에 갑자기 생겼어", value: "recent" },
-          { label: "싸운 후부터 시작됐어", value: "conflict" },
-        ],
-      },
       {
         index: 2,
-        text: "상대와 있을 때 \n 기분은 어때?",
-        type: "multiple",
+        text: "요즘 제일 신경 쓰이는 건 뭐야?",
+        type: "single",
         options: [
-          { label: "편하고 안정적임", value: "comfortable" },
-          { label: "설렘", value: "excited" },
-          { label: "긴장되거나 불안함", value: "tense" },
-          { label: "공허함", value: "empty" },
-          { label: "의무감을 느낌", value: "obligated" },
+          {
+            label: "답장 속도나 연락 텀이 자꾸 신경 쓰여",
+            value: "reply_speed",
+          },
+          { label: "말투 하나에도 의미를 찾게 돼", value: "tone_words" },
+          {
+            label: "둘이 있을 때 분위기가 너무 좋아서 헷갈려",
+            value: "private_mood",
+          },
+          {
+            label: "나를 대하는 태도가 자꾸 달라져",
+            value: "changing_attitude",
+          },
         ],
       },
       {
         index: 3,
-        text: "상대와 헤어질 때는 \n 어떤 감정이 들어?",
-        type: "single",
-        options: [
-          { label: "한숨이 쉬어짐", value: "relief" },
-          { label: "슬픔", value: "sad" },
-          { label: "공허함", value: "empty" },
-          { label: "불안함", value: "anxious" },
-        ],
-      },
-      {
-        index: 4,
-        text: "혼자 있는 시간은 어때?",
-        type: "single",
-        options: [
-          { label: "평화로움", value: "peaceful" },
-          { label: "따분함", value: "bored" },
-          { label: "외로움", value: "lonely" },
-          { label: "홀가분함", value: "relieved" },
-        ],
-      },
-      {
-        index: 5,
-        text: "상대의 어떤 점이 좋아?",
+        text: "이 사람 때문에 \n네 마음은 어때?",
         type: "multiple",
         options: [
-          { label: "성격이나 가치관", value: "personality" },
-          { label: "외모", value: "appearance" },
-          { label: "함께하면 편함", value: "comfort" },
-          { label: "나를 인정해줌", value: "validation" },
-          { label: "항상 있어줌", value: "availability" },
+          { label: "괜히 혼자 기대하게 돼", value: "expectation" },
+          { label: "사소한 행동에도 감정이 흔들려", value: "emotional_swing" },
+          { label: "확신이 없는데 자꾸 기다리게 돼", value: "waiting" },
+          {
+            label: "계속 의미를 찾고 있는 나를 보게 돼",
+            value: "overthinking",
+          },
+          { label: "나만 더 좋아하는 것 같아서 불안해", value: "imbalance" },
         ],
       },
+
       {
-        index: 6,
-        text: "이 관계가 없어졌을 때를 \n 상상해보면?",
+        index: 4,
+        text: "이 관계에서 \n제일 무서운 건 뭐야?",
         type: "single",
         options: [
-          { label: "정말 슬플 것 같음", value: "sad" },
-          { label: "오히려 홀가분할 것 같음", value: "relieved" },
-          { label: "큰 공허함을 느낄 것 같음", value: "empty" },
-          { label: "크게 상관없을 것 같음", value: "neutral" },
+          { label: "나만 혼자 진심인 걸까봐", value: "alone_serious" },
+          { label: "괜히 기대했다가 상처받을까봐", value: "hurt" },
+          { label: "애매한 상태로 계속 이어질까봐", value: "stuck" },
+          { label: "결국 내가 먼저 포기하게 될까봐", value: "give_up" },
+        ],
+      },
+
+      {
+        index: 5,
+        text: "솔직히 네가 \n제일 바라는 건 뭐야?",
+        type: "single",
+        options: [
+          {
+            label: "확실하게 좋아한다고 말해줬으면 좋겠어",
+            value: "confirmation",
+          },
+          {
+            label: "애매하지 않게 관계를 정했으면 좋겠어",
+            value: "define_relationship",
+          },
+          {
+            label: "나만 불안한 상태가 끝났으면 좋겠어",
+            value: "stop_anxiety",
+          },
+          { label: "이 마음에서 좀 벗어나고 싶어", value: "escape_feeling" },
         ],
       },
     ],

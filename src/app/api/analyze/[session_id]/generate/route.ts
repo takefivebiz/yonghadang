@@ -109,10 +109,17 @@ export const POST = async (
       throw new Error("Claude 응답이 비어있습니다");
     }
 
+    console.log(`[generate] Claude 원본 응답 길이: ${rawText.length}`);
+    console.log(`[generate] Claude 원본 응답 처음 500자:\n${rawText.slice(0, 500)}`);
+
     const rawResult = parseClaudeResult(rawText);
 
-    // carry_over를 제거하고 ResultScene[]로 변환
-    const result_scenes = mapClaudeToResultScenes(session_id, rawResult.scenes);
+    // carry_over를 제거하고 ResultScene[]로 변환 (scene_config의 intro 포함)
+    const result_scenes = mapClaudeToResultScenes(
+      session_id,
+      rawResult.scenes,
+      scene_config
+    );
 
     // TODO: [백엔드 연동] result_scenes를 Supabase scenes 테이블에 저장
 

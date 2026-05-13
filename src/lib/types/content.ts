@@ -35,6 +35,8 @@ export interface SceneConfigItem {
   index: number;
   /** 프론트에 노출되는 scene 제목 */
   title: string;
+  /** 장면 진입 직전의 감정 흐름. 사용자를 다음 장면 안으로 끌어들이는 문장 */
+  intro?: string;
   /** Claude가 이해할 내부 역할 (예: "state_definition", "pattern_recognition") */
   role: string;
   /** 이 scene이 반드시 밝혀야 하는 목적 */
@@ -42,6 +44,7 @@ export interface SceneConfigItem {
   /** 생성 시 포함해야 할 핵심 포인트 */
   focus: string[];
   /** 이 scene에서 특히 지켜야 할 문장 방향 */
+  forbidden?: string[];
   tone: string;
   is_free: boolean;
   /** 레거시 단일 프롬프트 (선택적, 신규 콘텐츠는 goal+focus+tone으로 대체) */

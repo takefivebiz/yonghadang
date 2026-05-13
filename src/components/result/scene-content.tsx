@@ -42,7 +42,7 @@ const AiBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
         style={{
           /* 배경과 자연스럽게 blend되는 bubble */
           background: "rgba(255, 255, 255, 0.04)",
-          borderRadius: "3px 14px 14px 14px",
+          borderRadius: "14px 14px 14px 0",
           padding: "10px 15px",
           /* 아주 약한 border로 정의감 최소화 */
           border: "1px solid rgba(255, 255, 255, 0.015)",
@@ -120,18 +120,6 @@ const MemoBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
       </div>
     </div>
   );
-};
-
-const getSceneIntroText = (sceneIndex: number): string => {
-  const introTexts: Record<number, string> = {
-    1: "마음은 이미 작은 반응에도 흔들리고 있었어.",
-    2: "안심보다 확인이 먼저 필요해진 상태였어.",
-    3: "반복은 여기서부터 더 선명해져.",
-    4: "이제 돌이킬 수 없는 지점이 가까워지고 있었어.",
-    5: "마지막 순간의 선택이 남겨진 거야.",
-    6: "모든 흐름의 끝에 보이는 것들이 있어.",
-  };
-  return introTexts[sceneIndex] || "";
 };
 
 const renderMessage = (msg: SceneMessage, idx: number) => {
@@ -247,7 +235,7 @@ const SceneContent = ({
             {scene.scene_title}
           </h2>
 
-          {getSceneIntroText(scene.scene_index) && (
+          {scene.intro && (
             <p
               className="leading-relaxed mt-1.5 mb-4"
               style={{
@@ -256,7 +244,7 @@ const SceneContent = ({
                 lineHeight: "1.6",
               }}
             >
-              {getSceneIntroText(scene.scene_index)}
+              {scene.intro}
             </p>
           )}
         </div>

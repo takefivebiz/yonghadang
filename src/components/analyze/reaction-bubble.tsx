@@ -45,7 +45,7 @@ const ReactionBubble = ({
   }, [messages.length, onComplete]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6 relative">
+    <div className="w-full max-w-lg mx-auto flex min-h-screen flex-col bg-background px-4 py-6 sm:px-6 relative">
       {/* Progress indicator */}
       <div className="mb-12 flex items-center gap-3 justify-center">
         <div className="flex items-center gap-1">
@@ -80,7 +80,7 @@ const ReactionBubble = ({
       </div>
 
       {/* Reaction bubbles */}
-      <div className="mx-auto w-full max-w-2xl flex-1 flex flex-col items-start gap-2">
+      <div className="w-full flex-1 flex flex-col items-start gap-2">
         {messages.map((msg, idx) => (
           <div
             key={idx}

@@ -60,13 +60,23 @@ const formatSceneInstructions = (scenes: SceneConfigItem[]): string => {
     .map((scene) => {
       const freeLabel = scene.is_free ? "[무료 공개]" : "[유료]";
       const focusLines = scene.focus.map((f) => `  - ${f}`).join("\n");
+      const forbiddenLines = scene.forbidden
+        ? scene.forbidden.map((f) => `  - ${f}`).join("\n")
+        : "";
 
-      return `### Scene ${scene.index}: ${scene.title} ${freeLabel}
+      let sceneBlock = `### Scene ${scene.index}: ${scene.title} ${freeLabel}
 role: ${scene.role}
 goal: ${scene.goal}
 focus:
 ${focusLines}
 tone: ${scene.tone}`;
+
+      if (forbiddenLines) {
+        sceneBlock += `\nforbidden (이것을 피하라):
+${forbiddenLines}`;
+      }
+
+      return sceneBlock;
     })
     .join("\n\n");
 };
@@ -98,8 +108,8 @@ export const buildGenerateResultPrompt = (params: {
   const totalScenes = sceneConfig.scenes.length;
 
   // ── 시스템 프롬프트 ────────────────────────────────────────────────
-  const system = `너는 VEIL의 AI 분석가다.
-VEIL은 사용자의 감정·관계·직업 상황을 분석하는 서비스다.
+  const system = `너는 VEIL의 AI 해석가다.
+VEIL은 사용자의 감정·관계·직업 상황을 해석하는 서비스다.
 사용자가 입력한 상황을 기반으로, 아래 scene 구조에 따라 결과를 생성한다.
 
 ## 핵심 원칙
@@ -108,23 +118,82 @@ VEIL은 사용자의 감정·관계·직업 상황을 분석하는 서비스다.
 - 사용자가 이미 어렴풋이 알고 있는 것을 명확하게 언어화해준다.
 - 각 scene은 독립된 카드가 아닌, 하나의 흐름(narrative) 안에서 연결된다.
 - 앞 scene에서 다룬 내용은 뒤 scene에서 반복하지 않는다.
+- **각 scene 안의 messages도 서로 이어져야 한다.** 앞 메시지를 받아 다음 메시지가 자연스럽게 이어지는 흐름.
+- 직접 조언하지 않으면서도, 사용자가 읽을 때 "나한테 계속 이어서 말해주는 느낌"이 있어야 한다.
 
 ## 문체 규칙
 - 반말 (편한 존댓말 아닌, 친구처럼 말 놓는 투)
-- 짧고 간결한 문장. 한 문장에 하나의 생각만.
+- 짧은 문장과 긴 문장을 섞어라. ai 메시지는 보통 2~3문장으로 자연스럽게 이어지게 한다.
+  * 첫 문장: 앞 메시지를 받아주기 (문제는, 그 다음이, 그래서, 여기서, 결국 등)
+  * 두 번째: 한 단계 더 깊이 들어가기
+  * 필요하면 세 번째: 짧게 마무리하기
+  * punch만 짧고 단정적으로 끊기
 - "~할 수 있어", "~인 것 같아" 같은 애매한 표현 금지.
-- 사실처럼 말한다. 사용자가 반박할 수 없을 만큼 정확하게.
+- 사실처럼 말하되, 보고서처럼 단정하지 말 것. 사용자의 흐름을 따라가며 말한다.
+- ⚠️ 단, 상대방의 내면 상태(기분, 의도, 감정)를 추측하거나 미래를 명확히 예측하지 않는다. ("상대는 진심으로 좋아하는 것 같아" 같은 추측 금지)
+
+### ⚠️ 반말 종결 규칙 (매우 중요)
+- 절대 하지 말 것: ~다, ~된다, ~한다, ~시작된다, ~행동이다, ~것이다, ~할 수 있어, ~일 수 있어 (문어체/보고서 톤/애매함/투명성 부족)
+- **종결 방식을 반드시 다양화할 것. 같은 종결을 반복하지 말 것:**
+  - ~하고 있어
+  - ~하게 돼
+  - ~처럼 느껴져
+  - ~에 가까워
+  - ~로 이어져
+  - ~부터 시작돼
+  - ~을 보게 돼
+  - ~이 남아
+  - ~가 커져
+  - ~흔들려 / ~흔들리고 있어
+  - ~넘어서게 돼
+  - ~흐르게 돼
+- 과하게 친근하거나 귀엽지 않게. 담담하고 단정적인 반말만 사용.
+- punch와 memo도 동일한 반말 규칙 적용.
 
 ## 출력 규칙
 - 반드시 JSON만 출력한다. 마크다운 코드블록('''json) 없이 순수 JSON만.
-- 각 scene은 3~5개의 messages를 포함한다.
-- message type 비율: ai 70% / punch 20% / memo 10%
-  - ai: 주 분석 문장 (사실처럼 묘사)
-  - punch: 씬의 핵심 한 줄. 짧고 강렬하게. 씬당 최대 1개. (예: "반복만 해도 익숙해져")
-  - memo: 손글씨 메모처럼 짧은 관찰. 1문장, 40자 이내. 씬당 최대 1개. 선택적. (예: "뇌는 반복을 기억해")
+
+### 무료 Scene (is_free: true)
+- messages 3~4개
+- 짧고 명확하게. 현재 상태를 직관적으로 전달.
+- **메시지 간에도 자연스러운 흐름이 있어야 한다.** 앞 메시지를 받아주며 이어가되, 간결성을 유지할 것.
+- type 비율: ai 70% / punch 20% / memo 10%
+
+### 유료 Scene (is_free: false) - 반드시 더 깊게
+- messages **최소 5개 이상**
+- 그중 **최소 1개는 80~140자의 긴 버블** (단순 요약이 아닌 깊이 있는 분석)
+- type 비율: ai 75% / punch 15% / memo 10%
+- punch: 씬의 핵심. 짧고 강렬하게. 씬당 최대 1개. (예: "반복만 해도 익숙해져")
+- memo: 선택적. 있다면 40~60자. **절대 긴 문장 금지, 단어 나열이나 짧은 문구 중심.**
+- **메시지끼리 감정 호흡이 있어야 한다.** 길이만 늘리는 것이 아니라 각 메시지가 이전 메시지를 받으며 차근차근 깊어지는 흐름.
+- **유료 scene은 단순히 현재 상황을 다시 설명하지 말고**, 아래 중 하나를 반드시 수행:
+  * 왜 이 상태에서 못 벗어나는지 (구조적 이유)
+  * 지금 흐름이 계속되면 어떻게 되는지 (미래 예측)
+  * 질문의 관점을 어떻게 바꿔야 하는지 (인식의 전환)
+  * 결국 어떤 기준 앞에 서게 되는지 (선택의 기준)
+
 - carry_over는 Claude 내부 검수용 필드다. 프론트에 노출되지 않는다.
   key_insight: 이 scene에서 확정된 핵심 사실 한 줄
   do_not_repeat: 이후 scene에서 반복하면 안 되는 표현·개념 목록
+
+## Scene 분리 규칙 (중요)
+각 scene은 **하나의 층위만 다룬다.**
+- 이전 scene에서 다룬 현재 상태/행동 패턴/미래 흐름을 다음 scene에서 다시 설명하지 않는다.
+- carry_over.do_not_repeat 항목은 반드시 다음 scene에서 회피할 것.
+- 각 scene이 새로운 깊이로 들어가야 narrative가 진행된다.
+
+## Messages 연결성 (매우 중요)
+각 message는 독립적이 아니라 서로 이어져야 한다:
+
+❌ 나쁜 예:
+- 상대가 애매하게 행동하고 있어.
+- 너는 그걸 계속 해석하고 있어.
+- 그래서 마음이 흔들려.
+
+⭕ 좋은 예:
+- 상대가 애매하게 행동하면, 너는 그걸 그냥 넘기지 못해.
+- 문제는 그 다음이야. 그 작은 반응 하나가 기준이 되고, 그 기준에 맞지 않는 순간부터 마음이 흔들리기 시작해.
+- 그래서 이 관계는 상대가 뭘 했는지보다, 네가 그걸 어떻게 붙잡고 있는지가 더 중요해져.
 
 ## 출력 포맷
 {
@@ -175,40 +244,62 @@ export const parseClaudeResult = (raw: string): ClaudeGeneratedResult => {
   // 전략 1: 응답에서 첫 번째 JSON 오브젝트 블록 추출 (가장 안전)
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
+    console.error("[parseClaudeResult] JSON을 찾을 수 없습니다. 원본 응답:", raw.slice(0, 500));
     throw new Error("Claude 응답에서 JSON을 찾을 수 없습니다");
   }
 
-  const parsed = JSON.parse(jsonMatch[0]) as ClaudeGeneratedResult;
+  try {
+    const parsed = JSON.parse(jsonMatch[0]) as ClaudeGeneratedResult;
 
-  if (!Array.isArray(parsed.scenes)) {
-    throw new Error("Claude 응답에 scenes 배열이 없습니다");
-  }
-
-  // 각 scene의 필수 필드 검증
-  for (const scene of parsed.scenes) {
-    if (typeof scene.scene_index !== "number") {
-      throw new Error(`scene_index가 숫자가 아닙니다: ${JSON.stringify(scene)}`);
+    if (!Array.isArray(parsed.scenes)) {
+      throw new Error("Claude 응답에 scenes 배열이 없습니다");
     }
-    if (!Array.isArray(scene.messages)) {
-      throw new Error(`scene ${scene.scene_index}의 messages가 배열이 아닙니다`);
-    }
-  }
 
-  return parsed;
+    // 각 scene의 필수 필드 검증
+    for (const scene of parsed.scenes) {
+      if (typeof scene.scene_index !== "number") {
+        throw new Error(
+          `scene_index가 숫자가 아닙니다: ${JSON.stringify(scene)}`,
+        );
+      }
+      if (!Array.isArray(scene.messages)) {
+        throw new Error(
+          `scene ${scene.scene_index}의 messages가 배열이 아닙니다`,
+        );
+      }
+    }
+
+    return parsed;
+  } catch (parseErr) {
+    console.error("[parseClaudeResult] JSON 파싱 또는 검증 실패");
+    console.error("추출된 JSON 첫 1000자:", jsonMatch[0].slice(0, 1000));
+    console.error("파싱 에러:", parseErr);
+    throw new Error(
+      `Claude JSON 처리 실패: ${parseErr instanceof Error ? parseErr.message : "알 수 없는 에러"}`
+    );
+  }
 };
 
 /**
  * Claude 생성 결과를 프론트엔드 ResultScene 배열로 변환한다.
  * - id: sessionId + scene_index로 생성
+ * - intro: sceneConfig에서 각 scene의 intro 가져오기
  * - is_unlocked: false로 초기화 (result 페이지의 unlockedScenes가 관리)
  * - preview_messages: 유료 scene은 첫 3개 메시지를 미리보기로 노출
  * - carry_over: 의도적으로 제외 (프론트 노출 없음)
  */
 export const mapClaudeToResultScenes = (
   sessionId: string,
-  claudeScenes: ClaudeGeneratedScene[]
+  claudeScenes: ClaudeGeneratedScene[],
+  sceneConfig: SceneConfig,
 ): ResultScene[] => {
   return claudeScenes.map((scene) => {
+    // scene_config에서 해당 index의 intro 가져오기
+    const configScene = sceneConfig.scenes.find(
+      (s) => s.index === scene.scene_index,
+    );
+    const intro = configScene?.intro;
+
     // carry_over를 제외한 messages만 SceneMessage[]로 매핑
     const messages: SceneMessage[] = scene.messages.map((m) => ({
       type: m.type,
@@ -224,6 +315,7 @@ export const mapClaudeToResultScenes = (
       id: `${sessionId}-scene-${scene.scene_index}`,
       scene_index: scene.scene_index,
       scene_title: scene.scene_title,
+      intro,
       is_free: scene.is_free,
       is_unlocked: false,
       // MVP: 모든 messages를 내려보내고 잠금은 result 페이지의 is_unlocked로 제어
