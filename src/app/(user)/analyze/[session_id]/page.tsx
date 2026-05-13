@@ -10,6 +10,7 @@ import { AnalyzeState, Answer, AnalyzeAnswers } from "@/lib/types/analyze";
 import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
 import { DUMMY_INPUT_CONFIGS } from "@/lib/data/dummy-analyze-config";
 import { getSceneConfig } from "@/lib/data/dummy-scene-configs";
+import type { ResultScene } from "@/lib/types/result";
 
 interface PageProps {
   params: Promise<{ session_id: string }>;
@@ -163,7 +164,7 @@ const AnalyzePage = ({ params }: PageProps) => {
 
     const simulateProgress = () => {
       const currentStage = progressStages[stageIndex];
-      const { range, speed } = currentStage;
+      const { range } = currentStage;
 
       // 증가량: 단계별로 조정
       let increment = 0;
@@ -255,7 +256,7 @@ const AnalyzePage = ({ params }: PageProps) => {
 
         const resData = (await res.json()) as {
           session_id: string;
-          result_scenes: any[];
+          result_scenes: ResultScene[];
         };
 
         // scenes 캐시 저장 (리다이렉트 후 재생성 방지)

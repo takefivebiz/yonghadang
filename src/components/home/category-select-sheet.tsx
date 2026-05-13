@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Category, CATEGORY_LABELS } from "@/lib/types/content";
+import type { Category } from "@/lib/types/content";
 
 interface CategorySelectSheetProps {
   isOpen: boolean;

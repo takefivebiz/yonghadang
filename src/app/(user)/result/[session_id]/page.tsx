@@ -256,7 +256,7 @@ const ResultPage = ({ params }: PageProps) => {
       console.log("[payment failed]");
       window.history.replaceState({}, "", window.location.pathname);
     }
-  }, [analyzeData]);
+  }, [analyzeData, unlockedScenes]);
 
   // 네비게이션 메뉴 열림 상태 감지 (Progress Indicator 숨기기)
   useEffect(() => {
