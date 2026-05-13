@@ -2,7 +2,7 @@
 export type Category = "love" | "relationship" | "career" | "emotion";
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  love: "연애",
+  love: "연애·결혼",
   relationship: "인간관계",
   career: "직업·진로",
   emotion: "감정",

@@ -4,31 +4,56 @@ import { Content, Category } from "@/lib/types/content";
 
 const CATEGORY_CONFIG: Record<
   Category,
-  { label: string; badge: string; accent: string; ring: string }
+  {
+    label: string;
+    badge: string;
+    accent: string;
+    ring: string;
+    categoryColor: string;
+    categoryBg: string;
+    categoryBorder: string;
+    arrowColor: string;
+  }
 > = {
   love: {
     label: "연애",
     badge: "bg-accent/15 text-accent/70",
     accent: "bg-accent",
     ring: "border-accent/15",
+    categoryColor: "text-[rgba(209,109,172,0.88)]",
+    categoryBg: "bg-[rgba(209,109,172,0.18)]",
+    categoryBorder: "border-[rgba(209,109,172,0.18)]",
+    arrowColor: "border-[rgba(209,109,172,0.72)] text-[rgba(209,109,172,0.72)]",
   },
   relationship: {
     label: "인간관계",
     badge: "bg-secondary/25 text-white/70",
     accent: "bg-secondary",
     ring: "border-secondary/15",
+    categoryColor: "text-[rgba(105,169,190,0.88)]",
+    categoryBg: "bg-[rgba(105,169,190,0.18)]",
+    categoryBorder: "border-[rgba(105,169,190,0.18)]",
+    arrowColor: "border-[rgba(105,169,190,0.72)] text-[rgba(105,169,190,0.72)]",
   },
   career: {
     label: "직업·진로",
     badge: "bg-white/8 text-white/60",
     accent: "bg-highlight/60",
     ring: "border-highlight/10",
+    categoryColor: "text-[rgba(190,172,145,0.88)]",
+    categoryBg: "bg-[rgba(190,172,145,0.18)]",
+    categoryBorder: "border-[rgba(190,172,145,0.18)]",
+    arrowColor: "border-[rgba(190,172,145,0.72)] text-[rgba(190,172,145,0.72)]",
   },
   emotion: {
     label: "감정",
     badge: "bg-purple-400/15 text-purple-300/70",
     accent: "bg-purple-400",
     ring: "border-purple-400/15",
+    categoryColor: "text-[rgba(160,118,210,0.88)]",
+    categoryBg: "bg-[rgba(160,118,210,0.18)]",
+    categoryBorder: "border-[rgba(160,118,210,0.18)]",
+    arrowColor: "border-[rgba(160,118,210,0.72)] text-[rgba(160,118,210,0.72)]",
   },
 };
 
@@ -40,6 +65,10 @@ interface ContentCardProps {
    * list: 카테고리 세로 리스트 (브런치형 텍스트 중심)
    */
   variant?: "carousel" | "list";
+  /** list variant 전용 — featured는 인트로 페이지용으로 더 큼 */
+  size?: "default" | "featured";
+  /** list variant 전용 — 화살표 표시 여부 */
+  showArrow?: boolean;
   /** carousel variant 전용 — 카테고리 배지 표시 여부 */
   showBadge?: boolean;
 }
@@ -110,15 +139,48 @@ const CarouselCard = ({
   );
 };
 
-// ── list variant (카테고리 세로 스택 카드) ────────────────────
-const ListCard = ({ content, priority }: Omit<ContentCardProps, "variant">) => {
+// ── list variant (세로형 그리드 카드 — 정방형 이미지) ─────────────
+const ListCard = ({
+  content,
+  priority,
+  size = "default",
+  showArrow = true,
+}: Omit<ContentCardProps, "variant">) => {
   const config = CATEGORY_CONFIG[content.category];
 
+  const cardWidth = size === "featured" ? "lg:w-[260px]" : "lg:w-[230px]";
+  const cardMaxWidth =
+    size === "featured" ? "lg:max-w-[260px]" : "lg:max-w-[230px]";
+  const mobileMaxWidth =
+    size === "featured" ? "max-w-[240px]" : "max-w-[280px]";
+
+  const titleSize =
+    size === "featured" && !showArrow
+      ? "text-[15px] lg:text-[18px]"
+      : size === "featured"
+        ? "text-[18px] lg:text-[24px]"
+        : "text-[15px] lg:text-[19px]";
+  const subtitleSize =
+    size === "featured" && !showArrow
+      ? "text-[11px] lg:text-[12px]"
+      : size === "featured"
+        ? "text-[12px] lg:text-[14px]"
+        : "text-[11px] lg:text-[13px]";
+  const minHeight =
+    size === "featured" && !showArrow
+      ? "min-h-[100px] lg:min-h-[110px]"
+      : "min-h-[150px] lg:min-h-[160px]";
+
   return (
-    <Link href={`/content/${content.id}`} className="group block">
-      <article className="flex flex-col overflow-hidden rounded-2xl border border-white/5 bg-surface/20 transition-all duration-300 hover:border-white/15 hover:shadow-md hover:-translate-y-1">
-        {/* 썸네일 — 가로형 이미지 자연스럽게 표시 */}
-        <div className="relative aspect-video w-full overflow-hidden">
+    <Link
+      href={`/content/${content.id}`}
+      className={`group block w-full ${cardWidth}`}
+    >
+      <article
+        className={`group flex w-full ${mobileMaxWidth} ${cardMaxWidth} flex-col overflow-hidden rounded-[10px] border border-[rgba(209,109,172,0.18)] bg-[rgba(20,20,38,0.72)]`}
+      >
+        {/* 정방형 썸네일 — 감정 오브젝트 */}
+        <div className="relative aspect-square shrink-0 overflow-hidden">
           {content.thumbnail_url ? (
             <Image
               src={content.thumbnail_url}
@@ -126,10 +188,10 @@ const ListCard = ({ content, priority }: Omit<ContentCardProps, "variant">) => {
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               priority={priority}
-              className="object-cover object-center"
+              className="object-cover object-center transition-opacity duration-300 group-hover:opacity-85"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-surface/60 to-surface/40">
+            <div className="absolute inset-0 bg-surface/40">
               <div
                 className={`absolute -right-6 -top-6 h-32 w-32 rounded-full border-2 ${config.ring}`}
               />
@@ -138,38 +200,49 @@ const ListCard = ({ content, priority }: Omit<ContentCardProps, "variant">) => {
               />
             </div>
           )}
+
+          {/* 카테고리 라벨 — 이미지 위 overlay */}
+          <span
+            className={`absolute top-2 left-2 rounded-[20px] px-2 py-1 text-[10px] font-medium ${config.categoryColor} ${config.categoryBg}`}
+          >
+            {config.label}
+          </span>
         </div>
 
-        {/* 텍스트 영역 */}
-        <div className="flex flex-col gap-2.5 px-4 py-4 sm:gap-3 sm:px-5 sm:py-5">
+        {/* 텍스트 패널 — divider + 화살표 포함 */}
+        <div
+          className={`relative flex ${minHeight} flex-1 flex-col border-t border-white/[0.06] px-4 pt-5 pb-5 lg:px-5 lg:py-5 lg:pt-5 lg:pb-5`}
+        >
           {/* 제목 */}
-          <h2 className="text-base font-nomal leading-snug tracking-tight text-highlight transition-colors group-hover:text-white sm:text-lg font-content-card">
+          <h2
+            className={`min-h-[40px] line-clamp-2 whitespace-pre-line font-medium leading-[1.45] ${titleSize}`}
+          >
             {content.title}
           </h2>
 
-          {/* 설명 */}
+          {/* 부제 */}
           {content.subtitle && (
-            <p className="line-clamp-2 text-sm leading-relaxed text-highlight/50 sm:text-base">
+            <p
+              className={`mt-2 line-clamp-2 whitespace-pre-line pr-9 leading-[1.55] text-highlight/45 ${subtitleSize}`}
+            >
               {content.subtitle}
             </p>
           )}
 
-          {/* 메타 정보 — 카테고리 · 소요시간
-          <div className="flex items-center gap-2.5 pt-1">
-            <span
-              className={`rounded-md px-2.5 py-1 text-[11px] font-semibold leading-none sm:text-[11px] ${config.badge}`}
-            >
-              {config.label}
-            </span>
-            {content.estimated_minutes && (
-              <>
-                <span className="text-highlight/15">·</span>
-                <span className="text-xs text-highlight/40">
-                  {content.estimated_minutes}분
-                </span>
-              </>
-            )}
-          </div> */}
+          {/* 화살표 — 카드 오른쪽 아래 고정 */}
+          {showArrow && (
+            <div className="absolute bottom-4 right-1.5 flex h-6 w-6 items-center justify-center transition-opacity duration-300 group-hover:opacity-50 lg:h-8 lg:w-8">
+              <svg
+                className="h-3 w-3 text-white/18 lg:h-3.5 lg:w-3.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          )}
         </div>
       </article>
     </Link>
@@ -181,10 +254,19 @@ const ContentCard = ({
   content,
   priority = false,
   variant = "carousel",
+  size = "default",
+  showArrow = true,
   showBadge = true,
 }: ContentCardProps) => {
   if (variant === "list") {
-    return <ListCard content={content} priority={priority} />;
+    return (
+      <ListCard
+        content={content}
+        priority={priority}
+        size={size}
+        showArrow={showArrow}
+      />
+    );
   }
   return (
     <CarouselCard content={content} priority={priority} showBadge={showBadge} />

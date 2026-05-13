@@ -1,49 +1,16 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 import { Content, CATEGORY_LABELS } from "@/lib/types/content";
-import { Heart, Lightbulb, Compass, Lock } from "lucide-react";
 
-/** 카테고리별 색상 */
-const CATEGORY_CONFIG: Record<
-  Content["category"],
-  { badge: string; button: string; buttonHover: string; glow: string }
-> = {
-  love: {
-    badge: "bg-accent/8 text-accent/70 border border-accent/15",
-    button: "bg-slate-600 text-white",
-    buttonHover: "hover:bg-slate-700",
-    glow: "from-accent/10",
-  },
-  relationship: {
-    badge: "bg-secondary/8 text-secondary/70 border border-secondary/15",
-    button: "bg-slate-600 text-white",
-    buttonHover: "hover:bg-slate-700",
-    glow: "from-secondary/10",
-  },
-  career: {
-    badge: "bg-highlight/6 text-highlight/60 border border-highlight/10",
-    button: "bg-slate-600 text-white",
-    buttonHover: "hover:bg-slate-700",
-    glow: "from-highlight/8",
-  },
-  emotion: {
-    badge: "bg-purple-400/8 text-purple-300/70 border border-purple-400/15",
-    button: "bg-slate-600 text-white",
-    buttonHover: "hover:bg-slate-700",
-    glow: "from-purple-400/10",
-  },
+const CATEGORY_CONFIG: Record<Content["category"], { glow: string }> = {
+  love: { glow: "from-accent/10" },
+  relationship: { glow: "from-secondary/10" },
+  career: { glow: "from-highlight/8" },
+  emotion: { glow: "from-purple-400/10" },
 };
-
-/** 인사이트 아이콘 매핑 */
-const INSIGHT_ICONS = [
-  <Compass key="compass" className="w-5 h-5" />,
-  <Heart key="heart" className="w-5 h-5" />,
-  <Lightbulb key="lightbulb" className="w-5 h-5" />,
-  <Lock key="lock" className="w-5 h-5" />,
-];
 
 interface ContentIntroProps {
   content: Content;
@@ -63,112 +30,228 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
   };
 
   return (
-    <div className="w-full max-w-full relative min-h-[calc(125vh-3.5rem)] overflow-x-hidden overflow-y-visible">
-      {/* SEO / 접근성용 제목 */}
-      <h1 className="sr-only">{content.title}</h1>
-      {content.subtitle && <p className="sr-only">{content.subtitle}</p>}
-
-      {/* 전체 블러 배경 */}
-      {content.thumbnail_url && (
-        <div className="absolute inset-0 w-full overflow-hidden">
-          <Image
-            src={content.thumbnail_url}
-            alt=""
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1024px"
-            className="scale-125 object-cover opacity-15 blur-3xl"
-            priority
-          />
-        </div>
-      )}
-
+    <div className="w-full max-w-full relative overflow-x-hidden">
+      {/* 배경 그래디언트 */}
       <div
         className={`absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-b ${config.glow} via-background/80 to-background`}
       />
 
-      <main className="relative z-10 mx-auto max-w-lg px-5 pb-12 pt-8">
-        {/* 썸네일 섹션 */}
-        <section className="mb-8">
-          <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-white/[0.04] shadow-2xl shadow-black/40">
-            {content.thumbnail_url ? (
-              <Image
-                src={content.thumbnail_url}
-                alt={content.title}
-                fill
-                sizes="(max-width: 640px) calc(100vw - 40px), 600px"
-                className="object-cover object-center"
-                priority
-              />
-            ) : (
-              <div className="absolute inset-0 bg-surface/50" />
-            )}
-          </div>
-        </section>
-
-        {/* 메인 콘텐츠 섹션 */}
-        <section>
-          {/* 카테고리 배지 */}
-          <div className="mb-6">
-            <span
-              className={`inline-block rounded-full px-4 py-1.5 text-xs font-semibold ${config.badge}`}
-            >
-              {CATEGORY_LABELS[content.category]}
-            </span>
-          </div>
-
-          {/* 제목 */}
-          <h2 className="mb-3 text-3xl font-bold leading-tight text-white">
-            {content.title}
-          </h2>
-
-          {/* Intro text (PRD 요구사항) */}
-          <p className="mb-8 text-base leading-relaxed text-white/70">
-            {content.subtitle || "이 흐름을 통해 알게 되는 진짜 감정"}
-          </p>
-
-          {/* 인사이트 카드들 */}
-          <div className="mb-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur">
-            <p className="mb-5 pb-4 border-b border-white/10 text-base font-semibold text-white">
-              이 흐름 안에서 보이는 것들
-            </p>
-            <div className="space-y-4">
-              {(content.insights ?? []).map((insight, i) => (
-                <div key={i} className="flex items-start gap-3 text-white/80">
-                  <div className="mt-1 shrink-0 text-accent/80">
-                    {INSIGHT_ICONS[i % INSIGHT_ICONS.length]}
-                  </div>
-                  <span className="text-sm leading-relaxed">{insight}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* CTA 버튼 */}
-          <button
-            onClick={handleStart}
-            disabled={loading}
-            className="w-full rounded-2xl py-4 text-base font-bold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+      <main className="relative z-10 w-full flex flex-col justify-between px-5 py-8 pb-50">
+        {/* 티켓 오브젝트 */}
+        <div className="flex-1 flex items-start pt-8">
+          {/* Ticket Wrapper with Texture Background */}
+          <div
+            className="relative w-[100%] max-w-[320px] mx-auto"
             style={{
-              background: loading
-                ? "rgba(255, 255, 255, 0.03)"
-                : "linear-gradient(135deg, rgba(180, 110, 160, 0.75) 0%, rgba(155, 95, 140, 0.75) 100%)",
-              border: loading
-                ? "1px solid rgba(255, 255, 255, 0.05)"
-                : "1px solid rgba(220, 150, 200, 0.35)",
-              color: "rgba(255, 255, 255, 0.9)",
-              boxShadow: loading
-                ? "none"
-                : "0 4px 16px rgba(180, 110, 160, 0.15)",
+              borderRadius: "12px",
+              overflow: "hidden",
             }}
           >
-            {loading ? "준비 중..." : "시작하기 →"}
-          </button>
+            {/* 미묘한 Grain Texture — CSS Gradient */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: `
+                  radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 24%),
+                  radial-gradient(circle at 80% 10%, rgba(209,109,172,0.06), transparent 28%),
+                  linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0))
+                `,
+              }}
+            />
+            {/* 상단 Section */}
+            <div
+              className="relative z-10 px-6 pt-3 pb-6 space-y-4"
+              style={{
+                border: "1.5px solid rgba(155, 123, 168, 0.4)",
+                borderBottom: "none",
+                borderRadius: "12px 12px 0 0",
+              }}
+            >
+              {/* VEIL Logo */}
+              <div className="text-center mb-4">
+                <span
+                  className="text-[9px] font-semibold uppercase tracking-[0.25em]"
+                  style={{ color: "rgba(155, 123, 168, 0.6)" }}
+                >
+                  V E I L
+                </span>
+              </div>
 
-          {/* 하단 설명 텍스트 */}
-          <p className="mt-6 text-center text-xs text-white/40">
-            이제, 진짜 마음을 들여다볼 차례야.
-          </p>
-        </section>
+              {/* 상단 Header — 이미지 + 제목/부제 */}
+              <div className="flex gap-3 items-start">
+                {/* 썸네일 */}
+                <div className="w-24 shrink-0">
+                  <div className="relative aspect-square overflow-hidden rounded-lg">
+                    {content.thumbnail_url ? (
+                      <Image
+                        src={content.thumbnail_url}
+                        alt={content.title}
+                        fill
+                        sizes="112px"
+                        priority
+                        className="object-cover object-center"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-surface/40" />
+                    )}
+                  </div>
+                </div>
+
+                {/* 제목/부제 */}
+                <div className="flex-1 pt-0.5">
+                  {/* 카테고리 배지 */}
+                  <div className="mb-2">
+                    <span className="text-[9px] font-semibold uppercase tracking-widest text-white/40">
+                      {CATEGORY_LABELS[content.category]}
+                    </span>
+                  </div>
+                  <h1 className="text-[16px] lg:text-[16px] font-medium leading-[1.3] text-white/80 mb-1 line-clamp-1">
+                    {content.title}
+                  </h1>
+                  {content.subtitle && (
+                    <p className="text-[12px] lg:text-[12px] leading-[1.4] text-white/55 line-clamp-2">
+                      {content.subtitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 절취선 */}
+            <div
+              className="relative"
+              style={{
+                height: "12px",
+                display: "flex",
+                alignItems: "center",
+                paddingLeft: "10px",
+                paddingRight: "10px",
+              }}
+            >
+              {/* 좌측 Diamond */}
+              <div
+                style={{
+                  position: "absolute",
+                  left: "-16px",
+                  width: "20px",
+                  height: "20px",
+                  transform: "rotate(45deg)",
+                  border: "1.5px solid rgba(155, 123, 168, 0.4)",
+                  borderBottom: "2px solid transparent",
+                  borderLeft: "2px solid transparent",
+                  pointerEvents: "none",
+                }}
+              />
+
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    flex: 1,
+                    height: "1px",
+                    backgroundImage:
+                      "repeating-linear-gradient(90deg, rgba(155, 123, 168, 0.4) 0px, rgba(155, 123, 168, 0.4) 4px, transparent 4px, transparent 10px)",
+                  }}
+                />
+                <span
+                  className="text-[7px] font-semibold uppercase tracking-[0.2em] whitespace-nowrap"
+                  style={{ color: "rgba(155, 123, 168, 0.6)" }}
+                >
+                  FLOW PREVIEW
+                </span>
+                <div
+                  style={{
+                    flex: 1,
+                    height: "1px",
+                    backgroundImage:
+                      "repeating-linear-gradient(90deg, rgba(155, 123, 168, 0.4) 0px, rgba(155, 123, 168, 0.4) 4px, transparent 4px, transparent 10px)",
+                  }}
+                />
+              </div>
+
+              {/* 우측 Diamond */}
+              <div
+                style={{
+                  position: "absolute",
+                  right: "-16px",
+                  width: "20px",
+                  height: "20px",
+                  transform: "rotate(45deg)",
+                  border: "1.5px solid rgba(155, 123, 168, 0.4)",
+                  borderTop: "2px solid transparent",
+                  borderRight: "2px solid transparent",
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
+
+            {/* 하단 Section */}
+            <div
+              className="relative z-10 px-6 pt-4 pb-6"
+              style={{
+                borderLeft: "1.5px solid rgba(155, 123, 168, 0.4)",
+                borderRight: "1.5px solid rgba(155, 123, 168, 0.4)",
+
+                borderRadius: "0 0 12px 20px",
+              }}
+            >
+              {/* Teaser — 티켓 정보 영역 */}
+              {content.insights && content.insights.length > 0 && (
+                <div className="space-y-5 pt-4 pb-3">
+                  {content.insights.map((insight, i) => (
+                    <div key={i} className="flex flex-col gap-2 pl-2">
+                      <span className="text-[9px] font-semibold text-white/30 uppercase tracking-[0.18em]">
+                        FLOW {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <p className="text-[13px] lg:text-[13px] leading-[1] text-white/75">
+                        {insight}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* CTA 영역 */}
+            <div className="w-[100%] max-w-[320px] mx-auto pb-12">
+              <button
+                onClick={handleStart}
+                disabled={loading}
+                className="w-full py-6 text-base font-medium transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                style={{
+                  borderRadius: "12px",
+                  background: loading
+                    ? "rgba(255, 255, 255, 0.02)"
+                    : "linear-gradient(135deg, rgba(155, 123, 168, 0.233) 0%, rgba(117, 65, 116, 0.841) 100%)",
+                  borderTop: loading
+                    ? "1.5px dashed rgba(155, 123, 168, 0.15)"
+                    : "1.5px dashed rgba(155, 123, 168, 0.4)",
+                  borderLeft: loading
+                    ? "1.5px solid rgba(155, 123, 168, 0.2)"
+                    : "1.5px solid rgba(155, 123, 168, 0.4)",
+                  borderRight: loading
+                    ? "1.5px solid rgba(155, 123, 168, 0.2)"
+                    : "1.5px solid rgba(155, 123, 168, 0.4)",
+                  borderBottom: loading
+                    ? "1.5px solid rgba(155, 123, 168, 0.2)"
+                    : "1.5px solid rgba(155, 123, 168, 0.4)",
+                  color: "rgba(255, 255, 255, 0.85)",
+                  boxShadow: loading
+                    ? "none"
+                    : "inset 0 1px 2px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(155, 123, 168, 0.08)",
+                }}
+              >
+                {loading ? "준비 중..." : "시작하기"}
+              </button>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
