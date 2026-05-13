@@ -65,10 +65,12 @@ const CategorySelectSheet = ({ isOpen, onClose }: CategorySelectSheetProps) => {
 
       {/* 바텀 시트 */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] bg-gradient-to-t from-[rgba(20,20,38,0.95)] to-[rgba(28,28,50,0.90)] transition-transform duration-300 ${
+        className={`fixed bottom-0 left-0 right-0 z-50 flex justify-center max-h-[85vh] transition-transform duration-300 ${
           isOpen ? "translate-y-0" : "translate-y-full"
         }`}
       >
+        <div className="w-full max-w-[500px] bg-gradient-to-t from-[rgba(20,20,38,0.95)] to-[rgba(28,28,50,0.90)] rounded-t-3xl">
+
         {/* 그래브 바 */}
         <div className="flex justify-center pt-4 pb-2">
           <div className="h-1 w-12 rounded-full bg-white/10" />
@@ -182,6 +184,7 @@ const CategorySelectSheet = ({ isOpen, onClose }: CategorySelectSheetProps) => {
 
           {/* 패딩 (하단 스페이스) */}
           <div className="h-8" />
+        </div>
         </div>
       </div>
     </>

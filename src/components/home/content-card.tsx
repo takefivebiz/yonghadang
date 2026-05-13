@@ -178,7 +178,7 @@ const ListCard = ({
       className={`group block w-full ${cardWidth}`}
     >
       <article
-        className={`group flex w-full ${mobileMaxWidth} ${cardMaxWidth} flex-col overflow-hidden rounded-[10px] border border-[rgba(209,109,172,0.18)]`}
+        className={`group flex w-full ${mobileMaxWidth} ${cardMaxWidth} flex-col overflow-hidden rounded-[10px] border border-[rgba(209,109,172,0.12)]`}
       >
         {/* 정방형 썸네일 — 감정 오브젝트 */}
         <div className="relative aspect-square shrink-0 overflow-hidden">

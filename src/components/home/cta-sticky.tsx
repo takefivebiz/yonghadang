@@ -9,10 +9,10 @@ const CTASticky = () => {
   return (
     <>
       <div className="fixed bottom-0 left-0 right-0 z-30">
-        <div className="mx-auto max-w-screen-lg px-4 py-4">
+        <div className="mx-auto max-w-screen-lg px-4 py-4 flex justify-center">
           <button
             onClick={() => setIsSheetOpen(true)}
-            className="group flex w-full items-center gap-3 rounded-3xl rounded-bl-none border border-white/10 bg-black/30 backdrop-blur-sm px-5 py-3 text-left transition-all duration-200 hover:border-accent/30 hover:bg-black/30"
+            className="group flex w-full max-w-[500px] items-center gap-3 rounded-3xl rounded-bl-none border border-white/10 bg-black/30 backdrop-blur-sm px-5 py-3 text-left transition-all duration-200 hover:border-accent/30 hover:bg-black/30"
           >
             <span className="text-lg shrink-0">✨</span>
             <span className="flex-1 text-sm font-nomal text-white/90">
