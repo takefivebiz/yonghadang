@@ -49,7 +49,7 @@ const AiBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
         }}
       >
         <p
-          className="text-sm leading-relaxed"
+          className="text-sm leading-relaxed whitespace-pre-line"
           style={{
             color: "rgba(249, 249, 229, 0.80)",
             fontSize: "14px",

@@ -152,12 +152,28 @@ VEIL은 사용자의 감정·관계·직업 상황을 해석하는 서비스다.
 
 ## 출력 규칙
 - 반드시 JSON만 출력한다. 마크다운 코드블록('''json) 없이 순수 JSON만.
+- ⚠️ messages.text에는 순수 텍스트만 포함. 절대 마크다운/코드블록 금지:
+  * \`\`\`txt, \`\`\`markdown, \`\`\` 같은 fenced code block 금지
+  * 줄바꿈은 일반 \\n만 사용 (백틱이나 코드블록 문법 사용 금지)
+
+### ai 메시지 (모든 scene)
+- 기본은 한 줄로 이어진 형태
+- 긴 메시지(90자 이상)에서는 의미 단위로 줄바꿈(\n) 가능
+- 감정/호흡이 바뀌는 지점에서 끊기 (모든 긴 메시지를 억지로 줄바꿈하지 말 것)
+- 예: "확신을 받고 싶은 마음 뒤에는,\n사실 안정감에 대한 욕구가 있어."
 
 ### 무료 Scene (is_free: true)
 - messages 3~4개
 - 짧고 명확하게. 현재 상태를 직관적으로 전달.
 - **메시지 간에도 자연스러운 흐름이 있어야 한다.** 앞 메시지를 받아주며 이어가되, 간결성을 유지할 것.
 - type 비율: ai 70% / punch 20% / memo 10%
+- **마지막 메시지 (매우 중요):**
+  * "설명 완료"로 끝나지 말 것
+  * 새로운 층위/질문/관점을 열어야 한다
+  * 다음 유료 scene으로 자연스럽게 진행되는 느낌
+  * 예: "근데 여기서 진짜 봐야 할 건, 왜 너는 아직 이 애매함을 못 놓고 있느냐야."
+  * 예: "문제는 상대보다, 네가 아직 이 가능성을 놓지 못하고 있다는 거야."
+  * 사용자가 "그 다음은?" "더 깊이 들어가고 싶은" 마음이 생기게 할 것
 
 ### 유료 Scene (is_free: false) - 반드시 더 깊게
 - messages **최소 5개 이상**
@@ -198,6 +214,22 @@ VEIL은 사용자의 감정·관계·직업 상황을 해석하는 서비스다.
 - 상대가 애매하게 행동하면, 너는 그걸 그냥 넘기지 못해.
 - 문제는 그 다음이야. 그 작은 반응 하나가 기준이 되고, 그 기준에 맞지 않는 순간부터 마음이 흔들리기 시작해.
 - 그래서 이 관계는 상대가 뭘 했는지보다, 네가 그걸 어떻게 붙잡고 있는지가 더 중요해져.
+
+## 무료 → 유료 Scene 전환 (프로그레션)
+**무료 scene이 끝나고 유료 scene이 새로 시작하는 느낌이 아니어야 한다.**
+**각 무료 scene의 마지막 메시지는 다음 유료 scene을 자연스럽게 불러와야 한다.**
+
+규칙:
+- 무료 scene 2의 마지막 메시지는 다음 유료 scene 3의 주제를 암시
+- 현재 상태 설명을 넘어, 새로운 질문/관점/층위를 열어주기
+- 사용자가 "더 알고 싶다" "깊이 들어가야 한다"는 자연스러운 욕구 유발
+- 감정 흐름이 끊기지 않고 progression으로 느껴지도록
+
+예시:
+- 무료 2가 "패턴 발견"에서 끝나면
+  → 유료 3은 "그 패턴의 본질 이해"로 이어진다
+- 무료 2의 마지막: "근데 이 패턴 뒤에 있는 진짜 이유는 뭘까?"
+- 유료 3의 첫 메시지: "그건 이 부분을 봐야 해..."
 
 ## 출력 포맷
 {
@@ -240,6 +272,15 @@ ${sceneInstructions}
   return { system, userMessage };
 };
 
+// message.text 정제 (마크다운/코드블록 제거)
+const sanitizeMessageText = (text: string): string => {
+  // 줄 시작의 "txt ", "markdown " 등 제거
+  let sanitized = text.replace(/^(txt|markdown|json|code)\s+/gm, "");
+  // 코드블록 제거
+  sanitized = sanitized.replace(/^```[\s\S]*?```$/gm, "");
+  return sanitized.trim();
+};
+
 /**
  * Claude 응답 JSON 문자열을 파싱한다.
  * Claude가 JSON 앞뒤에 텍스트를 추가하거나 코드블록으로 감싸는 경우도 처리한다.
@@ -259,7 +300,7 @@ export const parseClaudeResult = (raw: string): ClaudeGeneratedResult => {
       throw new Error("Claude 응답에 scenes 배열이 없습니다");
     }
 
-    // 각 scene의 필수 필드 검증
+    // 각 scene의 필수 필드 검증 및 text 정제
     for (const scene of parsed.scenes) {
       if (typeof scene.scene_index !== "number") {
         throw new Error(
@@ -270,6 +311,10 @@ export const parseClaudeResult = (raw: string): ClaudeGeneratedResult => {
         throw new Error(
           `scene ${scene.scene_index}의 messages가 배열이 아닙니다`,
         );
+      }
+      // 각 message의 text 정제
+      for (const msg of scene.messages) {
+        msg.text = sanitizeMessageText(msg.text);
       }
     }
 
