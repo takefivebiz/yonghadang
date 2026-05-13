@@ -70,11 +70,10 @@ const PunchBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
   return (
     <div className={`${verticalMargin} px-4 text-center`}>
       <p
-        className="font-punch "
+        className="font-punch whitespace-pre-line"
         style={{
           /* 충분한 가독성과 배경과의 조화 */
           color: "rgba(209, 109, 172, 0.653)",
-          whiteSpace: "pre-line",
           fontSize: "15px",
           lineHeight: "1.6",
           fontWeight: "500",
@@ -186,13 +185,13 @@ const SceneContent = ({
       }}
     >
       {/* Scene 제목 및 상태 */}
-      <div className="mb-4 flex gap-3">
+      <div className="mb-8 flex gap-3">
         {/* Subtle vertical marker */}
         <div
           className="w-px flex-shrink-0 self-start"
           style={{
             background: "rgba(209, 109, 172, 0.392)",
-            minHeight: "80px",
+            minHeight: "55px",
           }}
         />
 
@@ -226,7 +225,7 @@ const SceneContent = ({
           </div>
 
           <h2
-            className="text-xl font-normal leading-relaxed"
+            className="text-lg font-normal leading-relaxed whitespace-pre-line"
             style={{
               color: "rgba(249, 249, 229, 0.80)",
               letterSpacing: "-0.01em",
@@ -234,19 +233,6 @@ const SceneContent = ({
           >
             {scene.scene_title}
           </h2>
-
-          {scene.intro && (
-            <p
-              className="leading-relaxed mt-1.5 mb-4"
-              style={{
-                color: "rgba(249, 249, 229, 0.28)",
-                fontSize: "13px",
-                lineHeight: "1.6",
-              }}
-            >
-              {scene.intro}
-            </p>
-          )}
         </div>
       </div>
 

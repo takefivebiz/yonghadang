@@ -22,6 +22,15 @@ type Stage =
   | "correction_questions"
   | "completing";
 
+interface BubbleState {
+  status: "hidden" | "past" | "current" | "future";
+  opacity: number;
+  scale: number;
+  translateY: number;
+  filter: string;
+  animation: string;
+}
+
 // ── Debug flag: generate loading 화면만 고정으로 보기 (개발용) ──────────────────
 // .env.local에 NEXT_PUBLIC_FORCE_GENERATE_LOADING=true로 설정하면 활성화
 // 실제 generate 호출 없이 loading 화면만 표시함
@@ -292,28 +301,15 @@ const AnalyzePage = ({ params }: PageProps) => {
   };
 
   // ── Bubble Progression Rendering ────────────────────────────────────────────
-  // 각 버블의 상태를 currentBubbleIndex 기준으로 계산
-  const getBubbleState = (index: number) => {
-    const diff = index - currentBubbleIndex;
-
-    if (diff < -2 || diff > 2) return null; // 보이지 않음
-
+  // 현재 버블 기준으로 이전/현재/다음만 렌더링 (최대 3개)
+  const getBubbleState = (diff: number): BubbleState => {
     switch (diff) {
-      case -2: // 먼 과거
-        return {
-          status: "past" as const,
-          opacity: 0.05,
-          scale: 0.90,
-          translateY: -12,
-          filter: "blur(2px)",
-          animation: "none",
-        };
-      case -1: // 과거
+      case -1: // 이전
         return {
           status: "past" as const,
           opacity: 0.22,
           scale: 0.94,
-          translateY: -6,
+          translateY: 0,
           filter: "none",
           animation: "none",
         };
@@ -326,22 +322,22 @@ const AnalyzePage = ({ params }: PageProps) => {
           filter: "none",
           animation: "bubblePulse 3s ease-in-out infinite",
         };
-      case 1: // 미래
+      case 1: // 다음
         return {
           status: "future" as const,
           opacity: 0.12,
           scale: 0.94,
-          translateY: 8,
-          filter: "blur(1px)",
+          translateY: 0,
+          filter: "blur(0.8px)",
           animation: "none",
         };
-      case 2: // 먼 미래
+      default:
         return {
-          status: "future" as const,
-          opacity: 0.03,
-          scale: 0.90,
-          translateY: 16,
-          filter: "blur(2px)",
+          status: "hidden" as const,
+          opacity: 0,
+          scale: 0.9,
+          translateY: 0,
+          filter: "none",
           animation: "none",
         };
     }
@@ -351,19 +347,56 @@ const AnalyzePage = ({ params }: PageProps) => {
     <div className="min-h-screen bg-background flex justify-center">
       {/* 완료 화면: Bubble Progression */}
       {stage === "completing" && (
-        <div className="flex min-h-screen w-full max-w-lg flex-col items-center justify-start pt-40 px-4 transition-all duration-700">
+        <div className="flex min-h-screen w-full max-w-lg flex-col items-center justify-center px-4 transition-all duration-700">
           <div
             style={{
               animation: "fadeIn 600ms ease-out",
             }}
           >
-            {/* 버블 progression: 실제 채팅처럼 올라가는 느낌 */}
-            <div className="w-[220px] mx-auto flex flex-col gap-4 mb-10">
-              {LOADING_BUBBLES.map((text, index) => {
-                const state = getBubbleState(index);
-                if (!state) return null;
+            {/* Progress Bar: 보조 요소 */}
+            <div className="w-[200px] mx-auto mb-8">
+              <div
+                className="relative h-1 rounded-full overflow-visible"
+                style={{ background: "rgba(249, 249, 229, 0.15)" }}
+              >
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${progress}%`,
+                    background: "rgba(209, 109, 172, 0.5)",
+                    transitionDuration: progress > 85 ? "2000ms" : "300ms",
+                  }}
+                />
 
-                const isCurrent = state.status === "current";
+                {/* Flow point at the end of progress */}
+                <div
+                  className="absolute top-1/2 rounded-full"
+                  style={{
+                    width: "5px",
+                    height: "5px",
+                    left: `${progress}%`,
+                    transform: "translate(-50%, -50%)",
+                    background: "rgba(209, 109, 172, 0.6)",
+                    boxShadow: "0 0 8px rgba(209, 109, 172, 0.15)",
+                    animation: "flowPulse 2.5s ease-in-out infinite",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 버블 progression: 현재 기준 ±1 최대 3개만 렌더링 */}
+            <div className="w-[240px] mx-auto mt-10 flex flex-col gap-3 mb-10">
+              {[
+                currentBubbleIndex - 1,
+                currentBubbleIndex,
+                currentBubbleIndex + 1,
+              ]
+                .filter((i) => i >= 0 && i < LOADING_BUBBLES.length)
+                .map((index) => {
+                  const text = LOADING_BUBBLES[index];
+                  const diff = index - currentBubbleIndex;
+                  const state = getBubbleState(diff);
+                  const isCurrent = state.status === "current";
 
                 return (
                   <div
@@ -374,7 +407,7 @@ const AnalyzePage = ({ params }: PageProps) => {
                       filter: state.filter,
                       animation: state.animation,
                       transition:
-                        "all 1200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                        "all 1800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
                     }}
                     className="flex justify-start"
                   >
@@ -431,37 +464,6 @@ const AnalyzePage = ({ params }: PageProps) => {
                   </div>
                 );
               })}
-            </div>
-
-            {/* Progress Bar: 보조 요소 */}
-            <div className="w-[200px] mx-auto">
-              <div
-                className="relative h-0.5 rounded-full overflow-visible"
-                style={{ background: "rgba(249, 249, 229, 0.06)" }}
-              >
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${progress}%`,
-                    background: "rgba(209, 109, 172, 0.5)",
-                    transitionDuration: progress > 85 ? "2000ms" : "300ms",
-                  }}
-                />
-
-                {/* Flow point at the end of progress */}
-                <div
-                  className="absolute top-1/2 rounded-full"
-                  style={{
-                    width: "5px",
-                    height: "5px",
-                    left: `${progress}%`,
-                    transform: "translate(-50%, -50%)",
-                    background: "rgba(209, 109, 172, 0.6)",
-                    boxShadow: "0 0 8px rgba(209, 109, 172, 0.15)",
-                    animation: "flowPulse 2.5s ease-in-out infinite",
-                  }}
-                />
-              </div>
             </div>
           </div>
 

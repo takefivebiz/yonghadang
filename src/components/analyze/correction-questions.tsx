@@ -161,7 +161,7 @@ const CorrectionQuestions = ({
                     borderRadius: "14px 14px 0px 14px",
                   }}
                 >
-                  <span className="text-xs sm:text-sm">{option.label}</span>
+                  <span className="text-sm">{option.label}</span>
                 </button>
               );
             })}

@@ -13,8 +13,8 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
     scenes: [
       {
         index: 1,
-        title: "왜 자꾸 마음을 확인하고 싶어지는지",
-        intro: "확신이 없으니까 몸이 먼저 움직이고 있었어.",
+        title: "왜 자꾸 마음을 확인하고 싶어질까?",
+        intro: "확신이 없으니까, 확인하게 되지",
         role: "state_awareness",
         goal: "사용자가 상대 마음을 확인하려는 현재 상태를 장면처럼 보여준다. 아직 이유를 깊게 파고들지 않는다.",
         focus: [
@@ -32,8 +32,8 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
       },
       {
         index: 2,
-        title: "사소한 반응 하나에도 의미를 찾게 되는 이유",
-        intro: "그 신호들을 자꾸 모으게 되고, 혼자 의미를 더하고 있었어.",
+        title: "사소한 반응에도 \n 의미를 찾게 되는 이유",
+        intro: "-",
         role: "pattern_capture",
         goal: "사용자가 상대의 작은 반응을 계속 해석하게 되는 반복 행동을 보여준다. 현재 상태 설명을 반복하지 않는다.",
         focus: [
@@ -51,7 +51,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
       },
       {
         index: 3,
-        title: "확신이 없는데도 계속 기대하게 되는 이유",
+        title: "확신이 없는데도 \n 계속 기대하게 되는 이유",
         intro: "불안할수록 기대를 놓지 못하게 되고 있었어.",
         role: "attachment_to_possibility",
         goal: "확신이 부족한데도 관계를 놓지 못하는 이유를 보여준다. 핵심은 상대가 아니라 가능성에 묶이는 상태다.",
@@ -70,7 +70,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
       },
       {
         index: 4,
-        title: "지금처럼 기다리기만 하면 어떻게 될지",
+        title: "지금처럼 기다리기만 하면 \n 어떻게 될까",
         intro: "이 흐름이 계속되면 감정이 어떻게 흘러갈까.",
         role: "future_flow",
         goal: "현재처럼 기다리고 해석하는 흐름이 계속될 때 감정이 어떻게 소모되는지 보여준다.",
@@ -89,7 +89,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
       },
       {
         index: 5,
-        title: "내가 원하는 게 이 사람인지, 확신받는 감정인지",
+        title: "내가 원하는 게 이 사람인지, \n 확신받는 감정인지",
         intro: "사실은 그 사람보다 다른 것을 원하고 있었을 수도 있어.",
         role: "perspective_shift",
         goal: "질문을 상대의 마음에서 사용자의 욕구로 전환한다. 이 scene에서 관점이 반드시 바뀌어야 한다.",
