@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import {
-  buildGenerateResultPrompt,
+  buildFreeGeneratePrompt,
+  buildPaidGeneratePrompt,
   parseClaudeResult,
   mapClaudeToResultScenes,
   ClaudeGeneratedResult,
   UserInputPayload,
+  FreeSceneContext,
 } from "@/lib/prompts/generate-result";
 import { SceneConfig } from "@/lib/types/content";
-import { ResultScene } from "@/lib/types/result";
+import { ResultScene, SceneMessage } from "@/lib/types/result";
 
 // TODO: [백엔드 연동] Supabase service_role 클라이언트로 세션·콘텐츠 조회로 교체
 
@@ -29,6 +31,7 @@ export interface GenerateRequestBody {
   user_input: UserInputPayload;
   scene_config: SceneConfig;
   scene_indexes?: number[];  // 선택적: 특정 scenes만 생성. 기본값은 전체
+  free_scene_context?: FreeSceneContext;  // 유료 scene 생성 시 필요: 무료 scene의 마지막 메시지
 }
 
 export interface GenerateResponseBody {
@@ -63,7 +66,7 @@ export const POST = async (
 
   try {
     const body = (await req.json()) as GenerateRequestBody;
-    const { content_title, category, user_input, scene_config, scene_indexes } = body;
+    const { content_title, category, user_input, scene_config, scene_indexes, free_scene_context } = body;
 
     if (!content_title || !category || !user_input || !scene_config) {
       return NextResponse.json(
@@ -86,25 +89,63 @@ export const POST = async (
       );
     }
 
-    // scene_indexes가 있으면 유효성 검사
-    if (scene_indexes && Array.isArray(scene_indexes)) {
+    // scene_indexes가 있으면 유효성 검사 및 무료/유료 판단
+    let sceneIndexesToUse = scene_indexes || scene_config.scenes.map(s => s.index);
+    let hasAnyPaidScene = false;
+
+    if (Array.isArray(sceneIndexesToUse)) {
       const validIndexes = scene_config.scenes.map(s => s.index);
-      const invalidIndexes = scene_indexes.filter(i => !validIndexes.includes(i));
+      const invalidIndexes = sceneIndexesToUse.filter(i => !validIndexes.includes(i));
       if (invalidIndexes.length > 0) {
         return NextResponse.json(
           { error: `유효하지 않은 scene_index: ${invalidIndexes.join(", ")}` },
           { status: 400 }
         );
       }
+
+      // 유료 scene이 있는지 확인
+      hasAnyPaidScene = sceneIndexesToUse.some(idx => {
+        const scene = scene_config.scenes.find(s => s.index === idx);
+        return scene && !scene.is_free;
+      });
     }
 
-    const { system, userMessage } = buildGenerateResultPrompt({
-      contentTitle: content_title,
-      category,
-      userInput: user_input,
-      sceneConfig: scene_config,
-      sceneIndexes: scene_indexes,
-    });
+    // 유료 scene 생성 시 context 검증
+    if (hasAnyPaidScene && !free_scene_context) {
+      return NextResponse.json(
+        { error: "유료 scene 생성 시 free_scene_context가 필수입니다" },
+        { status: 400 }
+      );
+    }
+
+    // 무료/유료 구분해서 prompt 생성
+    let system: string;
+    let userMessage: string;
+
+    if (hasAnyPaidScene) {
+      // 유료 scene 생성
+      const promptResult = buildPaidGeneratePrompt({
+        contentTitle: content_title,
+        category,
+        userInput: user_input,
+        sceneConfig: scene_config,
+        sceneIndexes: sceneIndexesToUse,
+        freeSceneContext: free_scene_context!,
+      });
+      system = promptResult.system;
+      userMessage = promptResult.userMessage;
+    } else {
+      // 무료 scene 생성
+      const promptResult = buildFreeGeneratePrompt({
+        contentTitle: content_title,
+        category,
+        userInput: user_input,
+        sceneConfig: scene_config,
+        sceneIndexes: sceneIndexesToUse,
+      });
+      system = promptResult.system;
+      userMessage = promptResult.userMessage;
+    }
 
     // 기본 모델: claude-sonnet-4-6 (ANTHROPIC_MODEL env로 오버라이드 가능)
     // scenes가 8개 이상이거나 품질 이슈 발생 시 claude-opus-4-7로 교체 검토.

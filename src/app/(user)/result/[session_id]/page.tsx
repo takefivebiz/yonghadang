@@ -249,7 +249,20 @@ const ResultPage = ({ params }: PageProps) => {
           };
         });
 
-      // API 호출: paid scenes만 생성
+      // 무료 scene context 추출 (유료 prompt에 포함할 정보)
+      const freeScenes = scenes.filter((s) => s.is_free);
+      const lastFreeScene = freeScenes[freeScenes.length - 1];
+
+      if (!lastFreeScene?.messages) {
+        throw new Error("무료 scene 메시지를 찾을 수 없어");
+      }
+
+      const freeSceneContext = {
+        sceneTitle: lastFreeScene.scene_title,
+        lastMessages: lastFreeScene.messages.slice(-2), // 마지막 1~2개 메시지
+      };
+
+      // API 호출: paid scenes만 생성 (무료 context 포함)
       const res = await fetch(
         `/api/analyze/${analyzeData.session_id}/generate`,
         {
@@ -264,6 +277,7 @@ const ResultPage = ({ params }: PageProps) => {
             },
             scene_config: sceneConfig,
             scene_indexes: paidSceneIndexes,
+            free_scene_context: freeSceneContext, // 유료 prompt 생성용
           }),
         },
       );
