@@ -3,6 +3,7 @@ import MiniHero from "@/components/home/mini-hero";
 import TrendingSection from "@/components/home/trending-section";
 import CategoryTabsSticky from "@/components/home/category-tabs-sticky";
 import ContentSection from "@/components/home/content-section";
+import CTASticky from "@/components/home/cta-sticky";
 import { DUMMY_CONTENTS, TRENDING_CONTENTS } from "@/lib/data/dummy-contents";
 import { Category } from "@/lib/types/content";
 
@@ -37,25 +38,30 @@ const HomePage = () => {
   );
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden mx-auto max-w-screen-lg pb-20">
-      {/* 미니히어로 */}
-      <MiniHero />
+    <>
+      <div className="w-full max-w-full overflow-x-hidden mx-auto max-w-screen-lg pb-28">
+        {/* 미니히어로 */}
+        <MiniHero />
 
-      {/* 트렌딩 섹션 */}
-      <TrendingSection contents={TRENDING_CONTENTS} />
+        {/* 트렌딩 섹션 */}
+        <TrendingSection contents={TRENDING_CONTENTS} />
 
-      {/* 카테고리 탭 — Navbar 바로 아래 고정 (스크롤 감지로 배경 동적 변경) */}
-      <CategoryTabsSticky />
+        {/* 카테고리 탭 — Navbar 바로 아래 고정 (스크롤 감지로 배경 동적 변경) */}
+        <CategoryTabsSticky />
 
-      {/* 카테고리별 콘텐츠 섹션 */}
-      {CATEGORY_ORDER.map((category) => (
-        <ContentSection
-          key={category}
-          category={category}
-          contents={contentsByCategory[category]}
-        />
-      ))}
-    </div>
+        {/* 카테고리별 콘텐츠 섹션 */}
+        {CATEGORY_ORDER.map((category) => (
+          <ContentSection
+            key={category}
+            category={category}
+            contents={contentsByCategory[category]}
+          />
+        ))}
+      </div>
+
+      {/* CTA 스티키 — 하단 고정 */}
+      <CTASticky />
+    </>
   );
 };
 

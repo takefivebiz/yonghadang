@@ -34,7 +34,7 @@ const ContentSection = ({ category, contents }: ContentSectionProps) => {
         {/* 그리드 카드 목록 — 모바일 2열 / 태블릿 2열 / 데스크톱 3열 */}
         <div className="grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-10 lg:max-w-[960px] lg:mx-auto">
           {contents.map((content) => (
-            <ContentCard key={content.id} content={content} variant="list" />
+            <ContentCard key={content.id} content={content} variant="list" showBadge={false} />
           ))}
         </div>
       </div>

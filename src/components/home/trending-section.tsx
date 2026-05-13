@@ -20,7 +20,7 @@ const TrendingSection = ({ contents }: TrendingSectionProps) => {
           data-testid="trending-grid"
         >
           {contents.map((content) => (
-            <ContentCard key={content.id} content={content} variant="list" />
+            <ContentCard key={content.id} content={content} variant="list" showBadge={true} />
           ))}
         </div>
       </div>

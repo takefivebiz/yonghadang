@@ -7,10 +7,10 @@ import { Category, CATEGORY_LABELS } from "@/lib/types/content";
 
 // ── 카테고리 메타 정보 ────────────────────────────────────────────
 const CATEGORY_META: Record<Category, { description: string }> = {
-  love: { description: "연애의 감정과 관계 흐름을 해석합니다" },
-  relationship: { description: "사람과의 관계에서 생기는 패턴을 봅니다" },
-  career: { description: "일과 진로에서 오는 고민을 풀어냅니다" },
-  emotion: { description: "내 감정의 실체와 원인을 찾습니다" },
+  love: { description: "관계 안에서 흔들리는 마음을 해석해줄게" },
+  relationship: { description: "사람 사이에서 반복되는 감정을 읽어줄게" },
+  career: { description: "선택 앞에서 계속 망설이게 되는 이유를 알려줄게" },
+  emotion: { description: "마음 안에 남아있는 감정을 들여다볼게" },
 };
 
 const VALID_CATEGORIES: Category[] = [
@@ -61,7 +61,6 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
   const cat = category as Category;
   const label = CATEGORY_LABELS[cat];
-  const { description } = CATEGORY_META[cat];
 
   // TODO: [백엔드 연동] 더미데이터를 GET /api/contents?category={cat} 실제 호출로 교체
   const contents = DUMMY_CONTENTS.filter((c) => c.category === cat);
@@ -93,9 +92,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
             {label}
           </h1>
         </div>
-        <p className="pl-3.5 text-sm leading-relaxed text-highlight/45">
-          {description}
-        </p>
+
         <p className="mt-2 pl-3.5 text-xs text-highlight/25">
           총 {contents.length}개
         </p>
@@ -113,6 +110,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
                 content={content}
                 priority={index < 4}
                 variant="list"
+                showBadge={false}
               />
             </li>
           ))}

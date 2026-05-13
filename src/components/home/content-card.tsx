@@ -145,6 +145,7 @@ const ListCard = ({
   priority,
   size = "default",
   showArrow = true,
+  showBadge = false,
 }: Omit<ContentCardProps, "variant">) => {
   const config = CATEGORY_CONFIG[content.category];
 
@@ -177,7 +178,7 @@ const ListCard = ({
       className={`group block w-full ${cardWidth}`}
     >
       <article
-        className={`group flex w-full ${mobileMaxWidth} ${cardMaxWidth} flex-col overflow-hidden rounded-[10px] border border-[rgba(209,109,172,0.18)] bg-[rgba(20,20,38,0.72)]`}
+        className={`group flex w-full ${mobileMaxWidth} ${cardMaxWidth} flex-col overflow-hidden rounded-[10px] border border-[rgba(209,109,172,0.18)]`}
       >
         {/* 정방형 썸네일 — 감정 오브젝트 */}
         <div className="relative aspect-square shrink-0 overflow-hidden">
@@ -202,11 +203,13 @@ const ListCard = ({
           )}
 
           {/* 카테고리 라벨 — 이미지 위 overlay */}
-          <span
-            className={`absolute top-2 left-2 rounded-[20px] px-2 py-1 text-[10px] font-medium ${config.categoryColor} ${config.categoryBg}`}
-          >
-            {config.label}
-          </span>
+          {showBadge && (
+            <span
+              className={`absolute top-2 left-2 rounded-[20px] px-2 py-1 text-[10px] font-medium ${config.categoryColor} ${config.categoryBg}`}
+            >
+              {config.label}
+            </span>
+          )}
         </div>
 
         {/* 텍스트 패널 — divider + 화살표 포함 */}
@@ -233,7 +236,7 @@ const ListCard = ({
           {showArrow && (
             <div className="absolute bottom-4 right-1.5 flex h-6 w-6 items-center justify-center transition-opacity duration-300 group-hover:opacity-50 lg:h-8 lg:w-8">
               <svg
-                className="h-3 w-3 text-white/18 lg:h-3.5 lg:w-3.5"
+                className="h-3 w-3 text-white/30 lg:h-3.5 lg:w-3.5"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
@@ -265,6 +268,7 @@ const ContentCard = ({
         priority={priority}
         size={size}
         showArrow={showArrow}
+        showBadge={showBadge}
       />
     );
   }
