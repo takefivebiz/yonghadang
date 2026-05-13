@@ -147,27 +147,88 @@ export const POST = async (
       userMessage = promptResult.userMessage;
     }
 
+    // ── Max Tokens 동적 설정 ────────────────────────────────────────
+    // 무료는 짧고 빠르게, 유료는 충분히 깊게
+    let max_tokens: number;
+    if (hasAnyPaidScene) {
+      // 유료 scene 개수에 따라 동적 설정
+      const paidSceneCount = sceneIndexesToUse.filter(idx => {
+        const scene = scene_config.scenes.find(s => s.index === idx);
+        return scene && !scene.is_free;
+      }).length;
+
+      if (paidSceneCount >= 4) {
+        max_tokens = 8000; // 전체 유료 (4개 이상)
+      } else if (paidSceneCount > 1) {
+        max_tokens = 4000; // 일부 유료 (2~3개)
+      } else {
+        max_tokens = 3000; // 개별 유료 (1개)
+      }
+    } else {
+      max_tokens = 2000; // 무료만
+    }
+
+    console.log(
+      `[generate] max_tokens=${max_tokens}, scenes=${sceneIndexesToUse.length}, isPaid=${hasAnyPaidScene}`,
+    );
+
     // 기본 모델: claude-sonnet-4-6 (ANTHROPIC_MODEL env로 오버라이드 가능)
-    // scenes가 8개 이상이거나 품질 이슈 발생 시 claude-opus-4-7로 교체 검토.
     const model = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
-    const response = await anthropic.messages.create({
+    let response = await anthropic.messages.create({
       model,
-      max_tokens: 4096,
+      max_tokens,
       system,
       messages: [{ role: "user", content: userMessage }],
     });
 
-    const rawText =
+    let rawText =
       response.content[0].type === "text" ? response.content[0].text : "";
 
     if (!rawText) {
       throw new Error("Claude 응답이 비어있습니다");
     }
 
-    console.log(`[generate] Claude 원본 응답 길이: ${rawText.length}`);
-    console.log(`[generate] Claude 원본 응답 처음 500자:\n${rawText.slice(0, 500)}`);
+    console.log(
+      `[generate] Claude 응답 길이: ${rawText.length}, max_tokens: ${max_tokens}`,
+    );
+    console.log(`[generate] 응답 처음 500자:\n${rawText.slice(0, 500)}`);
+    console.log(`[generate] 응답 마지막 200자:\n${rawText.slice(-200)}`);
 
-    const rawResult = parseClaudeResult(rawText);
+    // ── Parse with Retry ────────────────────────────────────────
+    let rawResult: ClaudeGeneratedResult;
+    try {
+      rawResult = parseClaudeResult(rawText);
+    } catch (parseError) {
+      // JSON truncation 같은 경우 1회 재시도
+      console.warn(
+        `[generate] 첫 시도 파싱 실패 (원본 길이: ${rawText.length}). 재시도 중...`,
+        parseError,
+      );
+
+      // max_tokens를 20% 증가시켜서 재시도
+      const retryMaxTokens = Math.min(Math.floor(max_tokens * 1.2), 12000);
+      console.log(`[generate] retry: max_tokens ${max_tokens} → ${retryMaxTokens}`);
+
+      response = await anthropic.messages.create({
+        model,
+        max_tokens: retryMaxTokens,
+        system,
+        messages: [{ role: "user", content: userMessage }],
+      });
+
+      rawText =
+        response.content[0].type === "text" ? response.content[0].text : "";
+
+      if (!rawText) {
+        throw new Error("Claude 재시도 응답이 비어있습니다");
+      }
+
+      console.log(`[generate] 재시도 응답 길이: ${rawText.length}`);
+
+      // 재시도에서도 실패하면 error throw
+      rawResult = parseClaudeResult(rawText);
+      console.log(`[generate] 재시도 파싱 성공`);
+    }
 
     // carry_over를 제거하고 ResultScene[]로 변환 (scene_config의 intro 포함)
     const result_scenes = mapClaudeToResultScenes(

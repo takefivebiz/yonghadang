@@ -386,11 +386,15 @@ const sanitizeMessageText = (text: string): string => {
 };
 
 export const parseClaudeResult = (raw: string): ClaudeGeneratedResult => {
+  console.log(`[parseClaudeResult] 입력 문자열 길이: ${raw.length}`);
+
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     console.error("[parseClaudeResult] JSON을 찾을 수 없습니다. 원본 응답:", raw.slice(0, 500));
     throw new Error("Claude 응답에서 JSON을 찾을 수 없습니다");
   }
+
+  console.log(`[parseClaudeResult] 추출된 JSON 길이: ${jsonMatch[0].length}`);
 
   try {
     const parsed = JSON.parse(jsonMatch[0]) as ClaudeGeneratedResult;
@@ -398,6 +402,8 @@ export const parseClaudeResult = (raw: string): ClaudeGeneratedResult => {
     if (!Array.isArray(parsed.scenes)) {
       throw new Error("Claude 응답에 scenes 배열이 없습니다");
     }
+
+    console.log(`[parseClaudeResult] Scene 개수: ${parsed.scenes.length}`);
 
     for (const scene of parsed.scenes) {
       if (typeof scene.scene_index !== "number") {
@@ -415,10 +421,13 @@ export const parseClaudeResult = (raw: string): ClaudeGeneratedResult => {
       }
     }
 
+    console.log(`[parseClaudeResult] 파싱 성공`);
     return parsed;
   } catch (parseErr) {
     console.error("[parseClaudeResult] JSON 파싱 또는 검증 실패");
+    console.error("추출된 JSON 길이:", jsonMatch[0].length);
     console.error("추출된 JSON 첫 1000자:", jsonMatch[0].slice(0, 1000));
+    console.error("추출된 JSON 마지막 300자:", jsonMatch[0].slice(-300));
     console.error("파싱 에러:", parseErr);
     throw new Error(
       `Claude JSON 처리 실패: ${parseErr instanceof Error ? parseErr.message : "알 수 없는 에러"}`
