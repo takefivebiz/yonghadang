@@ -168,7 +168,7 @@ MiniHero → TrendingSection → CategoryTabs → ContentSection
 텍스트: 지금 많이 보는  
 구조: 카드 카드 카드 카드 → 가로 스크롤
 
-- 각 카드에 카테고리 뱃지
+- 각 카드에 카테고리 뱃지 표시 (list variant showBadge={true})
 
 ---
 
@@ -198,6 +198,11 @@ MiniHero → TrendingSection → CategoryTabs → ContentSection
 카테고리 이름 - 전체보기  
 카드 카드 카드 카드 카드 → 가로 스크롤
 
+**카드 설정:**
+
+- variant: "list"
+- showBadge: false (카테고리 배지 미표시)
+
 ---
 
 ### 카테고리 전체보기 페이지
@@ -214,8 +219,12 @@ MiniHero → TrendingSection → CategoryTabs → ContentSection
 **구성:**
 
 카테고리 제목  
-카테고리 설명  
 콘텐츠 피드 (세로 스택 카드)
+
+**카드 설정:**
+
+- variant: "list"
+- showBadge: false (카테고리 배지 미표시)
 
 **동작 방식:**
 
@@ -247,6 +256,14 @@ MiniHero → TrendingSection → CategoryTabs → ContentSection
 - 콘텐츠 피드 느낌의 카드 디자인
 - 모바일: 좁은 2열 그리드
 - 데스크톱: 여유있는 3열 그리드
+
+**디자인 업데이트:**
+
+- 텍스트 영역 배경: 투명 (흰색 배경 제거)
+- 보더 색상: 카테고리별 색상 유지, opacity 낮춤 (0.18 → 0.12)
+- 카테고리 배지: showBadge prop으로 조건부 표시
+  - Trending Section: showBadge={true}
+  - Category Page & ContentSection: showBadge={false}
 
 **공통:**
 
@@ -325,15 +342,59 @@ MiniHero → TrendingSection → CategoryTabs → ContentSection
 
 ---
 
-### CTA 버튼
+### CTA 버튼 (메인 페이지 하단 — 카테고리 진입 유도)
 
-CTA는 “결제”나 “테스트 시작” 느낌보다,
-흐름 안으로 들어가는 느낌을 우선한다.
+**목적:**
 
-사용 가능 예시:
+- 사용자가 현재 상태와 가장 가까운 카테고리에 쉽게 진입하도록 유도
 
-- 시작하기
-- 이 흐름 시작하기
+**텍스트:**
+
+- 진짜 나를 이해하는 3분, 지금 시작하기
+
+**위치 및 동작:**
+
+- 메인 페이지 하단 고정 (sticky)
+- 데스크탑: 최대 너비 제한 (max-w-[500px]), 가운데 정렬
+- 클릭 시 카테고리 선택 Bottom Sheet 열기
+
+**디자인:**
+
+- 버블 메시지 스타일 (rounded-3xl, 왼쪽 하단 뾰족함)
+- 배경: 다크톤 (bg-black/30), 블러 효과 (backdrop-blur-sm)
+- 보더: subtle (border-white/10), hover시 accent 색상
+- 이모지 + 텍스트 + 화살표 레이아웃
+
+---
+
+### 카테고리 선택 Bottom Sheet
+
+**목적:**
+
+- 사용자가 “지금 가장 신경 쓰이는 영역”을 자연스럽게 선택하도록 유도
+- 감정 진입 전 선택의 과정을 조용하고 자연스럽게 제공
+
+**구조:**
+
+1. 헤드라인: “지금, 어떤 부분이 가장 신경 쓰여?” (왼쪽 버블 메시지)
+2. 카테고리 선택지 4개 (오른쪽 버블 메시지)
+   - 아이콘 + 카테고리명 (한 줄)
+   - 설명 텍스트 (아래)
+3. 각 카테고리별 색상 반영
+
+**디자인:**
+
+- 채팅창처럼 보이는 버블 메시지 UI
+- 헤드라인: 왼쪽 버블 (시스템 메시지 느낌)
+- 선택지: 오른쪽 버블 (사용자 메시지 느낌)
+- 배경: gradient + 투명도 (from-[rgba(20,20,38,0.95)] to-[rgba(28,28,50,0.90)])
+- rounded-t-3xl로 위쪽만 둥글게
+- 데스크탑: 최대 너비 제한 (max-w-[500px]), 가운데 정렬
+
+**동작:**
+
+- 카테고리 선택 시 해당 `/category/[category]` page로 이동
+- Bottom Sheet 외부 클릭 시 닫기
 
 ---
 
@@ -347,9 +408,9 @@ CTA는 “결제”나 “테스트 시작” 느낌보다,
 
 ---
 
-### 동작
+### 동작 (콘텐츠 인트로 페이지 CTA)
 
-- CTA 버튼 클릭 시 세션을 생성한다.
+- 콘텐츠 선택 후 인트로 페이지에서 CTA 클릭 시 세션을 생성한다.
 - 프론트 구현 단계에서는 mock session을 생성한다.
 - 이후 백엔드 연동 시 `POST /api/analyze`로 실제 session을 생성한다.
 - 세션 생성 후 `/analyze/[session_id]`로 이동한다.
