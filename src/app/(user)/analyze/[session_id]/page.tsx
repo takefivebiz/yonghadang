@@ -244,6 +244,11 @@ const AnalyzePage = ({ params }: PageProps) => {
       const useMock = process.env.NEXT_PUBLIC_USE_MOCK_RESULT !== "false";
 
       if (!useMock) {
+        // 무료 scenes만 생성 (결제 전 빠른 로딩)
+        const freeSceneIndexes = sceneConfig.scenes
+          .filter((s) => s.is_free)
+          .map((s) => s.index);
+
         // 실제 Claude generate 호출
         const res = await fetch(
           `/api/analyze/${finalData.session_id}/generate`,
@@ -258,6 +263,7 @@ const AnalyzePage = ({ params }: PageProps) => {
                 answers: userAnswers,
               },
               scene_config: sceneConfig,
+              scene_indexes: freeSceneIndexes,
             }),
           },
         );
@@ -274,10 +280,10 @@ const AnalyzePage = ({ params }: PageProps) => {
           result_scenes: ResultScene[];
         };
 
-        // scenes 캐시 저장 (리다이렉트 후 재생성 방지)
+        // free scenes 캐시 저장 (나중에 merge용)
         if (typeof window !== "undefined") {
           localStorage.setItem(
-            `veil_result_scenes_${finalData.session_id}`,
+            `veil_free_scenes_${finalData.session_id}`,
             JSON.stringify(resData.result_scenes),
           );
         }

@@ -9,11 +9,14 @@ import { getSceneConfig } from "@/lib/data/dummy-scene-configs";
 import { ResultScene } from "@/lib/types/result";
 import { AnalyzeAnswers, Answer } from "@/lib/types/analyze";
 import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
+import { mergeScenes } from "@/lib/utils/merge-scenes";
+import { createPaidScenePlaceholders } from "@/lib/utils/create-paid-scene-placeholders";
 import SceneContent from "@/components/result/scene-content";
 import FlowOverview from "@/components/result/flow-overview";
 import ProgressIndicator from "@/components/result/progress-indicator";
 import PaymentModal from "@/components/modals/payment-modal";
 import ResultActions from "@/components/result/result-actions";
+import PaidGenerationLoading from "@/components/result/paid-generation-loading";
 
 interface PageProps {
   params: Promise<{ session_id: string }>;
@@ -25,6 +28,7 @@ const ResultPage = ({ params }: PageProps) => {
   const [unlockedScenes, setUnlockedScenes] = useState<number[]>([]);
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [paidGenerationLoading, setPaidGenerationLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -54,13 +58,22 @@ const ResultPage = ({ params }: PageProps) => {
         setAnalyzeData(data);
 
         // ── 캐시된 scenes 확인 ─────────────────────────────────────────
-        const scenesKey = `veil_result_scenes_${param.session_id}`;
-        const cachedScenes = localStorage.getItem(scenesKey);
+        // 1. merged all scenes 확인 (결제 후)
+        const allScenesKey = `veil_all_scenes_${param.session_id}`;
+        const cachedAllScenes = localStorage.getItem(allScenesKey);
+
+        // 2. free scenes만 확인 (초기 결과)
+        const freeScenesKey = `veil_free_scenes_${param.session_id}`;
+        const cachedFreeScenes = localStorage.getItem(freeScenesKey);
+
         let resultScenes: ResultScene[];
 
-        if (cachedScenes) {
-          // 캐시된 scenes 복원 (재생성 방지)
-          resultScenes = JSON.parse(cachedScenes) as ResultScene[];
+        if (cachedAllScenes) {
+          // merged all scenes 우선 로드 (결제 후 상태)
+          resultScenes = JSON.parse(cachedAllScenes) as ResultScene[];
+        } else if (cachedFreeScenes) {
+          // free scenes 로드 (초기 결과)
+          resultScenes = JSON.parse(cachedFreeScenes) as ResultScene[];
         } else {
           // ── Mock / Real 분기 ─────────────────────────────────────────
           // NEXT_PUBLIC_USE_MOCK_RESULT=false 로 명시해야만 실제 Claude 호출.
@@ -68,10 +81,11 @@ const ResultPage = ({ params }: PageProps) => {
           const useMock = process.env.NEXT_PUBLIC_USE_MOCK_RESULT !== "false";
 
           if (useMock) {
-            // TODO: [백엔드 연동] mock 제거 후 아래 real 경로만 사용
+            // mock 데이터 사용 (개발 중)
             resultScenes = generateMockResultScenes(data.content_id);
           } else {
-            // ── 실제 Claude generate 호출 (free + paid 전체 생성) ────────────────────────────
+            // ── 실제 Claude generate: free scenes만 생성 ──────────────────────
+            // (analyze page에서 이미 생성했을 수 있으나, fallback용)
             const content = DUMMY_CONTENTS.find(
               (c) => c.id === data.content_id,
             );
@@ -83,7 +97,6 @@ const ResultPage = ({ params }: PageProps) => {
             const sceneConfig = getSceneConfig(data.content_id);
 
             // Answer.answer_options(value[]) → {values, labels} 변환
-            // inputConfig에서 option label을 역참조. 없으면 value를 그대로 사용.
             const userAnswers = data.answers
               .filter(
                 (a: Answer) =>
@@ -108,6 +121,11 @@ const ResultPage = ({ params }: PageProps) => {
                 };
               });
 
+            // free scenes만 생성
+            const freeSceneIndexes = sceneConfig.scenes
+              .filter((s) => s.is_free)
+              .map((s) => s.index);
+
             const res = await fetch(
               `/api/analyze/${param.session_id}/generate`,
               {
@@ -121,6 +139,7 @@ const ResultPage = ({ params }: PageProps) => {
                     answers: userAnswers,
                   },
                   scene_config: sceneConfig,
+                  scene_indexes: freeSceneIndexes,
                 }),
               },
             );
@@ -132,20 +151,28 @@ const ResultPage = ({ params }: PageProps) => {
               );
             }
 
-            // result_scenes: carry_over 없는 ResultScene[].
-            // free + paid 전체를 한 번에 포함하고 있음.
             const resData = (await res.json()) as {
               session_id: string;
               result_scenes: ResultScene[];
             };
             resultScenes = resData.result_scenes;
 
-            // ── 캐시 저장: 리다이렉트 후 재생성 방지 ─────────────────────────
-            localStorage.setItem(scenesKey, JSON.stringify(resultScenes));
+            // ── 캐시 저장: free scenes로 저장 ─────────────────────────
+            localStorage.setItem(freeScenesKey, JSON.stringify(resultScenes));
           }
         }
 
-        setScenes(resultScenes);
+        // ── Paid Scenes Placeholder 추가 ────────────────────────────
+        // 무료 scenes 뒤에 유료 scenes placeholder를 추가
+        // (아직 generate되지 않은 상태 = messages null, preview_messages로 표시)
+        const sceneConfig = getSceneConfig(data.content_id);
+        const paidPlaceholders = createPaidScenePlaceholders(
+          param.session_id,
+          sceneConfig,
+        );
+        const allScenes = mergeScenes(resultScenes, paidPlaceholders);
+
+        setScenes(allScenes);
 
         // ── Unlock 상태 복원 ──────────────────────────────────────
         // 1. localStorage에서 저장된 unlock 상태 확인
@@ -187,9 +214,95 @@ const ResultPage = ({ params }: PageProps) => {
     initData();
   }, [params]);
 
+  // ── Paid Scenes Generate 함수 ───────────────────────────────────────
+  const generatePaidScenes = async (paidSceneIndexes: number[]) => {
+    try {
+      if (!analyzeData) throw new Error("분석 데이터가 없어");
+
+      const content = DUMMY_CONTENTS.find(
+        (c) => c.id === analyzeData.content_id,
+      );
+      if (!content) throw new Error(`콘텐츠를 찾을 수 없어: ${analyzeData.content_id}`);
+
+      const inputConfig = DUMMY_INPUT_CONFIGS[analyzeData.content_id];
+      const sceneConfig = getSceneConfig(analyzeData.content_id);
+
+      // Answer → {values, labels} 변환
+      const userAnswers = analyzeData.answers
+        .filter(
+          (a: Answer) =>
+            Array.isArray(a.answer_options) && a.answer_options.length > 0,
+        )
+        .map((a: Answer) => {
+          const question = inputConfig?.questions.find(
+            (q) => q.index === a.question_index,
+          );
+          const labels = (a.answer_options ?? []).map((value) => {
+            const option = question?.options.find((o) => o.value === value);
+            return option?.label ?? value;
+          });
+          return {
+            question_index: a.question_index,
+            question_text: a.question_text,
+            values: a.answer_options ?? [],
+            labels,
+          };
+        });
+
+      // API 호출: paid scenes만 생성
+      const res = await fetch(
+        `/api/analyze/${analyzeData.session_id}/generate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content_title: content.title.replace(/\n/g, " "),
+            category: content.category,
+            user_input: {
+              text: analyzeData.free_input,
+              answers: userAnswers,
+            },
+            scene_config: sceneConfig,
+            scene_indexes: paidSceneIndexes,
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        const errData = (await res.json()) as { error?: string };
+        throw new Error(
+          errData.error ?? `결과 생성 실패 (HTTP ${res.status})`,
+        );
+      }
+
+      const resData = (await res.json()) as {
+        session_id: string;
+        result_scenes: ResultScene[];
+      };
+
+      // merge: 기존 scenes + 새로운 paid scenes
+      const mergedScenes = mergeScenes(scenes, resData.result_scenes);
+      setScenes(mergedScenes);
+
+      // 캐시 저장: merged scenes
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          `veil_all_scenes_${analyzeData.session_id}`,
+          JSON.stringify(mergedScenes),
+        );
+      }
+
+      console.log("[paid scenes generated]", paidSceneIndexes, mergedScenes);
+    } catch (err) {
+      console.error("Paid scenes 생성 실패:", err);
+      // TODO: 사용자에게 에러 알림
+    }
+  };
+
   // ── Phase 2: 결제 완료 상태 감지 (Toss redirect param 기반) ──────────────────────────
   // Toss는 successUrl에 paymentKey/orderId/amount를 자동으로 추가함
   // 우리는 _unlock, _payment_type, _scene_index를 통해 unlock 처리를 구분함
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (typeof window === "undefined" || !analyzeData) return;
 
@@ -216,35 +329,27 @@ const ResultPage = ({ params }: PageProps) => {
 
     if (isUnlock && hasPaymentKey) {
       // Toss 결제 성공 ✓ + 우리의 unlock 플래그 ✓
-      setScenes((prevScenes) => {
-        console.log("[before unlock]", {
-          scenes: prevScenes.length,
-          currentUnlockedScenes: unlockedScenes,
-        });
+      // 결제된 scene_indexes 추출
+      let paidSceneIndexes: number[] = [];
 
-        if (paymentType === "single" && sceneIndex > 0) {
-          // 단일 scene unlock
-          const newUnlocked = [...new Set([...unlockedScenes, sceneIndex])];
-          console.log("[single unlock]", sceneIndex, newUnlocked);
-          setUnlockedScenes(newUnlocked);
+      if (paymentType === "single" && sceneIndex > 0) {
+        paidSceneIndexes = [sceneIndex];
+      } else if (paymentType === "all") {
+        paidSceneIndexes = scenes
+          .filter((s) => !s.is_free)
+          .map((s) => s.scene_index);
+      }
 
-          // localStorage에 unlock 상태 저장
-          if (typeof window !== "undefined") {
-            localStorage.setItem(
-              `veil_unlocked_scenes_${sessionId}`,
-              JSON.stringify(newUnlocked),
-            );
-            console.log("[unlock saved]", `veil_unlocked_scenes_${sessionId}`);
-          }
-        } else if (paymentType === "all") {
-          // 모든 paid scene unlock
-          const allPaidIndices = prevScenes
-            .filter((s) => !s.is_free)
-            .map((s) => s.scene_index);
+      // loading UI 표시
+      setPaidGenerationLoading(true);
+
+      // Paid scenes 생성 (mock placeholder를 실제 generated scenes으로 교체)
+      generatePaidScenes(paidSceneIndexes)
+        .then(() => {
+          // 생성 완료 후 unlock 상태 업데이트
           const newUnlocked = [
-            ...new Set([...unlockedScenes, ...allPaidIndices]),
+            ...new Set([...unlockedScenes, ...paidSceneIndexes]),
           ];
-          console.log("[all unlock]", allPaidIndices, newUnlocked);
           setUnlockedScenes(newUnlocked);
 
           // localStorage에 unlock 상태 저장
@@ -255,28 +360,32 @@ const ResultPage = ({ params }: PageProps) => {
             );
             console.log("[unlock saved]", `veil_unlocked_scenes_${sessionId}`);
           }
-        }
-        return prevScenes;
-      });
 
-      // URL 정리 (히스토리에 결제 파라미터 남지 않게)
-      // replace로 history stack 변경
-      window.history.replaceState({}, "", window.location.pathname);
+          // URL 정리 (히스토리에 결제 파라미터 남지 않게)
+          window.history.replaceState({}, "", window.location.pathname);
 
-      // 결제 완료 후 FlowOverview로 스크롤
-      setTimeout(() => {
-        if (flowOverviewRef.current) {
-          flowOverviewRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      }, 300);
+          // 결제 완료 후 FlowOverview로 스크롤
+          setTimeout(() => {
+            if (flowOverviewRef.current) {
+              flowOverviewRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }
+          }, 300);
+        })
+        .catch((err) => {
+          console.error("[paid generation failed]", err);
+          // TODO: 사용자에게 에러 알림 (시도 재시도 옵션 제공)
+        })
+        .finally(() => {
+          setPaidGenerationLoading(false);
+        });
     } else if (searchParams.get("_payment_failed") === "true") {
       console.log("[payment failed]");
       window.history.replaceState({}, "", window.location.pathname);
     }
-  }, [analyzeData, unlockedScenes]);
+  }, [analyzeData, scenes, unlockedScenes]);
 
   // 네비게이션 메뉴 열림 상태 감지 (Progress Indicator 숨기기)
   useEffect(() => {
@@ -620,6 +729,9 @@ const ResultPage = ({ params }: PageProps) => {
         sceneIndex={paymentModal.sceneIndex}
         cardTitle={paymentModal.cardTitle}
       />
+
+      {/* 유료 씬 생성 로딩 UI */}
+      {paidGenerationLoading && <PaidGenerationLoading />}
     </div>
   );
 };

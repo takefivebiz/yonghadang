@@ -28,6 +28,7 @@ export interface GenerateRequestBody {
   category: string;
   user_input: UserInputPayload;
   scene_config: SceneConfig;
+  scene_indexes?: number[];  // 선택적: 특정 scenes만 생성. 기본값은 전체
 }
 
 export interface GenerateResponseBody {
@@ -62,7 +63,7 @@ export const POST = async (
 
   try {
     const body = (await req.json()) as GenerateRequestBody;
-    const { content_title, category, user_input, scene_config } = body;
+    const { content_title, category, user_input, scene_config, scene_indexes } = body;
 
     if (!content_title || !category || !user_input || !scene_config) {
       return NextResponse.json(
@@ -85,11 +86,24 @@ export const POST = async (
       );
     }
 
+    // scene_indexes가 있으면 유효성 검사
+    if (scene_indexes && Array.isArray(scene_indexes)) {
+      const validIndexes = scene_config.scenes.map(s => s.index);
+      const invalidIndexes = scene_indexes.filter(i => !validIndexes.includes(i));
+      if (invalidIndexes.length > 0) {
+        return NextResponse.json(
+          { error: `유효하지 않은 scene_index: ${invalidIndexes.join(", ")}` },
+          { status: 400 }
+        );
+      }
+    }
+
     const { system, userMessage } = buildGenerateResultPrompt({
       contentTitle: content_title,
       category,
       userInput: user_input,
       sceneConfig: scene_config,
+      sceneIndexes: scene_indexes,
     });
 
     // 기본 모델: claude-sonnet-4-6 (ANTHROPIC_MODEL env로 오버라이드 가능)
