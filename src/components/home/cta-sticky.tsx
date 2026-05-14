@@ -15,8 +15,8 @@ const CTASticky = () => {
             className="group flex w-full max-w-[500px] items-center gap-3 rounded-3xl rounded-bl-none border border-white/10 bg-black/30 backdrop-blur-sm px-5 py-3 text-left transition-all duration-200 hover:border-accent/30 hover:bg-black/30"
           >
             <span className="text-lg shrink-0">✨</span>
-            <span className="flex-1 text-sm font-nomal text-white/90">
-              털어놓기 힘든 고민들, 말해볼래?
+            <span className="flex-1 text-[13px] font-nomal text-white/90">
+              혼자 고민하고 있었다면, 편하게 말해볼래?
             </span>
             <svg
               className="h-4 w-4 shrink-0 text-white/40 transition-all group-hover:text-white/60"
