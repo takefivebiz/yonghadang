@@ -16,7 +16,7 @@ const CTASticky = () => {
           >
             <span className="text-lg shrink-0">✨</span>
             <span className="flex-1 text-sm font-nomal text-white/90">
-              진짜 나를 이해하는 3분, 지금 시작하기
+              털어놓기 힘든 고민들, 말해볼래?
             </span>
             <svg
               className="h-4 w-4 shrink-0 text-white/40 transition-all group-hover:text-white/60"

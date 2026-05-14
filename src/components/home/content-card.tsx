@@ -62,14 +62,15 @@ interface ContentCardProps {
   priority?: boolean;
   /**
    * carousel: 홈 가로 스크롤 (기존 디자인 유지)
-   * list: 카테고리 세로 리스트 (브런치형 텍스트 중심)
+   * list: 텍스트 중심 1열 가로 카드
+   * trending: 이미지 중심 2열 카드
    */
-  variant?: "carousel" | "list";
+  variant?: "carousel" | "list" | "trending";
   /** list variant 전용 — featured는 인트로 페이지용으로 더 큼 */
   size?: "default" | "featured";
   /** list variant 전용 — 화살표 표시 여부 */
   showArrow?: boolean;
-  /** carousel variant 전용 — 카테고리 배지 표시 여부 */
+  /** 카테고리 배지 표시 여부 */
   showBadge?: boolean;
 }
 
@@ -139,104 +140,69 @@ const CarouselCard = ({
   );
 };
 
-// ── list variant (세로형 그리드 카드 — 정방형 이미지) ─────────────
+// ── list variant (가로형 카드 — 질문 읽기 중심, 정보 hierarchy 강화) ────────
 const ListCard = ({
   content,
   priority,
-  size = "default",
   showArrow = true,
   showBadge = false,
 }: Omit<ContentCardProps, "variant">) => {
   const config = CATEGORY_CONFIG[content.category];
 
-  const cardWidth = size === "featured" ? "lg:w-[260px]" : "lg:w-[230px]";
-  const cardMaxWidth =
-    size === "featured" ? "lg:max-w-[260px]" : "lg:max-w-[230px]";
-  const mobileMaxWidth =
-    size === "featured" ? "max-w-[240px]" : "max-w-[280px]";
-
-  const titleSize =
-    size === "featured" && !showArrow
-      ? "text-[15px] lg:text-[18px]"
-      : size === "featured"
-        ? "text-[18px] lg:text-[24px]"
-        : "text-[15px] lg:text-[19px]";
-  const subtitleSize =
-    size === "featured" && !showArrow
-      ? "text-[11px] lg:text-[12px]"
-      : size === "featured"
-        ? "text-[12px] lg:text-[14px]"
-        : "text-[11px] lg:text-[13px]";
-  const minHeight =
-    size === "featured" && !showArrow
-      ? "min-h-[100px] lg:min-h-[110px]"
-      : "min-h-[150px] lg:min-h-[160px]";
-
   return (
-    <Link
-      href={`/content/${content.id}`}
-      className={`group block w-full ${cardWidth}`}
-    >
-      <article
-        className={`group flex w-full ${mobileMaxWidth} ${cardMaxWidth} flex-col overflow-hidden rounded-[10px] border border-[rgba(209,109,172,0.12)]`}
-      >
-        {/* 정방형 썸네일 — 감정 오브젝트 */}
-        <div className="relative aspect-square shrink-0 overflow-hidden">
+    <Link href={`/content/${content.id}`} className="group block w-full">
+      <article className="flex w-full min-h-[100px] lg:min-h-[140px] overflow-hidden rounded-[12px] border border-white/[0.05] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]">
+        {/* 썸네일 — 왼쪽 패널 (카드 높이를 꽉 채움) */}
+        <div className={`relative w-24 lg:w-28 shrink-0 self-stretch`}>
           {content.thumbnail_url ? (
             <Image
               src={content.thumbnail_url}
               alt={content.title}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              sizes="(max-width: 640px) 96px, 112px"
               priority={priority}
-              className="object-cover object-center transition-opacity duration-300 group-hover:opacity-85"
+              className="object-cover object-center transition-opacity duration-300 group-hover:opacity-70"
             />
           ) : (
-            <div className="absolute inset-0 bg-surface/40">
+            <div className="absolute inset-0 bg-surface/30">
               <div
-                className={`absolute -right-6 -top-6 h-32 w-32 rounded-full border-2 ${config.ring}`}
+                className={`absolute -right-4 -top-4 h-16 w-16 rounded-full border-2 ${config.ring} opacity-40`}
               />
               <div
-                className={`absolute -right-2 -top-2 h-20 w-20 rounded-full border ${config.ring} opacity-50`}
+                className={`absolute -right-1 -top-1 h-10 w-10 rounded-full border ${config.ring} opacity-20`}
               />
             </div>
           )}
+        </div>
 
-          {/* 카테고리 라벨 — 이미지 위 overlay */}
+        {/* 텍스트 패널 — 질문 덩어리 (수직 중앙 정렬) */}
+        <div className="relative flex flex-1 flex-col justify-center px-5 py-4 lg:px-6 lg:py-5">
+          {/* 카테고리 — 조용하게 (showBadge={true}일 때만) */}
           {showBadge && (
             <span
-              className={`absolute top-2 left-2 rounded-[20px] px-2 py-1 text-[10px] font-medium ${config.categoryColor} ${config.categoryBg}`}
+              className={`inline-block mb-4 rounded-[3px] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-widest ${config.categoryColor} opacity-50 w-fit`}
             >
               {config.label}
             </span>
           )}
-        </div>
 
-        {/* 텍스트 패널 — divider + 화살표 포함 */}
-        <div
-          className={`relative flex ${minHeight} flex-1 flex-col border-t border-white/[0.06] px-4 pt-5 pb-5 lg:px-5 lg:py-5 lg:pt-5 lg:pb-5`}
-        >
-          {/* 제목 */}
-          <h2
-            className={`min-h-[40px] line-clamp-2 whitespace-pre-line font-medium leading-[1.45] ${titleSize}`}
-          >
+          {/* 제목 — 정보 hierarchy 최강 */}
+          <h2 className="line-clamp-3 whitespace-pre-line font-nomal leading-[1.4] text-[15px] lg:text-[18px] text-white/85 mb-2">
             {content.title}
           </h2>
 
-          {/* 부제 */}
+          {/* 부제 — subtle hook */}
           {content.subtitle && (
-            <p
-              className={`mt-2 line-clamp-2 whitespace-pre-line pr-9 leading-[1.55] text-highlight/45 ${subtitleSize}`}
-            >
+            <p className="line-clamp-2 whitespace-pre-line leading-[1.6] text-[12px] lg:text-[13px] text-highlight/35">
               {content.subtitle}
             </p>
           )}
 
-          {/* 화살표 — 카드 오른쪽 아래 고정 */}
+          {/* 화살표 — 거의 보이지 않게 */}
           {showArrow && (
-            <div className="absolute bottom-4 right-1.5 flex h-6 w-6 items-center justify-center transition-opacity duration-300 group-hover:opacity-50 lg:h-8 lg:w-8">
+            <div className="absolute right-4 bottom-5 lg:right-5 lg:bottom-6 flex h-4 w-4 items-center justify-center transition-opacity duration-300 group-hover:opacity-40">
               <svg
-                className="h-3 w-3 text-white/30 lg:h-3.5 lg:w-3.5"
+                className="h-3 w-3 text-white/30"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
@@ -245,6 +211,68 @@ const ListCard = ({
                 <path d="M9 5l7 7-7 7" />
               </svg>
             </div>
+          )}
+        </div>
+      </article>
+    </Link>
+  );
+};
+
+// ── trending variant (이미지 중심 2열 카드) ────────────────────────────
+const TrendingCard = ({
+  content,
+  priority,
+  showBadge = true,
+}: Omit<ContentCardProps, "variant" | "size" | "showArrow">) => {
+  const config = CATEGORY_CONFIG[content.category];
+
+  return (
+    <Link href={`/content/${content.id}`} className="group block w-full">
+      <article className="flex flex-col h-[260px] lg:h-[290px] overflow-hidden rounded-[12px] border border-white/[0.05] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]">
+        {/* 이미지 — 상단 (고정 높이) */}
+        <div className="relative h-[150px] lg:h-[180px] shrink-0 overflow-hidden">
+          {content.thumbnail_url ? (
+            <Image
+              src={content.thumbnail_url}
+              alt={content.title}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              priority={priority}
+              className="object-cover object-center transition-opacity duration-300 group-hover:opacity-80"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-surface/40">
+              <div
+                className={`absolute -right-6 -top-6 h-32 w-32 rounded-full border-2 ${config.ring} opacity-40`}
+              />
+              <div
+                className={`absolute -right-2 -top-2 h-20 w-20 rounded-full border ${config.ring} opacity-20`}
+              />
+            </div>
+          )}
+
+          {/* 카테고리 배지 — 이미지 왼쪽 상단 */}
+          {showBadge && (
+            <span
+              className={`absolute top-2 left-2.5 inline-block rounded-[10px] border px-1.5 py-0.5 text-[8px] font-semibold ${config.categoryColor} ${config.categoryBorder} ${config.categoryBg} backdrop-blur-sm`}
+            >
+              {config.label}
+            </span>
+          )}
+        </div>
+
+        {/* 텍스트 영역 — 하단 */}
+        <div className="flex-1 px-4 py-3.5 lg:px-5 lg:py-4 flex flex-col">
+          {/* 제목 */}
+          <h2 className="line-clamp-2 whitespace-pre-line font-nomal leading-[1.45] text-[14px] lg:text-[16px] text-white/85 mb-1.5">
+            {content.title}
+          </h2>
+
+          {/* 부제 */}
+          {content.subtitle && (
+            <p className="whitespace-pre-line leading-[1.5] text-[11px] lg:text-[12px] text-highlight/35">
+              {content.subtitle}
+            </p>
           )}
         </div>
       </article>
@@ -268,6 +296,15 @@ const ContentCard = ({
         priority={priority}
         size={size}
         showArrow={showArrow}
+        showBadge={showBadge}
+      />
+    );
+  }
+  if (variant === "trending") {
+    return (
+      <TrendingCard
+        content={content}
+        priority={priority}
         showBadge={showBadge}
       />
     );

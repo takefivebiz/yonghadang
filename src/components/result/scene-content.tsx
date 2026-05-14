@@ -305,7 +305,7 @@ const SceneContent = ({
                     fontWeight: "400",
                   }}
                 >
-                  900원
+                  1,900원
                 </p>
               </div>
             </button>

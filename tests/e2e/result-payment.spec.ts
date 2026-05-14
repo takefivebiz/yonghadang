@@ -54,7 +54,9 @@ const openSingleModal = async (page: Page) => {
 const openAllModal = async (page: Page) => {
   await gotoResult(page);
   await waitForScenes(page);
-  const unlockAllBtn = page.locator("[data-testid='flow-overview-unlock-all-btn']");
+  const unlockAllBtn = page.locator(
+    "[data-testid='flow-overview-unlock-all-btn']",
+  );
   await unlockAllBtn.click();
   await expect(page.locator("[data-testid='payment-modal']")).toBeVisible({
     timeout: 5000,
@@ -75,9 +77,7 @@ test.describe("R: 결과 페이지 - 결제 모달", () => {
       .locator("[data-scene-idx='2'] h2")
       .textContent();
 
-    const unlockBtn = page
-      .locator("[data-testid='scene-unlock-btn']")
-      .first();
+    const unlockBtn = page.locator("[data-testid='scene-unlock-btn']").first();
     await unlockBtn.scrollIntoViewIfNeeded();
     await unlockBtn.click();
 
@@ -95,26 +95,26 @@ test.describe("R: 결과 페이지 - 결제 모달", () => {
     }
   });
 
-  // ── R-19: 개별 구매 모달 - 900원 가격 표시 ────────────────────────────
-  test("R-19: 개별 Scene 구매 모달에 900원 가격이 표시된다", async ({
+  // ── R-19: 개별 구매 모달 - 1900원 가격 표시 ────────────────────────────
+  test("R-19: 개별 Scene 구매 모달에 1900원 가격이 표시된다", async ({
     page,
   }) => {
     await openSingleModal(page);
 
     const priceEl = page.locator("[data-testid='payment-modal-price']");
     await expect(priceEl).toBeVisible({ timeout: 5000 });
-    await expect(priceEl).toContainText("900");
+    await expect(priceEl).toContainText("1,900");
   });
 
   // ── R-20: 개별 구매 모달 - 결제 버튼 렌더링 ──────────────────────────
-  test("R-20: 개별 Scene 구매 모달에 '900원 결제하기' 버튼이 렌더링된다 (초기 활성 상태)", async ({
+  test("R-20: 개별 Scene 구매 모달에 '1,900원 결제하기' 버튼이 렌더링된다 (초기 활성 상태)", async ({
     page,
   }) => {
     await openSingleModal(page);
 
     const payBtn = page.locator("[data-testid='payment-modal-pay-btn']");
     await expect(payBtn).toBeVisible({ timeout: 5000 });
-    await expect(payBtn).toContainText("900");
+    await expect(payBtn).toContainText("1,900");
     await expect(payBtn).toContainText("결제하기");
     // 초기에는 활성 상태 (isProcessing=false)
     await expect(payBtn).not.toBeDisabled();
@@ -131,13 +131,13 @@ test.describe("R: 결과 페이지 - 결제 모달", () => {
     await expect(modalTitle).toHaveText("전체 흐름 열기");
   });
 
-  // ── R-22: 전체 구매 모달 - 2,900원 가격 표시 ─────────────────────────
-  test("R-22: 전체 구매 모달에 2,900원 가격이 표시된다", async ({ page }) => {
+  // ── R-22: 전체 구매 모달 - 4,900원 가격 표시 ─────────────────────────
+  test("R-22: 전체 구매 모달에 4,900원 가격이 표시된다", async ({ page }) => {
     await openAllModal(page);
 
     const priceEl = page.locator("[data-testid='payment-modal-price']");
     await expect(priceEl).toBeVisible({ timeout: 5000 });
-    await expect(priceEl).toContainText("2,900");
+    await expect(priceEl).toContainText("4,900");
   });
 
   // ── R-23: 취소 버튼 클릭 → 모달 닫힘 ────────────────────────────────
@@ -164,9 +164,7 @@ test.describe("R: 결과 페이지 - 결제 모달", () => {
     await gotoResult(page);
     await waitForScenes(page);
 
-    const unlockBtn = page
-      .locator("[data-testid='scene-unlock-btn']")
-      .first();
+    const unlockBtn = page.locator("[data-testid='scene-unlock-btn']").first();
     await unlockBtn.scrollIntoViewIfNeeded();
     await unlockBtn.click();
 
@@ -261,12 +259,7 @@ test.describe("R: 결과 페이지 - 결제 모달", () => {
     page,
   }) => {
     // 결제 실패 mock
-    await gotoResult(
-      page,
-      SESSION_ID,
-      CONTENT_ID,
-      "?payment_failed=true",
-    );
+    await gotoResult(page, SESSION_ID, CONTENT_ID, "?payment_failed=true");
     await waitForScenes(page);
 
     // scene-messages 개수: 무료 씬만 = FREE_SCENE_COUNT
@@ -311,8 +304,8 @@ test.describe("R: 결과 페이지 - 결제 모달", () => {
     await expect(page.locator("text=unlocked")).toBeVisible();
   });
 
-  // ── R-29: 개별 구매 후 전체 구매 모달 - 차액 없이 2,900원 표시 ─────────
-  test("R-29: 개별 Scene 구매 후 전체 구매 모달은 2,900원을 그대로 표시한다 (차액 결제 미지원 현재 구현 기준)", async ({
+  // ── R-29: 개별 구매 후 전체 구매 모달 - 차액 없이 4,900원 표시 ─────────
+  test("R-29: 개별 Scene 구매 후 전체 구매 모달은 4,900원을 그대로 표시한다 (차액 결제 미지원 현재 구현 기준)", async ({
     page,
   }) => {
     // sceneIndex=3 이미 구매 완료 상태로 진입
@@ -336,15 +329,17 @@ test.describe("R: 결과 페이지 - 결제 모달", () => {
       timeout: 5000,
     });
 
-    // 현재 구현: 차액 없이 2,900원 표시 (개선 여지: 구매한 씬 금액 차감)
+    // 현재 구현: 차액 없이 4,900원 표시 (개선 여지: 구매한 씬 금액 차감)
     const priceEl = page.locator("[data-testid='payment-modal-price']");
     await expect(priceEl).toBeVisible({ timeout: 5000 });
-    await expect(priceEl).toContainText("2,900");
+    await expect(priceEl).toContainText("4,900");
 
     // 모달 닫기
     await page.locator("[data-testid='payment-modal-close-btn']").click();
-    await expect(page.locator("[data-testid='payment-modal']")).not.toBeVisible({
-      timeout: 3000,
-    });
+    await expect(page.locator("[data-testid='payment-modal']")).not.toBeVisible(
+      {
+        timeout: 3000,
+      },
+    );
   });
 });

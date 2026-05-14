@@ -153,7 +153,7 @@ const FlowOverview = ({
                   fontWeight: "400",
                 }}
               >
-                2,900원
+                4,900원
               </span>
             </button>
             {/* 추천 뱃지

@@ -28,7 +28,7 @@ const PaymentModal = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isSingle = paymentType === "single";
-  const amount = isSingle ? 900 : 2900;
+  const amount = isSingle ? 1900 : 4900;
   const title = isSingle ? `[${cardTitle}] 열기` : "전체 흐름 열기";
   const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || "";
 
@@ -105,8 +105,7 @@ const PaymentModal = ({
       if (error && "code" in error && error.code === "USER_CANCEL") {
         setError("결제가 취소되었어요");
       } else if (error && "code" in error && error.code) {
-        const message =
-          "message" in error ? error.message : "알 수 없는 오류";
+        const message = "message" in error ? error.message : "알 수 없는 오류";
         setError(`결제 오류: ${message}`);
       } else {
         setError("결제 처리 중 오류가 발생했어요");
@@ -120,7 +119,10 @@ const PaymentModal = ({
   if (!isOpen) return null;
 
   return (
-    <div data-testid="payment-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+    <div
+      data-testid="payment-modal"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
+    >
       <div
         ref={containerRef}
         className="w-full max-w-md rounded-2xl bg-background border border-white/10 flex flex-col max-h-[90vh]"
@@ -140,7 +142,10 @@ const PaymentModal = ({
           {/* 결제 정보 */}
           {!error ? (
             <div>
-              <h2 data-testid="payment-modal-title" className="mb-2 text-xl font-bold text-highlight sm:text-2xl">
+              <h2
+                data-testid="payment-modal-title"
+                className="mb-2 text-xl font-bold text-highlight sm:text-2xl"
+              >
                 {title}
               </h2>
               <p className="mb-8 text-sm text-highlight/50">
@@ -154,7 +159,10 @@ const PaymentModal = ({
                 <p className="mb-2 text-xs font-semibold text-highlight/60">
                   결제 금액
                 </p>
-                <p data-testid="payment-modal-price" className="text-sm font-bold text-secondary">
+                <p
+                  data-testid="payment-modal-price"
+                  className="text-sm font-bold text-secondary"
+                >
                   {amount.toLocaleString()}
                   <span className="text-sm text-highlight/60">원</span>
                 </p>
@@ -185,7 +193,10 @@ const PaymentModal = ({
 
               {/* 로딩 상태 */}
               {isProcessing && (
-                <div data-testid="payment-modal-spinner" className="mt-4 flex justify-center">
+                <div
+                  data-testid="payment-modal-spinner"
+                  className="mt-4 flex justify-center"
+                >
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-secondary/30 border-t-secondary" />
                 </div>
               )}
@@ -193,7 +204,12 @@ const PaymentModal = ({
           ) : (
             // 에러 상태
             <div className="text-center py-6">
-              <p data-testid="payment-modal-error-msg" className="mb-6 text-sm text-red-400">{error}</p>
+              <p
+                data-testid="payment-modal-error-msg"
+                className="mb-6 text-sm text-red-400"
+              >
+                {error}
+              </p>
               <button
                 data-testid="payment-modal-error-close-btn"
                 onClick={onClose}

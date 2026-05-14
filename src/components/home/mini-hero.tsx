@@ -8,10 +8,10 @@ const MiniHero = () => {
       <h1
         className="
     mt-1
-    text-[1.8rem]
+    text-[1.5rem]
     font-semibold
-    leading-[1.28]
-    tracking-[-0.03em]
+    leading-[1.4]
+    tracking-[-0.02em]
     text-highlight
     sm:text-[2.9rem]
     sm:leading-[1.2]
@@ -24,15 +24,25 @@ const MiniHero = () => {
             textShadow: "0 0 10px rgba(209, 109, 172, 0.22)",
           }}
         >
-          진짜 너
+          다정
         </span>
-        를 알고 싶다면
+        하게 듣고,
+        <br />
+        <span
+          className="text-accent"
+          style={{
+            textShadow: "0 0 10px rgba(209, 109, 172, 0.22)",
+          }}
+        >
+          정확
+        </span>
+        하게 말해줄게
       </h1>
 
       <p
         className="
     mt-3
-    text-[1.08rem]
+    text-[1rem]
     font-light
     leading-[1.55]
     tracking-[-0.015em]
@@ -42,7 +52,7 @@ const MiniHero = () => {
     font-hero
   "
       >
-        지금, 너만의 이야기를 시작해봐
+        듣고 싶은 말만 해주진 않아
       </p>
 
       {/* 서브타이틀 */}
