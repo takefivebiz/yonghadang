@@ -32,6 +32,8 @@ export interface GenerateRequestBody {
   scene_config: SceneConfig;
   scene_indexes?: number[];  // 선택적: 특정 scenes만 생성. 기본값은 전체
   free_scene_context?: FreeSceneContext;  // 유료 scene 생성 시 필요: 무료 scene의 마지막 메시지
+  /** 클라이언트에서 hidden state 계산 후 전달하는 사용자 내면 상태 요약문. Claude 프롬프트에 주입된다. */
+  state_summary?: string[];
 }
 
 export interface GenerateResponseBody {
@@ -66,7 +68,9 @@ export const POST = async (
 
   try {
     const body = (await req.json()) as GenerateRequestBody;
-    const { content_title, category, user_input, scene_config, scene_indexes, free_scene_context } = body;
+    const { content_title, category, user_input, scene_config, scene_indexes, free_scene_context, state_summary } = body;
+
+    console.log(`[generate] state_summary 수신 (${state_summary?.length ?? 0}개):`, state_summary);
 
     if (!content_title || !category || !user_input || !scene_config) {
       return NextResponse.json(
@@ -131,6 +135,7 @@ export const POST = async (
         sceneConfig: scene_config,
         sceneIndexes: sceneIndexesToUse,
         freeSceneContext: free_scene_context!,
+        stateSummary: state_summary,
       });
       system = promptResult.system;
       userMessage = promptResult.userMessage;
@@ -142,6 +147,7 @@ export const POST = async (
         userInput: user_input,
         sceneConfig: scene_config,
         sceneIndexes: sceneIndexesToUse,
+        stateSummary: state_summary,
       });
       system = promptResult.system;
       userMessage = promptResult.userMessage;

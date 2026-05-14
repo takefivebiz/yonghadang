@@ -100,6 +100,7 @@ const FlowOverview = ({
 
               {/* Scene info */}
               <p
+                className="whitespace-pre-line"
                 style={{
                   color: isUnlocked
                     ? "rgba(249, 249, 229, 0.75)"

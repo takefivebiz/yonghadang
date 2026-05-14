@@ -151,15 +151,15 @@ const ListCard = ({
 
   return (
     <Link href={`/content/${content.id}`} className="group block w-full">
-      <article className="flex w-full min-h-[100px] lg:min-h-[140px] overflow-hidden rounded-[12px] border border-white/[0.05] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]">
+      <article className="flex w-full min-h-[120px] lg:min-h-[160px] overflow-hidden rounded-[12px] border border-white/[0.05] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]">
         {/* 썸네일 — 왼쪽 패널 (카드 높이를 꽉 채움) */}
-        <div className={`relative w-24 lg:w-28 shrink-0 self-stretch`}>
+        <div className={`relative w-28 lg:w-32 shrink-0 self-stretch`}>
           {content.thumbnail_url ? (
             <Image
               src={content.thumbnail_url}
               alt={content.title}
               fill
-              sizes="(max-width: 640px) 96px, 112px"
+              sizes="(max-width: 640px) 112px, 128px"
               priority={priority}
               className="object-cover object-center transition-opacity duration-300 group-hover:opacity-70"
             />

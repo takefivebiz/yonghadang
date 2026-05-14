@@ -16,7 +16,7 @@ const MiniHero = () => {
       <div
         className="relative h-full flex items-center justify-center px-4 sm:px-8"
         style={{
-          transform: "translateY(-30px)",
+          transform: "translateY(-50px)",
         }}
       >
         {/* 히어로 카드 */}
@@ -28,9 +28,9 @@ const MiniHero = () => {
         >
           {/* 이미지 컨테이너 - 아치 모양 */}
           <div
-            className="relative w-full h-[72vh] max-h-[760px] overflow-hidden"
+            className="relative w-full h-[72vh] max-h-[760px] overflow-hidden scale-[0.92]"
             style={{
-              borderRadius: "180px 180px 0 0",
+              borderRadius: "120px 120px 0 0",
             }}
           >
             {/* 일러스트 */}
@@ -51,17 +51,18 @@ const MiniHero = () => {
               className="absolute inset-0 flex flex-col items-center text-center px-8"
               style={{
                 background:
-                  "linear-gradient(180deg, rgba(68, 53, 72, 0.674) 0%, rgba(0,0,0,0) 100%)",
+                  "linear-gradient(180deg, rgba(116, 94, 123, 0.754) 0%, rgba(0,0,0,0) 50%)",
                 paddingTop: "62px",
               }}
             >
               <h2
-                className="font-hero leading-[1.35]"
+                className="font-hero font-medium leading-[1.35]"
                 style={{
-                  color: "rgba(249,249,229,0.94)",
-                  fontSize: "clamp(1.3rem, 2.2vw, 1.5rem)",
-                  fontWeight: 500,
+                  color: "rgb(228, 217, 229)",
+                  fontSize: "clamp(1.4rem, 2.2vw, 1.5rem)",
                   letterSpacing: "-0.03em",
+                  textShadow:
+                    "0 2px 0px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 0, 0, 0.2)",
                 }}
               >
                 다정하게 듣고,
@@ -72,11 +73,13 @@ const MiniHero = () => {
               <p
                 className="font-body mt-2"
                 style={{
-                  color: "rgba(254, 254, 254, 0.72)",
-                  fontSize: "clamp(0.9rem, 1.2vw, 1.1rem)",
+                  color: "rgb(222, 214, 221)",
+                  fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)",
                   fontWeight: 300,
                   letterSpacing: "-0.02em",
                   lineHeight: 1.6,
+                  textShadow:
+                    "0 2px 0px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 0, 0, 0.2)",
                 }}
               >
                 좋은 말보다 필요한 말을.
@@ -86,15 +89,15 @@ const MiniHero = () => {
 
           {/* 하단 정보 */}
           <div
-            className="absolute left-0 right-0 flex flex-col items-center gap-5"
+            className="absolute left-0 right-0 flex flex-col items-center gap-8"
             style={{
-              bottom: "-30px",
+              bottom: "-20px",
             }}
           >
             <p
               className="tracking-[0.18em]"
               style={{
-                color: "rgba(249, 249, 229, 0.489)",
+                color: "rgb(189, 189, 189)",
                 fontSize: "11px",
               }}
             >

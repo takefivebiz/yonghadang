@@ -12,6 +12,9 @@ import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
 import { DUMMY_INPUT_CONFIGS } from "@/lib/data/dummy-analyze-config";
 import { getSceneConfig } from "@/lib/data/dummy-scene-configs";
 import type { ResultScene } from "@/lib/types/result";
+import { getContentPack } from "@/lib/content-packs";
+import { accumulateHiddenState } from "@/lib/quiz/accumulator";
+import { translateStateToSummary } from "@/lib/quiz/translator";
 
 interface PageProps {
   params: Promise<{ session_id: string }>;
@@ -139,12 +142,12 @@ const AnalyzePage = ({ params }: PageProps) => {
     console.log("[analyze] generateScenes 호출 시작", new Date().toISOString());
     generateScenes(finalData, loadingStartTime);
 
-    // ✅ 핵심 2: 실제 경과 시간에 맞춰 progress 업데이트 (0% → 95%까지)
-    const expectedDuration = 3000; // 예상 완료 시간: 3초
-
+    // ✅ 핵심 2: 지수 감쇠 방식으로 progress 업데이트
+    // 선형+하드캡 대신 95%에 점근적으로 수렴 → "95%에서 멈추는 느낌" 없음
     const updateProgress = () => {
       const elapsedTime = Date.now() - loadingStartTime;
-      const calculatedProgress = Math.min((elapsedTime / expectedDuration) * 100, 95);
+      // 12초 기준 지수 감쇠: 초반에 빠르게 올라가고 95% 근처에서 자연히 감속
+      const calculatedProgress = 95 * (1 - Math.exp(-4 * elapsedTime / 12000));
       setProgress(calculatedProgress);
 
       // 계속해서 progress 업데이트
@@ -192,6 +195,31 @@ const AnalyzePage = ({ params }: PageProps) => {
           };
         });
 
+      // ── Hidden State 계산 ────────────────────────────────────────
+      // 사용자가 선택한 모든 option value를 플랫하게 모아 hidden state 점수 계산
+      const contentPack = getContentPack(finalData.content_id);
+      const selectedValues = finalData.answers.flatMap(
+        (a) => a.answer_options ?? [],
+      );
+      const hiddenScores = contentPack
+        ? accumulateHiddenState(selectedValues, contentPack.scoreMap, contentPack.dimensions)
+        : {};
+      const stateSummary = contentPack
+        ? translateStateToSummary(hiddenScores, contentPack.translationRules)
+        : [];
+
+      console.log("[analyze] selectedValues:", selectedValues);
+      console.log("[analyze] hiddenScores:", hiddenScores);
+      console.log("[analyze] stateSummary:", stateSummary);
+
+      // result 페이지에서 additionalReadings 우선순위 계산에 사용
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          `veil_hidden_state_${finalData.session_id}`,
+          JSON.stringify(hiddenScores),
+        );
+      }
+
       // ── Mock / Real 분기 ──────────────────────────────────────────
       const useMock = process.env.NEXT_PUBLIC_USE_MOCK_RESULT !== "false";
 
@@ -216,6 +244,7 @@ const AnalyzePage = ({ params }: PageProps) => {
               },
               scene_config: sceneConfig,
               scene_indexes: freeSceneIndexes,
+              state_summary: stateSummary,
             }),
           },
         );

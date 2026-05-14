@@ -17,6 +17,11 @@ import ProgressIndicator from "@/components/result/progress-indicator";
 import PaymentModal from "@/components/modals/payment-modal";
 import ResultActions from "@/components/result/result-actions";
 import PaidGenerationLoading from "@/components/result/paid-generation-loading";
+import { getContentPack } from "@/lib/content-packs";
+import { prioritizeAdditionalReadings } from "@/lib/quiz/accumulator";
+import { translateStateToSummary } from "@/lib/quiz/translator";
+import type { AdditionalReading, HiddenState } from "@/lib/types/quiz";
+import AdditionalReadings from "@/components/result/additional-readings";
 
 interface PageProps {
   params: Promise<{ session_id: string }>;
@@ -31,6 +36,7 @@ const ResultPage = ({ params }: PageProps) => {
   const [paidGenerationLoading, setPaidGenerationLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [additionalReadings, setAdditionalReadings] = useState<AdditionalReading[]>([]);
 
   const sceneRefsMap = useRef<Record<number, HTMLDivElement | null>>({});
   const flowOverviewRef = useRef<HTMLDivElement | null>(null);
@@ -56,6 +62,19 @@ const ResultPage = ({ params }: PageProps) => {
 
         const data = JSON.parse(stored) as AnalyzeAnswers;
         setAnalyzeData(data);
+
+        // ── contentPack + hiddenState 로드 ──────────────────────────
+        const pack = getContentPack(data.content_id);
+        const rawHiddenState = localStorage.getItem(`veil_hidden_state_${param.session_id}`);
+        const hiddenScores: HiddenState = rawHiddenState
+          ? (JSON.parse(rawHiddenState) as HiddenState)
+          : {};
+
+        // additionalReadings: hiddenState 기반 우선순위 정렬 후 상위 5개
+        if (pack) {
+          const prioritized = prioritizeAdditionalReadings(hiddenScores, pack.additionalReadings);
+          setAdditionalReadings(prioritized.slice(0, 5));
+        }
 
         // ── 캐시된 scenes 확인 ─────────────────────────────────────────
         // 1. merged all scenes 확인 (결제 후)
@@ -126,6 +145,11 @@ const ResultPage = ({ params }: PageProps) => {
               .filter((s) => s.is_free)
               .map((s) => s.index);
 
+            // stateSummary: fallback generate 호출 시 Claude에 주입
+            const stateSummary = pack
+              ? translateStateToSummary(hiddenScores, pack.translationRules)
+              : [];
+
             const res = await fetch(
               `/api/analyze/${param.session_id}/generate`,
               {
@@ -140,6 +164,7 @@ const ResultPage = ({ params }: PageProps) => {
                   },
                   scene_config: sceneConfig,
                   scene_indexes: freeSceneIndexes,
+                  state_summary: stateSummary,
                 }),
               },
             );
@@ -263,6 +288,19 @@ const ResultPage = ({ params }: PageProps) => {
         lastMessages: lastFreeScene.messages.slice(-2), // 마지막 1~2개 메시지
       };
 
+      // hidden state 기반 stateSummary 계산 (Claude 프롬프트 주입용)
+      const rawHiddenState =
+        typeof window !== "undefined"
+          ? localStorage.getItem(`veil_hidden_state_${analyzeData.session_id}`)
+          : null;
+      const hiddenScores: HiddenState = rawHiddenState
+        ? (JSON.parse(rawHiddenState) as HiddenState)
+        : {};
+      const genPack = getContentPack(analyzeData.content_id);
+      const stateSummary = genPack
+        ? translateStateToSummary(hiddenScores, genPack.translationRules)
+        : [];
+
       // API 호출: paid scenes만 생성 (무료 context 포함)
       const res = await fetch(
         `/api/analyze/${analyzeData.session_id}/generate`,
@@ -279,6 +317,7 @@ const ResultPage = ({ params }: PageProps) => {
             scene_config: sceneConfig,
             scene_indexes: paidSceneIndexes,
             free_scene_context: freeSceneContext, // 유료 prompt 생성용
+            state_summary: stateSummary,
           }),
         },
       );
@@ -724,6 +763,9 @@ const ResultPage = ({ params }: PageProps) => {
               </>
             );
           })()}
+
+          {/* 추가 리딩 카드 */}
+          <AdditionalReadings readings={additionalReadings} />
         </div>
 
         {/* 결과 페이지 하단 액션 */}

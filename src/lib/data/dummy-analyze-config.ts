@@ -10,94 +10,135 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       "연락은 계속 하는데 이 사람이 나를 좋아하는 건지 잘 모르겠어",
       "둘이 있으면 분위기는 좋은데, 관계를 확실히 하려는 말은 없어",
     ],
+
     questions: [
+      // 1. 현재 관계 상태
       {
         index: 1,
-        text: "그 사람 태도는 \n어떤 느낌이야?",
+        text: "지금 이 관계는\n어떤 느낌에 가까워?",
         type: "single",
         options: [
           {
-            label: "다정하긴 한데 확실한 말은 안 해",
-            value: "kind_but_unclear",
+            label: "분위기는 있는데 확실한 말은 없어",
+            value: "undefined_but_close",
           },
           {
-            label: "잘해줄 때도 있고 갑자기 멀어질 때도 있어",
-            value: "hot_and_cold",
+            label: "가까워질 듯하면 다시 애매해져",
+            value: "push_pull",
           },
           {
-            label: "연락은 계속하는데 관계는 그대로야",
-            value: "contact_no_progress",
+            label: "연락은 이어지는데 관계는 그대로야",
+            value: "stagnant_connection",
           },
-          { label: "나만 더 기다리고 있는 느낌이야", value: "waiting_more" },
+          {
+            label: "내가 더 마음이 큰 느낌이 들어",
+            value: "one_sided_energy",
+          },
         ],
       },
 
+      // 2. 상대 태도
       {
         index: 2,
-        text: "요즘 제일 신경 쓰이는 건 뭐야?",
+        text: "상대는 관계를\n어떤 식으로 대하는 것 같아?",
         type: "single",
         options: [
           {
-            label: "답장 속도나 연락 텀이 자꾸 신경 쓰여",
-            value: "reply_speed",
-          },
-          { label: "말투 하나에도 의미를 찾게 돼", value: "tone_words" },
-          {
-            label: "둘이 있을 때 분위기가 너무 좋아서 헷갈려",
-            value: "private_mood",
+            label: "좋아하는 티는 나는데 확실하게 표현하진 않아",
+            value: "emotion_without_clarity",
           },
           {
-            label: "나를 대하는 태도가 자꾸 달라져",
-            value: "changing_attitude",
+            label: "편한 관계처럼 두려고 하는 느낌이야",
+            value: "comfortable_without_progress",
+          },
+          {
+            label: "다가오는 것 같다가 다시 거리를 둬",
+            value: "inconsistent_interest",
+          },
+          {
+            label: "마음을 숨기고 계산하는 느낌이 들어",
+            value: "guarded_behavior",
           },
         ],
       },
+
+      // 3. 내 반응 방식
       {
         index: 3,
-        text: "이 사람 때문에 \n네 마음은 어때?",
+
+        text: "너는 이런 상황에서\n보통 어떻게 반응해?",
         type: "multiple",
         options: [
-          { label: "괜히 혼자 기대하게 돼", value: "expectation" },
-          { label: "사소한 행동에도 감정이 흔들려", value: "emotional_swing" },
-          { label: "확신이 없는데 자꾸 기다리게 돼", value: "waiting" },
           {
-            label: "계속 의미를 찾고 있는 나를 보게 돼",
-            value: "overthinking",
+            label: "나눴던 대화를 계속 다시 보게 돼",
+            value: "rechecking_signals",
           },
-          { label: "나만 더 좋아하는 것 같아서 불안해", value: "imbalance" },
+          {
+            label: "괜찮은 척하지만 혼자 의미를 찾게 돼",
+            value: "silent_overthinking",
+          },
+          {
+            label: "상대 반응 하나에 하루 기분이 흔들려",
+            value: "emotionally_affected",
+          },
+          {
+            label: "직접 묻고 싶지만 괜히 참게 돼",
+            value: "holding_back",
+          },
+          {
+            label: "이 관계를 쉽게 포기 못하겠어",
+            value: "difficulty_letting_go",
+          },
         ],
       },
 
+      // 4. 가장 큰 불안
       {
         index: 4,
-        text: "이 관계에서 \n제일 무서운 건 뭐야?",
+        text: "사실 네가 제일 두려운 건 뭐야?",
         type: "single",
         options: [
-          { label: "나만 혼자 진심인 걸까봐", value: "alone_serious" },
-          { label: "괜히 기대했다가 상처받을까봐", value: "hurt" },
-          { label: "애매한 상태로 계속 이어질까봐", value: "stuck" },
-          { label: "결국 내가 먼저 포기하게 될까봐", value: "give_up" },
+          {
+            label: "나만 진심이었다는 걸 확인하게 되는 거",
+            value: "fear_one_sided",
+          },
+          {
+            label: "애매한 상태가 계속 이어지는 거",
+            value: "fear_stagnation",
+          },
+          {
+            label: "괜히 기대했다가 혼자 상처받는 거",
+            value: "fear_disappointment",
+          },
+          {
+            label: "결국 내가 먼저 지쳐서 놓게 되는 거",
+            value: "fear_exhaustion",
+          },
         ],
       },
 
+      // 5. 진짜 원하는 것
       {
         index: 5,
-        text: "솔직히 네가 \n제일 바라는 건 뭐야?",
+        text: "솔직히 지금\n가장 원하는 건 뭐야?",
         type: "single",
         options: [
           {
-            label: "확실하게 좋아한다고 말해줬으면 좋겠어",
-            value: "confirmation",
+            label: "상대가 먼저 확실한 표현을 해줬으면 좋겠어",
+            value: "want_expression",
           },
           {
-            label: "애매하지 않게 관계를 정했으면 좋겠어",
-            value: "define_relationship",
+            label: "이 관계가 어디로 가는 건지 알고 싶어",
+            value: "want_direction",
           },
           {
-            label: "나만 불안한 상태가 끝났으면 좋겠어",
-            value: "stop_anxiety",
+            label: "이제는 내 마음이 덜 흔들렸으면 좋겠어",
+            value: "want_stability",
           },
-          { label: "이 마음에서 좀 벗어나고 싶어", value: "escape_feeling" },
+          {
+            label: "솔직히 아직 끝난 관계는 아니었으면 좋겠어",
+            value: "want_possibility",
+          },
         ],
       },
     ],

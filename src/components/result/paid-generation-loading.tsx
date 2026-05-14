@@ -1,81 +1,202 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
 const PaidGenerationLoading = () => {
+  const [progress, setProgress] = useState(0);
+  const progressPercent = Math.round(progress);
+
+  // 지수 감쇠 방식: 남은 거리의 일정 비율씩 줄여나가 95%에 점근적으로 수렴.
+  // 하드 캡 없이 자연히 감속하므로 "멈춰있는 느낌"이 없다.
+  useEffect(() => {
+    let fakeProgress = 0;
+    const interval = setInterval(() => {
+      const remaining = 95 - fakeProgress;
+      fakeProgress += remaining * 0.03 + Math.random() * 0.4;
+      setProgress(fakeProgress);
+    }, 800);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background overflow-hidden">
       <style>{`
-        @keyframes fillBubble {
-          0% { clip-path: inset(100% 0 0 0); }
-          100% { clip-path: inset(0 0 0 0); }
+        @keyframes paidFragment1 {
+          0% { transform: translate(100px, -90px); opacity: 0.55; }
+          100% { transform: translate(0, 0); opacity: 0; }
         }
-
-        @keyframes glowPulse {
-          0%, 100% { box-shadow: 0 0 30px rgba(255, 200, 200, 0.3), inset 0 0 20px rgba(255, 200, 200, 0.2); }
-          50% { box-shadow: 0 0 40px rgba(255, 200, 200, 0.4), inset 0 0 25px rgba(255, 200, 200, 0.3); }
+        @keyframes paidFragment2 {
+          0% { transform: translate(-120px, -70px); opacity: 0.4; }
+          100% { transform: translate(0, 0); opacity: 0; }
         }
-
-        @keyframes convergeBubble1 {
-          0% { transform: translate(120px, -80px); opacity: 0.4; }
+        @keyframes paidFragment3 {
+          0% { transform: translate(110px, 100px); opacity: 0.3; }
+          100% { transform: translate(0, 0); opacity: 0; }
+        }
+        @keyframes paidFragment4 {
+          0% { transform: translate(-100px, 95px); opacity: 0.6; }
           100% { transform: translate(0, 0); opacity: 0; }
         }
 
-        @keyframes convergeBubble2 {
-          0% { transform: translate(-140px, -60px); opacity: 0.35; }
-          100% { transform: translate(0, 0); opacity: 0; }
+        .paid-frag { position: absolute; }
+        .paid-frag-1 { animation: paidFragment1 3s ease-in infinite; }
+        .paid-frag-2 { animation: paidFragment2 3s ease-in infinite; }
+        .paid-frag-3 { animation: paidFragment3 3s ease-in infinite; }
+        .paid-frag-4 { animation: paidFragment4 3s ease-in infinite; }
+
+        @keyframes paidFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
 
-        @keyframes convergeBubble3 {
-          0% { transform: translate(100px, 100px); opacity: 0.3; }
-          100% { transform: translate(0, 0); opacity: 0; }
+        @keyframes paidBounce {
+          0% { transform: translateY(0); }
+          5% { transform: translateY(-6px); }
+          10% { transform: translateY(0); }
+          15% { transform: translateY(-5px); }
+          20% { transform: translateY(0); }
+          50%, 100% { transform: translateY(0); }
         }
 
-        @keyframes convergeBubble4 {
-          0% { transform: translate(-110px, 90px); opacity: 0.35; }
-          100% { transform: translate(0, 0); opacity: 0; }
+        @keyframes paidShimmer {
+          0% { background-position: 200% center; }
+          100% { background-position: -200% center; }
         }
 
-        @keyframes convergeBubble5 {
-          0% { transform: translate(60px, -120px); opacity: 0.25; }
-          100% { transform: translate(0, 0); opacity: 0; }
+        .paid-status-text {
+          background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.2) 60%, rgba(255,255,255,0.2) 100%);
+          background-size: 200% 100%;
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: paidShimmer 5.5s linear infinite;
         }
-
-        .main-bubble {
-          animation: glowPulse 2s ease-in-out infinite;
-        }
-
-        .converge-bubble {
-          position: absolute;
-          border-radius: 50%;
-          background: radial-gradient(circle at 30% 30%, rgba(255, 220, 200, 0.15), rgba(255, 180, 180, 0.05));
-        }
-
-        .converge-bubble-1 { animation: convergeBubble1 3s ease-in infinite; }
-        .converge-bubble-2 { animation: convergeBubble2 3s ease-in infinite; }
-        .converge-bubble-3 { animation: convergeBubble3 3s ease-in infinite; }
-        .converge-bubble-4 { animation: convergeBubble4 3s ease-in infinite; }
-        .converge-bubble-5 { animation: convergeBubble5 3s ease-in infinite; }
       `}</style>
 
-      {/* 수렴하는 작은 버블들 */}
-      <div className="absolute w-20 h-20 converge-bubble converge-bubble-1"></div>
-      <div className="absolute w-16 h-16 converge-bubble converge-bubble-2"></div>
-      <div className="absolute w-24 h-24 converge-bubble converge-bubble-3"></div>
-      <div className="absolute w-14 h-14 converge-bubble converge-bubble-4"></div>
-      <div className="absolute w-28 h-28 converge-bubble converge-bubble-5"></div>
+      <div
+        style={{ animation: "paidFadeIn 600ms ease-out", marginTop: "-300px" }}
+      >
+        {/* 수렴하는 메시지 조각들 */}
+        <div className="relative w-80 h-80 flex items-center justify-center mb-4">
+          <div
+            className="paid-frag paid-frag-1"
+            style={{
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              borderRadius: "12px 12px 3px 12px",
+              fontSize: "11px",
+              color: "rgba(249, 249, 229, 0.3)",
+              padding: "6px 12px",
+            }}
+          >
+            ...
+          </div>
+          <div
+            className="paid-frag paid-frag-2"
+            style={{
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              borderRadius: "12px 12px 3px 12px",
+              fontSize: "11px",
+              color: "rgba(249, 249, 229, 0.25)",
+              padding: "6px 12px",
+            }}
+          >
+            ...
+          </div>
+          <div
+            className="paid-frag paid-frag-3"
+            style={{
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              borderRadius: "12px 12px 3px 12px",
+              fontSize: "14px",
+              color: "rgba(249, 249, 229, 0.28)",
+              padding: "6px 12px",
+            }}
+          >
+            ...
+          </div>
+          <div
+            className="paid-frag paid-frag-4"
+            style={{
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+              borderRadius: "12px 12px 3px 12px",
+              fontSize: "11px",
+              color: "rgba(249, 249, 229, 0.32)",
+              padding: "6px 12px",
+            }}
+          >
+            ...
+          </div>
 
-      <div className="flex flex-col items-center gap-8">
-        {/* 메인 버블 */}
-        <div className="relative w-32 h-32">
-          <div className="main-bubble absolute inset-0 rounded-full bg-gradient-to-b from-pink-200/40 to-pink-100/20 border border-pink-200/30 transition-all duration-300"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-white/60 text-xs font-light tracking-wide">깊이를 더하는 중</div>
+          {/* 메인 버블 (progress 채우기) */}
+          <div
+            className="relative flex items-center justify-center"
+            style={{
+              animation: "paidBounce 4s ease-in-out infinite",
+              width: "100px",
+              height: "55px",
+              background: "rgba(255, 255, 255, 0.04)",
+              border: "1px solid rgba(209, 126, 191, 0.27)",
+              borderRadius: "25px 25px 25px 4px",
+              padding: "16px",
+              overflow: "hidden",
+              boxShadow:
+                "0 0 24px rgba(209, 109, 172, 0.12), inset 0 0 12px rgba(209, 109, 172, 0.08)",
+            }}
+          >
+            {/* 아래에서 위로 채우는 효과 */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(to top, rgba(209, 109, 172, 0.15), transparent)",
+                clipPath: `inset(${Math.max(0, 100 - progressPercent)}% 0 0 0)`,
+                transition: "clip-path 300ms ease-out",
+                borderRadius: "16px 16px 16px 4px",
+                pointerEvents: "none",
+              }}
+            />
+            <div className="relative z-10 text-center">
+              <div
+                style={{
+                  fontSize: "13px",
+                  fontWeight: "300",
+                  color: "rgba(249, 249, 229, 0.746)",
+                  letterSpacing: "-0.02em",
+                  lineHeight: "1",
+                }}
+              >
+                {progressPercent}%
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 텍스트 */}
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-white/80 text-base font-light">깊은 흐름이 형성되고 있어...</p>
-          <p className="text-white/40 text-sm font-light">잠시만 기다려줘</p>
+        {/* 상태 문구 */}
+        <div className="text-center">
+          <p
+            className="paid-status-text"
+            style={{
+              fontSize: "13px",
+              fontWeight: "300",
+              letterSpacing: "0.04em",
+              marginTop: "-135px",
+            }}
+          >
+            {progressPercent < 20
+              ? "더 깊은 흐름을 읽는 중..."
+              : progressPercent < 40
+                ? "감정의 구조를 분석 중..."
+                : progressPercent < 60
+                  ? "통찰을 정리하는 중..."
+                  : progressPercent < 80
+                    ? "결과를 구성하는 중..."
+                    : "거의 다 됐어"}
+          </p>
         </div>
       </div>
     </div>
