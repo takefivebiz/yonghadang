@@ -10,7 +10,7 @@ import {
   FreeSceneContext,
 } from "@/lib/prompts/generate-result";
 import { SceneConfig } from "@/lib/types/content";
-import { ResultScene, SceneMessage } from "@/lib/types/result";
+import { ResultScene } from "@/lib/types/result";
 
 // TODO: [백엔드 연동] Supabase service_role 클라이언트로 세션·콘텐츠 조회로 교체
 
@@ -90,7 +90,7 @@ export const POST = async (
     }
 
     // scene_indexes가 있으면 유효성 검사 및 무료/유료 판단
-    let sceneIndexesToUse = scene_indexes || scene_config.scenes.map(s => s.index);
+    const sceneIndexesToUse = scene_indexes || scene_config.scenes.map(s => s.index);
     let hasAnyPaidScene = false;
 
     if (Array.isArray(sceneIndexesToUse)) {

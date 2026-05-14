@@ -18,7 +18,7 @@ const ReactionBubble = ({
   );
 
   useEffect(() => {
-    const delays = [100, 800, 1800];
+    const delays = [150, 1000, 2000];
     const timers = delays.map((delay, idx) =>
       setTimeout(() => {
         setVisibleMessages((prev) => {
@@ -31,11 +31,11 @@ const ReactionBubble = ({
 
     const fadeOutTimer = setTimeout(() => {
       setVisibleMessages(Array(messages.length).fill(false));
-    }, 3000);
+    }, 3500);
 
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, 4000);
+    }, 4500);
 
     return () => {
       timers.forEach(clearTimeout);
@@ -80,7 +80,7 @@ const ReactionBubble = ({
       </div>
 
       {/* Reaction bubbles */}
-      <div className="w-full flex-1 flex flex-col items-start gap-2">
+      <div className="w-full flex-1 flex flex-col items-start gap-3">
         {messages.map((msg, idx) => (
           <div
             key={idx}
@@ -95,7 +95,7 @@ const ReactionBubble = ({
             }}
           >
             <div
-              className="px-5 py-4 sm:px-6 sm:py-5"
+              className="px-5 py-3 sm:px-6 sm:py-3"
               style={{
                 background: "rgba(255, 255, 255, 0.04)",
                 border: "1px solid rgba(255, 255, 255, 0.06)",

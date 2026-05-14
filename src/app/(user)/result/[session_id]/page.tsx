@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { generateMockResultScenes } from "@/lib/data/dummy-result-scenes";
@@ -215,14 +215,15 @@ const ResultPage = ({ params }: PageProps) => {
   }, [params]);
 
   // ── Paid Scenes Generate 함수 ───────────────────────────────────────
-  const generatePaidScenes = async (paidSceneIndexes: number[]) => {
+  const generatePaidScenes = useCallback(async (paidSceneIndexes: number[]) => {
     try {
       if (!analyzeData) throw new Error("분석 데이터가 없어");
 
       const content = DUMMY_CONTENTS.find(
         (c) => c.id === analyzeData.content_id,
       );
-      if (!content) throw new Error(`콘텐츠를 찾을 수 없어: ${analyzeData.content_id}`);
+      if (!content)
+        throw new Error(`콘텐츠를 찾을 수 없어: ${analyzeData.content_id}`);
 
       const inputConfig = DUMMY_INPUT_CONFIGS[analyzeData.content_id];
       const sceneConfig = getSceneConfig(analyzeData.content_id);
@@ -284,9 +285,7 @@ const ResultPage = ({ params }: PageProps) => {
 
       if (!res.ok) {
         const errData = (await res.json()) as { error?: string };
-        throw new Error(
-          errData.error ?? `결과 생성 실패 (HTTP ${res.status})`,
-        );
+        throw new Error(errData.error ?? `결과 생성 실패 (HTTP ${res.status})`);
       }
 
       const resData = (await res.json()) as {
@@ -311,12 +310,11 @@ const ResultPage = ({ params }: PageProps) => {
       console.error("Paid scenes 생성 실패:", err);
       // TODO: 사용자에게 에러 알림
     }
-  };
+  }, [analyzeData, scenes]);
 
   // ── Phase 2: 결제 완료 상태 감지 (Toss redirect param 기반) ──────────────────────────
   // Toss는 successUrl에 paymentKey/orderId/amount를 자동으로 추가함
   // 우리는 _unlock, _payment_type, _scene_index를 통해 unlock 처리를 구분함
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (typeof window === "undefined" || !analyzeData) return;
 
@@ -399,7 +397,7 @@ const ResultPage = ({ params }: PageProps) => {
       console.log("[payment failed]");
       window.history.replaceState({}, "", window.location.pathname);
     }
-  }, [analyzeData, scenes, unlockedScenes]);
+  }, [analyzeData, scenes, unlockedScenes, generatePaidScenes]);
 
   // 네비게이션 메뉴 열림 상태 감지 (Progress Indicator 숨기기)
   useEffect(() => {

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import TypeAInput from "@/components/analyze/type-a-input";
 import CorrectionQuestions from "@/components/analyze/correction-questions";
 import ReactionBubble from "@/components/analyze/reaction-bubble";
+import GeneratingLoading from "@/components/analyze/generating-loading";
 import { getInputConfig } from "@/lib/data/dummy-analyze-config";
 import { AnalyzeState, Answer, AnalyzeAnswers } from "@/lib/types/analyze";
 import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
@@ -21,33 +22,6 @@ type Stage =
   | "reaction_after_free"
   | "correction_questions"
   | "completing";
-
-interface BubbleState {
-  status: "hidden" | "past" | "current" | "future";
-  opacity: number;
-  scale: number;
-  translateY: number;
-  filter: string;
-  animation: string;
-}
-
-// ── Debug flag: generate loading 화면만 고정으로 보기 (개발용) ──────────────────
-// .env.local에 NEXT_PUBLIC_FORCE_GENERATE_LOADING=true로 설정하면 활성화
-// 실제 generate 호출 없이 loading 화면만 표시함
-const FORCE_GENERATE_LOADING =
-  process.env.NEXT_PUBLIC_FORCE_GENERATE_LOADING === "true";
-
-// ── Loading Bubbles: 결과 생성 흐름의 단계별 버블 메시지 ────────────────────────
-const LOADING_BUBBLES = [
-  "모든 질문이 끝났어",
-  "이제 네 이야기를 정리할게",
-  "흐름을 읽는 중",
-  "흔들리는 지점을 찾는 중",
-  "감정의 결을 읽는 중",
-  "결과를 구성하는 중",
-  "마지막 흐름을 정리하는 중",
-  "곧 결과가 나와",
-];
 
 const AnalyzePage = ({ params }: PageProps) => {
   const router = useRouter();
@@ -67,12 +41,14 @@ const AnalyzePage = ({ params }: PageProps) => {
 
   // ── Cleanup: timeout 정리 ──────────────────────────────────────
   useEffect(() => {
+    const progressRef = progressIntervalRef.current;
+    const fakeProgressRef = fakeProgressIntervalRef.current;
     return () => {
-      if (progressIntervalRef.current) {
-        clearTimeout(progressIntervalRef.current);
+      if (progressRef) {
+        clearTimeout(progressRef);
       }
-      if (fakeProgressIntervalRef.current) {
-        clearInterval(fakeProgressIntervalRef.current);
+      if (fakeProgressRef) {
+        clearInterval(fakeProgressRef);
       }
     };
   }, []);
@@ -86,19 +62,17 @@ const AnalyzePage = ({ params }: PageProps) => {
     answers: [],
   });
   const [progress, setProgress] = useState(0);
-  const [currentBubbleIndex, setCurrentBubbleIndex] = useState(0);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const fakeProgressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const config = getInputConfig(analyzeData.content_id);
 
-  // ── Progress → BubbleIndex 매핑: completing 단계에서 progress에 따라 bubble 자동 진행 ──
+  // ── Stage 변경 시 최상단으로 스크롤 ──────────────────────────────────────
   useEffect(() => {
-    if (stage !== "completing") return;
-    const breakpoints = [0, 10, 25, 40, 55, 70, 85, 96];
-    const newIndex = breakpoints.filter((bp) => progress >= bp).length - 1;
-    setCurrentBubbleIndex(Math.min(newIndex, LOADING_BUBBLES.length - 1));
-  }, [progress, stage]);
+    if (typeof window !== "undefined" && stage === "reaction_after_free") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [stage]);
 
   // 자유입력 → reaction_after_free
   const handleFreeInputSubmit = (input: string) => {
@@ -137,24 +111,21 @@ const AnalyzePage = ({ params }: PageProps) => {
       answers,
     }));
 
-    // ── Debug: generate loading 화면만 고정으로 보기 ──────────────────────────────
-    if (FORCE_GENERATE_LOADING) {
-      console.log(
-        "[DEBUG] FORCE_GENERATE_LOADING enabled - showing loading screen only",
-      );
+    // ── Dev mode: 로딩화면 계속 표시 ──────────────────────────────────────
+    if (process.env.NEXT_PUBLIC_SHOW_ANALYZE_LOADING === "true") {
+      console.log("[DEBUG] NEXT_PUBLIC_SHOW_ANALYZE_LOADING enabled - showing loading screen only");
       setStage("completing");
       setProgress(0);
-      setCurrentBubbleIndex(0);
 
-      // Fake progress 움직임
+      // Fake progress 애니메이션
       let fakeProgress = 0;
       fakeProgressIntervalRef.current = setInterval(() => {
-        fakeProgress += Math.random() * 2.5 + 2.5;
+        fakeProgress += Math.random() * 0.8 + 0.5;
         if (fakeProgress > 95) fakeProgress = 95;
         setProgress(fakeProgress);
-      }, 1200);
+      }, 800);
 
-      return; // 여기서 종료 (실제 flow는 실행하지 않음)
+      return;
     }
 
     // ── Generate Progress: 즉시 generating 시작 + progress 병렬 진행 ─────────────
@@ -163,58 +134,25 @@ const AnalyzePage = ({ params }: PageProps) => {
 
     setStage("completing");
     setProgress(0);
-    setCurrentBubbleIndex(0);
 
     // ✅ 핵심 1: 생성 즉시 호출 (progress 대기 안 함!)
     console.log("[analyze] generateScenes 호출 시작", new Date().toISOString());
     generateScenes(finalData, loadingStartTime);
 
-    // ✅ 핵심 2: 동시에 progress 병렬 진행 (0% → 90%만)
-    const progressStages = [
-      { range: [0, 60], speed: 1200 },
-      { range: [60, 85], speed: 1800 },
-      { range: [85, 90], speed: 2500 }, // 90%까지만 빠르게 진행
-    ];
+    // ✅ 핵심 2: 실제 경과 시간에 맞춰 progress 업데이트 (0% → 95%까지)
+    const expectedDuration = 3000; // 예상 완료 시간: 3초
 
-    let currentProgress = 0;
-    let stageIndex = 0;
+    const updateProgress = () => {
+      const elapsedTime = Date.now() - loadingStartTime;
+      const calculatedProgress = Math.min((elapsedTime / expectedDuration) * 100, 95);
+      setProgress(calculatedProgress);
 
-    const simulateProgress = () => {
-      const currentStage = progressStages[stageIndex];
-      const { range } = currentStage;
-
-      // 증가량: 단계별로 조정
-      let increment = 0;
-      if (range[0] < 60) {
-        increment = Math.random() * 2.5 + 2.5;
-      } else if (range[0] < 85) {
-        increment = Math.random() * 1 + 0.5;
-      } else {
-        increment = Math.random() * 0.5 + 0.2;
-      }
-
-      currentProgress += increment;
-
-      if (currentProgress >= range[1]) {
-        currentProgress = range[1];
-        setProgress(currentProgress);
-        stageIndex += 1;
-      } else {
-        setProgress(currentProgress);
-      }
-
-      if (stageIndex < progressStages.length) {
-        const nextSpeed = progressStages[stageIndex]?.speed || 2500;
-        progressIntervalRef.current = setTimeout(simulateProgress, nextSpeed);
-      } else {
-        // ✅ 핵심 3: 90% 도달. 이 후부터는 API 응답까지만 대기 (generateScenes가 진행 중)
-        // progress는 일단 멈추고, generateScenes 완료 시 100%로 점프
-        console.log("[analyze] Progress 90% 도달. API 응답 대기 중...", new Date().toISOString());
-      }
+      // 계속해서 progress 업데이트
+      progressIntervalRef.current = setTimeout(updateProgress, 100);
     };
 
-    // progress 시뮬레이션 시작
-    simulateProgress();
+    // progress 업데이트 시작
+    updateProgress();
   };
 
   // ── Generate API 호출 및 장면 캐싱 ──────────────────────────────────────
@@ -338,217 +276,11 @@ const AnalyzePage = ({ params }: PageProps) => {
     }
   };
 
-  // ── Bubble Progression Rendering ────────────────────────────────────────────
-  // 현재 버블 기준으로 이전/현재/다음만 렌더링 (최대 3개)
-  const getBubbleState = (diff: number): BubbleState => {
-    switch (diff) {
-      case -1: // 이전
-        return {
-          status: "past" as const,
-          opacity: 0.22,
-          scale: 0.94,
-          translateY: 0,
-          filter: "none",
-          animation: "none",
-        };
-      case 0: // 현재
-        return {
-          status: "current" as const,
-          opacity: 1,
-          scale: 1,
-          translateY: 0,
-          filter: "none",
-          animation: "bubblePulse 3s ease-in-out infinite",
-        };
-      case 1: // 다음
-        return {
-          status: "future" as const,
-          opacity: 0.12,
-          scale: 0.94,
-          translateY: 0,
-          filter: "blur(0.8px)",
-          animation: "none",
-        };
-      default:
-        return {
-          status: "hidden" as const,
-          opacity: 0,
-          scale: 0.9,
-          translateY: 0,
-          filter: "none",
-          animation: "none",
-        };
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background flex justify-center">
-      {/* 완료 화면: Bubble Progression */}
+      {/* 완료 화면: 단서 수렴 로딩 */}
       {stage === "completing" && (
-        <div className="flex min-h-screen w-full max-w-lg flex-col items-center justify-center px-4 transition-all duration-700">
-          <div
-            style={{
-              animation: "fadeIn 600ms ease-out",
-            }}
-          >
-            {/* Progress Bar: 보조 요소 */}
-            <div className="w-[200px] mx-auto mb-8">
-              <div
-                className="relative h-1 rounded-full overflow-visible"
-                style={{ background: "rgba(249, 249, 229, 0.15)" }}
-              >
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${progress}%`,
-                    background: "rgba(209, 109, 172, 0.5)",
-                    transitionDuration: progress > 85 ? "2000ms" : "300ms",
-                  }}
-                />
-
-                {/* Flow point at the end of progress */}
-                <div
-                  className="absolute top-1/2 rounded-full"
-                  style={{
-                    width: "5px",
-                    height: "5px",
-                    left: `${progress}%`,
-                    transform: "translate(-50%, -50%)",
-                    background: "rgba(209, 109, 172, 0.6)",
-                    boxShadow: "0 0 8px rgba(209, 109, 172, 0.15)",
-                    animation: "flowPulse 2.5s ease-in-out infinite",
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* 버블 progression: 현재 기준 ±1 최대 3개만 렌더링 */}
-            <div className="w-[240px] mx-auto mt-10 flex flex-col gap-3 mb-10">
-              {[
-                currentBubbleIndex - 1,
-                currentBubbleIndex,
-                currentBubbleIndex + 1,
-              ]
-                .filter((i) => i >= 0 && i < LOADING_BUBBLES.length)
-                .map((index) => {
-                  const text = LOADING_BUBBLES[index];
-                  const diff = index - currentBubbleIndex;
-                  const state = getBubbleState(diff);
-                  const isCurrent = state.status === "current";
-
-                return (
-                  <div
-                    key={`bubble-${index}`}
-                    style={{
-                      opacity: state.opacity,
-                      transform: `scale(${state.scale}) translateY(${state.translateY}px)`,
-                      filter: state.filter,
-                      animation: state.animation,
-                      transition:
-                        "all 1800ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                    }}
-                    className="flex justify-start"
-                  >
-                    <div
-                      style={{
-                        background: "rgba(255, 255, 255, 0.04)",
-                        borderRadius: "14px 14px 14px 0px",
-                        padding: "12px 16px",
-                        border: "1px solid rgba(255, 255, 255, 0.015)",
-                        boxShadow: isCurrent
-                          ? "0 0 16px rgba(209, 109, 172, 0.12)"
-                          : "none",
-                      }}
-                    >
-                      <p
-                        className="text-sm"
-                        style={{
-                          color: "rgba(249, 249, 229, 0.80)",
-                          fontSize: "14px",
-                          lineHeight: "1.6",
-                          letterSpacing: "-0.01em",
-                        }}
-                      >
-                        {text}
-                        {isCurrent && (
-                          <span className="inline-block ml-1">
-                            <span
-                              style={{
-                                animation: "dotPulse 1.4s infinite",
-                              }}
-                            >
-                              .
-                            </span>
-                            <span
-                              style={{
-                                animation: "dotPulse 1.4s 0.3s infinite",
-                                marginLeft: "1px",
-                              }}
-                            >
-                              .
-                            </span>
-                            <span
-                              style={{
-                                animation: "dotPulse 1.4s 0.6s infinite",
-                                marginLeft: "1px",
-                              }}
-                            >
-                              .
-                            </span>
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <style>{`
-            /* Fade in/out transition */
-            @keyframes fadeIn {
-              from {
-                opacity: 0;
-              }
-              to {
-                opacity: 1;
-              }
-            }
-
-            /* 현재 버블: 아주 미세한 pulse (조용한 생명감) */
-            @keyframes bubblePulse {
-              0%, 100% {
-                opacity: 1;
-              }
-              50% {
-                opacity: 0.9;
-              }
-            }
-
-            /* 입력 중 표시: dot opacity 순차 변화 (채팅 "입력 중" 느낌) */
-            @keyframes dotPulse {
-              0%, 100% {
-                opacity: 0.4;
-              }
-              50% {
-                opacity: 0.9;
-              }
-            }
-
-            /* 흐름이 이어지고 있다는 느낌: flow point pulse */
-            @keyframes flowPulse {
-              0%, 100% {
-                opacity: 0.4;
-                box-shadow: 0 0 6px rgba(209, 109, 172, 0.1);
-              }
-              50% {
-                opacity: 0.8;
-                box-shadow: 0 0 10px rgba(209, 109, 172, 0.2);
-              }
-            }
-          `}</style>
-        </div>
+        <GeneratingLoading progress={progress} />
       )}
 
       {/* 입력 단계 */}

@@ -60,7 +60,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
           { type: "ai", text: "아니면 훨씬 오래전부터 있던 건지," },
           { type: "ai", text: "한번쯤 생각해본 적 있어?" },
           {
-            type: "memo",
+            type: "ai",
             text: "반복된 경험은 자동으로 저장돼",
           },
           {
@@ -152,7 +152,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
             text: "그 10분 동안 뭐가 두려운지 적어봐. 연락이 없는 게 두려운 건지, 아니면 그게 의미하는 무언가가 두려운 건지.",
           },
           {
-            type: "memo",
+            type: "ai",
             text: "작은 간격이 쌓이면\n반응하는 사람이 아니라\n선택하는 사람이 돼",
           },
           { type: "ai", text: "이게 시작이야." },
@@ -229,7 +229,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
             text: "함께 있어도 외롭다면, 그건 다른 차원의 외로움이야.",
           },
           {
-            type: "memo",
+            type: "ai",
             text: "진심은 함께할 때 따뜻해져.\n외로움은 함께 있어도 추워.",
           },
         ],
@@ -311,7 +311,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
           { type: "ai", text: "진짜로 그 자리를 채워주기를 원하는 사람인가?" },
           { type: "ai", text: "아니면 그냥 밤이 덜 외로우면 되는 건가?" },
           {
-            type: "memo",
+            type: "ai",
             text: "그 답이 당신의 다음 결정을\n결정해.",
           },
         ],
@@ -363,7 +363,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
           { type: "ai", text: "하나의 신호도 여러 의미로 읽힐 수 있거든." },
           { type: "punch", text: "불확실성을 원하는 대로 채워버려." },
           {
-            type: "memo",
+            type: "ai",
             text: "그게 가장 위험한 부분이야.\n확실함의 부재가,\n우리를 붙잡아.",
           },
         ],
@@ -431,7 +431,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
             text: "상대가 명확해지지 않을 때, 그걸 받아주는 것만이 사랑은 아니거든.",
           },
           {
-            type: "memo",
+            type: "ai",
             text: "때론 경계를 긋는 것도\n자신을 소중히 여기는\n한 가지 방식이야.",
           },
         ],
@@ -442,7 +442,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
             text: "상대가 명확해지지 않을 때, 그걸 받아주는 것만이 사랑은 아니거든.",
           },
           {
-            type: "memo",
+            type: "ai",
             text: "때론 경계를 긋는 것도\n자신을 소중히 여기는\n한 가지 방식이야.",
           },
         ],
@@ -496,7 +496,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
           { type: "punch", text: "다급함이 빨리 움직이게 만들고," },
           { type: "ai", text: "빨리 움직이면 실수가 커져." },
           {
-            type: "memo",
+            type: "ai",
             text: "충분한 시간은 없지만,\n서두르는 것도 최선은 아니야.",
           },
         ],
@@ -565,7 +565,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
             text: "공부? 사이드 프로젝트? 아니면 다른 팀으로의 이동?",
           },
           {
-            type: "memo",
+            type: "ai",
             text: "작은 경험이 모여서\n당신의 방향을 만들어.\n지금 정해지지 않아도 괜찮아.",
           },
         ],
@@ -575,7 +575,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
             type: "ai",
             text: "공부? 사이드 프로젝트? 아니면 다른 팀으로의 이동?",
           },
-          { type: "memo", text: "작은 경험이 모여서\n당신의 방향을 만들어." },
+          { type: "ai", text: "작은 경험이 모여서\n당신의 방향을 만들어." },
         ],
       },
     ],
@@ -639,7 +639,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
           text: "훨씬 오래된 곳에서 배운 반응이 지금 여기서 반복되고 있는 거야.",
         },
         {
-          type: "memo",
+          type: "ai",
           text: "그 학습이 한때는 당신을 지켰어.\n하지만 지금은 가두고 있을 수 있어.",
         },
         { type: "ai", text: "이건 당신 잘못이 아니야." },
@@ -706,7 +706,7 @@ export function generateMockResultScenes(contentId: string): ResultScene[] {
           text: "다음에 이 감정이 올라올 때, 평소와 다른 딱 한 가지만 해봐.",
         },
         {
-          type: "memo",
+          type: "ai",
           text: "그 작은 간격이 습관이 되면,\n반응하는 사람이 아니라\n선택하는 사람이 돼.",
         },
         { type: "ai", text: "이게 시작이야." },

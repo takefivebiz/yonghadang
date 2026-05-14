@@ -1,9 +1,8 @@
 // ── Scene 메시지 타입 비율 가이드:
-//   ai    ~70% — 감정 기록 느낌의 주 메시지 (컨테이너 없는 순수 텍스트)
+//   ai    ~80% — 감정 기록 느낌의 주 메시지 (컨테이너 없는 순수 텍스트)
 //   punch ~20% — 핵심 문장 강조, 씬당 최대 1개
-//   memo  ~10% — 감정 메모 쪽지, 씬당 최대 1개
 
-export type SceneMessageType = "ai" | "punch" | "memo";
+export type SceneMessageType = "ai" | "punch";
 
 export interface SceneMessage {
   type: SceneMessageType;

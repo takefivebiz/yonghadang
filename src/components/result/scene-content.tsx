@@ -1,7 +1,6 @@
 "use client";
 
 import { ResultScene, SceneMessage } from "@/lib/types/result";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 interface SceneContentProps {
@@ -42,7 +41,7 @@ const AiBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
         style={{
           /* 배경과 자연스럽게 blend되는 bubble */
           background: "rgba(255, 255, 255, 0.04)",
-          borderRadius: "14px 14px 14px 0",
+          borderRadius: "15px 15px 15px 0",
           padding: "10px 15px",
           /* 아주 약한 border로 정의감 최소화 */
           border: "1px solid rgba(255, 255, 255, 0.015)",
@@ -87,48 +86,12 @@ const PunchBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
   );
 };
 
-// 메모 쪽지
-const MemoBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
-  // const verticalMargin = index % 2 === 0 ? "my-5" : "my-6";
-  const rotation = index % 2 === 0 ? "-1.2deg" : "-1.4deg";
-  return (
-    <div className="relative w-full max-w-[300px] mb-3 rotate-[-1deg] opacity-80">
-      <Image
-        src="/texture/memo-paper1.png"
-        alt=""
-        width={320}
-        height={110}
-        className="w-full h-auto select-none pointer-events-none"
-      />
-
-      <div className="absolute inset-0 flex items-center px-8 py-6">
-        <p
-          className="font-memo"
-          style={{
-            color: "#3A2A18",
-            padding: "17px 16px",
-            borderRadius: "4px",
-            transform: `rotate(${rotation})`,
-            fontSize: "16px",
-            lineHeight: "1.5",
-            whiteSpace: "pre-line",
-          }}
-        >
-          {text}
-        </p>
-      </div>
-    </div>
-  );
-};
-
 const renderMessage = (msg: SceneMessage, idx: number) => {
   switch (msg.type) {
     case "ai":
       return <AiBlock key={idx} text={msg.text} index={idx} />;
     case "punch":
       return <PunchBlock key={idx} text={msg.text} index={idx} />;
-    case "memo":
-      return <MemoBlock key={idx} text={msg.text} index={idx} />;
   }
 };
 
@@ -191,7 +154,7 @@ const SceneContent = ({
           className="w-px flex-shrink-0 self-start"
           style={{
             background: "rgba(209, 109, 172, 0.392)",
-            minHeight: "55px",
+            minHeight: "80px",
           }}
         />
 

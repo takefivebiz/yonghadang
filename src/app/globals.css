@@ -131,14 +131,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Dooneun";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2205@1.0/Donoun-Medium.woff2")
-    format("woff2");
-  font-weight: normal;
-  font-display: swap;
-}
-
 /**
  * Veil 디자인 시스템 색상 팔레트 (PRD 4. 디자인 가이드)
  * Tailwind v4 @theme 블록으로 CSS 변수 정의 → bg-*, text-*, border-* 유틸리티 자동 생성
@@ -162,7 +154,6 @@
   --font-body: "Suit"; /* 본문 텍스트 */
   --font-punch: "Suit"; /* Punch line */
   --font-result: "Suit"; /* 결과페이지 */
-  --font-memo: "Dooneun"; /* 메모 텍스트 */
 }
 
 html {
@@ -305,8 +296,4 @@ body {
 
 @utility font-result {
   font-family: var(--font-result);
-}
-
-@utility font-memo {
-  font-family: var(--font-memo);
 }
