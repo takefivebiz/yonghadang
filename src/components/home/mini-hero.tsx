@@ -35,7 +35,7 @@ const MiniHero = () => {
           >
             {/* 일러스트 */}
             <Image
-              src="/img/main2.png"
+              src="/img/hero.png"
               alt="VEIL 메인 일러스트"
               fill
               priority
