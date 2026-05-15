@@ -34,12 +34,17 @@ const ResultPage = ({ params }: PageProps) => {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [paidGenerationLoading, setPaidGenerationLoading] = useState(false);
+  const [isPaidGenerationRecovery, setIsPaidGenerationRecovery] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [additionalReadings, setAdditionalReadings] = useState<AdditionalReading[]>([]);
+  // QA mode: ?qa=1 또는 NEXT_PUBLIC_QA_MODE=true → 결제 없이 전체 씬 확인
+  const [isQaMode, setIsQaMode] = useState(false);
 
   const sceneRefsMap = useRef<Record<number, HTMLDivElement | null>>({});
   const flowOverviewRef = useRef<HTMLDivElement | null>(null);
+  // 결제 감지 useEffect 더블 실행 방지 (scenes 업데이트로 useEffect 재실행될 수 있음)
+  const isProcessingPayment = useRef(false);
 
   // ── Phase 1: 초기 데이터 및 scene 생성 또는 복원 ──────────────────────────
   // 리다이렉트 후 다시 로드되었을 때, generateCalledRef가 reset되지 않도록
@@ -85,105 +90,115 @@ const ResultPage = ({ params }: PageProps) => {
         const freeScenesKey = `veil_free_scenes_${param.session_id}`;
         const cachedFreeScenes = localStorage.getItem(freeScenesKey);
 
+        console.log(
+          "[result] cache 확인: allScenes=", !!cachedAllScenes,
+          "freeScenes=", !!cachedFreeScenes,
+          "| session=", param.session_id,
+        );
+
         let resultScenes: ResultScene[];
 
         if (cachedAllScenes) {
           // merged all scenes 우선 로드 (결제 후 상태)
           resultScenes = JSON.parse(cachedAllScenes) as ResultScene[];
+          console.log("[result] veil_all_scenes_ 로드:", resultScenes.length, "scenes,",
+            "indexes:", resultScenes.map((s) => `${s.scene_index}(msg=${s.messages?.length ?? "null"})`));
         } else if (cachedFreeScenes) {
           // free scenes 로드 (초기 결과)
           resultScenes = JSON.parse(cachedFreeScenes) as ResultScene[];
+          console.log("[result] veil_free_scenes_ 로드:", resultScenes.length, "scenes");
         } else {
-          // ── Mock / Real 분기 ─────────────────────────────────────────
-          // NEXT_PUBLIC_USE_MOCK_RESULT=false 로 명시해야만 실제 Claude 호출.
-          // 기본값 true: 개발 중 불필요한 API 비용 방지.
+          // ── 캐시 없음: API 시도 → 실패 시 mock fallback ──────────────
+          // useMock=true : API key 없이 빠른 개발 확인용. 직접 mock 사용.
+          // useMock=false: 실제 API 호출. 실패해도 mock으로 UX 유지 (에러 화면 없음).
           const useMock = process.env.NEXT_PUBLIC_USE_MOCK_RESULT !== "false";
 
           if (useMock) {
-            // mock 데이터 사용 (개발 중)
             resultScenes = generateMockResultScenes(data.content_id);
           } else {
-            // ── 실제 Claude generate: free scenes만 생성 ──────────────────────
-            // (analyze page에서 이미 생성했을 수 있으나, fallback용)
-            const content = DUMMY_CONTENTS.find(
-              (c) => c.id === data.content_id,
-            );
-            if (!content) {
-              throw new Error(`콘텐츠를 찾을 수 없어: ${data.content_id}`);
-            }
-
-            const inputConfig = DUMMY_INPUT_CONFIGS[data.content_id];
-            const sceneConfig = getSceneConfig(data.content_id);
-
-            // Answer.answer_options(value[]) → {values, labels} 변환
-            const userAnswers = data.answers
-              .filter(
-                (a: Answer) =>
-                  Array.isArray(a.answer_options) &&
-                  a.answer_options.length > 0,
-              )
-              .map((a: Answer) => {
-                const question = inputConfig?.questions.find(
-                  (q) => q.index === a.question_index,
-                );
-                const labels = (a.answer_options ?? []).map((value) => {
-                  const option = question?.options.find(
-                    (o) => o.value === value,
-                  );
-                  return option?.label ?? value;
-                });
-                return {
-                  question_index: a.question_index,
-                  question_text: a.question_text,
-                  values: a.answer_options ?? [],
-                  labels,
-                };
-              });
-
-            // free scenes만 생성
-            const freeSceneIndexes = sceneConfig.scenes
-              .filter((s) => s.is_free)
-              .map((s) => s.index);
-
-            // stateSummary: fallback generate 호출 시 Claude에 주입
-            const stateSummary = pack
-              ? translateStateToSummary(hiddenScores, pack.translationRules)
-              : [];
-
-            const res = await fetch(
-              `/api/analyze/${param.session_id}/generate`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  content_title: content.title.replace(/\n/g, " "),
-                  category: content.category,
-                  user_input: {
-                    text: data.free_input,
-                    answers: userAnswers,
-                  },
-                  scene_config: sceneConfig,
-                  scene_indexes: freeSceneIndexes,
-                  state_summary: stateSummary,
-                }),
-              },
-            );
-
-            if (!res.ok) {
-              const errData = (await res.json()) as { error?: string };
-              throw new Error(
-                errData.error ?? `결과 생성 실패 (HTTP ${res.status})`,
+            try {
+              // ── 실제 Claude generate fallback ────────────────────────
+              // analyze page가 이미 생성해서 캐시했으면 여기 오지 않는다.
+              // 직접 URL 접근이나 analyze 실패 후 재방문 시의 fallback 경로.
+              const content = DUMMY_CONTENTS.find(
+                (c) => c.id === data.content_id,
               );
+              if (!content) {
+                throw new Error(`콘텐츠를 찾을 수 없어: ${data.content_id}`);
+              }
+
+              const inputConfig = DUMMY_INPUT_CONFIGS[data.content_id];
+              const sceneConfig = getSceneConfig(data.content_id);
+
+              const userAnswers = data.answers
+                .filter(
+                  (a: Answer) =>
+                    Array.isArray(a.answer_options) &&
+                    a.answer_options.length > 0,
+                )
+                .map((a: Answer) => {
+                  const question = inputConfig?.questions.find(
+                    (q) => q.index === a.question_index,
+                  );
+                  const labels = (a.answer_options ?? []).map((value) => {
+                    const option = question?.options.find(
+                      (o) => o.value === value,
+                    );
+                    return option?.label ?? value;
+                  });
+                  return {
+                    question_index: a.question_index,
+                    question_text: a.question_text,
+                    values: a.answer_options ?? [],
+                    labels,
+                  };
+                });
+
+              const freeSceneIndexes = sceneConfig.scenes
+                .filter((s) => s.is_free)
+                .map((s) => s.index);
+
+              const stateSummary = pack
+                ? translateStateToSummary(hiddenScores, pack.translationRules)
+                : [];
+
+              const res = await fetch(
+                `/api/analyze/${param.session_id}/generate`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    content_title: content.title.replace(/\n/g, " "),
+                    category: content.category,
+                    user_input: {
+                      text: data.free_input,
+                      answers: userAnswers,
+                    },
+                    scene_config: sceneConfig,
+                    scene_indexes: freeSceneIndexes,
+                    state_summary: stateSummary,
+                  }),
+                },
+              );
+
+              if (!res.ok) {
+                const errData = (await res.json()) as { error?: string };
+                throw new Error(
+                  errData.error ?? `결과 생성 실패 (HTTP ${res.status})`,
+                );
+              }
+
+              const resData = (await res.json()) as {
+                session_id: string;
+                result_scenes: ResultScene[];
+              };
+              resultScenes = resData.result_scenes;
+              localStorage.setItem(freeScenesKey, JSON.stringify(resultScenes));
+            } catch (apiErr) {
+              // API 실패 → mock으로 UX 유지. 에러 화면 절대 안 뜸.
+              console.warn("[result] fallback generate 실패, mock 사용:", apiErr);
+              resultScenes = generateMockResultScenes(data.content_id);
             }
-
-            const resData = (await res.json()) as {
-              session_id: string;
-              result_scenes: ResultScene[];
-            };
-            resultScenes = resData.result_scenes;
-
-            // ── 캐시 저장: free scenes로 저장 ─────────────────────────
-            localStorage.setItem(freeScenesKey, JSON.stringify(resultScenes));
           }
         }
 
@@ -195,35 +210,58 @@ const ResultPage = ({ params }: PageProps) => {
           param.session_id,
           sceneConfig,
         );
-        const allScenes = mergeScenes(resultScenes, paidPlaceholders);
+        // paidPlaceholders를 first arg로 놓아야 resultScenes(실제 데이터)가 collision 시 우선한다.
+        // QA mode나 결제 후 재방문 시 real messages가 placeholder에 덮이는 것을 방지한다.
+        const allScenes = mergeScenes(paidPlaceholders, resultScenes);
 
         setScenes(allScenes);
 
-        // ── Unlock 상태 복원 ──────────────────────────────────────
-        // 1. localStorage에서 저장된 unlock 상태 확인
-        // 2. 없으면 무료 scene만 unlock (결제 전 상태)
-        const unlockedKey = `veil_unlocked_scenes_${param.session_id}`;
-        const savedUnlocked = localStorage.getItem(unlockedKey);
+        // ── QA mode 감지 ─────────────────────────────────────────
+        // ?qa=1 URL 파라미터 또는 NEXT_PUBLIC_QA_MODE=true 환경변수
+        // localStorage 상태를 건드리지 않고 메모리에서만 모든 씬 unlock
+        const isQa =
+          new URLSearchParams(window.location.search).get("qa") === "1" ||
+          process.env.NEXT_PUBLIC_QA_MODE === "true";
+        setIsQaMode(isQa);
 
-        if (savedUnlocked) {
-          // 이전에 저장된 unlock 상태 복원
-          try {
-            const parsedUnlocked = JSON.parse(savedUnlocked) as number[];
-            console.log("[restored unlock state]", parsedUnlocked);
-            setUnlockedScenes(parsedUnlocked);
-          } catch {
-            // JSON 파싱 실패 시, 무료 scene만 unlock
+        console.log(
+          "[result] isQaMode=", isQa,
+          "| allScenes:", allScenes.length,
+          "| paid scenes:", allScenes.filter(s => !s.is_free).map(s => `${s.scene_index}(msg=${s.messages?.length ?? "null"})`),
+        );
+
+        if (isQa) {
+          // QA mode: 결제 없이 전체 씬 확인 (localStorage 기록 없음)
+          const allIndexes = allScenes.map((s) => s.scene_index);
+          console.log("[result] QA mode: unlockedScenes 전체 설정 →", allIndexes);
+          setUnlockedScenes(allIndexes);
+        } else {
+          // ── Unlock 상태 복원 ────────────────────────────────────
+          // 1. localStorage에서 저장된 unlock 상태 확인
+          // 2. 없으면 무료 scene만 unlock (결제 전 상태)
+          const unlockedKey = `veil_unlocked_scenes_${param.session_id}`;
+          const savedUnlocked = localStorage.getItem(unlockedKey);
+
+          if (savedUnlocked) {
+            // 이전에 저장된 unlock 상태 복원
+            try {
+              const parsedUnlocked = JSON.parse(savedUnlocked) as number[];
+              console.log("[restored unlock state]", parsedUnlocked);
+              setUnlockedScenes(parsedUnlocked);
+            } catch {
+              // JSON 파싱 실패 시, 무료 scene만 unlock
+              const freeIndices = resultScenes
+                .filter((s) => s.is_free)
+                .map((s) => s.scene_index);
+              setUnlockedScenes(freeIndices);
+            }
+          } else {
+            // 저장된 상태 없음 → 무료 scene만 unlock (결제 전 상태)
             const freeIndices = resultScenes
               .filter((s) => s.is_free)
               .map((s) => s.scene_index);
             setUnlockedScenes(freeIndices);
           }
-        } else {
-          // 저장된 상태 없음 → 무료 scene만 unlock (결제 전 상태)
-          const freeIndices = resultScenes
-            .filter((s) => s.is_free)
-            .map((s) => s.scene_index);
-          setUnlockedScenes(freeIndices);
         }
 
         setLoading(false);
@@ -348,6 +386,8 @@ const ResultPage = ({ params }: PageProps) => {
     } catch (err) {
       console.error("Paid scenes 생성 실패:", err);
       // TODO: 사용자에게 에러 알림
+      // re-throw: 호출 측 .then()이 실행되지 않아야 unlock state가 잘못 저장되지 않음
+      throw err;
     }
   }, [analyzeData, scenes]);
 
@@ -379,6 +419,10 @@ const ResultPage = ({ params }: PageProps) => {
     }
 
     if (isUnlock && hasPaymentKey) {
+      // 더블 실행 방지: scenes 업데이트로 useEffect가 재실행될 수 있음
+      if (isProcessingPayment.current) return;
+      isProcessingPayment.current = true;
+
       // Toss 결제 성공 ✓ + 우리의 unlock 플래그 ✓
       // 결제된 scene_indexes 추출
       let paidSceneIndexes: number[] = [];
@@ -391,28 +435,35 @@ const ResultPage = ({ params }: PageProps) => {
           .map((s) => s.scene_index);
       }
 
+      // recovery 여부 감지: 이전 시도 마커가 있으면 재방문 복구 케이스
+      const pendingKey = `veil_payment_pending_${sessionId}`;
+      const isRecovery = !!localStorage.getItem(pendingKey);
+      localStorage.setItem(pendingKey, "1");
+      setIsPaidGenerationRecovery(isRecovery);
+
       // loading UI 표시
       setPaidGenerationLoading(true);
 
       // Paid scenes 생성 (mock placeholder를 실제 generated scenes으로 교체)
       generatePaidScenes(paidSceneIndexes)
         .then(() => {
-          // 생성 완료 후 unlock 상태 업데이트
+          // 생성 완료 후에만 unlock 상태 저장 (성공 확인된 경우에만)
           const newUnlocked = [
             ...new Set([...unlockedScenes, ...paidSceneIndexes]),
           ];
           setUnlockedScenes(newUnlocked);
 
-          // localStorage에 unlock 상태 저장
+          // localStorage에 unlock 상태 저장 + 마커 제거
           if (typeof window !== "undefined") {
             localStorage.setItem(
               `veil_unlocked_scenes_${sessionId}`,
               JSON.stringify(newUnlocked),
             );
+            localStorage.removeItem(pendingKey);
             console.log("[unlock saved]", `veil_unlocked_scenes_${sessionId}`);
           }
 
-          // URL 정리 (히스토리에 결제 파라미터 남지 않게)
+          // URL 정리: 성공 후에만 정리 (이탈 후 재방문 시 URL 파라미터로 재시도 가능하게 유지)
           window.history.replaceState({}, "", window.location.pathname);
 
           // 결제 완료 후 FlowOverview로 스크롤
@@ -427,9 +478,12 @@ const ResultPage = ({ params }: PageProps) => {
         })
         .catch((err) => {
           console.error("[paid generation failed]", err);
+          // URL 정리하지 않음: 재방문 시 URL 파라미터가 남아 자동 재시도됨
+          // pendingKey도 유지: 다음 재방문 시 recovery=true로 표시
           // TODO: 사용자에게 에러 알림 (시도 재시도 옵션 제공)
         })
         .finally(() => {
+          isProcessingPayment.current = false;
           setPaidGenerationLoading(false);
         });
     } else if (searchParams.get("_payment_failed") === "true") {
@@ -778,17 +832,19 @@ const ResultPage = ({ params }: PageProps) => {
         />
       </main>
 
-      {/* 결제 모달 */}
-      <PaymentModal
-        isOpen={paymentModal.isOpen}
-        onClose={handleClosePaymentModal}
-        paymentType={paymentModal.type}
-        sceneIndex={paymentModal.sceneIndex}
-        cardTitle={paymentModal.cardTitle}
-      />
+      {/* 결제 모달: QA mode에서는 렌더 자체를 제거 */}
+      {!isQaMode && (
+        <PaymentModal
+          isOpen={paymentModal.isOpen}
+          onClose={handleClosePaymentModal}
+          paymentType={paymentModal.type}
+          sceneIndex={paymentModal.sceneIndex}
+          cardTitle={paymentModal.cardTitle}
+        />
+      )}
 
       {/* 유료 씬 생성 로딩 UI */}
-      {paidGenerationLoading && <PaidGenerationLoading />}
+      {paidGenerationLoading && <PaidGenerationLoading isRecovery={isPaidGenerationRecovery} />}
     </div>
   );
 };

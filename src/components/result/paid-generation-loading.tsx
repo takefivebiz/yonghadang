@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from "react";
 
-const PaidGenerationLoading = () => {
+interface PaidGenerationLoadingProps {
+  isRecovery?: boolean;
+}
+
+const PaidGenerationLoading = ({ isRecovery = false }: PaidGenerationLoadingProps) => {
   const [progress, setProgress] = useState(0);
   const progressPercent = Math.round(progress);
 
@@ -22,19 +26,19 @@ const PaidGenerationLoading = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden backdrop-blur-sm" style={{ backgroundColor: "rgba(29, 25, 43, 0.7)" }}>
       <style>{`
         @keyframes paidFragment1 {
-          0% { transform: translate(100px, -90px); opacity: 0.55; }
+          0% { transform: translate(100px, -90px); opacity: 0.85; }
           100% { transform: translate(0, 0); opacity: 0; }
         }
         @keyframes paidFragment2 {
-          0% { transform: translate(-120px, -70px); opacity: 0.4; }
+          0% { transform: translate(-120px, -70px); opacity: 0.75; }
           100% { transform: translate(0, 0); opacity: 0; }
         }
         @keyframes paidFragment3 {
-          0% { transform: translate(110px, 100px); opacity: 0.3; }
+          0% { transform: translate(110px, 100px); opacity: 0.7; }
           100% { transform: translate(0, 0); opacity: 0; }
         }
         @keyframes paidFragment4 {
-          0% { transform: translate(-100px, 95px); opacity: 0.6; }
+          0% { transform: translate(-100px, 95px); opacity: 0.85; }
           100% { transform: translate(0, 0); opacity: 0; }
         }
 
@@ -64,7 +68,7 @@ const PaidGenerationLoading = () => {
         }
 
         .paid-status-text {
-          background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.2) 60%, rgba(255,255,255,0.2) 100%);
+          background: linear-gradient(90deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0.5) 100%);
           background-size: 200% 100%;
           background-clip: text;
           -webkit-background-clip: text;
@@ -81,11 +85,11 @@ const PaidGenerationLoading = () => {
           <div
             className="paid-frag paid-frag-1"
             style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
+              background: "rgba(255, 255, 255, 0.08)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
               borderRadius: "12px 12px 3px 12px",
               fontSize: "11px",
-              color: "rgba(249, 249, 229, 0.3)",
+              color: "rgba(249, 249, 229, 0.7)",
               padding: "6px 12px",
             }}
           >
@@ -94,11 +98,11 @@ const PaidGenerationLoading = () => {
           <div
             className="paid-frag paid-frag-2"
             style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
+              background: "rgba(255, 255, 255, 0.08)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
               borderRadius: "12px 12px 3px 12px",
               fontSize: "11px",
-              color: "rgba(249, 249, 229, 0.25)",
+              color: "rgba(249, 249, 229, 0.65)",
               padding: "6px 12px",
             }}
           >
@@ -107,11 +111,11 @@ const PaidGenerationLoading = () => {
           <div
             className="paid-frag paid-frag-3"
             style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
+              background: "rgba(255, 255, 255, 0.08)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
               borderRadius: "12px 12px 3px 12px",
               fontSize: "14px",
-              color: "rgba(249, 249, 229, 0.28)",
+              color: "rgba(249, 249, 229, 0.68)",
               padding: "6px 12px",
             }}
           >
@@ -120,11 +124,11 @@ const PaidGenerationLoading = () => {
           <div
             className="paid-frag paid-frag-4"
             style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
+              background: "rgba(255, 255, 255, 0.08)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
               borderRadius: "12px 12px 3px 12px",
               fontSize: "11px",
-              color: "rgba(249, 249, 229, 0.32)",
+              color: "rgba(249, 249, 229, 0.72)",
               padding: "6px 12px",
             }}
           >
@@ -138,13 +142,13 @@ const PaidGenerationLoading = () => {
               animation: "paidBounce 4s ease-in-out infinite",
               width: "100px",
               height: "55px",
-              background: "rgba(255, 255, 255, 0.04)",
-              border: "1px solid rgba(209, 126, 191, 0.27)",
+              background: "rgba(255, 255, 255, 0.09)",
+              border: "1px solid rgba(209, 126, 191, 0.55)",
               borderRadius: "25px 25px 25px 4px",
               padding: "16px",
               overflow: "hidden",
               boxShadow:
-                "0 0 24px rgba(209, 109, 172, 0.12), inset 0 0 12px rgba(209, 109, 172, 0.08)",
+                "0 0 24px rgba(209, 109, 172, 0.25), inset 0 0 12px rgba(209, 109, 172, 0.18)",
             }}
           >
             {/* 아래에서 위로 채우는 효과 */}
@@ -153,7 +157,7 @@ const PaidGenerationLoading = () => {
                 position: "absolute",
                 inset: 0,
                 background:
-                  "linear-gradient(to top, rgba(209, 109, 172, 0.15), transparent)",
+                  "linear-gradient(to top, rgba(209, 109, 172, 0.3), transparent)",
                 clipPath: `inset(${Math.max(0, 100 - progressPercent)}% 0 0 0)`,
                 transition: "clip-path 300ms ease-out",
                 borderRadius: "16px 16px 16px 4px",
@@ -165,7 +169,7 @@ const PaidGenerationLoading = () => {
                 style={{
                   fontSize: "13px",
                   fontWeight: "300",
-                  color: "rgba(249, 249, 229, 0.746)",
+                  color: "rgba(249, 249, 229, 0.92)",
                   letterSpacing: "-0.02em",
                   lineHeight: "1",
                 }}
@@ -187,15 +191,19 @@ const PaidGenerationLoading = () => {
               marginTop: "-135px",
             }}
           >
-            {progressPercent < 20
-              ? "더 깊은 흐름을 읽는 중..."
-              : progressPercent < 40
-                ? "감정의 구조를 분석 중..."
-                : progressPercent < 60
-                  ? "통찰을 정리하는 중..."
-                  : progressPercent < 80
-                    ? "결과를 구성하는 중..."
-                    : "거의 다 됐어"}
+            {isRecovery
+            ? (progressPercent < 50
+                ? "결제한 내용을 이어서 불러오는 중..."
+                : "거의 다 됐어")
+            : (progressPercent < 20
+                ? "더 깊은 흐름을 읽는 중..."
+                : progressPercent < 40
+                  ? "감정의 구조를 분석 중..."
+                  : progressPercent < 60
+                    ? "통찰을 정리하는 중..."
+                    : progressPercent < 80
+                      ? "결과를 구성하는 중..."
+                      : "거의 다 됐어")}
           </p>
         </div>
       </div>

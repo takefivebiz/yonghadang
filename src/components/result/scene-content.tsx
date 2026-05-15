@@ -64,10 +64,12 @@ const AiBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
 
 // 펀치라인 (강조 문장)
 const PunchBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
-  const verticalMargin = index % 2 === 0 ? "my-11" : "my-12";
+  // index=0: title 바로 아래 subtitle 위치. 상단 margin 없애고 하단만 유지.
+  // index>0: 본문 중간 감정 강조 (기존 스타일 유지)
+  const verticalMargin = index === 0 ? "mt-0 mb-7" : (index % 2 === 0 ? "my-11" : "my-12");
 
   return (
-    <div className={`${verticalMargin} px-4 text-center`}>
+    <div className={`${verticalMargin} px-4 text-left`}>
       <p
         className="font-punch whitespace-pre-line"
         style={{
@@ -137,6 +139,8 @@ const SceneContent = ({
   const messages = scene.messages ?? [];
   const openingMessages = messages.slice(0, 1);
   const bodyMessages = messages.slice(1);
+  // punch가 첫 메시지(subtitle 위치)면 title과의 간격을 좁힘
+  const hasLeadingPunch = openingMessages[0]?.type === "punch";
 
   return (
     <div
@@ -202,7 +206,7 @@ const SceneContent = ({
       {/* Scene 콘텐츠 */}
       {!isLocked ? (
         // 무료 또는 unlocked scene
-        <div data-testid="scene-messages" className="space-y-1 mt-6">
+        <div data-testid="scene-messages" className={`space-y-1 ${hasLeadingPunch ? "mt-3" : "mt-6"}`}>
           {/* Opening: 항상 visible */}
           {openingMessages.map((msg, idx) => renderMessage(msg, idx))}
 

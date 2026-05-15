@@ -15,6 +15,7 @@ import type { ResultScene } from "@/lib/types/result";
 import { getContentPack } from "@/lib/content-packs";
 import { accumulateHiddenState } from "@/lib/quiz/accumulator";
 import { translateStateToSummary } from "@/lib/quiz/translator";
+import { mergeScenes } from "@/lib/utils/merge-scenes";
 
 interface PageProps {
   params: Promise<{ session_id: string }>;
@@ -160,6 +161,11 @@ const AnalyzePage = ({ params }: PageProps) => {
 
   // ── Generate API 호출 및 장면 캐싱 ──────────────────────────────────────
   const generateScenes = async (finalData: AnalyzeAnswers, loadingStartTime: number) => {
+    // try block 외부에서 선언해야 catch block에서도 참조 가능
+    const isQaMode =
+      searchParams.get("qa") === "1" ||
+      process.env.NEXT_PUBLIC_QA_MODE === "true";
+
     try {
       const generateStartTime = Date.now();
       console.log(
@@ -220,16 +226,126 @@ const AnalyzePage = ({ params }: PageProps) => {
         );
       }
 
-      // ── Mock / Real 분기 ──────────────────────────────────────────
-      const useMock = process.env.NEXT_PUBLIC_USE_MOCK_RESULT !== "false";
-
-      if (!useMock) {
-        // 무료 scenes만 생성 (결제 전 빠른 로딩)
+      if (isQaMode) {
+        // ── QA mode: 무료 씬 → 유료 씬 순서로 2-call 생성 ───────────────────
+        // 실서비스 흐름(무료 씬만 생성)은 절대 변경하지 않는다.
+        console.log("[QA] 2-call generate 시작");
         const freeSceneIndexes = sceneConfig.scenes
           .filter((s) => s.is_free)
           .map((s) => s.index);
 
-        // 실제 Claude generate 호출
+        // Call 1: 무료 씬 생성
+        const freeRes = await fetch(
+          `/api/analyze/${finalData.session_id}/generate`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              content_title: content.title.replace(/\n/g, " "),
+              category: content.category,
+              user_input: { text: finalData.free_input, answers: userAnswers },
+              scene_config: sceneConfig,
+              scene_indexes: freeSceneIndexes,
+              state_summary: stateSummary,
+            }),
+          },
+        );
+        if (!freeRes.ok) throw new Error(`무료 씬 생성 실패 (HTTP ${freeRes.status})`);
+        const freeData = (await freeRes.json()) as { session_id: string; result_scenes: ResultScene[] };
+        const freeScenes = freeData.result_scenes;
+
+        console.log(
+          "[QA] Call 1 완료. freeScenes:", freeScenes.length,
+          "| scene_indexes:", freeScenes.map((s) => s.scene_index),
+          "| is_free values:", freeScenes.map((s) => `${s.scene_index}:${s.is_free}`),
+          "| messages 존재:", freeScenes.map((s) => `${s.scene_index}:${!!s.messages}`),
+        );
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem(
+            `veil_free_scenes_${finalData.session_id}`,
+            JSON.stringify(freeScenes),
+          );
+        }
+
+        // Call 2: 유료 씬 생성 (무료 씬 context 포함)
+        const paidSceneIndexes = sceneConfig.scenes
+          .filter((s) => !s.is_free)
+          .map((s) => s.index);
+
+        if (paidSceneIndexes.length > 0) {
+          // s.is_free는 Claude 응답값이라 undefined일 수 있다.
+          // freeScenes 배열은 무료 씬만 생성한 결과이므로 마지막 원소가 마지막 무료 씬이다.
+          const lastFreeScene = freeScenes.slice(-1)[0];
+          console.log(
+            "[QA] lastFreeScene 추출 →",
+            lastFreeScene
+              ? `scene_index: ${lastFreeScene.scene_index}, messages: ${lastFreeScene.messages?.length ?? "null"}`
+              : "없음 (freeScenes 비어있음)",
+          );
+          if (!lastFreeScene?.messages) throw new Error("무료 씬 context를 추출할 수 없어");
+
+          const freeSceneContext = {
+            sceneTitle: lastFreeScene.scene_title,
+            lastMessages: lastFreeScene.messages.slice(-2),
+          };
+
+          const paidRes = await fetch(
+            `/api/analyze/${finalData.session_id}/generate`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                content_title: content.title.replace(/\n/g, " "),
+                category: content.category,
+                user_input: { text: finalData.free_input, answers: userAnswers },
+                scene_config: sceneConfig,
+                scene_indexes: paidSceneIndexes,
+                free_scene_context: freeSceneContext,
+                state_summary: stateSummary,
+              }),
+            },
+          );
+          if (!paidRes.ok) throw new Error(`유료 씬 생성 실패 (HTTP ${paidRes.status})`);
+          const paidData = (await paidRes.json()) as { session_id: string; result_scenes: ResultScene[] };
+          const paidScenes = paidData.result_scenes;
+
+          console.log(
+            "[QA] Call 2 완료. paidScenes:", paidScenes.length,
+            "| scene_indexes:", paidScenes.map((s) => s.scene_index),
+            "| messages 존재:", paidScenes.map((s) => `${s.scene_index}:${!!s.messages}(${s.messages?.length ?? 0}개)`),
+          );
+
+          // 무료 + 유료 병합 → veil_all_scenes_ 에 저장
+          // result page는 이 키를 먼저 읽고, paid placeholder보다 실제 데이터를 우선 사용한다
+          const allScenes = mergeScenes(freeScenes, paidScenes);
+          console.log(
+            "[QA] mergeScenes 완료. allScenes:", allScenes.length,
+            "| indexes:", allScenes.map((s) => `${s.scene_index}(${s.is_free ? "free" : "paid"},msg=${s.messages?.length ?? "null"})`),
+          );
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem(
+              `veil_all_scenes_${finalData.session_id}`,
+              JSON.stringify(allScenes),
+            );
+            console.log(`[QA] veil_all_scenes_${finalData.session_id} 저장 완료`);
+          }
+        }
+
+        setProgress(100);
+        setTimeout(() => {
+          console.log("[QA] result page로 이동 (?qa=1 포함)");
+          router.push(`/result/${finalData.session_id}?qa=1`);
+        }, 300);
+      } else {
+        // ── 일반 mode: 무료 씬만 생성 (결제 전 빠른 로딩) ──────────────────
+        // 항상 실제 API 호출. 실패 시 catch에서 result page로 이동하고,
+        // result page는 veil_free_scenes_ 캐시가 없으면 자체 fallback(mock)을 사용한다.
+        const freeSceneIndexes = sceneConfig.scenes
+          .filter((s) => s.is_free)
+          .map((s) => s.index);
+
         const res = await fetch(
           `/api/analyze/${finalData.session_id}/generate`,
           {
@@ -261,46 +377,47 @@ const AnalyzePage = ({ params }: PageProps) => {
           result_scenes: ResultScene[];
         };
 
-        // free scenes 캐시 저장 (나중에 merge용)
+        // 무료 scenes 캐시 저장 → result page가 veil_free_scenes_ key로 읽는다
         if (typeof window !== "undefined") {
           localStorage.setItem(
             `veil_free_scenes_${finalData.session_id}`,
             JSON.stringify(resData.result_scenes),
           );
         }
-      }
 
-      // ✅ API 응답 완료 로그
-      const generateEndTime = Date.now();
-      const totalLoadingTime = generateEndTime - loadingStartTime;
-      console.log(
-        "[analyze] Generate API 응답 완료",
-        new Date(generateEndTime).toISOString(),
-        {
-          apiResponseTime: `${generateEndTime - generateStartTime}ms`,
-          totalLoadingTime: `${totalLoadingTime}ms`,
-        },
-      );
-
-      // Progress를 100%로 설정 (API 완료)
-      setProgress(100);
-
-      // 짧은 딜레이 후 result page로 이동
-      setTimeout(() => {
-        const navigateTime = Date.now();
+        // ✅ API 응답 완료 로그
+        const generateEndTime = Date.now();
+        const totalLoadingTime = generateEndTime - loadingStartTime;
         console.log(
-          "[analyze] Result page 이동",
-          new Date(navigateTime).toISOString(),
-          `(총 Loading 시간: ${navigateTime - loadingStartTime}ms)`,
+          "[analyze] Generate API 응답 완료",
+          new Date(generateEndTime).toISOString(),
+          {
+            apiResponseTime: `${generateEndTime - generateStartTime}ms`,
+            totalLoadingTime: `${totalLoadingTime}ms`,
+          },
         );
-        router.push(`/result/${finalData.session_id}`);
-      }, 300);
+
+        // Progress를 100%로 설정 (API 완료)
+        setProgress(100);
+
+        // 짧은 딜레이 후 result page로 이동
+        setTimeout(() => {
+          const navigateTime = Date.now();
+          console.log(
+            "[analyze] Result page 이동",
+            new Date(navigateTime).toISOString(),
+            `(총 Loading 시간: ${navigateTime - loadingStartTime}ms)`,
+          );
+          router.push(`/result/${finalData.session_id}`);
+        }, 300);
+      }
     } catch (err) {
-      console.error("Generate 실패:", err);
-      // 에러 처리 (현재는 간단히 진행)
+      console.error("[generate] 실패:", err);
       setProgress(100);
+      // QA mode에서 에러가 나도 ?qa=1 유지 → result page가 QA unlock 상태 유지
+      // (free scenes는 저장됐을 수 있으므로 unlock 상태로 보여주는 게 낫다)
       setTimeout(() => {
-        router.push(`/result/${finalData.session_id}`);
+        router.push(`/result/${finalData.session_id}${isQaMode ? "?qa=1" : ""}`);
       }, 1000);
     }
   };
