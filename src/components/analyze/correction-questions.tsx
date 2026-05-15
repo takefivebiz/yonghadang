@@ -116,7 +116,7 @@ const CorrectionQuestions = ({
               background: "rgba(255, 255, 255, 0.04)",
               border: "1px solid rgba(255, 255, 255, 0.015)",
               borderRadius: "14px 14px 14px 0px",
-              maxWidth: "220px",
+              maxWidth: "250px",
             }}
           >
             <p
@@ -125,7 +125,7 @@ const CorrectionQuestions = ({
             >
               질문 {currentQuestionIndex + 1}
             </p>
-            <h1 className="text-lg sm:text-xl font-semibold leading-tight mb-4 whitespace-pre-line">
+            <h1 className="text-base sm:text-lg font-semibold leading-tight mb-4 whitespace-pre-line">
               {currentQuestion.text}
             </h1>
             <p
