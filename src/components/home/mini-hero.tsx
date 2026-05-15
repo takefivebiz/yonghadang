@@ -39,7 +39,6 @@ const MiniHero = () => {
               alt="VEIL 메인 일러스트"
               fill
               priority
-              quality={95}
               className="object-cover object-center"
               style={{
                 opacity: 0.82,
@@ -51,18 +50,17 @@ const MiniHero = () => {
               className="absolute inset-0 flex flex-col items-center text-center px-8"
               style={{
                 background:
-                  "linear-gradient(180deg, rgba(116, 94, 123, 0.754) 0%, rgba(0,0,0,0) 50%)",
+                  "linear-gradient(180deg, rgba(59, 54, 82, 0.902) 0%, rgba(0,0,0,0) 60%)",
                 paddingTop: "62px",
               }}
             >
               <h2
-                className="font-hero font-medium leading-[1.35]"
+                className="font-hero font-nomal leading-[1.2] text-[2rem] md:text-[2.5rem]"
                 style={{
                   color: "rgb(228, 217, 229)",
-                  fontSize: "clamp(1.4rem, 2.2vw, 1.5rem)",
                   letterSpacing: "-0.03em",
                   textShadow:
-                    "0 2px 0px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 0, 0, 0.2)",
+                    "0 2px 0px rgba(0, 0, 0, 0.4), 0 0 3px rgba(0, 0, 0, 0.2)",
                 }}
               >
                 다정하게 듣고,
@@ -73,16 +71,14 @@ const MiniHero = () => {
               <p
                 className="font-body mt-2"
                 style={{
-                  color: "rgb(222, 214, 221)",
-                  fontSize: "clamp(0.95rem, 1.2vw, 1.1rem)",
-                  fontWeight: 300,
-                  letterSpacing: "-0.02em",
+                  color: "rgba(255, 255, 255, 0.716)",
+                  fontSize: "clamp(1rem, 1.2vw, 1.1rem)",
+                  fontWeight: 400,
+                  letterSpacing: "-0.04em",
                   lineHeight: 1.6,
-                  textShadow:
-                    "0 2px 0px rgba(0, 0, 0, 0.4), 0 0 12px rgba(0, 0, 0, 0.2)",
                 }}
               >
-                좋은 말보다 필요한 말을.
+                지금 너에게 가장 필요한 말
               </p>
             </div>
           </div>
@@ -97,7 +93,7 @@ const MiniHero = () => {
             <p
               className="tracking-[0.18em]"
               style={{
-                color: "rgb(189, 189, 189)",
+                color: "rgba(255, 255, 255, 0.802)",
                 fontSize: "11px",
               }}
             >

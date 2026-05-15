@@ -765,7 +765,10 @@ const ResultPage = ({ params }: PageProps) => {
           })()}
 
           {/* 추가 리딩 카드 */}
-          <AdditionalReadings readings={additionalReadings} />
+          {/* TODO: [결제 연동] unlockedReadingIds를 실제 구매 상태(DB/localStorage)로 교체 */}
+          <AdditionalReadings
+            readings={additionalReadings}
+          />
         </div>
 
         {/* 결과 페이지 하단 액션 */}

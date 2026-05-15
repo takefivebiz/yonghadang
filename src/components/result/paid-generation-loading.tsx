@@ -19,7 +19,7 @@ const PaidGenerationLoading = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden backdrop-blur-sm" style={{ backgroundColor: "rgba(29, 25, 43, 0.7)" }}>
       <style>{`
         @keyframes paidFragment1 {
           0% { transform: translate(100px, -90px); opacity: 0.55; }

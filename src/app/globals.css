@@ -2,14 +2,6 @@
 
 @font-face {
   font-family: "Suit";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Thin.woff2")
-    format("woff2");
-  font-weight: 100;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Suit";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraLight.woff2")
     format("woff2");
   font-weight: 200;
@@ -57,77 +49,10 @@
 }
 
 @font-face {
-  font-family: "Suit";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-ExtraBold.woff2")
-    format("woff2");
-  font-weight: 800;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Suit";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Heavy.woff2")
-    format("woff2");
-  font-weight: 900;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MaruBuri";
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-ExtraLight.woff2);
-  font-weight: 200;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MaruBuri";
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Light.woff2);
-  font-weight: 300;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MaruBuri";
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2);
+  font-family: "Memoment";
+  src: url("/fonts/memomentKkukkkuk.ttf") format("truetype");
   font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "MaruBuri";
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2);
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "MaruBuri";
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2);
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "MaruBuri";
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Light.woff2);
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "MaruBuri";
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-ExtraLight.woff2);
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MaruBuri";
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-SemiBold.woff2);
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MaruBuri";
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2);
-  font-weight: 700;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -148,7 +73,7 @@
 
   /* 폰트 테스트용 변수: 각 섹션별로 폰트패밀리 교체 가능 */
   --font-header: "Suit"; /* Navbar, 헤더 */
-  --font-hero: "MaruBuri"; /* MiniHero, 히어로 섹션 */
+  --font-hero: "Memoment"; /* MiniHero, 히어로 섹션 */
   --font-content-card: "Suit"; /* 콘텐츠 카드 제목 */
   --font-category: "Suit"; /* 카테고리 탭 */
   --font-body: "Suit"; /* 본문 텍스트 */

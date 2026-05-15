@@ -163,29 +163,15 @@ export const LOVE_1_ADDITIONAL_READINGS: AdditionalReading[] = [
     trigger_threshold: 3,
   },
   {
-    id: "what_if_i_make_a_move",
-    title: "내가 먼저 결단하면 무슨 일이 생길까?",
-    subtitle: "묻거나, 멈추거나, 거리를 둘 때 달라지는 것",
-    trigger_dimension: "confirmationNeed",
-    trigger_threshold: 3,
-  },
-  {
     id: "why_am_i_lower_position",
-    title: "나는 언제부터 이렇게 을의 연애를 했지?",
+    title: "나는 언제부터 이렇게 을의 연애를 했을까?",
     subtitle: "기다리고 맞추는 쪽이 되어버린 이유",
     trigger_dimension: "imbalanceSensitivity",
     trigger_threshold: 3,
   },
   {
-    id: "how_can_i_change_now",
-    title: "지금 당장 뭘 해야 내가 달라질까?",
-    subtitle: "흔들리는 쪽에서 선택하는 쪽으로 가는 방법",
-    trigger_dimension: "anxiety",
-    trigger_threshold: 3,
-  },
-  {
     id: "how_to_set_my_standard",
-    title: "기준을 어떻게 세워야 마음이 편해질까?",
+    title: "기준을 어떻게 세워야\n마음이 편해질까?",
     subtitle: "기다릴지, 확인할지, 멈출지 정하는 기준",
   },
 ];
