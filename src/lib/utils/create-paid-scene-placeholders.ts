@@ -21,7 +21,6 @@ export const createPaidScenePlaceholders = (
       id: `${sessionId}-scene-${configScene.index}`,
       scene_index: configScene.index,
       scene_title: configScene.title,
-      intro: configScene.intro,
       is_free: false,
       is_unlocked: false,
       messages: null,  // 잠금 상태: messages null

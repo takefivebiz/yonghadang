@@ -10,7 +10,7 @@ import { getInputConfig } from "@/lib/data/dummy-analyze-config";
 import { AnalyzeState, Answer, AnalyzeAnswers } from "@/lib/types/analyze";
 import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
 import { DUMMY_INPUT_CONFIGS } from "@/lib/data/dummy-analyze-config";
-import { getSceneConfig } from "@/lib/data/dummy-scene-configs";
+import { getSceneConfig } from "@/lib/data/scene-configs";
 import type { ResultScene } from "@/lib/types/result";
 import { getContentPack } from "@/lib/content-packs";
 import { accumulateHiddenState } from "@/lib/quiz/accumulator";
@@ -162,8 +162,13 @@ const AnalyzePage = ({ params }: PageProps) => {
   // ── Generate API 호출 및 장면 캐싱 ──────────────────────────────────────
   const generateScenes = async (finalData: AnalyzeAnswers, loadingStartTime: number) => {
     // try block 외부에서 선언해야 catch block에서도 참조 가능
+    // window.location.search 직접 사용 (result page와 동일한 패턴):
+    // useSearchParams() 훅은 Next.js 15 App Router에서 Suspense 경계 / route 전환
+    // 영향으로 빈 URLSearchParams를 반환할 수 있음 → ?qa=1이 있어도 감지 실패.
+    // 결과적으로 isQaMode=false → 일반 mode 분기 → veil_all_scenes_ 저장 안 됨.
     const isQaMode =
-      searchParams.get("qa") === "1" ||
+      (typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("qa") === "1") ||
       process.env.NEXT_PUBLIC_QA_MODE === "true";
 
     try {

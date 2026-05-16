@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { generateMockResultScenes } from "@/lib/data/dummy-result-scenes";
 import { DUMMY_INPUT_CONFIGS } from "@/lib/data/dummy-analyze-config";
-import { getSceneConfig } from "@/lib/data/dummy-scene-configs";
+import { getSceneConfig } from "@/lib/data/scene-configs";
 import { ResultScene } from "@/lib/types/result";
 import { AnalyzeAnswers, Answer } from "@/lib/types/analyze";
 import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";

@@ -14,8 +14,6 @@ export interface ResultScene {
   id: string;
   scene_index: number;
   scene_title: string;
-  /** 장면 진입 직전의 감정 흐름 */
-  intro?: string;
   is_free: boolean;
   is_unlocked: boolean;
   // 무료·잠금해제 씬: 전체 메시지, 미구매 유료 씬: null
