@@ -34,29 +34,23 @@ export const LOVE_1_SCORE_MAP: Record<
   Partial<Record<Love1Dimension, number>>
 > = {
   // ── Q1: 흔들림의 현재 위상 ─────────────────────────────────────────
+  // need_clear_answer+last_check_before_action → clarity_and_decide (clarityHunger:3, actionImminence:2)
+  // slowly_lowering_expectation+worn_out_from_shaking → fading_with_fatigue (expectationFold:3, emotionalFatigue:2)
   just_started_shaking: {
     shakeIntensity: 3,
     clarityHunger: 1,
   },
-  need_clear_answer: {
+  clarity_and_decide: {
     clarityHunger: 3,
-    shakeIntensity: 1,
+    actionImminence: 2,
   },
   replaying_conversations: {
     interpretiveLoop: 3,
     shakeIntensity: 1,
   },
-  last_check_before_action: {
-    actionImminence: 3,
-    clarityHunger: 2,
-  },
-  slowly_lowering_expectation: {
+  fading_with_fatigue: {
     expectationFold: 3,
-    emotionalFatigue: 1,
-  },
-  worn_out_from_shaking: {
-    emotionalFatigue: 3,
-    expectationFold: 2,
+    emotionalFatigue: 2,
   },
   cant_let_go_after_end: {
     shakeIntensity: 2,
@@ -86,11 +80,9 @@ export const LOVE_1_SCORE_MAP: Record<
   },
 
   // ── Q3: 흔들릴 때 내 반응 (multiple) ──────────────────────────────
-  rechecking_signals: {
-    interpretiveLoop: 2,
-    shakeIntensity: 1,
-  },
-  silent_overthinking: {
+  // rechecking_signals+silent_overthinking → looping_inside (점수 동일)
+  // unwanted_recurrence 제거 (Q1/Q4 중복 신호)
+  looping_inside: {
     interpretiveLoop: 2,
     shakeIntensity: 1,
   },
@@ -109,12 +101,9 @@ export const LOVE_1_SCORE_MAP: Record<
     expectationFold: 2,
     emotionalFatigue: 1,
   },
-  unwanted_recurrence: {
-    shakeIntensity: 2,
-    expectationFold: 2,
-  },
 
   // ── Q4: 가장 지치게 만드는 것 ─────────────────────────────────────
+  // failing_to_let_go+mind_keeps_returning → cant_move_on (expectationFold:3, shakeIntensity:2)
   confirmed_one_sided: {
     shakeIntensity: 2,
     emotionalFatigue: 1,
@@ -131,23 +120,16 @@ export const LOVE_1_SCORE_MAP: Record<
     actionImminence: 3,
     clarityHunger: 1,
   },
-  failing_to_let_go: {
-    expectationFold: 2,
-    shakeIntensity: 2,
-  },
-  mind_keeps_returning: {
-    shakeIntensity: 2,
+  cant_move_on: {
     expectationFold: 3,
+    shakeIntensity: 2,
   },
 
   // ── Q5: 진짜 원하는 것 ────────────────────────────────────────────
-  want_expression: {
+  // want_expression+want_direction → want_clarity_from_other (clarityHunger:3, shakeIntensity:1)
+  want_clarity_from_other: {
     clarityHunger: 3,
     shakeIntensity: 1,
-  },
-  want_direction: {
-    clarityHunger: 3,
-    actionImminence: 1,
   },
   want_to_know_their_heart: {
     interpretiveLoop: 2,

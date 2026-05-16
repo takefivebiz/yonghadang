@@ -12,12 +12,12 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
     ],
 
     questions: [
-      // ── Q1: 흔들림의 현재 위상 (single, 7 options) ──────────────────
-      // 7개 흔들림 subtype의 1차 진입 신호. 모두 "이미 흔들리고 있다"는 전제.
-      // 강한흔들림/확인욕구/반복해석/고백전/기대접기/소진/미련 subtype에 각각 +3씩 진입.
+      // ── Q1: 흔들림의 현재 위상 (single, 5 options) ──────────────────
+      // 5개로 정리. need_clear_answer+last_check_before_action 병합 → clarity_and_decide
+      // slowly_lowering_expectation+worn_out_from_shaking 병합 → fading_with_fatigue
       {
         index: 1,
-        text: "지금 너의 흔들림은\n어디쯤 와 있어?",
+        text: "지금 네 상황은 어때?",
         type: "single",
         options: [
           {
@@ -25,24 +25,16 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
             value: "just_started_shaking",
           },
           {
-            label: "좋아하는지 아닌지, 답이 필요해",
-            value: "need_clear_answer",
+            label: "좋아하는지 알고 싶고, 뭔가 결정해야 할 것 같아",
+            value: "clarity_and_decide",
           },
           {
             label: "같은 대화를 계속 다시 보고 있어",
             value: "replaying_conversations",
           },
           {
-            label: "곧 뭔가 해야 할 것 같은데, 한 번만 더 확인하고 싶어",
-            value: "last_check_before_action",
-          },
-          {
-            label: "천천히 기대를 접는 중이야",
-            value: "slowly_lowering_expectation",
-          },
-          {
-            label: "너무 오래 흔들려서 지쳐가고 있어",
-            value: "worn_out_from_shaking",
+            label: "기대는 접고 싶은데, 이미 많이 지쳐 있어",
+            value: "fading_with_fatigue",
           },
           {
             label: "끝난 것 같은데 마음이 못 놓아",
@@ -55,7 +47,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       // 모두 "애매하거나 결정적이지 않은" 상태 전제. 관망형/우위형 제거.
       {
         index: 2,
-        text: "상대 태도는\n어떤 애매함에 가까워?",
+        text: "상대의 태도는 어때?",
         type: "single",
         options: [
           {
@@ -81,20 +73,17 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
         ],
       },
 
-      // ── Q3: 흔들릴 때 내 반응 (multiple, 7 options) ─────────────────
-      // 7개 subtype별 행동 패턴. 관망/정의권 행동 제거, 흔들림의 결로 통일.
+      // ── Q3: 흔들릴 때 내 반응 (multiple, 5 options) ─────────────────
+      // rechecking_signals+silent_overthinking 병합 → looping_inside (점수 동일)
+      // unwanted_recurrence 제거 (Q1 cant_let_go / Q4 cant_move_on과 중복 신호)
       {
         index: 3,
         text: "흔들릴 때\n너는 보통 어떻게 반응해?",
         type: "multiple",
         options: [
           {
-            label: "나눴던 대화를 계속 다시 봐",
-            value: "rechecking_signals",
-          },
-          {
-            label: "괜찮은 척하지만 혼자 의미를 찾아",
-            value: "silent_overthinking",
+            label: "괜찮은 척하면서 혼자 계속 되짚어",
+            value: "looping_inside",
           },
           {
             label: "상대 반응 하나에 하루 기분이 좌우돼",
@@ -112,15 +101,11 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
             label: "이제 의미 부여를 줄이려고 노력해",
             value: "trying_to_detach",
           },
-          {
-            label: "다 잊은 줄 알았는데 자꾸 떠올라",
-            value: "unwanted_recurrence",
-          },
         ],
       },
 
-      // ── Q4: 가장 지치게 만드는 것 (single, 6 options) ──────────────
-      // "어디에서 소진되는가" → 흔들림의 결 차이를 가른다. 호기심/우위형 제거.
+      // ── Q4: 가장 지치게 만드는 것 (single, 5 options) ──────────────
+      // failing_to_let_go+mind_keeps_returning 병합 → cant_move_on
       {
         index: 4,
         text: "이 관계에서 너를\n가장 지치게 만드는 건 뭐야?",
@@ -143,30 +128,22 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
             value: "pressure_to_decide_soon",
           },
           {
-            label: "기대를 접으려는데 자꾸 흔들리는 것",
-            value: "failing_to_let_go",
-          },
-          {
-            label: "끝났는데도 마음이 자꾸 돌아가는 것",
-            value: "mind_keeps_returning",
+            label: "마음을 정리하려는데 자꾸 다시 돌아오는 것",
+            value: "cant_move_on",
           },
         ],
       },
 
-      // ── Q5: 진짜 원하는 것 (single, 6 options) ─────────────────────
-      // 흔들림의 출구. 자기기준/거리두기형 제거, 행동/정리 옵션 추가.
+      // ── Q5: 진짜 원하는 것 (single, 5 options) ─────────────────────
+      // want_expression+want_direction 병합 → want_clarity_from_other
       {
         index: 5,
         text: "솔직히 지금\n가장 원하는 건 뭐야?",
         type: "single",
         options: [
           {
-            label: "상대가 먼저 확실한 표현을 해줬으면",
-            value: "want_expression",
-          },
-          {
-            label: "이 관계가 어디로 가는 건지 알고 싶어",
-            value: "want_direction",
+            label: "상대가 이 관계를 확실히 해줬으면",
+            value: "want_clarity_from_other",
           },
           {
             label: "상대 마음이 어떤지 정확히 알고 싶어",
