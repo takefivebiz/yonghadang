@@ -12,7 +12,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
     scenes: [
       {
         index: 1,
-        title: "너는 애매할수록\n더 작은 신호에 흔들려",
+        title: "애매한 관계에서\n너는 어떻게 반응하는지",
         role: "relationship_tendency",
         goal: "사용자가 현재 관계 안에서 어떤 방식으로 흔들리고 반응하는 사람인지 읽어준다. 읽자마자 자기 성향을 들킨 느낌이 들어야 한다.",
         focus: [
@@ -35,7 +35,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
 
       {
         index: 2,
-        title: "그 사람은 마음보다\n확신을 아끼고 있어",
+        title: "상대의 태도에서\n무엇이 보이고 있는지",
         role: "partner_signal_reading",
         goal: "사용자의 자유입력과 선택지를 바탕으로, 상대가 이 관계를 어떤 태도로 대하고 있는지 해석한다. 단정적으로 좋아한다/아니다를 말하지는 않지만, 상대의 행동이 어떤 가능성과 한계를 동시에 보여주는지 짚는다.",
         focus: [
@@ -56,7 +56,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
 
       {
         index: 3,
-        title: "좋아하는 마음과\n책임지는 마음은 달라",
+        title: "이 관계가\n어디까지 갈 수 있는지",
         role: "relationship_possibility",
         goal: "이 관계가 좋아하는 감정 위에 있는지, 익숙함이나 애매함 위에 있는지 가능성을 해석한다. 사용자가 가장 궁금해하는 '그래서 이 사람 마음이 있는가'에 대해 조심스럽지만 분명한 방향성을 준다.",
         focus: [
@@ -77,7 +77,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
 
       {
         index: 4,
-        title: "애매함은 결국\n네 감정을 쓰게 만들어",
+        title: "이 관계가 너의 감정을\n어떻게 바꾸고 있는지",
         role: "emotional_effect",
         goal: "현재 관계가 사용자 감정과 기준에 어떤 영향을 주고 있는지 보여준다.",
         focus: [
@@ -97,7 +97,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
 
       {
         index: 5,
-        title: "네가 바란 건\n사랑보다 확실한 태도야",
+        title: "네가 진짜 확인받고 싶은 건\n무엇인지",
         role: "hidden_expectation",
         goal: "사용자가 이 관계에서 진짜 기대하고 있는 것이 무엇인지 보여준다. 단순히 사랑받고 싶은 건지, 선택받고 싶은 건지, 관계를 확신받고 싶은 건지 드러낸다.",
         focus: [
@@ -117,7 +117,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
 
       {
         index: 6,
-        title: "이 관계는 선명해지거나\n계속 너를 흔들 거야",
+        title: "이 관계가\n어디로 흘러갈 수 있는지",
         role: "relationship_direction",
         goal: "현재 관계가 어떤 방향으로 이어질 가능성이 큰지 보여준다. 상대 태도와 사용자 감정을 함께 읽어서, 이 관계가 어디에서 계속 흔들리고 있는지 해석한다.",
         focus: [
