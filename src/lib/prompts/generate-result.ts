@@ -663,9 +663,6 @@ export const mapClaudeToResultScenes = (
   sceneConfig: SceneConfig,
 ): ResultScene[] => {
   return claudeScenes.map((scene) => {
-    const configScene = sceneConfig.scenes.find(
-      (s) => s.index === scene.scene_index,
-    );
     const messages: SceneMessage[] = scene.messages.map((m) => ({
       type: m.type,
       text: m.text,
