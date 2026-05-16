@@ -5,9 +5,8 @@ import { Content, InputConfig, SceneConfig } from "@/lib/types/content";
 // 리스팅 페이지에서는 input_config/scene_config를 사용하지 않으므로 공통 stub 사용
 // 실제 값은 dummy-analyze-config.ts에서 관리하며, 백엔드 연동 시 통합됨
 const STUB_INPUT_CONFIG: InputConfig = {
-  placeholder: "",
-  example_inputs: [],
-  questions: [],
+  version: 2,
+  steps: [],
 };
 
 const STUB_SCENE_CONFIG: SceneConfig = {

@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { InputConfig } from "@/lib/types/content";
+import {
+  InputConfig,
+  InputStepSingleChoice,
+  InputStepMultiChoice,
+} from "@/lib/types/content";
 import { Answer } from "@/lib/types/analyze";
 
 interface CorrectionQuestionsProps {
@@ -23,13 +27,17 @@ const CorrectionQuestions = ({
     setIsVisible(true);
   }, []);
 
-  const questions = config.questions;
-  const currentQuestion = questions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === questions.length - 1;
+  // freeText step을 제외한 선택형 steps만 렌더링 대상
+  const choiceSteps = config.steps.filter(
+    (s): s is InputStepSingleChoice | InputStepMultiChoice =>
+      s.type === "singleChoice" || s.type === "multiChoice",
+  );
+  const currentStep = choiceSteps[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === choiceSteps.length - 1;
   const isAnswered = selectedValues.length > 0;
 
   const handleSelectOption = (value: string) => {
-    if (currentQuestion.type === "single") {
+    if (currentStep.type === "singleChoice") {
       setSelectedValues([value]);
     } else {
       setSelectedValues((prev) =>
@@ -42,8 +50,8 @@ const CorrectionQuestions = ({
 
   const handleNext = () => {
     const newAnswer: Answer = {
-      question_index: currentQuestion.index,
-      question_text: currentQuestion.text,
+      step_id: currentStep.id,
+      question_text: currentStep.question,
       answer_options: selectedValues,
     };
     const newAnswers = [...collectedAnswers, newAnswer];
@@ -126,13 +134,13 @@ const CorrectionQuestions = ({
               질문 {currentQuestionIndex + 1}
             </p>
             <h1 className="text-base sm:text-lg font-semibold leading-tight mb-4 whitespace-pre-line">
-              {currentQuestion.text}
+              {currentStep.question}
             </h1>
             <p
               className="text-xs"
               style={{ color: "rgba(249, 249, 229, 0.5)" }}
             >
-              {currentQuestion.type === "multiple"
+              {currentStep.type === "multiChoice"
                 ? "여러 개 선택할 수 있어"
                 : "하나를 선택해줘"}
             </p>
@@ -140,7 +148,7 @@ const CorrectionQuestions = ({
 
           {/* 선택지 */}
           <div className="mb-12 space-y-2 flex flex-col items-end">
-            {currentQuestion.options.map((option) => {
+            {currentStep.options.map((option) => {
               const isSelected = selectedValues.includes(option.value);
 
               return (

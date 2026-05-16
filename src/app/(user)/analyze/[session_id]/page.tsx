@@ -185,21 +185,21 @@ const AnalyzePage = ({ params }: PageProps) => {
       const inputConfig = DUMMY_INPUT_CONFIGS[finalData.content_id];
       const sceneConfig = getSceneConfig(finalData.content_id);
 
-      // Answer → {values, labels} 변환
+      // Answer → {values, labels} 변환 (V2: step_id 기반으로 step 조회)
       const userAnswers = finalData.answers
         .filter(
           (a) => Array.isArray(a.answer_options) && a.answer_options.length > 0,
         )
         .map((a) => {
-          const question = inputConfig?.questions.find(
-            (q) => q.index === a.question_index,
-          );
+          // step_id로 step 조회 → singleChoice/multiChoice에서 option label 추출
+          const step = inputConfig?.steps.find((s) => s.id === a.step_id);
           const labels = (a.answer_options ?? []).map((value) => {
-            const option = question?.options.find((o) => o.value === value);
+            if (!step || step.type === "freeText") return value;
+            const option = step.options.find((o) => o.value === value);
             return option?.label ?? value;
           });
           return {
-            question_index: a.question_index,
+            step_id: a.step_id,
             question_text: a.question_text,
             values: a.answer_options ?? [],
             labels,

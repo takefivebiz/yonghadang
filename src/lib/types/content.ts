@@ -16,17 +16,41 @@ export interface InputConfigOption {
   reaction?: string;
 }
 
-export interface InputConfigQuestion {
-  index: number;
-  text: string;
-  type: "single" | "multiple";
-  options: InputConfigOption[];
+// ── V2 step 타입 (version 2부터 questions 배열 대신 steps 배열 사용) ──
+
+export interface InputStepFreeText {
+  id: string;
+  type: "freeText";
+  question: string;
+  placeholder: string;
+  example_inputs?: string[];
+  required: boolean;
 }
 
+export interface InputStepSingleChoice {
+  id: string;
+  type: "singleChoice";
+  question: string;
+  options: InputConfigOption[];
+  required: boolean;
+}
+
+export interface InputStepMultiChoice {
+  id: string;
+  type: "multiChoice";
+  question: string;
+  options: InputConfigOption[];
+  required: boolean;
+}
+
+export type InputStep =
+  | InputStepFreeText
+  | InputStepSingleChoice
+  | InputStepMultiChoice;
+
 export interface InputConfig {
-  placeholder: string;
-  example_inputs: string[];
-  questions: InputConfigQuestion[];
+  version: 2;
+  steps: InputStep[];
 }
 
 // ── Scene 설정 (scene_config JSONB) ─────────────────────────────────

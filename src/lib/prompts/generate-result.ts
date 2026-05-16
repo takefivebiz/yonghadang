@@ -31,7 +31,7 @@ export interface ClaudeGeneratedResult {
 // ── 사용자 입력 타입 ───────────────────────────────────────────────────
 
 export interface UserAnswer {
-  question_index: number;
+  step_id: string;           // V2: step.id 기준
   question_text: string;
   values: string[];
   labels: string[];

@@ -1,6 +1,6 @@
 // ── 답변 단위 (API POST /api/analyze/[session_id]/answers body와 일치) ──
 export interface Answer {
-  question_index: number;
+  step_id: string;           // V2: step.id 기준 (question_index 대체)
   question_text: string;
   answer_text?: string;      // 자유 입력 또는 기타 텍스트 응답
   answer_options?: string[]; // 보정 질문 선택형 응답 (value 배열)

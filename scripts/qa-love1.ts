@@ -54,95 +54,115 @@ interface Scenario {
 }
 
 const SCENARIOS: Scenario[] = [
-  // ── 강한 흔들림형 ──────────────────────────────────────────────────
+  // ── confession_imminent ────────────────────────────────────────────
+  // 목표 차원: actionImminence ≥ 4 + clarityHunger ≥ 3
+  // q1 clarity_and_decide (cH:3, aI:2)
+  // q2 signal_without_commitment (iL:2, cH:1)
+  // q3 one_more_check_then_decide+holding_back_question (aI:3+cH:2, cH:2+aI:1)
+  // q4 pressure_to_decide_soon (aI:3, cH:1)
+  // q5 want_to_act_and_decide (aI:3, cH:2)
+  // 예상: actionImminence≈12, clarityHunger≈11
   {
-    subtype: "강한흔들림형",
+    subtype: "confession_imminent",
     freeText:
-      "어제 카페에서 만났는데 헤어질 때 '다음에 또 보자'고 했어. 근데 오늘 인스타 스토리에 다른 친구랑 찍은 사진 올라왔거든. 그 사진 보고 나서 아침부터 계속 생각이 멈추질 않아. 카톡 읽씹인지 아닌지 계속 확인하게 되고, 아무것도 안 잡혀.",
+      "이 사람이랑 분위기가 계속 좋은데, 확인을 안 하면 나만 깊어질 것 같아. 한 번만 더 좋은 반응 오면 솔직하게 말하려고. 근데 그게 계속 미뤄지고 있어. 이제 진짜 뭔가 정리해야 할 것 같아.",
     selections: {
-      q1: "just_started_shaking",
-      q2: "inconsistent_interest",
-      q3: ["mood_swings_by_signal", "rechecking_signals"],
-      q4: "confirmed_one_sided",
-      q5: "want_expression",
-    },
-  },
-  // ── 확인 욕구형 ────────────────────────────────────────────────────
-  {
-    subtype: "확인욕구형",
-    freeText:
-      "이 사람이 나를 좋아하는지 아닌지가 너무 궁금해. 같이 있을 때는 분명히 특별한 것 같은데, 막상 물어볼 수가 없어. 관계를 정의하면 불편해질까봐. 근데 이 상태로 계속 가면 나만 더 깊어질 것 같아서 이게 뭔지 알고 싶어.",
-    selections: {
-      q1: "need_clear_answer",
-      q2: "comfortable_without_progress",
-      q3: ["holding_back_question", "silent_overthinking"],
-      q4: "prolonged_ambiguity",
-      q5: "want_direction",
-    },
-  },
-  // ── 기대 접기형 ────────────────────────────────────────────────────
-  {
-    subtype: "기대접기형",
-    freeText:
-      "처음엔 진짜 기대했어. 근데 몇 달 지나면서 이 사람은 절대 먼저 안 한다는 걸 알게 됐어. 연락도 내가 먼저, 만남도 내가 먼저. 이제는 기대를 줄여야 한다는 걸 알겠는데, 완전히 닫지는 못하겠어. 그냥 이대로 흘러가는 게 맞는 건지.",
-    selections: {
-      q1: "slowly_lowering_expectation",
-      q2: "comfortable_without_progress",
-      q3: ["trying_to_detach", "silent_overthinking"],
-      q4: "failing_to_let_go",
-      q5: "want_time_to_fold",
+      q1: "clarity_and_decide",
+      q2: "signal_without_commitment",
+      q3: ["one_more_check_then_decide", "holding_back_question"],
+      q4: "pressure_to_decide_soon",
+      q5: "want_to_act_and_decide",
     },
   },
 
-  // ── 소진형 ────────────────────────────────────────────────────────
+  // ── interpretive_loop + clarity_hungry ────────────────────────────
+  // 목표 차원: interpretiveLoop ≥ 4 + clarityHunger ≥ 4
+  // q1 replaying_conversations (iL:3, sI:1)
+  // q2 emotion_without_clarity (cH:2, iL:1)
+  // q3 looping_inside+holding_back_question (iL:2+sI:1, cH:2+aI:1)
+  // q4 exhausted_by_my_own_interpretation (iL:2, eF:3)
+  // q5 want_to_know_their_heart (iL:2, cH:2)
+  // 예상: interpretiveLoop≈10, clarityHunger≈6
   {
-    subtype: "소진형",
+    subtype: "interpretive_loop+clarity_hungry",
     freeText:
-      "솔직히 지쳤어. 이 사람이 좋은지 아닌지도 이제 잘 모르겠어. 신호 찾고, 해석하고, 기다리는 걸 너무 오래 반복했더니 감정이 무뎌진 것 같아. 그냥 끝내고 싶은데 실제로 연락 끊으면 또 후회할까봐 그것도 못 하겠어.",
+      "그날 헤어지면서 했던 말이 계속 머릿속에 돌아. 어떤 의미인지 알고 싶은데 물어볼 수가 없어. 마음이 있는 건지 아닌지 정확히 알고 싶어. 그 사람이 나를 어떻게 생각하는지 모르겠어서 너무 힘들어.",
     selections: {
-      q1: "worn_out_from_shaking",
-      q2: "fading_response",
-      q3: ["trying_to_detach", "unwanted_recurrence"],
+      q1: "replaying_conversations",
+      q2: "emotion_without_clarity",
+      q3: ["looping_inside", "holding_back_question"],
       q4: "exhausted_by_my_own_interpretation",
+      q5: "want_to_know_their_heart",
+    },
+  },
+
+  // ── folding_expectation + burnout ─────────────────────────────────
+  // 목표 차원: expectationFold ≥ 4 + emotionalFatigue ≥ 4
+  // q1 fading_with_fatigue (eF:3, emF:2)
+  // q2 fading_response (emF:2, eF:2)
+  // q3 trying_to_detach (eF:2, emF:1)
+  // q4 cant_move_on (eF:3, sI:2)
+  // q5 want_time_to_fold (eF:3, emF:2)
+  // 예상: expectationFold≈13, emotionalFatigue≈7
+  {
+    subtype: "folding_expectation+burnout",
+    freeText:
+      "기대를 접어야 한다는 건 알아. 이미 많이 지쳤고, 이 관계가 어디로 가는지도 모르겠어. 근데 완전히 포기하면 또 다시 돌아올 것 같아서 그것도 못 하겠어. 그냥 시간이 좀 필요한 것 같아.",
+    selections: {
+      q1: "fading_with_fatigue",
+      q2: "fading_response",
+      q3: ["trying_to_detach"],
+      q4: "cant_move_on",
       q5: "want_time_to_fold",
     },
   },
 ];
 
-// ── Helper: question_text/labels 매핑 ────────────────────────────────
+// ── Helper: question_text/labels 매핑 (V2: steps 기반) ─────────────────
 const inputConfig = DUMMY_INPUT_CONFIGS["love-1"];
 
-const findLabel = (qIndex: number, value: string): string => {
-  const q = inputConfig.questions.find((q) => q.index === qIndex);
-  return q?.options.find((o) => o.value === value)?.label ?? value;
+// choiceSteps: freeText step을 제외한 선택형 steps (순서대로 q1~q5)
+const choiceSteps = inputConfig.steps.filter(
+  (s) => s.type === "singleChoice" || s.type === "multiChoice",
+);
+
+const findLabel = (stepId: string, value: string): string => {
+  const step = inputConfig.steps.find((s) => s.id === stepId);
+  if (!step || step.type === "freeText") return value;
+  return step.options.find((o) => o.value === value)?.label ?? value;
 };
 
 const buildAnswers = (sel: Scenario["selections"]) => {
   return [
     {
-      question_text: inputConfig.questions[0].text,
+      step_id: choiceSteps[0].id,
+      question_text: choiceSteps[0].question,
       values: [sel.q1],
-      labels: [findLabel(1, sel.q1)],
+      labels: [findLabel(choiceSteps[0].id, sel.q1)],
     },
     {
-      question_text: inputConfig.questions[1].text,
+      step_id: choiceSteps[1].id,
+      question_text: choiceSteps[1].question,
       values: [sel.q2],
-      labels: [findLabel(2, sel.q2)],
+      labels: [findLabel(choiceSteps[1].id, sel.q2)],
     },
     {
-      question_text: inputConfig.questions[2].text,
+      step_id: choiceSteps[2].id,
+      question_text: choiceSteps[2].question,
       values: sel.q3,
-      labels: sel.q3.map((v) => findLabel(3, v)),
+      labels: sel.q3.map((v) => findLabel(choiceSteps[2].id, v)),
     },
     {
-      question_text: inputConfig.questions[3].text,
+      step_id: choiceSteps[3].id,
+      question_text: choiceSteps[3].question,
       values: [sel.q4],
-      labels: [findLabel(4, sel.q4)],
+      labels: [findLabel(choiceSteps[3].id, sel.q4)],
     },
     {
-      question_text: inputConfig.questions[4].text,
+      step_id: choiceSteps[4].id,
+      question_text: choiceSteps[4].question,
       values: [sel.q5],
-      labels: [findLabel(5, sel.q5)],
+      labels: [findLabel(choiceSteps[4].id, sel.q5)],
     },
   ];
 };

@@ -27,8 +27,14 @@ const TypeAInput = ({
 }: TypeAInputProps) => {
   const [input, setInput] = useState("");
 
+  // freeText step에서 placeholder / example_inputs 읽기
+  const freeStep = config.steps.find((s) => s.type === "freeText");
+  const placeholder = freeStep?.type === "freeText" ? freeStep.placeholder : "";
+  const exampleInputs =
+    freeStep?.type === "freeText" ? (freeStep.example_inputs ?? []) : [];
+
   // 입력값이 예시와 정확히 동일하면 비활성화
-  const isInputExactlyExample = config.example_inputs.includes(input.trim());
+  const isInputExactlyExample = exampleInputs.includes(input.trim());
   const isInputEmpty = input.trim().length === 0;
   const isSubmitDisabled = isInputEmpty || isInputExactlyExample;
 
@@ -127,7 +133,7 @@ const TypeAInput = ({
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value.slice(0, maxChars))}
-            placeholder={config.placeholder}
+            placeholder={placeholder}
             className="veil-textarea w-full resize-none bg-transparent text-[14px] text-highlight outline-none leading-relaxed h-32 sm:h-40 mb-5"
             style={{
               color: "rgba(249, 249, 229, 0.85)",

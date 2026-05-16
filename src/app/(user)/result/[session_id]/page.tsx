@@ -162,17 +162,15 @@ const ResultPage = ({ params }: PageProps) => {
                     a.answer_options.length > 0,
                 )
                 .map((a: Answer) => {
-                  const question = inputConfig?.questions.find(
-                    (q) => q.index === a.question_index,
-                  );
+                  // V2: step_id 기반으로 step 조회 → option label 추출
+                  const step = inputConfig?.steps.find((s) => s.id === a.step_id);
                   const labels = (a.answer_options ?? []).map((value) => {
-                    const option = question?.options.find(
-                      (o) => o.value === value,
-                    );
+                    if (!step || step.type === "freeText") return value;
+                    const option = step.options.find((o) => o.value === value);
                     return option?.label ?? value;
                   });
                   return {
-                    question_index: a.question_index,
+                    step_id: a.step_id,
                     question_text: a.question_text,
                     values: a.answer_options ?? [],
                     labels,
@@ -316,22 +314,21 @@ const ResultPage = ({ params }: PageProps) => {
       const inputConfig = DUMMY_INPUT_CONFIGS[analyzeData.content_id];
       const sceneConfig = getSceneConfig(analyzeData.content_id);
 
-      // Answer → {values, labels} 변환
+      // Answer → {values, labels} 변환 (V2: step_id 기반)
       const userAnswers = analyzeData.answers
         .filter(
           (a: Answer) =>
             Array.isArray(a.answer_options) && a.answer_options.length > 0,
         )
         .map((a: Answer) => {
-          const question = inputConfig?.questions.find(
-            (q) => q.index === a.question_index,
-          );
+          const step = inputConfig?.steps.find((s) => s.id === a.step_id);
           const labels = (a.answer_options ?? []).map((value) => {
-            const option = question?.options.find((o) => o.value === value);
+            if (!step || step.type === "freeText") return value;
+            const option = step.options.find((o) => o.value === value);
             return option?.label ?? value;
           });
           return {
-            question_index: a.question_index,
+            step_id: a.step_id,
             question_text: a.question_text,
             values: a.answer_options ?? [],
             labels,
