@@ -9,15 +9,43 @@ export type ScoreDelta = Partial<Record<HiddenDimension, number>>;
 export type HiddenState = Record<HiddenDimension, number>;
 
 // ── 점수 → 산문 변환 규칙 ─────────────────────────────────────────────
-export interface StateTranslationRule {
+// 두 가지 형식을 지원한다:
+//   1) SingleDimensionRule: 단일 차원 + threshold (기존 방식, backward compatible)
+//   2) CompoundRule: 여러 차원의 조건 조합으로 subtype을 식별 (love-1 흔들림 subtype 등)
+//
+// translator.ts는 'conditions' in rule 으로 분기 처리한다.
+
+/** 단일 차원 + threshold 기반 규칙 (기존 형식) */
+export interface SingleDimensionRule {
   dimension: HiddenDimension;
-  /** 이 점수 이상이면 statement 포함 */
+  /** 이 점수 이상이면 statement 포함 (음수면 score <= threshold 로 매칭) */
   threshold: number;
   /** Claude에게 전달할 사용자 상태 문장 */
   statement: string;
   /** 낮을수록 먼저 포함 (최대 maxStatements개 선택) */
   priority: number;
 }
+
+/** Compound rule이 사용하는 개별 조건 */
+export interface CompoundCondition {
+  dimension: HiddenDimension;
+  /** 이 점수 이상이어야 통과 (음수면 score <= threshold 로 매칭) */
+  threshold: number;
+}
+
+/** 여러 차원의 조건이 모두 충족되어야 발화하는 규칙 (subtype 식별용) */
+export interface CompoundRule {
+  /** subtype 식별자. dedup 키로 사용된다. 같은 groupKey는 가장 우선순위 높은 것만 살아남는다. */
+  groupKey: string;
+  /** 모든 조건이 충족되어야 statement 발화 */
+  conditions: CompoundCondition[];
+  /** Claude에게 전달할 사용자 상태 문장 */
+  statement: string;
+  /** 낮을수록 먼저 포함 (최대 maxStatements개 선택) */
+  priority: number;
+}
+
+export type StateTranslationRule = SingleDimensionRule | CompoundRule;
 
 // ── Additional Reading 타입 ───────────────────────────────────────────
 // 결과를 모두 읽은 뒤 노출되는 추가 해석 콘텐츠.
