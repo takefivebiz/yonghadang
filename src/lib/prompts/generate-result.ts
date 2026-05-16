@@ -1,5 +1,6 @@
 import { SceneConfigItem, SceneConfig } from "@/lib/types/content";
 import { ResultScene, SceneMessage } from "@/lib/types/result";
+import { LoopType } from "@/lib/types/quiz";
 
 // ── Claude 응답 타입 ────────────────────────────────────────────────────
 
@@ -433,6 +434,165 @@ export const buildGenerateResultPrompt = (params: {
   });
 };
 
+// ── Loop Reading 타입 ────────────────────────────────────────────────────
+
+/** 루프 생성 시 기존 scene carry_over를 담는 단위 */
+export interface LoopReadingSceneInsight {
+  scene_title: string;
+  key_insight: string;
+  do_not_repeat: string[];
+}
+
+/** Claude가 루프 리딩에서 반환하는 raw 구조 */
+export interface ClaudeLoopResult {
+  loopType: string;
+  messages: ClaudeMessage[];
+}
+
+// ── Loop Reading Focus Map ────────────────────────────────────────────────
+
+const LOOP_TYPE_LABEL: Record<LoopType, string> = {
+  action: "지금 내가 할 수 있는 일",
+  standard: "내 기준을 단단히 세우는 법",
+  evaluate: "이 관계를 더 봐도 되는지",
+};
+
+// loopType별로 Claude에게 주는 focus anchor 지침
+const LOOP_FOCUS_ANCHOR: Record<LoopType, string> = {
+  action:
+    "지금 가능한 행동 선택지들을 구체적으로 펼친다. 각 선택이 사용자에게 어떤 감정적 결과를 만드는지 보여준다. '이렇게 해라'가 아니라 '이 선택을 하면 이런 흐름이 생긴다'를 보여준다.",
+  standard:
+    "상대의 반응이 아니라 자신의 기준으로 이 관계를 판단한다는 것의 의미를 풀어낸다. 기준 없이 판단할 때 어떤 반복이 생기는지, 그 기준이 지금 왜 필요한지를 보여준다.",
+  evaluate:
+    "지금 드러난 패턴이 계속될 때 이 관계가 어디를 향하는지 보여준다. 더 투자하는 게 사용자에게 어떤 의미인지, 그 선택이 현재 감정 구조와 어떻게 맞닿는지를 풀어낸다.",
+};
+
+// ── Loop Reading Helper ──────────────────────────────────────────────────
+
+const formatSceneInsights = (insights: LoopReadingSceneInsight[]): string => {
+  if (insights.length === 0) return "(이전 scene 정보 없음)";
+  return insights
+    .map((s) => {
+      const doNotRepeat =
+        s.do_not_repeat.length > 0
+          ? `\n  반복 금지: ${s.do_not_repeat.join(" / ")}`
+          : "";
+      return `[${s.scene_title}]\n  핵심 통찰: ${s.key_insight}${doNotRepeat}`;
+    })
+    .join("\n\n");
+};
+
+// ── Loop Reading System Prompt ────────────────────────────────────────────
+// coreSystemPrompt()를 상속하지 않는다.
+// 루프 리딩 전용 출력 스키마(scenes X → messages O)를 사용하기 때문에
+// 독립 프롬프트로 분리하여 혼선을 방지한다.
+
+export const buildLoopReadingSystemPrompt = (loopType: LoopType): string => {
+  const loopLabel = LOOP_TYPE_LABEL[loopType];
+  const focusAnchor = LOOP_FOCUS_ANCHOR[loopType];
+
+  return `너는 VEIL의 AI 해석가다.
+VEIL은 사용자의 감정·관계·직업 상황을 해석하는 서비스다.
+
+## 핵심 원칙
+- 사용자를 모호하게 위로하지 않는다
+- 관계의 미래를 예언하거나 상대 마음을 단정하지 않는다
+- 대신 현재 드러난 감정 반응과 행동 패턴은 선명하게 해석한다
+- 사용자가 "맞다/뜨끔하다" 느낄 만큼 직접적으로 말한다
+- 결론을 대신 내려주지는 않지만, 가능한 방향과 감정의 결과는 보여준다
+
+## 문체: 반말
+- 최종 메시지는 자연스러운 반말로 쓴다
+- "~일 수도 있어", "~인 것 같아", "~에 가까워"를 반복하지 않는다
+- 필요하면 "너는 ~하는 편이야", "너는 ~할수록 ~하게 돼"처럼 직접 말한다
+
+라벨링 금지: "불안형이야" / "회피형이야" / "애착유형상 ~" 등 심리 유형 라벨 금지.
+행동 패턴을 직접 말하는 건 허용.
+
+## 줄바꿈 규칙
+- 감정 연출용으로 남발하지 않는다
+- 문장은 자연스럽게 이어 읽히는 흐름을 우선한다
+- \\n은 정말 필요한 경우만 사용한다
+
+## Punch 규칙 (필수)
+messages[0]은 반드시 punch다. 예외 없음.
+
+punch = 이 루프 리딩에서 사용자가 "맞다/뜨끔하다"고 느낄 감정 압축 문장
+- 1문장. 반말.
+- 줄바꿈 규칙 — 아래 중 하나라도 해당하면 반드시 \\n 삽입. 예외 없음.
+  ① 대조·전환 구조 (A가 아니라 B / A보다 B / A지만 B)가 있으면 전환 접속어 직전에서 반드시 \\n.
+  ② 서술형이어도 문장 전체가 30자 이상이면 가장 자연스러운 호흡 지점에서 \\n.
+  ③ 30자 미만 단문만 \\n 생략 허용.
+- 진단/라벨링/위로 금지. 행동·감정 패턴을 직접 짚는다.
+- 이후 ai 메시지들이 이 punch를 전개한다. 내용을 미리 spoil하지 않는다.
+
+## 루프 리딩 목표
+이 리딩은 사용자가 무료·유료 결과를 모두 읽은 뒤 추가로 요청한 후속 리딩이다.
+
+사용자는 이미:
+- 자신의 감정 반응 패턴을 읽었다 (무료 결과)
+- 그 패턴의 구조적 의미를 이해했다 (유료 결과)
+
+이제 사용자가 더 알고 싶은 것: "${loopLabel}"
+
+## 루프 리딩 원칙
+- 기존 결과에서 이미 다룬 패턴/통찰을 반복하지 않는다
+- 행동 지시형 상담이 아니다: "해라/하지 마라" 단정 금지
+- 가능한 선택지와 각 선택이 만드는 감정적 결과를 보여준다
+- 판단 기준을 제시하되, 결론은 사용자가 내리게 한다
+- "이미 보인 것" → "이제 어떻게 볼 것인가"로의 이행
+
+## loopType: ${loopType}
+${focusAnchor}
+
+## 출력
+{
+  "loopType": "${loopType}",
+  "messages": [
+    { "type": "punch", "text": "이 루프 리딩의 핵심을 압축한 한 문장" },
+    { "type": "ai", "text": "..." },
+    { "type": "ai", "text": "..." },
+    { "type": "ai", "text": "..." }
+  ]
+}
+
+ai 메시지 수: 3~5개. ai 버블 길이: 충분히 깊게 (3~6문장).
+순수 JSON만. 마크다운/코드블록 금지.`;
+};
+
+// ── Loop Reading Prompt Builder ──────────────────────────────────────────
+
+export const buildLoopReadingUserPrompt = (params: {
+  loopType: LoopType;
+  loopTitle: string;
+  context: {
+    freeInput: string;
+    stateSummary: string[];
+    sceneInsights: LoopReadingSceneInsight[];
+  };
+}): { system: string; userMessage: string } => {
+  const { loopType, loopTitle, context } = params;
+  const { freeInput, stateSummary, sceneInsights } = context;
+
+  const system = buildLoopReadingSystemPrompt(loopType);
+  const formattedStateSummary = formatStateSummary(stateSummary);
+  const formattedInsights = formatSceneInsights(sceneInsights);
+
+  const userMessage = `## 사용자 상황 (자유입력)
+${freeInput}
+${formattedStateSummary}
+## 이미 다룬 내용 (반복 금지)
+${formattedInsights}
+
+## 이 루프 리딩의 질문
+loopType: ${loopType}
+알고 싶은 것: ${loopTitle}
+
+위 질문에 답하라. JSON만 출력한다.`;
+
+  return { system, userMessage };
+};
+
 // ── Parse & Sanitize ────────────────────────────────────────────────────
 
 const sanitizeMessageText = (text: string): string => {
@@ -526,4 +686,38 @@ export const mapClaudeToResultScenes = (
       preview_messages,
     };
   });
+};
+
+// ── Loop Reading Parser ────────────────────────────────────────────────────
+
+export const parseLoopResult = (raw: string): ClaudeLoopResult => {
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error("Claude 루프 응답에서 JSON을 찾을 수 없습니다");
+  }
+
+  try {
+    const parsed = JSON.parse(jsonMatch[0]) as ClaudeLoopResult;
+
+    if (!Array.isArray(parsed.messages) || parsed.messages.length === 0) {
+      throw new Error("루프 응답에 messages 배열이 없거나 비어있습니다");
+    }
+
+    // punch가 첫 번째여야 한다
+    if (parsed.messages[0]?.type !== "punch") {
+      console.warn("[parseLoopResult] 첫 번째 메시지가 punch가 아닙니다. 강제 보정.");
+      parsed.messages[0].type = "punch";
+    }
+
+    for (const msg of parsed.messages) {
+      msg.text = sanitizeMessageText(msg.text);
+    }
+
+    return parsed;
+  } catch (err) {
+    console.error("[parseLoopResult] JSON 파싱 실패. 원본:", jsonMatch[0].slice(0, 500));
+    throw new Error(
+      `루프 응답 JSON 처리 실패: ${err instanceof Error ? err.message : "알 수 없는 에러"}`,
+    );
+  }
 };
