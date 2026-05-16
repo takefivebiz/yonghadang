@@ -1,7 +1,7 @@
 # VEIL — 개발 진행 상황 로그
 
-> 마지막 업데이트: 2026-05-15  
-> 현재 단계: **backend baseline 진입 직전 — generate pipeline 연결 완료**
+> 마지막 업데이트: 2026-05-16  
+> 현재 단계: **Loop Reading 기능 완성 — 루프 결제·생성·표시 전체 플로우 작동**
 
 ---
 
@@ -215,6 +215,75 @@ Next.js App Router + Server Actions 구조에서 Service/Repository 레이어를
 
 ---
 
+---
+
+## Loop Reading 기능 구현 (2026-05-16)
+
+결과 페이지에서 유료 씬을 모두 읽은 뒤 구매할 수 있는 "루프 리딩" 기능 전체를 구현했다. 3개 loopType(action / standard / evaluate)에 대해 AI 생성 → 결제 → localStorage 캐시 → 재방문 복원까지 작동한다.
+
+### L1 — 타입 정의 + ContentPack 업데이트
+
+- `src/lib/types/quiz.ts`
+  - `LoopType = "action" | "standard" | "evaluate"` 추가
+  - `LoopMessage`, `LoopAnswer` 인터페이스 추가
+  - `AdditionalReading`에 `loopType: LoopType` 필드 추가 (필수)
+- `src/lib/content-packs/love-1.ts`
+  - `LOVE_1_ADDITIONAL_READINGS` 전면 교체 — 호기심 기반("이 사람 마음은 뭘까?") → 행동/기준/평가 기반 3개 항목
+
+### L2 — Loop Reading API 생성
+
+- `src/app/api/analyze/[session_id]/loop-reading/generate/route.ts` 신규 생성
+  - `POST` — loopType, loopTitle, context(freeInput, stateSummary, sceneInsights) 받아서 Claude 호출
+  - 응답: `LoopAnswer` (localStorage에 바로 저장 가능한 형태)
+- `src/lib/prompts/generate-result.ts`에 루프 전용 프롬프트 빌더 추가
+  - `buildLoopReadingSystemPrompt(loopType)` — 씬 프롬프트와 독립 (출력 스키마 충돌 방지)
+  - `buildLoopReadingUserPrompt(params)` — freeInput + stateSummary + sceneInsights(carry_over) 주입
+  - `parseLoopResult(raw)` — `{ loopType, messages[] }` JSON 파싱, punch 위치 보정 포함
+  - loopType별 focus anchor, 반복 금지 규칙 시스템 구축
+
+### L3 — Result Page 연결
+
+- `src/components/modals/payment-modal.tsx`
+  - `paymentType: "loop"` 추가, `loopType?: LoopType` prop 추가
+  - 루프 가격 900원, successUrl에 `_loop_type` 파라미터 포함
+- `src/components/result/additional-readings.tsx` 전면 재작성
+  - 더미 콘텐츠 제거 → 실제 `LoopAnswer` 렌더링
+  - punch: 씬 결과 `PunchBlock`과 동일 스타일 (핑크 이탤릭, 배경 없음)
+  - ai 버블: 생성 중 로딩 상태, 에러 + 재시도 버튼, 아코디언 자동 펼침
+- `src/app/(user)/result/[session_id]/page.tsx`
+  - `loopAnswers`, `loopLoading`, `loopError`, `activeLoopType` 상태 추가
+  - `handleLoopUnlock()` — localStorage 캐시 확인 → API 호출 → 저장 → 스크롤
+  - `generatePaidScenes()`에서 carry_over(`key_insight` + `do_not_repeat`) 추출 → `veil_scene_insights_${session_id}` 저장
+  - Phase 2 useEffect에 `_payment_type=loop` 분기 추가 (기존 scene unlock 로직 완전 유지)
+
+### QA 스크립트 + 검증
+
+- `scripts/qa-loop-readings.ts` 작성 및 실행
+  - "확인욕구형" 시나리오 (clarityHunger 지배), mock sceneInsights 3개
+  - 3개 loopType 각각 API 직접 호출
+  - 검증: punch 첫번째, `\n` 규칙, do_not_repeat 준수, 메시지 수 ≥ 3
+  - **결과: 3/3 PASS** (action, standard, evaluate 모두)
+
+### localStorage 키 추가 (동결)
+
+```
+veil_scene_insights_${session_id}   → LoopReadingSceneInsight[] (carry_over)
+veil_loop_${loopType}_${session_id} → LoopAnswer (루프 리딩 캐시)
+veil_payment_pending_loop_${sessionId} → LoopType (결제 진행 중 마커)
+```
+
+### 브라우저 QA bypass URL
+
+```
+# 유료 씬 전체 unlock (sceneInsights 저장 목적)
+/result/{session_id}?_payment_type=all&_scene_index=0&_unlock=true&paymentKey=fake&orderId=fake&amount=4900
+
+# 루프 리딩 bypass (loopType별로 테스트)
+/result/{session_id}?_payment_type=loop&_loop_type=action&_unlock=true&paymentKey=fake&orderId=fake&amount=900
+```
+
+---
+
 ## 진행 상황 체크리스트
 
 ### ✅ 완료
@@ -229,6 +298,7 @@ Next.js App Router + Server Actions 구조에서 Service/Repository 레이어를
 - [ x ] mock fallback 안전망 유지 (API 실패 시 UX 보호)
 - [ x ] QA mode (`?qa=1`) — 결제 없이 전체 씬 확인
 - [ x ] Supabase 초기 스키마 migration (profiles, contents, analysis_sessions, scene_unlocks 등)
+- [ x ] Loop Reading 기능 전체 (타입 / API / 프롬프트 / 결제 / UI / QA 3/3 PASS)
 
 ### 🔄 진행 중
 

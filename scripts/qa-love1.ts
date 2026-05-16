@@ -54,40 +54,57 @@ interface Scenario {
 }
 
 const SCENARIOS: Scenario[] = [
+  // ── 강한 흔들림형 ──────────────────────────────────────────────────
   {
-    subtype: "고백 전 확인형",
+    subtype: "강한흔들림형",
     freeText:
-      "한 달 정도 자주 만나고 있는 사람이 있어. 다음 주에 둘이 여행을 가기로 했는데, 그 전에 내 마음 정리해서 고백할까 고민 중이야. 근데 막상 말 꺼내려고 하면, 이 사람이 어떻게 받을지 한 번만 더 확인하고 싶어져.",
+      "어제 카페에서 만났는데 헤어질 때 '다음에 또 보자'고 했어. 근데 오늘 인스타 스토리에 다른 친구랑 찍은 사진 올라왔거든. 그 사진 보고 나서 아침부터 계속 생각이 멈추질 않아. 카톡 읽씹인지 아닌지 계속 확인하게 되고, 아무것도 안 잡혀.",
     selections: {
-      q1: "last_check_before_action",
-      q2: "emotion_without_clarity",
-      q3: ["one_more_check_then_decide", "holding_back_question"],
-      q4: "pressure_to_decide_soon",
-      q5: "want_to_act_and_decide",
+      q1: "just_started_shaking",
+      q2: "inconsistent_interest",
+      q3: ["mood_swings_by_signal", "rechecking_signals"],
+      q4: "confirmed_one_sided",
+      q5: "want_expression",
     },
   },
+  // ── 확인 욕구형 ────────────────────────────────────────────────────
   {
-    subtype: "반복 해석형",
+    subtype: "확인욕구형",
     freeText:
-      "어제 만났을 때 헤어지면서 그 사람이 '오늘 진짜 좋았어'라고 했는데, 그게 그냥 인사인지 진심인지 자꾸 생각하게 돼. 메시지 답도 평소보다 5분 늦어졌는데 그게 무슨 의미일까 하루 종일 곱씹고 있어.",
+      "이 사람이 나를 좋아하는지 아닌지가 너무 궁금해. 같이 있을 때는 분명히 특별한 것 같은데, 막상 물어볼 수가 없어. 관계를 정의하면 불편해질까봐. 근데 이 상태로 계속 가면 나만 더 깊어질 것 같아서 이게 뭔지 알고 싶어.",
     selections: {
-      q1: "replaying_conversations",
-      q2: "signal_without_commitment",
-      q3: ["rechecking_signals", "silent_overthinking"],
-      q4: "exhausted_by_my_own_interpretation",
-      q5: "want_to_know_their_heart",
+      q1: "need_clear_answer",
+      q2: "comfortable_without_progress",
+      q3: ["holding_back_question", "silent_overthinking"],
+      q4: "prolonged_ambiguity",
+      q5: "want_direction",
     },
   },
+  // ── 기대 접기형 ────────────────────────────────────────────────────
   {
-    subtype: "미련형",
+    subtype: "기대접기형",
     freeText:
-      "두 달 전에 자연스럽게 멀어졌어. 마지막에 '바쁘니까 다음에 보자'고 했는데 그 뒤로 연락이 없어. 머리로는 끝났다고 정리했는데, 어제 길에서 비슷한 향수 냄새 맡고 또 마음이 흔들렸어.",
+      "처음엔 진짜 기대했어. 근데 몇 달 지나면서 이 사람은 절대 먼저 안 한다는 걸 알게 됐어. 연락도 내가 먼저, 만남도 내가 먼저. 이제는 기대를 줄여야 한다는 걸 알겠는데, 완전히 닫지는 못하겠어. 그냥 이대로 흘러가는 게 맞는 건지.",
     selections: {
-      q1: "cant_let_go_after_end",
+      q1: "slowly_lowering_expectation",
+      q2: "comfortable_without_progress",
+      q3: ["trying_to_detach", "silent_overthinking"],
+      q4: "failing_to_let_go",
+      q5: "want_time_to_fold",
+    },
+  },
+
+  // ── 소진형 ────────────────────────────────────────────────────────
+  {
+    subtype: "소진형",
+    freeText:
+      "솔직히 지쳤어. 이 사람이 좋은지 아닌지도 이제 잘 모르겠어. 신호 찾고, 해석하고, 기다리는 걸 너무 오래 반복했더니 감정이 무뎌진 것 같아. 그냥 끝내고 싶은데 실제로 연락 끊으면 또 후회할까봐 그것도 못 하겠어.",
+    selections: {
+      q1: "worn_out_from_shaking",
       q2: "fading_response",
-      q3: ["unwanted_recurrence", "trying_to_detach"],
-      q4: "mind_keeps_returning",
-      q5: "want_possibility",
+      q3: ["trying_to_detach", "unwanted_recurrence"],
+      q4: "exhausted_by_my_own_interpretation",
+      q5: "want_time_to_fold",
     },
   },
 ];

@@ -452,9 +452,9 @@ export interface ClaudeLoopResult {
 // ── Loop Reading Focus Map ────────────────────────────────────────────────
 
 const LOOP_TYPE_LABEL: Record<LoopType, string> = {
-  action: "지금 내가 할 수 있는 일",
+  action: "지금 내가 뭘 하면 될까?",
   standard: "내 기준을 단단히 세우는 법",
-  evaluate: "이 관계를 더 봐도 되는지",
+  evaluate: "이 관계를 더 두고 봐도 될까?",
 };
 
 // loopType별로 Claude에게 주는 focus anchor 지침
@@ -705,7 +705,9 @@ export const parseLoopResult = (raw: string): ClaudeLoopResult => {
 
     // punch가 첫 번째여야 한다
     if (parsed.messages[0]?.type !== "punch") {
-      console.warn("[parseLoopResult] 첫 번째 메시지가 punch가 아닙니다. 강제 보정.");
+      console.warn(
+        "[parseLoopResult] 첫 번째 메시지가 punch가 아닙니다. 강제 보정.",
+      );
       parsed.messages[0].type = "punch";
     }
 
@@ -715,7 +717,10 @@ export const parseLoopResult = (raw: string): ClaudeLoopResult => {
 
     return parsed;
   } catch (err) {
-    console.error("[parseLoopResult] JSON 파싱 실패. 원본:", jsonMatch[0].slice(0, 500));
+    console.error(
+      "[parseLoopResult] JSON 파싱 실패. 원본:",
+      jsonMatch[0].slice(0, 500),
+    );
     throw new Error(
       `루프 응답 JSON 처리 실패: ${err instanceof Error ? err.message : "알 수 없는 에러"}`,
     );

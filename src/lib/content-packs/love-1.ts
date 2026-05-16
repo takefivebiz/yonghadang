@@ -247,7 +247,7 @@ export const LOVE_1_ADDITIONAL_READINGS: AdditionalReading[] = [
   {
     id: "what_i_can_do",
     loopType: "action",
-    title: "지금 내가 할 수 있는 일",
+    title: "지금 내가 뭘 하면 될까?",
     subtitle: "기다리거나, 확인하거나, 멈추거나 — 지금 가능한 선택의 범위",
   },
   {
@@ -259,7 +259,7 @@ export const LOVE_1_ADDITIONAL_READINGS: AdditionalReading[] = [
   {
     id: "keep_watching",
     loopType: "evaluate",
-    title: "이 관계를 더 봐도 되는지",
+    title: "이 관계를 더 두고 봐도 될까?",
     subtitle: "에너지를 더 쓸 가치가 있는지 판단하는 기준",
   },
 ];

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { AdditionalReading, LoopType, LoopAnswer, LoopMessage } from "@/lib/types/quiz";
+import type {
+  AdditionalReading,
+  LoopType,
+  LoopAnswer,
+  LoopMessage,
+} from "@/lib/types/quiz";
 
 interface AdditionalReadingsProps {
   readings: AdditionalReading[];
@@ -63,9 +68,7 @@ const AdditionalReadings = ({
   const handleCardClick = (reading: AdditionalReading) => {
     if (isLoading(reading)) return; // 생성 중: no-op
     if (isUnlocked(reading)) {
-      setExpandedReadingId((prev) =>
-        prev === reading.id ? null : reading.id,
-      );
+      setExpandedReadingId((prev) => (prev === reading.id ? null : reading.id));
     } else if (!hasError(reading)) {
       setSelectedReading(reading);
       setIsBottomSheetOpen(true);
@@ -267,7 +270,9 @@ const AdditionalReadings = ({
                         color: "rgba(201, 139, 176, 0.45)",
                         fontSize: "11px",
                         display: "inline-block",
-                        transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                        transform: isExpanded
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
                         transition: "transform 0.3s ease",
                       }}
                     >
@@ -319,39 +324,55 @@ const AdditionalReadings = ({
                       transition: "background 0.5s ease",
                     }}
                   >
-                    {messages.map((msg, idx) => (
-                      <div
-                        key={idx}
-                        className={isExpanded ? "bubble-fade" : ""}
-                        style={{
-                          // punch: 살짝 더 강조된 배경
-                          background:
-                            msg.type === "punch"
-                              ? "rgba(201, 139, 176, 0.10)"
-                              : "rgba(255, 255, 255, 0.05)",
-                          border:
-                            msg.type === "punch"
-                              ? "1px solid rgba(201, 139, 176, 0.18)"
-                              : "1px solid rgba(255, 255, 255, 0.10)",
-                          borderRadius: "14px 14px 14px 2px",
-                          padding: "14px 16px",
-                          width: "fit-content",
-                          maxWidth: "90%",
-                        }}
-                      >
-                        <p
-                          className="text-sm leading-relaxed"
+                    {messages.map((msg, idx) =>
+                      msg.type === "punch" ? (
+                        // 씬 결과의 PunchBlock과 동일한 스타일
+                        <div
+                          key={idx}
+                          className={`px-1 w-full ${isExpanded ? "bubble-fade" : ""}`}
+                          style={{ marginBottom: "12px" }}
+                        >
+                          <p
+                            className="font-punch whitespace-pre-line"
+                            style={{
+                              color: "rgba(209, 109, 172, 0.653)",
+                              fontSize: "14px",
+                              lineHeight: "1.6",
+                              fontWeight: "500",
+                              letterSpacing: "0",
+                              fontStyle: "italic",
+                            }}
+                          >
+                            {msg.text}
+                          </p>
+                        </div>
+                      ) : (
+                        <div
+                          key={idx}
+                          className={isExpanded ? "bubble-fade" : ""}
                           style={{
-                            color: "rgba(249, 249, 229, 0.78)",
-                            fontWeight: msg.type === "punch" ? 400 : 300,
-                            letterSpacing: "-0.02em",
-                            whiteSpace: "pre-line",
+                            background: "rgba(255, 255, 255, 0.05)",
+                            border: "1px solid rgba(255, 255, 255, 0.10)",
+                            borderRadius: "14px 14px 14px 2px",
+                            padding: "14px 16px",
+                            width: "fit-content",
+                            maxWidth: "90%",
                           }}
                         >
-                          {msg.text}
-                        </p>
-                      </div>
-                    ))}
+                          <p
+                            className="text-sm leading-relaxed"
+                            style={{
+                              color: "rgba(249, 249, 229, 0.78)",
+                              fontWeight: 300,
+                              letterSpacing: "-0.02em",
+                              whiteSpace: "pre-line",
+                            }}
+                          >
+                            {msg.text}
+                          </p>
+                        </div>
+                      ),
+                    )}
                   </div>
                 </div>
               </div>

@@ -12,7 +12,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
     scenes: [
       {
         index: 1,
-        title: "애매한 관계에서\n너는 어떻게 반응하는지",
+        title: "애매한 관계를 대하는 너의 방식",
         role: "relationship_tendency",
         goal: "사용자가 현재 관계 안에서 어떤 방식으로 흔들리고 반응하는 사람인지 읽어준다. 읽자마자 자기 성향을 들킨 느낌이 들어야 한다.",
         focus: [
@@ -35,7 +35,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
 
       {
         index: 2,
-        title: "상대의 태도에서\n무엇이 보이고 있는지",
+        title: "상대의 태도에서 알 수 있는 것",
         role: "partner_signal_reading",
         goal: "사용자의 자유입력과 선택지를 바탕으로, 상대가 이 관계를 어떤 태도로 대하고 있는지 해석한다. 단정적으로 좋아한다/아니다를 말하지는 않지만, 상대의 행동이 어떤 가능성과 한계를 동시에 보여주는지 짚는다.",
         focus: [
@@ -56,7 +56,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
 
       {
         index: 3,
-        title: "이 관계가\n어디까지 갈 수 있는지",
+        title: "우리의 관계는 지금 어디쯤 있는지",
         role: "relationship_possibility",
         goal: "이 관계가 좋아하는 감정 위에 있는지, 익숙함이나 애매함 위에 있는지 가능성을 해석한다. 사용자가 가장 궁금해하는 '그래서 이 사람 마음이 있는가'에 대해 조심스럽지만 분명한 방향성을 준다.",
         focus: [
@@ -77,7 +77,7 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
 
       {
         index: 4,
-        title: "이 관계가 너의 감정을\n어떻게 바꾸고 있는지",
+        title: "이 관계가 나에게 미치는 영향",
         role: "emotional_effect",
         goal: "현재 관계가 사용자 감정과 기준에 어떤 영향을 주고 있는지 보여준다.",
         focus: [
@@ -97,27 +97,31 @@ export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
 
       {
         index: 5,
-        title: "네가 진짜 확인받고 싶은 건\n무엇인지",
+        title: "네가 진짜 확인하고 싶은 것",
         role: "hidden_expectation",
-        goal: "사용자가 이 관계에서 진짜 기대하고 있는 것이 무엇인지 보여준다. 단순히 사랑받고 싶은 건지, 선택받고 싶은 건지, 관계를 확신받고 싶은 건지 드러낸다.",
+        goal: "사용자가 이 관계에서 진짜 확인하고 싶은 것이 무엇인지 보여준다. 그 대상은 상대의 마음, 관계의 의미, 자신의 해석이 틀리지 않았다는 감각, 아직 끝나지 않았다는 가능성, 혹은 이제 결정해도 된다는 근거일 수 있다. 모든 경우를 '선택받고 싶음'이나 '사랑받고 싶음'으로 환원하지 않는다.",
         focus: [
-          "사용자가 상대에게 진짜 바라고 있는 반응이나 태도",
-          "왜 상대의 확실한 표현이나 행동이 중요하게 느껴지는지",
-          "사랑 자체보다 더 붙잡고 있는 감정이 있는지",
-          "사용자가 이 관계를 통해 얻고 싶어하는 감정",
+          "사용자가 진짜 확인받고 싶은 대상이 무엇인지",
+          "상대의 표현보다 더 붙잡고 있는 감정이나 근거가 있는지",
+          "이 관계를 통해 자신의 해석·기대·결정 중 무엇을 확인하려 하는지",
+          "확인을 받은 뒤 사용자가 무엇을 할 수 있게 되는지",
         ],
+
         forbidden: [
+          "모든 욕구를 선택받고 싶음으로 환원하지 않는다",
+          "사랑받고 싶다/선택받고 싶다를 기본 결론으로 쓰지 않는다",
           "상대 반응 분석으로만 돌아가지 않는다",
           "희망고문처럼 쓰지 않는다",
           "정답처럼 결론내리지 않는다",
         ],
-        tone: "사용자가 상대에게 진짜 바라고 있던 것을 스스로 부정하기 어렵게 만든다",
+        tone: "사용자가 이 관계에서 무엇을 확인받아야 다음 감정으로 넘어갈 수 있는지 선명하게 짚는다",
+
         is_free: false,
       },
 
       {
         index: 6,
-        title: "이 관계가\n어디로 흘러갈 수 있는지",
+        title: "이 관계, 어디까지 이어질 수 있을까?",
         role: "relationship_direction",
         goal: "현재 관계가 어떤 방향으로 이어질 가능성이 큰지 보여준다. 상대 태도와 사용자 감정을 함께 읽어서, 이 관계가 어디에서 계속 흔들리고 있는지 해석한다.",
         focus: [
