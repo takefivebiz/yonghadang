@@ -4,175 +4,267 @@ import type {
   AdditionalReading,
 } from "@/lib/types/quiz";
 
+// ── Hidden State 차원 정의 ───────────────────────────────────────────
+// love-1은 "상대의 불확실함 때문에 흔들리는 사람들" 전용 콘텐츠다.
+// 모든 차원은 0~+5 단방향으로 운용한다 (음수 진입 없음).
+// 흔들림 자체는 전제이고, 차원은 "흔들림의 방식"이 어떻게 다른지를 식별한다.
+//
+// shakeIntensity     흔들림 강도 (모든 subtype의 베이스)
+// clarityHunger      확인/관계 정의 욕구
+// interpretiveLoop   신호 반복 해석 (대화·장면을 거듭 되감기)
+// actionImminence    행동 임박도 (곧 결정/표현해야 한다는 감각)
+// expectationFold    기대 접기 진행도 (마음을 천천히 줄이는 정도)
+// emotionalFatigue   감정 소진도 (흔들림에서 지쳐가는 정도)
 export const LOVE_1_DIMENSIONS = [
-  "anxiety",
-  "overInterpretation",
-  "confirmationNeed",
-  "imbalanceSensitivity",
-  "relationshipPotential",
-  "ambiguityRisk",
+  "shakeIntensity",
+  "clarityHunger",
+  "interpretiveLoop",
+  "actionImminence",
+  "expectationFold",
+  "emotionalFatigue",
 ] as const;
 
 export type Love1Dimension = (typeof LOVE_1_DIMENSIONS)[number];
 
+// ── option value → 점수 변화량 ───────────────────────────────────────
+// 각 value는 dummy-analyze-config.ts의 love-1 questions에서 정의된 것과 동일해야 한다.
+// 모든 값은 양수만 사용한다 (음수 진입 봉쇄).
 export const LOVE_1_SCORE_MAP: Record<
   string,
   Partial<Record<Love1Dimension, number>>
 > = {
-  undefined_but_close: {
-    confirmationNeed: 2,
-    relationshipPotential: 1,
-    ambiguityRisk: 1,
+  // ── Q1: 흔들림의 현재 위상 ─────────────────────────────────────────
+  just_started_shaking: {
+    shakeIntensity: 3,
+    clarityHunger: 1,
   },
-  push_pull: {
-    anxiety: 2,
-    ambiguityRisk: 2,
-    relationshipPotential: 1,
+  need_clear_answer: {
+    clarityHunger: 3,
+    shakeIntensity: 1,
   },
-  stagnant_connection: {
-    confirmationNeed: 1,
-    ambiguityRisk: 2,
+  replaying_conversations: {
+    interpretiveLoop: 3,
+    shakeIntensity: 1,
   },
-  one_sided_energy: {
-    imbalanceSensitivity: 2,
-    anxiety: 1,
+  last_check_before_action: {
+    actionImminence: 3,
+    clarityHunger: 2,
+  },
+  slowly_lowering_expectation: {
+    expectationFold: 3,
+    emotionalFatigue: 1,
+  },
+  worn_out_from_shaking: {
+    emotionalFatigue: 3,
+    expectationFold: 2,
+  },
+  cant_let_go_after_end: {
+    shakeIntensity: 2,
+    expectationFold: 3,
   },
 
+  // ── Q2: 상대 태도 (모두 "애매" 전제) ──────────────────────────────
   emotion_without_clarity: {
-    relationshipPotential: 2,
-    confirmationNeed: 2,
-    ambiguityRisk: 1,
-  },
-  comfortable_without_progress: {
-    ambiguityRisk: 2,
-    imbalanceSensitivity: 1,
+    clarityHunger: 2,
+    interpretiveLoop: 1,
   },
   inconsistent_interest: {
-    anxiety: 2,
-    ambiguityRisk: 2,
-    relationshipPotential: 1,
+    shakeIntensity: 2,
+    interpretiveLoop: 1,
   },
-  guarded_behavior: {
-    overInterpretation: 2,
-    confirmationNeed: 1,
-    ambiguityRisk: 1,
+  comfortable_without_progress: {
+    clarityHunger: 1,
+    expectationFold: 1,
+  },
+  signal_without_commitment: {
+    interpretiveLoop: 2,
+    clarityHunger: 1,
+  },
+  fading_response: {
+    emotionalFatigue: 2,
+    expectationFold: 2,
   },
 
+  // ── Q3: 흔들릴 때 내 반응 (multiple) ──────────────────────────────
   rechecking_signals: {
-    overInterpretation: 2,
-    anxiety: 1,
+    interpretiveLoop: 2,
+    shakeIntensity: 1,
   },
   silent_overthinking: {
-    overInterpretation: 2,
-    anxiety: 1,
+    interpretiveLoop: 2,
+    shakeIntensity: 1,
   },
-  emotionally_affected: {
-    anxiety: 2,
-    imbalanceSensitivity: 1,
+  mood_swings_by_signal: {
+    shakeIntensity: 3,
   },
-  holding_back: {
-    confirmationNeed: 1,
-    anxiety: 1,
+  holding_back_question: {
+    clarityHunger: 2,
+    actionImminence: 1,
   },
-  difficulty_letting_go: {
-    anxiety: 1,
-    relationshipPotential: 1,
-    imbalanceSensitivity: 1,
+  one_more_check_then_decide: {
+    actionImminence: 3,
+    clarityHunger: 2,
   },
-
-  fear_one_sided: {
-    imbalanceSensitivity: 2,
-    anxiety: 1,
+  trying_to_detach: {
+    expectationFold: 2,
+    emotionalFatigue: 1,
   },
-  fear_stagnation: {
-    ambiguityRisk: 2,
-    confirmationNeed: 1,
-  },
-  fear_disappointment: {
-    anxiety: 2,
-    relationshipPotential: 1,
-  },
-  fear_exhaustion: {
-    anxiety: 1,
-    imbalanceSensitivity: 1,
-    ambiguityRisk: 1,
+  unwanted_recurrence: {
+    shakeIntensity: 2,
+    expectationFold: 2,
   },
 
+  // ── Q4: 가장 지치게 만드는 것 ─────────────────────────────────────
+  confirmed_one_sided: {
+    shakeIntensity: 2,
+    emotionalFatigue: 1,
+  },
+  prolonged_ambiguity: {
+    clarityHunger: 2,
+    emotionalFatigue: 1,
+  },
+  exhausted_by_my_own_interpretation: {
+    interpretiveLoop: 2,
+    emotionalFatigue: 3,
+  },
+  pressure_to_decide_soon: {
+    actionImminence: 3,
+    clarityHunger: 1,
+  },
+  failing_to_let_go: {
+    expectationFold: 2,
+    shakeIntensity: 2,
+  },
+  mind_keeps_returning: {
+    shakeIntensity: 2,
+    expectationFold: 3,
+  },
+
+  // ── Q5: 진짜 원하는 것 ────────────────────────────────────────────
   want_expression: {
-    confirmationNeed: 2,
-    relationshipPotential: 1,
+    clarityHunger: 3,
+    shakeIntensity: 1,
   },
   want_direction: {
-    confirmationNeed: 1,
-    ambiguityRisk: 2,
+    clarityHunger: 3,
+    actionImminence: 1,
   },
-  want_stability: {
-    anxiety: 2,
+  want_to_know_their_heart: {
+    interpretiveLoop: 2,
+    clarityHunger: 2,
+  },
+  want_to_act_and_decide: {
+    actionImminence: 3,
+    clarityHunger: 2,
+  },
+  want_time_to_fold: {
+    expectationFold: 3,
+    emotionalFatigue: 2,
   },
   want_possibility: {
-    relationshipPotential: 2,
-    anxiety: 1,
+    shakeIntensity: 3,
+    expectationFold: 1,
   },
 };
 
+// ── Translation Rules (Compound) ──────────────────────────────────
+// 7개 subtype을 차원 조합으로 식별한다.
+// priority 1 = 2차원 조합으로 정확하게 식별되는 subtype (우선 발화)
+// priority 2 = 단일 차원의 강한 신호로 식별되는 subtype
+// priority 3 = 점진적 상태
+//
+// translator.ts는 priority 오름차순으로 정렬 후 최대 4개 statement를 선택한다.
+// 같은 groupKey는 dedup되어 1개만 살아남는다.
 export const LOVE_1_TRANSLATION_RULES: StateTranslationRule[] = [
+  // ── priority 1: 정밀 식별 subtype ────────────────────────────────
   {
-    dimension: "anxiety",
-    threshold: 4,
+    groupKey: "strong_shake",
     priority: 1,
-    statement: "상대 반응 하나에도 마음이 크게 흔들리는 편이다.",
+    conditions: [{ dimension: "shakeIntensity", threshold: 5 }],
+    statement: "상대의 사소한 반응 하나가 너의 하루 전체를 흔들고 있다.",
   },
   {
-    dimension: "overInterpretation",
-    threshold: 3,
+    groupKey: "confession_imminent",
+    priority: 1,
+    conditions: [
+      { dimension: "actionImminence", threshold: 4 },
+      { dimension: "clarityHunger", threshold: 3 },
+    ],
+    statement:
+      "곧 무언가 결정해야 한다는 감각 위에서, 마지막으로 한 번만 더 확신을 받고 싶어진다.",
+  },
+  {
+    groupKey: "lingering_after_end",
+    priority: 1,
+    conditions: [
+      { dimension: "expectationFold", threshold: 4 },
+      { dimension: "shakeIntensity", threshold: 3 },
+    ],
+    statement: "이미 끝났다고 정리했던 마음이, 자꾸 흔들림으로 돌아오고 있다.",
+  },
+
+  // ── priority 2: 단일 차원 핵심 subtype ───────────────────────────
+  {
+    groupKey: "clarity_hungry",
     priority: 2,
-    statement: "작은 말투나 태도에서도 관계의 의미를 찾으려는 경향이 있다.",
+    conditions: [{ dimension: "clarityHunger", threshold: 4 }],
+    statement:
+      "지금 너에게 필요한 건 상대의 마음 자체보다, 이 관계가 무엇인지에 대한 분명한 답이다.",
   },
   {
-    dimension: "confirmationNeed",
-    threshold: 3,
+    groupKey: "interpretive_loop",
+    priority: 2,
+    conditions: [{ dimension: "interpretiveLoop", threshold: 4 }],
+    statement:
+      "같은 대화와 같은 장면을 계속 다시 보면서, 의미를 끊임없이 다시 짜고 있다.",
+  },
+  {
+    groupKey: "burnout",
+    priority: 2,
+    conditions: [{ dimension: "emotionalFatigue", threshold: 4 }],
+    statement:
+      "흔들림이 너무 오래 이어져서, 이제는 의미를 찾는 것조차 지쳐가고 있다.",
+  },
+
+  // ── priority 3: 점진적 상태 subtype ───────────────────────────────
+  {
+    groupKey: "folding_expectation",
     priority: 3,
-    statement: "상대의 마음보다 확실한 표현과 태도를 더 필요로 한다.",
-  },
-  {
-    dimension: "imbalanceSensitivity",
-    threshold: 3,
-    priority: 4,
-    statement: "나만 더 마음이 큰 건 아닌지 예민하게 느끼는 편이다.",
-  },
-  {
-    dimension: "relationshipPotential",
-    threshold: 3,
-    priority: 5,
-    statement: "이 관계에 아직 가능성이 남아 있기를 바라는 마음이 크다.",
-  },
-  {
-    dimension: "ambiguityRisk",
-    threshold: 3,
-    priority: 6,
-    statement: "상대가 관계를 분명히 하지 않는 지점에 마음이 걸려 있다.",
+    conditions: [
+      { dimension: "expectationFold", threshold: 3 },
+      { dimension: "emotionalFatigue", threshold: 2 },
+    ],
+    statement:
+      "기대의 자리를 천천히 좁히고 있지만, 완전히 닫지는 못한 상태에 있다.",
   },
 ];
 
+// ── Additional Readings ──────────────────────────────────────────
+// ID/title/subtitle은 기존 유지. trigger_dimension만 새 차원으로 재매핑한다.
 export const LOVE_1_ADDITIONAL_READINGS: AdditionalReading[] = [
   {
     id: "why_keep_ambiguous",
     title: "이 사람 마음은 도대체 뭘까?",
     subtitle: "여지는 주는데 관계를 정리하지 않는 심리",
-    trigger_dimension: "ambiguityRisk",
-    trigger_threshold: 3,
+    // 관계가 분명해지길 갈망하는 사용자일수록 우선 노출
+    trigger_dimension: "clarityHunger",
+    trigger_threshold: 4,
   },
   {
     id: "why_am_i_lower_position",
     title: "나는 언제부터 이렇게 을의 연애를 했을까?",
     subtitle: "기다리고 맞추는 쪽이 되어버린 이유",
-    trigger_dimension: "imbalanceSensitivity",
-    trigger_threshold: 3,
+    // "을의 연애" 자각은 흔들림 강도가 강할수록 와닿음
+    trigger_dimension: "shakeIntensity",
+    trigger_threshold: 4,
   },
   {
     id: "how_to_set_my_standard",
     title: "기준을 어떻게 세워야\n마음이 편해질까?",
     subtitle: "기다릴지, 확인할지, 멈출지 정하는 기준",
+    // 흔들림에 지친 사용자일수록 기준 잡기에 관심이 높음
+    trigger_dimension: "emotionalFatigue",
+    trigger_threshold: 4,
   },
 ];
 

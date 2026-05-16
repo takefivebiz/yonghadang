@@ -12,119 +12,156 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
     ],
 
     questions: [
-      // 1. 현재 관계 상태
+      // ── Q1: 흔들림의 현재 위상 (single, 7 options) ──────────────────
+      // 7개 흔들림 subtype의 1차 진입 신호. 모두 "이미 흔들리고 있다"는 전제.
+      // 강한흔들림/확인욕구/반복해석/고백전/기대접기/소진/미련 subtype에 각각 +3씩 진입.
       {
         index: 1,
-        text: "지금 이 관계는\n어떤 느낌에 가까워?",
+        text: "지금 너의 흔들림은\n어디쯤 와 있어?",
         type: "single",
         options: [
           {
-            label: "분위기는 있는데 확실한 말은 없어",
-            value: "undefined_but_close",
+            label: "막 흔들리기 시작한 것 같아",
+            value: "just_started_shaking",
           },
           {
-            label: "가까워질 듯하면 다시 애매해져",
-            value: "push_pull",
+            label: "좋아하는지 아닌지, 답이 필요해",
+            value: "need_clear_answer",
           },
           {
-            label: "연락은 이어지는데 관계는 그대로야",
-            value: "stagnant_connection",
+            label: "같은 대화를 계속 다시 보고 있어",
+            value: "replaying_conversations",
           },
           {
-            label: "내가 더 마음이 큰 느낌이 들어",
-            value: "one_sided_energy",
+            label: "곧 뭔가 해야 할 것 같은데, 한 번만 더 확인하고 싶어",
+            value: "last_check_before_action",
+          },
+          {
+            label: "천천히 기대를 접는 중이야",
+            value: "slowly_lowering_expectation",
+          },
+          {
+            label: "너무 오래 흔들려서 지쳐가고 있어",
+            value: "worn_out_from_shaking",
+          },
+          {
+            label: "끝난 것 같은데 마음이 못 놓아",
+            value: "cant_let_go_after_end",
           },
         ],
       },
 
-      // 2. 상대 태도
+      // ── Q2: 상대 태도 (single, 5 options) ───────────────────────────
+      // 모두 "애매하거나 결정적이지 않은" 상태 전제. 관망형/우위형 제거.
       {
         index: 2,
-        text: "상대는 관계를\n어떤 식으로 대하는 것 같아?",
+        text: "상대 태도는\n어떤 애매함에 가까워?",
         type: "single",
         options: [
           {
-            label: "좋아하는 티는 나는데 확실하게 표현하진 않아",
+            label: "마음은 있는 것 같은데 확실한 표현이 없어",
             value: "emotion_without_clarity",
           },
           {
-            label: "편한 관계처럼 두려고 하는 느낌이야",
-            value: "comfortable_without_progress",
-          },
-          {
-            label: "다가오는 것 같다가 다시 거리를 둬",
+            label: "다가왔다가 다시 거리를 둬",
             value: "inconsistent_interest",
           },
           {
-            label: "마음을 숨기고 계산하는 느낌이 들어",
-            value: "guarded_behavior",
+            label: "편한 관계처럼 두려고 해",
+            value: "comfortable_without_progress",
+          },
+          {
+            label: "신호는 있는데 매번 결정적이지 않아",
+            value: "signal_without_commitment",
+          },
+          {
+            label: "이제는 반응 자체가 줄어들고 있어",
+            value: "fading_response",
           },
         ],
       },
 
-      // 3. 내 반응 방식
+      // ── Q3: 흔들릴 때 내 반응 (multiple, 7 options) ─────────────────
+      // 7개 subtype별 행동 패턴. 관망/정의권 행동 제거, 흔들림의 결로 통일.
       {
         index: 3,
-
-        text: "너는 이런 상황에서\n보통 어떻게 반응해?",
+        text: "흔들릴 때\n너는 보통 어떻게 반응해?",
         type: "multiple",
         options: [
           {
-            label: "나눴던 대화를 계속 다시 보게 돼",
+            label: "나눴던 대화를 계속 다시 봐",
             value: "rechecking_signals",
           },
           {
-            label: "괜찮은 척하지만 혼자 의미를 찾게 돼",
+            label: "괜찮은 척하지만 혼자 의미를 찾아",
             value: "silent_overthinking",
           },
           {
-            label: "상대 반응 하나에 하루 기분이 흔들려",
-            value: "emotionally_affected",
+            label: "상대 반응 하나에 하루 기분이 좌우돼",
+            value: "mood_swings_by_signal",
           },
           {
-            label: "직접 묻고 싶지만 괜히 참게 돼",
-            value: "holding_back",
+            label: "직접 묻고 싶지만 괜히 참아",
+            value: "holding_back_question",
           },
           {
-            label: "이 관계를 쉽게 포기 못하겠어",
-            value: "difficulty_letting_go",
+            label: "한 번만 더 확인하면 결정할 것 같아",
+            value: "one_more_check_then_decide",
+          },
+          {
+            label: "이제 의미 부여를 줄이려고 노력해",
+            value: "trying_to_detach",
+          },
+          {
+            label: "다 잊은 줄 알았는데 자꾸 떠올라",
+            value: "unwanted_recurrence",
           },
         ],
       },
 
-      // 4. 가장 큰 불안
+      // ── Q4: 가장 지치게 만드는 것 (single, 6 options) ──────────────
+      // "어디에서 소진되는가" → 흔들림의 결 차이를 가른다. 호기심/우위형 제거.
       {
         index: 4,
-        text: "사실 네가 제일 두려운 건 뭐야?",
+        text: "이 관계에서 너를\n가장 지치게 만드는 건 뭐야?",
         type: "single",
         options: [
           {
-            label: "나만 진심이었다는 걸 확인하게 되는 거",
-            value: "fear_one_sided",
+            label: "나만 진심이라는 게 자꾸 확인되는 것",
+            value: "confirmed_one_sided",
           },
           {
-            label: "애매한 상태가 계속 이어지는 거",
-            value: "fear_stagnation",
+            label: "이 애매한 상태가 길어지는 것",
+            value: "prolonged_ambiguity",
           },
           {
-            label: "괜히 기대했다가 혼자 상처받는 거",
-            value: "fear_disappointment",
+            label: "같은 신호를 매번 해석하고 있는 나 자신",
+            value: "exhausted_by_my_own_interpretation",
           },
           {
-            label: "결국 내가 먼저 지쳐서 놓게 되는 거",
-            value: "fear_exhaustion",
+            label: "곧 결정해야 한다는 압박",
+            value: "pressure_to_decide_soon",
+          },
+          {
+            label: "기대를 접으려는데 자꾸 흔들리는 것",
+            value: "failing_to_let_go",
+          },
+          {
+            label: "끝났는데도 마음이 자꾸 돌아가는 것",
+            value: "mind_keeps_returning",
           },
         ],
       },
 
-      // 5. 진짜 원하는 것
+      // ── Q5: 진짜 원하는 것 (single, 6 options) ─────────────────────
+      // 흔들림의 출구. 자기기준/거리두기형 제거, 행동/정리 옵션 추가.
       {
         index: 5,
         text: "솔직히 지금\n가장 원하는 건 뭐야?",
         type: "single",
         options: [
           {
-            label: "상대가 먼저 확실한 표현을 해줬으면 좋겠어",
+            label: "상대가 먼저 확실한 표현을 해줬으면",
             value: "want_expression",
           },
           {
@@ -132,11 +169,19 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
             value: "want_direction",
           },
           {
-            label: "이제는 내 마음이 덜 흔들렸으면 좋겠어",
-            value: "want_stability",
+            label: "상대 마음이 어떤지 정확히 알고 싶어",
+            value: "want_to_know_their_heart",
           },
           {
-            label: "솔직히 아직 끝난 관계는 아니었으면 좋겠어",
+            label: "내가 할 말 하고 결정하고 싶어",
+            value: "want_to_act_and_decide",
+          },
+          {
+            label: "천천히 마음을 정리할 시간이 필요해",
+            value: "want_time_to_fold",
+          },
+          {
+            label: "솔직히 아직은 끝난 관계가 아니길",
             value: "want_possibility",
           },
         ],
