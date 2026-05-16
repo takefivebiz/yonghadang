@@ -1,123 +1,95 @@
 "use client";
 
-import { useState } from "react";
-import type { AdditionalReading } from "@/lib/types/quiz";
+import { useState, useEffect } from "react";
+import type { AdditionalReading, LoopType, LoopAnswer, LoopMessage } from "@/lib/types/quiz";
 
 interface AdditionalReadingsProps {
   readings: AdditionalReading[];
-  // TODO: [결제 연동] unlockedReadingIds를 실제 구매 상태 기반으로 교체
-  unlockedReadingIds?: string[];
+  /** loopType → 생성 완료된 LoopAnswer 맵 */
+  loopAnswers?: Partial<Record<LoopType, LoopAnswer>>;
+  /** 현재 생성 중인 loopType (카드에 로딩 상태 표시) */
+  loopLoading?: LoopType | null;
+  /** 생성 실패한 loopType (재시도 버튼 표시) */
+  loopError?: LoopType | null;
+  /** 결제·생성 직후 자동 펼칠 loopType */
+  activeLoopType?: LoopType | null;
+  /** 개별 구매 버튼 클릭 시 호출 (Toss 결제 모달 열기) */
+  onPurchaseSingle?: (reading: AdditionalReading) => void;
+  /** 생성 실패 후 재시도 (결제 없이 API 재호출) */
+  onRetry?: (reading: AdditionalReading) => void;
+  // TODO: [결제 연동] 전체 구매 핸들러 추가 (현재 미구현)
 }
 
-// ── 더미 루프 콘텐츠 (reading.id별) ──────────────────────────────────
-// TODO: [결제 연동] 실제 생성 API(/api/analyze/[session_id]/loop-reading)로 교체
-const DUMMY_LOOP_CONTENTS: Record<string, string[]> = {
-  default: [
-    "너는 지금, 좋아하냐 아니냐보다 그 태도를 이해하고 싶은 거야.",
-    "이 사람은 모호하게 두는 게 더 편한 사람이야.",
-    "명확한 거절보다 애매한 온기가 더 오래 남거든.",
-  ],
-  longing: [
-    "그리움은 좋았던 순간만 남겨서 보여줘.",
-    "그 사람이 보고 싶은 건지, 그 시절의 내가 보고 싶은 건지.",
-    "아직 정리가 덜 된 거야.",
-  ],
-  trust: [
-    "제일 힘든 건 상대가 아니라, 믿었던 내 판단이야.",
-    "믿었다는 건 열려 있었다는 거야. 잘못이 아니야.",
-    "지금은 신뢰를 다시 쌓는 게 목표가 아니어도 괜찮아.",
-  ],
-};
-
-/** reading.id에 해당하는 더미 콘텐츠를 반환. id가 없으면 trigger_dimension 기반 fallback. */
-const getDummyContent = (reading: AdditionalReading): string[] => {
-  if (DUMMY_LOOP_CONTENTS[reading.id]) return DUMMY_LOOP_CONTENTS[reading.id];
-
-  const dim = reading.trigger_dimension ?? "";
-  if (dim.includes("longing") || dim.includes("그리움"))
-    return DUMMY_LOOP_CONTENTS.longing;
-  if (dim.includes("trust") || dim.includes("신뢰"))
-    return DUMMY_LOOP_CONTENTS.trust;
-
-  return DUMMY_LOOP_CONTENTS.default;
-};
-
-// ── 개별/전체 가격 상수 ────────────────────────────────────────────────
 const PRICE_SINGLE = 900;
-const PRICE_ALL = 2500;
-// TODO: [가격 정산] 개별 × 남은개수 - 전체가격 = 할인액 동적 계산 후 UI 반영
 
 const AdditionalReadings = ({
   readings,
-  unlockedReadingIds = [],
+  loopAnswers = {},
+  loopLoading = null,
+  loopError = null,
+  activeLoopType = null,
+  onPurchaseSingle,
+  onRetry,
 }: AdditionalReadingsProps) => {
-  // 바텀시트에서 선택된 reading
   const [selectedReading, setSelectedReading] =
     useState<AdditionalReading | null>(null);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
-
-  // 잠금 해제된 reading id 집합 (더미: prop 초기값 + 클릭 unlock 누적)
-  const [unlockedReadings, setUnlockedReadings] = useState<Set<string>>(
-    () => new Set(unlockedReadingIds),
-  );
-
-  // 현재 펼쳐진 accordion reading id
   const [expandedReadingId, setExpandedReadingId] = useState<string | null>(
     null,
   );
 
-  // 잠긴 reading 수 (전체 열기 가격 표시용)
-  const lockedCount = readings.filter(
-    (r) => !unlockedReadings.has(r.id),
-  ).length;
+  // 결제·생성 완료 후 해당 카드 자동 펼침
+  useEffect(() => {
+    if (!activeLoopType) return;
+    const reading = readings.find((r) => r.loopType === activeLoopType);
+    if (reading && loopAnswers[activeLoopType]) {
+      setExpandedReadingId(reading.id);
+    }
+  }, [activeLoopType, readings, loopAnswers]);
 
-  // ── 카드 클릭 ─────────────────────────────────────────────────────
+  const isUnlocked = (reading: AdditionalReading) =>
+    !!loopAnswers[reading.loopType];
+
+  const isLoading = (reading: AdditionalReading) =>
+    loopLoading === reading.loopType;
+
+  const hasError = (reading: AdditionalReading) =>
+    loopError === reading.loopType;
+
+  const getMessages = (reading: AdditionalReading): LoopMessage[] =>
+    loopAnswers[reading.loopType]?.messages ?? [];
+
+  // ── 카드 클릭 ────────────────────────────────────────────────
   const handleCardClick = (reading: AdditionalReading) => {
-    if (unlockedReadings.has(reading.id)) {
-      // 이미 열린 경우 → accordion 토글
-      setExpandedReadingId((prev) => (prev === reading.id ? null : reading.id));
-    } else {
-      // 잠긴 경우 → 바텀시트 열기
+    if (isLoading(reading)) return; // 생성 중: no-op
+    if (isUnlocked(reading)) {
+      setExpandedReadingId((prev) =>
+        prev === reading.id ? null : reading.id,
+      );
+    } else if (!hasError(reading)) {
       setSelectedReading(reading);
       setIsBottomSheetOpen(true);
     }
   };
 
-  // ── 바텀시트 닫기 ─────────────────────────────────────────────────
+  // ── 바텀시트 닫기 ────────────────────────────────────────────
   const handleCloseSheet = () => {
     setIsBottomSheetOpen(false);
-    // 닫힘 애니메이션 후 selectedReading 초기화
     setTimeout(() => setSelectedReading(null), 350);
   };
 
-  // ── 개별 열기 (더미) ─────────────────────────────────────────────
-  // TODO: [결제 연동] 실제 PG 결제(Toss) 처리로 교체
+  // ── 개별 구매 ────────────────────────────────────────────────
   const handleUnlockSingle = () => {
     if (!selectedReading) return;
-    const next = new Set(unlockedReadings);
-    next.add(selectedReading.id);
-    setUnlockedReadings(next);
-    setExpandedReadingId(selectedReading.id);
-    setIsBottomSheetOpen(false);
-    setTimeout(() => setSelectedReading(null), 350);
-  };
-
-  // ── 전체 열기 (더미) ─────────────────────────────────────────────
-  // TODO: [결제 연동] 실제 PG 결제(Toss) 처리로 교체
-  const handleUnlockAll = () => {
-    const allIds = new Set(readings.map((r) => r.id));
-    setUnlockedReadings(allIds);
-    // 선택한 reading을 바로 펼치기
-    if (selectedReading) setExpandedReadingId(selectedReading.id);
-    setIsBottomSheetOpen(false);
-    setTimeout(() => setSelectedReading(null), 350);
+    onPurchaseSingle?.(selectedReading);
+    handleCloseSheet();
   };
 
   if (readings.length === 0) return null;
 
   return (
     <section className="px-5 py-10">
-      {/* 펼침 애니메이션 스타일 */}
+      {/* 애니메이션 */}
       <style>{`
         @keyframes bubble-fade-in {
           from { opacity: 0; transform: translateY(8px); }
@@ -127,6 +99,13 @@ const AdditionalReadings = ({
         .bubble-fade:nth-child(1) { animation-delay: 0.05s; }
         .bubble-fade:nth-child(2) { animation-delay: 0.10s; }
         .bubble-fade:nth-child(3) { animation-delay: 0.15s; }
+        .bubble-fade:nth-child(4) { animation-delay: 0.20s; }
+        .bubble-fade:nth-child(5) { animation-delay: 0.25s; }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        .spin-slow { animation: spin-slow 1.4s linear infinite; }
       `}</style>
 
       {/* 섹션 구분 */}
@@ -151,33 +130,36 @@ const AdditionalReadings = ({
       {/* 카드 목록 */}
       <div className="flex flex-col gap-3">
         {readings.map((reading) => {
-          const isUnlocked = unlockedReadings.has(reading.id);
-          const isExpanded = expandedReadingId === reading.id && isUnlocked;
-          const dummyContent = getDummyContent(reading);
+          const unlocked = isUnlocked(reading);
+          const loading = isLoading(reading);
+          const error = hasError(reading);
+          const isExpanded = expandedReadingId === reading.id && unlocked;
+          const messages = getMessages(reading);
 
           return (
             <div key={reading.id}>
-              {/* 질문 카드 */}
+              {/* ── 질문 카드 ───────────────────────────────────────── */}
               <button
                 type="button"
                 onClick={() => handleCardClick(reading)}
+                disabled={loading}
                 className="w-full text-left transition-all duration-200"
                 style={{
                   background: isExpanded
                     ? "rgba(201, 139, 176, 0.07)"
-                    : isUnlocked
+                    : unlocked
                       ? "rgba(209, 109, 172, 0.10)"
                       : "rgba(255, 255, 255, 0.02)",
                   border: `1px solid ${
                     isExpanded
                       ? "rgba(201, 139, 176, 0.20)"
-                      : isUnlocked
+                      : unlocked
                         ? "rgba(201, 139, 176, 0.22)"
                         : "rgba(255, 255, 255, 0.07)"
                   }`,
                   borderRadius: isExpanded ? "14px 14px 0 0" : "14px",
                   padding: "18px 18px 16px",
-                  boxShadow: isUnlocked
+                  boxShadow: unlocked
                     ? "0 4px 16px rgba(201, 139, 176, 0.10)"
                     : "none",
                   transition: "all 0.2s ease",
@@ -191,9 +173,10 @@ const AdditionalReadings = ({
                       style={{
                         color: isExpanded
                           ? "rgba(249, 249, 229, 0.92)"
-                          : isUnlocked
+                          : unlocked
                             ? "rgba(249, 249, 229, 0.80)"
                             : "rgba(249, 249, 229, 0.55)",
+                        whiteSpace: "pre-line",
                       }}
                     >
                       {reading.title}
@@ -209,8 +192,8 @@ const AdditionalReadings = ({
                       </p>
                     )}
 
-                    {/* 잠긴 상태 힌트 */}
-                    {!isUnlocked && (
+                    {/* 상태 힌트 */}
+                    {!unlocked && !loading && !error && (
                       <div className="flex items-center gap-1.5">
                         <svg
                           className="h-3 w-3"
@@ -231,25 +214,67 @@ const AdditionalReadings = ({
                         </p>
                       </div>
                     )}
+
+                    {/* 생성 중 */}
+                    {loading && (
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="spin-slow inline-block text-xs"
+                          style={{ color: "rgba(201, 139, 176, 0.60)" }}
+                        >
+                          ◐
+                        </span>
+                        <p
+                          className="text-xs"
+                          style={{ color: "rgba(201, 139, 176, 0.55)" }}
+                        >
+                          생성 중이야...
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 에러 */}
+                    {error && !loading && (
+                      <div className="flex items-center gap-2">
+                        <p
+                          className="text-xs"
+                          style={{ color: "rgba(220, 100, 100, 0.70)" }}
+                        >
+                          생성에 실패했어
+                        </p>
+                        {onRetry && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRetry(reading);
+                            }}
+                            className="text-xs underline"
+                            style={{ color: "rgba(201, 139, 176, 0.65)" }}
+                          >
+                            다시 시도
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* 상태 인디케이터 */}
-                  {isUnlocked ? (
+                  {unlocked && (
                     <span
                       className="flex-shrink-0 mt-0.5"
                       style={{
                         color: "rgba(201, 139, 176, 0.45)",
                         fontSize: "11px",
                         display: "inline-block",
-                        transform: isExpanded
-                          ? "rotate(180deg)"
-                          : "rotate(0deg)",
+                        transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
                         transition: "transform 0.3s ease",
                       }}
                     >
                       ↓
                     </span>
-                  ) : (
+                  )}
+                  {!unlocked && !loading && !error && (
                     <span
                       className="flex-shrink-0"
                       style={{
@@ -263,7 +288,7 @@ const AdditionalReadings = ({
                 </div>
               </button>
 
-              {/* 아코디언 콘텐츠 (unlock된 경우에만) */}
+              {/* ── 아코디언 콘텐츠 (unlock 후에만) ──────────────────── */}
               <div
                 className="overflow-hidden"
                 style={{
@@ -294,13 +319,20 @@ const AdditionalReadings = ({
                       transition: "background 0.5s ease",
                     }}
                   >
-                    {dummyContent.map((text, idx) => (
+                    {messages.map((msg, idx) => (
                       <div
                         key={idx}
                         className={isExpanded ? "bubble-fade" : ""}
                         style={{
-                          background: "rgba(255, 255, 255, 0.05)",
-                          border: "1px solid rgba(255, 255, 255, 0.10)",
+                          // punch: 살짝 더 강조된 배경
+                          background:
+                            msg.type === "punch"
+                              ? "rgba(201, 139, 176, 0.10)"
+                              : "rgba(255, 255, 255, 0.05)",
+                          border:
+                            msg.type === "punch"
+                              ? "1px solid rgba(201, 139, 176, 0.18)"
+                              : "1px solid rgba(255, 255, 255, 0.10)",
                           borderRadius: "14px 14px 14px 2px",
                           padding: "14px 16px",
                           width: "fit-content",
@@ -311,15 +343,15 @@ const AdditionalReadings = ({
                           className="text-sm leading-relaxed"
                           style={{
                             color: "rgba(249, 249, 229, 0.78)",
-                            fontWeight: 300,
+                            fontWeight: msg.type === "punch" ? 400 : 300,
                             letterSpacing: "-0.02em",
+                            whiteSpace: "pre-line",
                           }}
                         >
-                          {text}
+                          {msg.text}
                         </p>
                       </div>
                     ))}
-                    {/* TODO: [결제 연동] 더미 콘텐츠 제거 후 실제 생성 콘텐츠로 교체 */}
                   </div>
                 </div>
               </div>
@@ -328,7 +360,7 @@ const AdditionalReadings = ({
         })}
       </div>
 
-      {/* 바텀시트 백드롭 */}
+      {/* ── 바텀시트 백드롭 ────────────────────────────────────────── */}
       <div
         className="fixed inset-0 z-50"
         style={{
@@ -342,7 +374,7 @@ const AdditionalReadings = ({
         onClick={handleCloseSheet}
       />
 
-      {/* ── 바텀시트 ──────────────────────────────────────────────────── */}
+      {/* ── 바텀시트 ──────────────────────────────────────────────── */}
       <div
         className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-md"
         style={{
@@ -387,7 +419,7 @@ const AdditionalReadings = ({
 
         {/* 콘텐츠 영역 */}
         <div className="px-6 pt-8 pb-8">
-          {/* 선택된 reading 제목/부제목 — 메시지 버블 스타일 */}
+          {/* 선택된 reading 제목 - 메시지 버블 스타일 */}
           {selectedReading && (
             <div className="mb-8 flex justify-end w-full">
               <div
@@ -400,7 +432,7 @@ const AdditionalReadings = ({
                 }}
               >
                 <p
-                  className="text-sm font-nomal leading-snug mb-1"
+                  className="text-sm font-normal leading-snug mb-1"
                   style={{
                     color: "rgba(249, 249, 229, 0.93)",
                     textShadow: "0 0 20px rgba(201, 139, 176, 0.06)",
@@ -449,65 +481,7 @@ const AdditionalReadings = ({
             </span>
           </button>
 
-          {/* 전체 열기 버튼 (잠긴 항목이 2개 이상일 때만 표시) */}
-          {lockedCount >= 2 && (
-            <button
-              type="button"
-              onClick={handleUnlockAll}
-              className="flex items-center justify-between"
-              style={{
-                width: "100%",
-                background: "rgba(201, 139, 176, 0.13)",
-                border: "1px solid rgba(201, 139, 176, 0.22)",
-                borderRadius: "12px 12px 12px 0px",
-                padding: "14px 16px",
-                transition: "all 0.15s ease",
-              }}
-            >
-              <div className="flex flex-col items-start gap-0.5">
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: "rgba(249, 249, 229, 0.90)" }}
-                >
-                  모든 질문 한번에 읽기
-                </span>
-                <span
-                  className="text-xs"
-                  style={{ color: "rgba(249, 249, 229, 0.45)" }}
-                >
-                  {lockedCount}개 질문
-                </span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                {/* 절약 뱃지 */}
-                <span
-                  className="text-[10px] px-1.5 py-0.5 rounded"
-                  style={{
-                    background: "rgba(201, 139, 176, 0.15)",
-                    color: "rgba(201, 139, 176, 0.75)",
-                  }}
-                >
-                  200원 절약
-                </span>
-                <span
-                  className="text-xs"
-                  style={{ color: "rgba(201, 139, 176, 0.65)" }}
-                >
-                  {PRICE_ALL.toLocaleString()}원
-                </span>
-              </div>
-            </button>
-          )}
-
-          {/* 잠긴 항목이 1개뿐일 때 - 전체 열기 불필요하므로 개별만 강조 */}
-          {lockedCount === 1 && (
-            <p
-              className="text-center text-xs mt-3"
-              style={{ color: "rgba(249, 249, 229, 0.22)" }}
-            >
-              마지막 질문이야
-            </p>
-          )}
+          {/* TODO: [결제 연동] 전체 구매 (3개 한번에) - 추후 구현 */}
         </div>
       </div>
     </section>

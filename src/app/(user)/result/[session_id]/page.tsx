@@ -20,7 +20,8 @@ import PaidGenerationLoading from "@/components/result/paid-generation-loading";
 import { getContentPack } from "@/lib/content-packs";
 import { prioritizeAdditionalReadings } from "@/lib/quiz/accumulator";
 import { translateStateToSummary } from "@/lib/quiz/translator";
-import type { AdditionalReading, HiddenState } from "@/lib/types/quiz";
+import type { AdditionalReading, HiddenState, LoopType, LoopAnswer } from "@/lib/types/quiz";
+import type { ClaudeGeneratedResult, LoopReadingSceneInsight } from "@/lib/prompts/generate-result";
 import AdditionalReadings from "@/components/result/additional-readings";
 
 interface PageProps {
@@ -41,8 +42,15 @@ const ResultPage = ({ params }: PageProps) => {
   // QA mode: ?qa=1 또는 NEXT_PUBLIC_QA_MODE=true → 결제 없이 전체 씬 확인
   const [isQaMode, setIsQaMode] = useState(false);
 
+  // ── Loop Reading 상태 ──────────────────────────────────────────────────
+  const [loopAnswers, setLoopAnswers] = useState<Partial<Record<LoopType, LoopAnswer>>>({});
+  const [loopLoading, setLoopLoading] = useState<LoopType | null>(null);
+  const [loopError, setLoopError] = useState<LoopType | null>(null);
+  const [activeLoopType, setActiveLoopType] = useState<LoopType | null>(null);
+
   const sceneRefsMap = useRef<Record<number, HTMLDivElement | null>>({});
   const flowOverviewRef = useRef<HTMLDivElement | null>(null);
+  const loopReadingsRef = useRef<HTMLDivElement | null>(null);
   // 결제 감지 useEffect 더블 실행 방지 (scenes 업데이트로 useEffect 재실행될 수 있음)
   const isProcessingPayment = useRef(false);
 
@@ -79,6 +87,23 @@ const ResultPage = ({ params }: PageProps) => {
         if (pack) {
           const prioritized = prioritizeAdditionalReadings(hiddenScores, pack.additionalReadings);
           setAdditionalReadings(prioritized.slice(0, 5));
+        }
+
+        // ── 저장된 loop answers 복원 ────────────────────────────────
+        const loopTypes: LoopType[] = ["action", "standard", "evaluate"];
+        const savedLoopAnswers: Partial<Record<LoopType, LoopAnswer>> = {};
+        for (const lt of loopTypes) {
+          const raw = localStorage.getItem(`veil_loop_${lt}_${param.session_id}`);
+          if (raw) {
+            try {
+              savedLoopAnswers[lt] = JSON.parse(raw) as LoopAnswer;
+            } catch {
+              // corrupt data: 무시
+            }
+          }
+        }
+        if (Object.keys(savedLoopAnswers).length > 0) {
+          setLoopAnswers(savedLoopAnswers);
         }
 
         // ── 캐시된 scenes 확인 ─────────────────────────────────────────
@@ -368,7 +393,33 @@ const ResultPage = ({ params }: PageProps) => {
       const resData = (await res.json()) as {
         session_id: string;
         result_scenes: ResultScene[];
+        _debug_raw_result?: ClaudeGeneratedResult;
       };
+
+      // scene carry_over를 loop-reading generate의 sceneInsights로 저장
+      if (resData._debug_raw_result?.scenes) {
+        const newInsights: LoopReadingSceneInsight[] = resData._debug_raw_result.scenes
+          .filter((s) => s.carry_over)
+          .map((s) => ({
+            scene_title: s.scene_title,
+            key_insight: s.carry_over.key_insight,
+            do_not_repeat: s.carry_over.do_not_repeat,
+          }));
+        if (newInsights.length > 0) {
+          const insightKey = `veil_scene_insights_${analyzeData.session_id}`;
+          const existingRaw = localStorage.getItem(insightKey);
+          const existing: LoopReadingSceneInsight[] = existingRaw
+            ? (JSON.parse(existingRaw) as LoopReadingSceneInsight[])
+            : [];
+          const merged = [
+            ...existing.filter(
+              (e) => !newInsights.some((n) => n.scene_title === e.scene_title),
+            ),
+            ...newInsights,
+          ];
+          localStorage.setItem(insightKey, JSON.stringify(merged));
+        }
+      }
 
       // merge: 기존 scenes + 새로운 paid scenes
       const mergedScenes = mergeScenes(scenes, resData.result_scenes);
@@ -391,6 +442,124 @@ const ResultPage = ({ params }: PageProps) => {
     }
   }, [analyzeData, scenes]);
 
+  // ── Loop Reading 생성 ──────────────────────────────────────────────────
+  // 결제 성공 후 또는 재시도 시 호출. 결제 검증 없이 API를 직접 호출한다.
+  const handleLoopUnlock = useCallback(
+    async (loopType: LoopType, loopTitle: string) => {
+      if (!analyzeData) return;
+      const sessionId = analyzeData.session_id;
+
+      // 이미 생성된 답변이 있으면 재생성 없이 표시
+      const cached = localStorage.getItem(`veil_loop_${loopType}_${sessionId}`);
+      if (cached) {
+        try {
+          const answer = JSON.parse(cached) as LoopAnswer;
+          setLoopAnswers((prev) => ({ ...prev, [loopType]: answer }));
+          setActiveLoopType(loopType);
+          window.history.replaceState({}, "", window.location.pathname);
+          return;
+        } catch {
+          localStorage.removeItem(`veil_loop_${loopType}_${sessionId}`);
+        }
+      }
+
+      localStorage.setItem(`veil_payment_pending_loop_${sessionId}`, loopType);
+      setLoopLoading(loopType);
+      setLoopError(null);
+
+      try {
+        const pack = getContentPack(analyzeData.content_id);
+        const rawHiddenState = localStorage.getItem(
+          `veil_hidden_state_${sessionId}`,
+        );
+        const hiddenScores: HiddenState = rawHiddenState
+          ? (JSON.parse(rawHiddenState) as HiddenState)
+          : {};
+        const stateSummary = pack
+          ? translateStateToSummary(hiddenScores, pack.translationRules)
+          : [];
+
+        const rawInsights = localStorage.getItem(
+          `veil_scene_insights_${sessionId}`,
+        );
+        const sceneInsights: LoopReadingSceneInsight[] = rawInsights
+          ? (JSON.parse(rawInsights) as LoopReadingSceneInsight[])
+          : [];
+
+        const res = await fetch(
+          `/api/analyze/${sessionId}/loop-reading/generate`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              loopType,
+              loopTitle,
+              context: {
+                freeInput: analyzeData.free_input,
+                stateSummary,
+                sceneInsights,
+              },
+            }),
+          },
+        );
+
+        if (!res.ok) {
+          const errData = (await res.json()) as { error?: string };
+          throw new Error(
+            errData.error ?? `루프 생성 실패 (HTTP ${res.status})`,
+          );
+        }
+
+        const answer = (await res.json()) as LoopAnswer;
+        localStorage.setItem(
+          `veil_loop_${loopType}_${sessionId}`,
+          JSON.stringify(answer),
+        );
+        localStorage.removeItem(`veil_payment_pending_loop_${sessionId}`);
+
+        setLoopAnswers((prev) => ({ ...prev, [loopType]: answer }));
+        setActiveLoopType(loopType);
+        window.history.replaceState({}, "", window.location.pathname);
+
+        setTimeout(() => {
+          if (loopReadingsRef.current) {
+            loopReadingsRef.current.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        }, 300);
+      } catch (err) {
+        console.error("[loop-unlock] 생성 실패:", err);
+        setLoopError(loopType);
+        // pending marker 유지: 다음 방문 시 재시도 가능
+      } finally {
+        setLoopLoading(null);
+      }
+    },
+    [analyzeData],
+  );
+
+  // loop 결제 모달 열기
+  const handlePurchaseLoop = useCallback((reading: AdditionalReading) => {
+    setPaymentModal({
+      isOpen: true,
+      type: "loop",
+      sceneIndex: 0,
+      cardTitle: reading.title.replace(/\n/g, " "),
+      loopType: reading.loopType,
+    });
+  }, []);
+
+  // loop 생성 재시도 (결제 없이 API 재호출)
+  const handleRetryLoopGenerate = useCallback(
+    (reading: AdditionalReading) => {
+      const loopTitle = reading.title.replace(/\n/g, " ");
+      void handleLoopUnlock(reading.loopType, loopTitle);
+    },
+    [handleLoopUnlock],
+  );
+
   // ── Phase 2: 결제 완료 상태 감지 (Toss redirect param 기반) ──────────────────────────
   // Toss는 successUrl에 paymentKey/orderId/amount를 자동으로 추가함
   // 우리는 _unlock, _payment_type, _scene_index를 통해 unlock 처리를 구분함
@@ -401,7 +570,6 @@ const ResultPage = ({ params }: PageProps) => {
     const isUnlock = searchParams.get("_unlock") === "true";
     const hasPaymentKey = searchParams.has("paymentKey"); // Toss가 추가한 파라미터
     const paymentType = searchParams.get("_payment_type");
-    const sceneIndex = parseInt(searchParams.get("_scene_index") || "0", 10);
     const sessionId = analyzeData.session_id;
 
     // ── Debug log (개발 중 확인용) ──────────────────────────────────────
@@ -413,84 +581,102 @@ const ResultPage = ({ params }: PageProps) => {
         orderId: searchParams.get("orderId"),
         amount: searchParams.get("amount"),
         _payment_type: paymentType,
-        _scene_index: sceneIndex,
         sessionId,
       });
     }
 
     if (isUnlock && hasPaymentKey) {
-      // 더블 실행 방지: scenes 업데이트로 useEffect가 재실행될 수 있음
+      // 더블 실행 방지
       if (isProcessingPayment.current) return;
       isProcessingPayment.current = true;
 
-      // Toss 결제 성공 ✓ + 우리의 unlock 플래그 ✓
-      // 결제된 scene_indexes 추출
-      let paidSceneIndexes: number[] = [];
-
-      if (paymentType === "single" && sceneIndex > 0) {
-        paidSceneIndexes = [sceneIndex];
-      } else if (paymentType === "all") {
-        paidSceneIndexes = scenes
-          .filter((s) => !s.is_free)
-          .map((s) => s.scene_index);
-      }
-
-      // recovery 여부 감지: 이전 시도 마커가 있으면 재방문 복구 케이스
-      const pendingKey = `veil_payment_pending_${sessionId}`;
-      const isRecovery = !!localStorage.getItem(pendingKey);
-      localStorage.setItem(pendingKey, "1");
-      setIsPaidGenerationRecovery(isRecovery);
-
-      // loading UI 표시
-      setPaidGenerationLoading(true);
-
-      // Paid scenes 생성 (mock placeholder를 실제 generated scenes으로 교체)
-      generatePaidScenes(paidSceneIndexes)
-        .then(() => {
-          // 생성 완료 후에만 unlock 상태 저장 (성공 확인된 경우에만)
-          const newUnlocked = [
-            ...new Set([...unlockedScenes, ...paidSceneIndexes]),
-          ];
-          setUnlockedScenes(newUnlocked);
-
-          // localStorage에 unlock 상태 저장 + 마커 제거
-          if (typeof window !== "undefined") {
-            localStorage.setItem(
-              `veil_unlocked_scenes_${sessionId}`,
-              JSON.stringify(newUnlocked),
-            );
-            localStorage.removeItem(pendingKey);
-            console.log("[unlock saved]", `veil_unlocked_scenes_${sessionId}`);
-          }
-
-          // URL 정리: 성공 후에만 정리 (이탈 후 재방문 시 URL 파라미터로 재시도 가능하게 유지)
-          window.history.replaceState({}, "", window.location.pathname);
-
-          // 결제 완료 후 FlowOverview로 스크롤
-          setTimeout(() => {
-            if (flowOverviewRef.current) {
-              flowOverviewRef.current.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              });
-            }
-          }, 300);
-        })
-        .catch((err) => {
-          console.error("[paid generation failed]", err);
-          // URL 정리하지 않음: 재방문 시 URL 파라미터가 남아 자동 재시도됨
-          // pendingKey도 유지: 다음 재방문 시 recovery=true로 표시
-          // TODO: 사용자에게 에러 알림 (시도 재시도 옵션 제공)
-        })
-        .finally(() => {
+      if (paymentType === "loop") {
+        // ── Loop unlock flow ─────────────────────────────────────────
+        const loopTypeParam = searchParams.get("_loop_type") as LoopType | null;
+        if (!loopTypeParam) {
           isProcessingPayment.current = false;
-          setPaidGenerationLoading(false);
+          return;
+        }
+        const reading = additionalReadings.find(
+          (r) => r.loopType === loopTypeParam,
+        );
+        const loopTitle = reading?.title.replace(/\n/g, " ") ?? loopTypeParam;
+
+        handleLoopUnlock(loopTypeParam, loopTitle).finally(() => {
+          isProcessingPayment.current = false;
         });
+      } else {
+        // ── Scene unlock flow (기존 로직 유지) ───────────────────────
+        const sceneIndex = parseInt(
+          searchParams.get("_scene_index") || "0",
+          10,
+        );
+        let paidSceneIndexes: number[] = [];
+
+        if (paymentType === "single" && sceneIndex > 0) {
+          paidSceneIndexes = [sceneIndex];
+        } else if (paymentType === "all") {
+          paidSceneIndexes = scenes
+            .filter((s) => !s.is_free)
+            .map((s) => s.scene_index);
+        }
+
+        const pendingKey = `veil_payment_pending_${sessionId}`;
+        const isRecovery = !!localStorage.getItem(pendingKey);
+        localStorage.setItem(pendingKey, "1");
+        setIsPaidGenerationRecovery(isRecovery);
+        setPaidGenerationLoading(true);
+
+        generatePaidScenes(paidSceneIndexes)
+          .then(() => {
+            const newUnlocked = [
+              ...new Set([...unlockedScenes, ...paidSceneIndexes]),
+            ];
+            setUnlockedScenes(newUnlocked);
+
+            if (typeof window !== "undefined") {
+              localStorage.setItem(
+                `veil_unlocked_scenes_${sessionId}`,
+                JSON.stringify(newUnlocked),
+              );
+              localStorage.removeItem(pendingKey);
+              console.log(
+                "[unlock saved]",
+                `veil_unlocked_scenes_${sessionId}`,
+              );
+            }
+
+            window.history.replaceState({}, "", window.location.pathname);
+
+            setTimeout(() => {
+              if (flowOverviewRef.current) {
+                flowOverviewRef.current.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }
+            }, 300);
+          })
+          .catch((err) => {
+            console.error("[paid generation failed]", err);
+          })
+          .finally(() => {
+            isProcessingPayment.current = false;
+            setPaidGenerationLoading(false);
+          });
+      }
     } else if (searchParams.get("_payment_failed") === "true") {
       console.log("[payment failed]");
       window.history.replaceState({}, "", window.location.pathname);
     }
-  }, [analyzeData, scenes, unlockedScenes, generatePaidScenes]);
+  }, [
+    analyzeData,
+    scenes,
+    unlockedScenes,
+    generatePaidScenes,
+    additionalReadings,
+    handleLoopUnlock,
+  ]);
 
   // 네비게이션 메뉴 열림 상태 감지 (Progress Indicator 숨기기)
   useEffect(() => {
@@ -567,11 +753,18 @@ const ResultPage = ({ params }: PageProps) => {
     };
   }, [scenes, currentSceneIndex]);
 
-  const [paymentModal, setPaymentModal] = useState({
+  const [paymentModal, setPaymentModal] = useState<{
+    isOpen: boolean;
+    type: "single" | "all" | "loop";
+    sceneIndex: number;
+    cardTitle: string;
+    loopType: LoopType | null;
+  }>({
     isOpen: false,
-    type: "single" as "single" | "all",
+    type: "single",
     sceneIndex: 0,
     cardTitle: "",
+    loopType: null,
   });
 
   const handleOpenPaymentModal = (
@@ -584,6 +777,7 @@ const ResultPage = ({ params }: PageProps) => {
       type,
       sceneIndex: sceneIndex || 0,
       cardTitle: cardTitle || "",
+      loopType: null,
     });
   };
 
@@ -818,11 +1012,18 @@ const ResultPage = ({ params }: PageProps) => {
             );
           })()}
 
-          {/* 추가 리딩 카드 */}
-          {/* TODO: [결제 연동] unlockedReadingIds를 실제 구매 상태(DB/localStorage)로 교체 */}
-          <AdditionalReadings
-            readings={additionalReadings}
-          />
+          {/* 추가 리딩 카드 (loop readings) */}
+          <div ref={loopReadingsRef}>
+            <AdditionalReadings
+              readings={additionalReadings}
+              loopAnswers={loopAnswers}
+              loopLoading={loopLoading}
+              loopError={loopError}
+              activeLoopType={activeLoopType}
+              onPurchaseSingle={handlePurchaseLoop}
+              onRetry={handleRetryLoopGenerate}
+            />
+          </div>
         </div>
 
         {/* 결과 페이지 하단 액션 */}
@@ -840,6 +1041,7 @@ const ResultPage = ({ params }: PageProps) => {
           paymentType={paymentModal.type}
           sceneIndex={paymentModal.sceneIndex}
           cardTitle={paymentModal.cardTitle}
+          loopType={paymentModal.loopType ?? undefined}
         />
       )}
 

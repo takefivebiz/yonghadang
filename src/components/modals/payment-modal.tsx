@@ -6,13 +6,16 @@ import {
   ANONYMOUS,
   type PaymentWidgetInstance,
 } from "@tosspayments/payment-widget-sdk";
+import type { LoopType } from "@/lib/types/quiz";
 
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  paymentType: "single" | "all";
+  paymentType: "single" | "all" | "loop";
   sceneIndex?: number;
   cardTitle?: string;
+  /** loop 결제 시 필수. successUrl에 _loop_type으로 포함된다. */
+  loopType?: LoopType;
 }
 
 const PaymentModal = ({
@@ -21,6 +24,7 @@ const PaymentModal = ({
   paymentType,
   sceneIndex,
   cardTitle,
+  loopType,
 }: PaymentModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,8 +32,13 @@ const PaymentModal = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isSingle = paymentType === "single";
-  const amount = isSingle ? 1900 : 4900;
-  const title = isSingle ? `[${cardTitle}] 열기` : "전체 흐름 열기";
+  const isLoop = paymentType === "loop";
+  const amount = isLoop ? 900 : isSingle ? 1900 : 4900;
+  const title = isLoop
+    ? `${cardTitle} 읽기`
+    : isSingle
+      ? `[${cardTitle}] 열기`
+      : "전체 흐름 열기";
   const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || "";
 
   // 위젯 초기화 및 결제 수단 선택 UI 렌더링
@@ -76,15 +85,21 @@ const PaymentModal = ({
 
     try {
       const orderId = `order_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-      const orderName = isSingle ? `${cardTitle} 열기` : "전체 흐름 열기";
+      const orderName = isLoop
+        ? `루프 리딩: ${cardTitle}`
+        : isSingle
+          ? `${cardTitle} 열기`
+          : "전체 흐름 열기";
 
       // 현재 페이지 URL (쿼리 제거)
       const baseUrl =
         typeof window !== "undefined" ? window.location.href.split("?")[0] : "";
 
-      // successUrl: 우리의 파라미터 + Toss가 추가할 paymentKey/orderId/amount
-      // Toss는 자동으로 paymentKey, orderId, amount를 query에 추가함
-      const successUrl = `${baseUrl}?_payment_type=${paymentType}&_scene_index=${sceneIndex || 0}&_unlock=true`;
+      // loop 결제: _loop_type 파라미터로 어떤 루프인지 전달
+      // scene 결제: _scene_index로 어떤 씬인지 전달 (기존 로직 유지)
+      const successUrl = isLoop
+        ? `${baseUrl}?_payment_type=loop&_loop_type=${loopType || ""}&_unlock=true`
+        : `${baseUrl}?_payment_type=${paymentType}&_scene_index=${sceneIndex || 0}&_unlock=true`;
       const failUrl = `${baseUrl}?_payment_failed=true`;
 
       // 결제 요청 (필수: successUrl, failUrl)
@@ -149,9 +164,11 @@ const PaymentModal = ({
                 {title}
               </h2>
               <p className="mb-8 text-sm text-highlight/50">
-                {isSingle
-                  ? "이어서 읽을 수 있어"
-                  : "잠겨있는 모든 흐름을 열 수 있어"}
+                {isLoop
+                  ? "결과를 더 깊이 읽을 수 있어"
+                  : isSingle
+                    ? "이어서 읽을 수 있어"
+                    : "잠겨있는 모든 흐름을 열 수 있어"}
               </p>
 
               {/* 가격 */}
