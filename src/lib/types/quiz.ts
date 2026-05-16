@@ -47,18 +47,39 @@ export interface CompoundRule {
 
 export type StateTranslationRule = SingleDimensionRule | CompoundRule;
 
+// ── Loop Reading 타입 ────────────────────────────────────────────────
+// 무료+유료 결과를 다 읽은 뒤 추가 구매하는 후속 리딩.
+// 사용자가 더 알고 싶은 방향(loopType)만 다르고, subtype 차이는 기존 context에서 반영된다.
+
+/** 후속 리딩 방향 키 */
+export type LoopType = "action" | "standard" | "evaluate";
+
+export interface LoopMessage {
+  type: "punch" | "ai";
+  text: string;
+}
+
+/** 생성 완료된 루프 답변. localStorage에 저장된다. */
+export interface LoopAnswer {
+  loopType: LoopType;
+  title: string;
+  generatedAt: string; // ISO 8601
+  messages: LoopMessage[];
+}
+
 // ── Additional Reading 타입 ───────────────────────────────────────────
 // 결과를 모두 읽은 뒤 노출되는 추가 해석 콘텐츠.
-// AI가 생성하지 않는다. 콘텐츠별로 미리 정의된 후보 목록.
 // 각 항목은 개별 구매 가능한 추가 리딩이 된다.
-// hidden state 점수 기반으로 노출 우선순위를 결정한다.
+// loopType은 generate API 호출 시 사용된다.
 export interface AdditionalReading {
   id: string;
+  /** 루프 생성/결제 처리에 사용되는 방향 키 */
+  loopType: LoopType;
   /** 사용자에게 노출되는 질문 형태의 제목 */
   title: string;
   /** 한 줄 부제목 (선택적) */
   subtitle?: string;
-  /** 우선 노출 기준: 이 dimension 점수가 높을수록 상위에 노출 */
+  /** 우선 노출 기준: 이 dimension 점수가 높을수록 상위에 노출 (love-1에서는 미사용) */
   trigger_dimension?: HiddenDimension;
   /** trigger_dimension 점수가 이 값 이상이어야 '관련도 높음'으로 간주 */
   trigger_threshold?: number;

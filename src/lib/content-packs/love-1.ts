@@ -239,32 +239,28 @@ export const LOVE_1_TRANSLATION_RULES: StateTranslationRule[] = [
   },
 ];
 
-// ── Additional Readings ──────────────────────────────────────────
-// ID/title/subtitle은 기존 유지. trigger_dimension만 새 차원으로 재매핑한다.
+// ── Additional Readings (루프 리딩) ──────────────────────────────────
+// 무료+유료 결과를 다 읽은 뒤 추가 구매하는 후속 리딩 3종.
+// 순서는 고정. trigger_dimension/threshold는 love-1에서 미사용.
+// subtype 차이는 기존 stateSummary + scene carry_over에서 자연스럽게 반영된다.
 export const LOVE_1_ADDITIONAL_READINGS: AdditionalReading[] = [
   {
-    id: "why_keep_ambiguous",
-    title: "이 사람 마음은 도대체 뭘까?",
-    subtitle: "여지는 주는데 관계를 정리하지 않는 심리",
-    // 관계가 분명해지길 갈망하는 사용자일수록 우선 노출
-    trigger_dimension: "clarityHunger",
-    trigger_threshold: 4,
+    id: "what_i_can_do",
+    loopType: "action",
+    title: "지금 내가 할 수 있는 일",
+    subtitle: "기다리거나, 확인하거나, 멈추거나 — 지금 가능한 선택의 범위",
   },
   {
-    id: "why_am_i_lower_position",
-    title: "나는 언제부터 이렇게 을의 연애를 했을까?",
-    subtitle: "기다리고 맞추는 쪽이 되어버린 이유",
-    // "을의 연애" 자각은 흔들림 강도가 강할수록 와닿음
-    trigger_dimension: "shakeIntensity",
-    trigger_threshold: 4,
+    id: "my_standard",
+    loopType: "standard",
+    title: "내 기준을 단단히 세우는 법",
+    subtitle: "언제 기다리고, 언제 멈추는지를 내가 먼저 정해야 하는 이유",
   },
   {
-    id: "how_to_set_my_standard",
-    title: "기준을 어떻게 세워야\n마음이 편해질까?",
-    subtitle: "기다릴지, 확인할지, 멈출지 정하는 기준",
-    // 흔들림에 지친 사용자일수록 기준 잡기에 관심이 높음
-    trigger_dimension: "emotionalFatigue",
-    trigger_threshold: 4,
+    id: "keep_watching",
+    loopType: "evaluate",
+    title: "이 관계를 더 봐도 되는지",
+    subtitle: "에너지를 더 쓸 가치가 있는지 판단하는 기준",
   },
 ];
 
