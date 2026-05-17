@@ -82,6 +82,9 @@ export interface SceneConfig {
 // ── 콘텐츠 (API GET /api/contents 응답 타입과 일치) ──────────────────
 export interface Content {
   id: string;
+  /** URL slug이자 콘텐츠 고유 식별자 (예: "love-1"). id(UUID)가 아니라 slug 기준으로 필터링할 것.
+   *  DB에서 조회한 경우 항상 값이 있다. 코드 source(contents.ts)에서는 생략 가능. */
+  slug?: string | null;
   title: string;
   subtitle: string | null;
   category: Category;
@@ -93,6 +96,8 @@ export interface Content {
   sort_order: number | null;
   created_at: string;
   updated_at: string;
-  // TODO: [백엔드 연동] scene_config.scenes[].title에서 파생 예정. 현재는 프론트 전용 필드.
+  // scene_config.scenes[].title에서 파생한다.
+  // 카드 표시용 preview 문구가 scene 제목과 달라지는 시점에는
+  // DB에 card_previews: string[] 컬럼을 별도 추가하고 이 파생 로직을 제거해야 한다.
   insights?: string[];
 }
