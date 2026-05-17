@@ -94,7 +94,7 @@ const AnalyzePage = ({ params }: PageProps) => {
   };
 
   // correction_questions 완료 → completing
-  const handleCorrectionSubmit = (answers: Answer[]) => {
+  const handleCorrectionSubmit = async (answers: Answer[]) => {
     const finalData: AnalyzeAnswers = {
       session_id: analyzeData.session_id,
       content_id: analyzeData.content_id,
@@ -114,6 +114,43 @@ const AnalyzePage = ({ params }: PageProps) => {
       ...prev,
       answers,
     }));
+
+    // ── DB 저장: QA mode에서는 skip ──────────────────────────────────────
+    // window.location.search 직접 사용: useSearchParams()는 Suspense 경계 영향으로
+    // ?qa=1이 있어도 빈 값을 반환할 수 있음 (generateScenes와 동일한 패턴).
+    const isQaMode =
+      (typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("qa") === "1") ||
+      process.env.NEXT_PUBLIC_QA_MODE === "true";
+
+    if (!isQaMode) {
+      try {
+        const res = await fetch(
+          `/api/analyze/${finalData.session_id}/answers`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              free_input: finalData.free_input,
+              answers: finalData.answers,
+            }),
+          },
+        );
+        if (!res.ok) {
+          const errData = (await res.json()) as { error?: string };
+          console.error(
+            "[answers] DB 저장 실패:",
+            errData.error ?? `HTTP ${res.status}`,
+          );
+        } else {
+          console.log("[answers] session_answers DB 저장 완료");
+        }
+      } catch (err) {
+        console.error("[answers] DB 저장 중 예외 발생:", err);
+      }
+    } else {
+      console.log("[answers] QA mode — DB 저장 skip");
+    }
 
     // ── Dev mode: 로딩화면 계속 표시 ──────────────────────────────────────
     if (process.env.NEXT_PUBLIC_SHOW_ANALYZE_LOADING === "true") {
