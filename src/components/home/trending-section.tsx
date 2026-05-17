@@ -1,8 +1,8 @@
-import { Content } from "@/lib/types/content";
+import { PublicContent } from "@/lib/types/content";
 import ContentCard from "@/components/home/content-card";
 
 interface TrendingSectionProps {
-  contents: Content[];
+  contents: PublicContent[];
 }
 
 const TrendingSection = ({ contents }: TrendingSectionProps) => {

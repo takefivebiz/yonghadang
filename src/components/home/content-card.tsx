@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Content, Category } from "@/lib/types/content";
+import { PublicContent, Category } from "@/lib/types/content";
 
 const CATEGORY_CONFIG: Record<
   Category,
@@ -58,7 +58,7 @@ const CATEGORY_CONFIG: Record<
 };
 
 interface ContentCardProps {
-  content: Content;
+  content: PublicContent;
   priority?: boolean;
   /**
    * carousel: 홈 가로 스크롤 (기존 디자인 유지)

@@ -13,10 +13,21 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
   const content = CONTENTS.find((c) => c.id === id)
   if (!content) return { title: "VEIL" }
 
-  const plainTitle = content.title.replace(/\n\s*/g, " ")
+  const plainTitle = content.title.replace(/\n\s*/g, " ").trim()
   return {
-    title: `${plainTitle} — VEIL`,
-    description: content.subtitle,
+    // template "%s | VEIL"이 자동 적용되어 "제목 | VEIL" 형식으로 렌더링됨
+    title: plainTitle,
+    description: content.subtitle ?? undefined,
+    openGraph: {
+      title: `${plainTitle} | VEIL`,
+      description: content.subtitle ?? undefined,
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${plainTitle} | VEIL`,
+      description: content.subtitle ?? undefined,
+    },
   }
 }
 

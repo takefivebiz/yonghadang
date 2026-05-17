@@ -19,19 +19,38 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: {
     template: "%s | VEIL",
-    default: "VEIL — 베일에 가려진 진짜 나",
+    default: "VEIL | 지금 너에게 가장 필요한 말",
   },
   description:
-    "콘텐츠 기반으로 현재 상황, 감정, 관계를 해석하는 AI 자기 해석 서비스",
+    "연애, 결혼, 인간관계, 직업, 진로, 감정까지. VEIL은 다양한 고민을 듣고 정확하게 해석해주는 맞춤 해석 서비스입니다.",
+  keywords: [
+    "연애 고민",
+    "관계 고민",
+    "상대 심리",
+    "인간관계",
+    "진로 고민",
+    "감정 해석",
+    "연애 상담",
+    "짝사랑 고민",
+    "직장 고민",
+    "감정 분석",
+    "마음 읽기",
+    "VEIL",
+  ],
   openGraph: {
-    title: "VEIL — 베일에 가려진 진짜 나",
+    title: "VEIL | 지금 너에게 가장 필요한 말",
     description:
-      "콘텐츠 기반으로 현재 상황, 감정, 관계를 해석하는 AI 자기 해석 서비스",
+      "연애, 결혼, 인간관계, 직업, 진로, 감정까지. VEIL은 다양한 고민을 듣고 정확하게 해석해주는 맞춤 해석 서비스입니다.",
     type: "website",
     locale: "ko_KR",
-    // TODO: [배포 연동] 실제 서비스 URL로 교체
-    url: "https://veil.app",
+    url: "https://veil-veil.vercel.app",
     siteName: "VEIL",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VEIL | 지금 너에게 가장 필요한 말",
+    description:
+      "연애, 결혼, 인간관계, 직업, 진로, 감정까지. VEIL은 다양한 고민을 듣고 정확하게 해석해주는 맞춤 해석 서비스입니다.",
   },
 };
 

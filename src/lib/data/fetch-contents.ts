@@ -4,7 +4,7 @@
  * `next: { revalidate }` 옵션은 클라이언트에서는 무시되므로
  * 클라이언트 컴포넌트에서는 SWR/React Query로 별도 구현한다.
  */
-import type { Content } from "@/lib/types/content";
+import type { PublicContent } from "@/lib/types/content";
 
 /**
  * URL 우선순위:
@@ -23,7 +23,7 @@ const getBaseUrl = (): string => {
  * /api/contents를 fetch한다.
  * 네트워크 오류 또는 API 오류 시 빈 배열을 반환한다.
  */
-export const fetchContents = async (): Promise<Content[]> => {
+export const fetchContents = async (): Promise<PublicContent[]> => {
   try {
     const res = await fetch(`${getBaseUrl()}/api/contents`, {
       // 60초 ISR 캐시: 빈번한 콘텐츠 변경은 없지만 배포 직후 갱신 반영
@@ -41,7 +41,7 @@ export const fetchContents = async (): Promise<Content[]> => {
       return [];
     }
 
-    return data as Content[];
+    return data as PublicContent[];
   } catch {
     return [];
   }

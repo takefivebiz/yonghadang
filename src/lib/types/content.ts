@@ -79,7 +79,19 @@ export interface SceneConfig {
   scenes: SceneConfigItem[];
 }
 
-// ── 콘텐츠 (API GET /api/contents 응답 타입과 일치) ──────────────────
+// ── Public listing API 응답 타입 (GET /api/contents) ─────────────────
+// input_config / scene_config 등 내부 설계 데이터는 절대 포함하지 않는다.
+export interface PublicContent {
+  id: string;
+  slug: string | null;
+  title: string;
+  subtitle: string | null;
+  category: Category;
+  thumbnail_url: string | null;
+  insights: string[];
+}
+
+// ── 콘텐츠 전체 타입 (서버 내부 및 dummy data 전용) ───────────────────
 export interface Content {
   id: string;
   /** URL slug이자 콘텐츠 고유 식별자 (예: "love-1"). id(UUID)가 아니라 slug 기준으로 필터링할 것.

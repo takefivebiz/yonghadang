@@ -5,16 +5,24 @@ import CategoryTabsSticky from "@/components/home/category-tabs-sticky";
 import ContentSection from "@/components/home/content-section";
 import CTASticky from "@/components/home/cta-sticky";
 import { fetchContents } from "@/lib/data/fetch-contents";
-import { Category, Content } from "@/lib/types/content";
+import { Category, PublicContent } from "@/lib/types/content";
 
 export const metadata: Metadata = {
-  title: "VEIL — 베일에 가려진 진짜 나",
+  // absolute: layout template("%s | VEIL")이 중복 적용되지 않도록 완전한 타이틀을 직접 지정
+  title: { absolute: "VEIL | 지금 너에게 가장 필요한 말" },
   description:
-    "콘텐츠와 간단한 입력을 통해 나의 현재 상황, 감정, 관계를 해석하는 자기 해석 서비스",
+    "연애, 결혼, 인간관계, 직업, 진로, 감정까지. VEIL은 다양한 고민을 듣고 정확하게 해석해주는 맞춤 해석 서비스입니다.",
   openGraph: {
-    title: "VEIL — 베일에 가려진 진짜 나",
-    description: "사주·MBTI처럼 끼워넣은 나말고, 진짜 나를 찾다",
+    title: "VEIL | 지금 너에게 가장 필요한 말",
+    description:
+      "연애, 결혼, 인간관계, 직업, 진로, 감정까지. VEIL은 다양한 고민을 듣고 정확하게 해석해주는 맞춤 해석 서비스입니다.",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VEIL | 지금 너에게 가장 필요한 말",
+    description:
+      "연애, 결혼, 인간관계, 직업, 진로, 감정까지. VEIL은 다양한 고민을 듣고 정확하게 해석해주는 맞춤 해석 서비스입니다.",
   },
 };
 
@@ -29,14 +37,14 @@ const CATEGORY_ORDER: Category[] = [
 const TRENDING_SLUGS = ["love-1", "rel-1", "career-2", "emotion-3"];
 
 const HomePage = async () => {
-  const allContents: Content[] = await fetchContents();
+  const allContents: PublicContent[] = await fetchContents();
 
-  const contentsByCategory = CATEGORY_ORDER.reduce<Record<Category, Content[]>>(
+  const contentsByCategory = CATEGORY_ORDER.reduce<Record<Category, PublicContent[]>>(
     (acc, category) => {
       acc[category] = allContents.filter((c) => c.category === category);
       return acc;
     },
-    {} as Record<Category, Content[]>,
+    {} as Record<Category, PublicContent[]>,
   );
 
   // API slug 기준으로 트렌딩 필터링 (slug가 없는 경우 id로 fallback)

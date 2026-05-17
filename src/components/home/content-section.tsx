@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Content, Category, CATEGORY_LABELS } from "@/lib/types/content";
+import { PublicContent, Category, CATEGORY_LABELS } from "@/lib/types/content";
 import ContentCard from "@/components/home/content-card";
 
 interface ContentSectionProps {
   category: Category;
-  contents: Content[];
+  contents: PublicContent[];
 }
 
 const ContentSection = ({ category, contents }: ContentSectionProps) => {

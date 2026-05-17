@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ContentCard from "@/components/home/content-card";
 import { fetchContents } from "@/lib/data/fetch-contents";
-import { Category, CATEGORY_LABELS } from "@/lib/types/content";
+import { Category, CATEGORY_LABELS, PublicContent } from "@/lib/types/content";
 
 // ── 카테고리 메타 정보 ────────────────────────────────────────────
 const CATEGORY_META: Record<Category, { description: string }> = {
-  love: { description: "사랑 안에서 얽히는 마음" },
-  relationship: { description: "사람 사이의 복잡한 감정들" },
-  career: { description: "일과 선택 사이에서" },
-  emotion: { description: "쉽게 설명되지 않는 마음들" },
+  love: { description: "연애·결혼 고민, VEIL이 지금 네 감정을 정확하게 읽어드립니다." },
+  relationship: { description: "인간관계 고민, VEIL이 관계 속 감정과 상대 심리를 해석해드립니다." },
+  career: { description: "직업·진로 고민, VEIL이 지금 너에게 필요한 방향을 찾아줍니다." },
+  emotion: { description: "설명되지 않는 감정, VEIL이 네 마음을 정확하게 해석해드립니다." },
 };
 
 const VALID_CATEGORIES: Category[] = [
@@ -38,12 +38,18 @@ export const generateMetadata = async ({
   const { description } = CATEGORY_META[cat];
 
   return {
-    title: `${label} — VEIL`,
+    // template "%s | VEIL"이 자동 적용되어 "연애·결혼 | VEIL" 형식으로 렌더링됨
+    title: label,
     description,
     openGraph: {
-      title: `${label} — VEIL`,
+      title: `${label} | VEIL`,
       description,
       type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${label} | VEIL`,
+      description,
     },
   };
 };
@@ -61,7 +67,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
   const cat = category as Category;
   const label = CATEGORY_LABELS[cat];
 
-  const allContents = await fetchContents();
+  const allContents: PublicContent[] = await fetchContents();
   const contents = allContents.filter((c) => c.category === cat);
 
   return (
