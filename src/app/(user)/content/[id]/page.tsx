@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import { CONTENTS } from "@/lib/data/contents"
 import ContentIntro from "@/components/content/content-intro"
@@ -37,7 +38,12 @@ const ContentPage = async ({ params }: PageProps) => {
   const content = CONTENTS.find((c) => c.id === id)
   if (!content) notFound()
 
-  return <ContentIntro content={content} />
+  // useSearchParams 사용으로 인한 Suspense 경계 필요
+  return (
+    <Suspense>
+      <ContentIntro content={content} />
+    </Suspense>
+  )
 }
 
 export default ContentPage

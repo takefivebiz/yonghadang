@@ -1,7 +1,7 @@
 # VEIL — 개발 진행 상황 로그
 
-> 마지막 업데이트: 2026-05-16  
-> 현재 단계: **Loop Reading 기능 완성 — 루프 결제·생성·표시 전체 플로우 작동**
+> 마지막 업데이트: 2026-05-17  
+> 현재 단계: **커밋 3~5 완료 — DB migration 복구, contents API 공개, 홈/카테고리 실제 데이터 연동**
 
 ---
 
@@ -284,6 +284,53 @@ veil_payment_pending_loop_${sessionId} → LoopType (결제 진행 중 마커)
 
 ---
 
+## 커밋 3~5: DB Migration 복구 + Contents API + 홈/카테고리 실제 데이터 연동 (2026-05-17)
+
+### 커밋 3 — 원격 Supabase DB migration 복구
+
+migration history에 누락된 002~005가 apply된 적 없었음. 안전하게 복구:
+
+- **002**: `contents` 테이블에 `slug`, `estimated_minutes` 컬럼 추가, UNIQUE 제약, INDEX, love-1 upsert seed (`ON CONFLICT DO UPDATE`)
+- **003**: `loop_answers` 테이블 생성 (RLS, trigger, index 포함)
+- **004**: `analysis_sessions`에 `share_token` 컬럼 추가 (UNIQUE, index, 기존 row backfill)
+- **005**: `session_answers`에서 `question_index` 제거, `step_id NOT NULL` + UNIQUE 제약 추가 (적용 전 row 0개 확인)
+- **006**: love-1 `thumbnail_url` 수정 (`null` → `/img/love-1.png`)
+- **007**: love-1 `title`/`subtitle` DB 오입력 수정 (올바른 값으로 업데이트)
+
+### 커밋 4 — GET /api/contents 공개 API 제한
+
+`/api/contents`가 `input_config`, `scene_config` 등 내부 설계 데이터를 노출하던 문제 수정:
+
+- `PublicContent` 타입 신규 추가 (`id`, `slug`, `title`, `subtitle`, `category`, `thumbnail_url`, `insights`만 포함)
+- `GET /api/contents` → PublicContent[] 반환으로 제한, SELECT에서 내부 필드 제외
+- `insights`는 `scene_config.scenes[].title` 배열에서 파생 후 scene_config 자체는 미반환
+- `src/lib/types/content.ts`에 `Content`(내부 전용) / `PublicContent`(API 응답) 타입 분리 확정
+
+### 커밋 5 — 홈/카테고리 페이지 실제 데이터 연동
+
+`DUMMY_CONTENTS` → `/api/contents` fetch 기반으로 교체:
+
+- `src/lib/data/fetch-contents.ts` 신규 생성 (server-only, ISR revalidate 60초, 실패 시 빈 배열 반환)
+  - URL 우선순위: `VERCEL_URL` → `NEXT_PUBLIC_SITE_URL_DEVELOPMENT` → `localhost:3000`
+- 홈(`page.tsx`), 카테고리(`/category/[category]/page.tsx`) → async Server Component + `fetchContents()` 사용
+- `ContentCard`, `ContentSection`, `TrendingSection` → `Content` 타입에서 `PublicContent` 타입으로 전환
+- slug 기반 라우팅: `content.slug ?? content.id` (href 생성)
+- empty state 처리: 콘텐츠 없으면 "아직 준비된 콘텐츠가 없습니다." / TrendingSection은 null 반환 (섹션 숨김)
+
+### SEO 메타데이터 정비
+
+- `layout.tsx`: 글로벌 title template `"%s | VEIL"`, description, keywords, OG, twitter 전면 정비
+- 홈(`page.tsx`): `title: { absolute: "VEIL | 지금 너에게 가장 필요한 말" }` — template 중복 방지
+- 카테고리 페이지: `title: label`만 사용 (template이 "연애·결혼 | VEIL"로 자동 조합)
+- 콘텐츠 인트로(`/content/[id]`): OG(article), twitter 메타데이터 추가
+
+### Vercel 환경변수 수정
+
+- `SUPABASE_URL` → `NEXT_PUBLIC_SUPABASE_URL`로 변경 (코드가 이 이름으로 읽으므로 통일)
+- `src/lib/supabase/server.ts`: `NEXT_PUBLIC_SUPABASE_URL`만 읽도록 정리
+
+---
+
 ## 진행 상황 체크리스트
 
 ### ✅ 완료
@@ -307,9 +354,9 @@ veil_payment_pending_loop_${sessionId} → LoopType (결제 진행 중 마커)
 
 ### 📋 다음 단계 (순서대로)
 
-1. **`contents` 테이블 seed** — `love-1` content를 DB에 등록 (input_config + scene_config)
-2. **`GET /api/contents` 구현** — contents 테이블 조회 (현재 `export {}`)
-3. **홈/카테고리 페이지 → API 교체** — `DUMMY_CONTENTS` 대신 `/api/contents` fetch
+1. ~~**`contents` 테이블 seed** — `love-1` content를 DB에 등록~~ ✅ 완료 (migration 002/006/007)
+2. ~~**`GET /api/contents` 구현**~~ ✅ 완료 (PublicContent 타입으로 제한)
+3. ~~**홈/카테고리 페이지 → API 교체**~~ ✅ 완료 (fetchContents + PublicContent)
 4. **`analysis_sessions` 저장** — analyze 완료 시 세션 DB 기록 시작
 5. **`scene_unlocks` 연동** — 결제 완료 시 unlock 기록 → result page API로 읽기
 6. **소셜 로그인 실제 구현** — Kakao/Google OAuth callback

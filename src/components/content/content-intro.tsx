@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import { Content, CATEGORY_LABELS } from "@/lib/types/content";
@@ -18,15 +18,45 @@ interface ContentIntroProps {
 
 const ContentIntro = ({ content }: ContentIntroProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const config = CATEGORY_CONFIG[content.category];
 
   const handleStart = async () => {
     setLoading(true);
-    const mockSessionId =
-      crypto.randomUUID?.() ||
-      `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    router.push(`/analyze/${mockSessionId}?content_id=${content.id}`);
+
+    // QA mode: DB 세션 생성 없이 local UUID로 진행 (?qa=1 우선, env fallback)
+    const isQaMode =
+      searchParams.get("qa") === "1" ||
+      process.env.NEXT_PUBLIC_QA_MODE === "true";
+
+    if (isQaMode) {
+      const localSessionId = crypto.randomUUID();
+      router.push(`/analyze/${localSessionId}?content_id=${content.id}&qa=1`);
+      return;
+    }
+
+    try {
+      // analysis_sessions 생성 → DB UUID 취득
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content_id: content.id }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`세션 생성 실패 (HTTP ${res.status})`);
+      }
+
+      const data = (await res.json()) as { session_id: string };
+      router.push(`/analyze/${data.session_id}?content_id=${content.id}`);
+    } catch (err) {
+      // API 실패 시 local UUID fallback → localStorage 기반 흐름으로 계속
+      console.error("[handleStart] API 실패, fallback UUID 사용:", err);
+      const fallbackSessionId = crypto.randomUUID();
+      router.push(`/analyze/${fallbackSessionId}?content_id=${content.id}`);
+      // setLoading(false)를 호출하지 않음: router.push 후 페이지 이동이 되므로 불필요
+    }
   };
 
   // Flow preview: 최대 4개까지만 노출
