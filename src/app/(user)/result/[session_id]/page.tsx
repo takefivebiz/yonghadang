@@ -48,7 +48,9 @@ const ResultPage = ({ params }: PageProps) => {
   const [loopAnswers, setLoopAnswers] = useState<Partial<Record<LoopType, LoopAnswer>>>({});
   const [loopLoading, setLoopLoading] = useState<LoopType | null>(null);
   const [loopError, setLoopError] = useState<LoopType | null>(null);
-  const [activeLoopType, setActiveLoopType] = useState<LoopType | null>(null);
+  // 현재 세션에서 새로 생성 완료된 loop 목록 (badge 표시용).
+  // activeLoopType(자동 포커스)과 분리: 생성 완료가 읽기 포커스를 강제하지 않는다.
+  const [newlyUnlockedLoops, setNewlyUnlockedLoops] = useState<LoopType[]>([]);
   // loop_all 구매 후 순차 생성 대기 중 상태 (카드에 "구매 완료 · 대기 중" 표시용)
   const [loopAllPurchased, setLoopAllPurchased] = useState(false);
   // loop / loop_all 결제 후 AdditionalReadings 섹션 스크롤 트리거
@@ -462,8 +464,7 @@ const ResultPage = ({ params }: PageProps) => {
         try {
           const answer = JSON.parse(cached) as LoopAnswer;
           setLoopAnswers((prev) => ({ ...prev, [loopType]: answer }));
-          setActiveLoopType(loopType);
-          // URL cleanup은 Phase 2에서 처리 → 여기서 replaceState 불필요
+          // 캐시 복원은 새 unlock이 아니므로 badge 없이 조용히 반영
           return;
         } catch {
           localStorage.removeItem(`veil_loop_${loopType}_${sessionId}`);
@@ -525,8 +526,10 @@ const ResultPage = ({ params }: PageProps) => {
         localStorage.removeItem(`veil_payment_pending_loop_${sessionId}`);
 
         setLoopAnswers((prev) => ({ ...prev, [loopType]: answer }));
-        setActiveLoopType(loopType);
-        // URL cleanup은 Phase 2에서 처리 → 여기서 replaceState 불필요 (중복 호출 시 Next.js scroll reset 유발)
+        // 자동 포커스 강제 대신: badge만 표시 (사용자가 직접 클릭해서 읽게)
+        setNewlyUnlockedLoops((prev) =>
+          prev.includes(loopType) ? prev : [...prev, loopType],
+        );
 
         if (!skipScroll) {
           // useEffect + double RAF로 스크롤: React 페인트 이후 실행 보장
@@ -568,13 +571,24 @@ const ResultPage = ({ params }: PageProps) => {
   );
 
   // "전체 질문 깊게 읽기" 클릭 핸들러
-  // loop QA mode: 잠긴 모든 loop reading 직접 생성 / 비QA mode: loop_all 결제 모달 열기
+  // loop QA mode: 실제 loop_all 결제 흐름과 동일하게 순차 생성 (스크롤 1회 + loopAllPurchased 배너)
+  // 비QA mode: loop_all 결제 모달 열기
   const handlePurchaseAllLoops = useCallback(() => {
     if (isLoopQaMode) {
       const locked = additionalReadings.filter((r) => !loopAnswers[r.loopType]);
-      for (const reading of locked) {
-        void handleLoopUnlock(reading.loopType, reading.title.replace(/\n/g, " "));
-      }
+      if (locked.length === 0) return;
+
+      // 실제 loop_all 결제 후 Phase 2 흐름과 동일하게 재현
+      setLoopAllPurchased(true);
+      setPendingScrollToLoop(true);
+      const unlockAllQa = async () => {
+        for (const r of locked) {
+          // skipScroll=true: 개별 생성마다 스크롤 트리거 방지 (섹션 이동은 위 setPendingScrollToLoop로 1회만)
+          await handleLoopUnlock(r.loopType, r.title.replace(/\n/g, " "), true);
+        }
+        setLoopAllPurchased(false);
+      };
+      void unlockAllQa();
     } else {
       setPaymentModal({
         isOpen: true,
@@ -1103,7 +1117,7 @@ const ResultPage = ({ params }: PageProps) => {
                 loopAnswers={loopAnswers}
                 loopLoading={loopLoading}
                 loopError={loopError}
-                activeLoopType={activeLoopType}
+                newlyUnlockedLoops={newlyUnlockedLoops}
                 loopAllPurchased={loopAllPurchased}
                 onPurchaseSingle={handleLoopCardClick}
                 onPurchaseAll={handlePurchaseAllLoops}

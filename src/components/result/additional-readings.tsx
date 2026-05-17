@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type {
   AdditionalReading,
   LoopType,
@@ -16,8 +16,9 @@ interface AdditionalReadingsProps {
   loopLoading?: LoopType | null;
   /** 생성 실패한 loopType (재시도 버튼 표시) */
   loopError?: LoopType | null;
-  /** 결제·생성 직후 자동 펼칠 loopType */
-  activeLoopType?: LoopType | null;
+  /** 현재 세션에서 새로 생성 완료된 loopType 목록 (badge 표시용).
+   *  activeLoopType과 달리 자동 포커스를 강제하지 않는다. */
+  newlyUnlockedLoops?: LoopType[];
   /** 개별 구매 버튼 클릭 시 호출 (Toss 결제 모달 열기) */
   onPurchaseSingle?: (reading: AdditionalReading) => void;
   /** 전체 구매 버튼 클릭 시 호출 (잠긴 항목 2개 이상일 때 표시) */
@@ -41,7 +42,7 @@ const AdditionalReadings = ({
   loopAnswers = {},
   loopLoading = null,
   loopError = null,
-  activeLoopType = null,
+  newlyUnlockedLoops = [],
   loopAllPurchased = false,
   onPurchaseSingle,
   onPurchaseAll,
@@ -55,15 +56,6 @@ const AdditionalReadings = ({
     null,
   );
 
-  // 결제·생성 완료 후 해당 카드 자동 펼침
-  useEffect(() => {
-    if (!activeLoopType) return;
-    const reading = readings.find((r) => r.loopType === activeLoopType);
-    if (reading && loopAnswers[activeLoopType]) {
-      setExpandedReadingId(reading.id);
-    }
-  }, [activeLoopType, readings, loopAnswers]);
-
   const isUnlocked = (reading: AdditionalReading) =>
     !!loopAnswers[reading.loopType];
 
@@ -72,6 +64,10 @@ const AdditionalReadings = ({
 
   const hasError = (reading: AdditionalReading) =>
     loopError === reading.loopType;
+
+  // 현재 세션에서 새로 생성 완료된 loop (badge 표시 여부)
+  const isNewlyUnlocked = (reading: AdditionalReading) =>
+    newlyUnlockedLoops.includes(reading.loopType);
 
   const getMessages = (reading: AdditionalReading): LoopMessage[] =>
     loopAnswers[reading.loopType]?.messages ?? [];
@@ -131,6 +127,11 @@ const AdditionalReadings = ({
           to   { transform: rotate(360deg); }
         }
         .spin-slow { animation: spin-slow 1.4s linear infinite; }
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 0.9; transform: scale(1); }
+          50%       { opacity: 0.5; transform: scale(0.75); }
+        }
+        .pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
       `}</style>
 
       {/* 섹션 구분 */}
@@ -174,16 +175,25 @@ const AdditionalReadings = ({
           const loading = isLoading(reading);
           const error = hasError(reading);
           const isExpanded = expandedReadingId === reading.id && unlocked;
+          const newlyUnlocked = isNewlyUnlocked(reading);
           const messages = getMessages(reading);
 
           return (
             <div key={reading.id}>
               {/* ── 질문 카드 ───────────────────────────────────────── */}
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={loading ? -1 : 0}
+                aria-disabled={loading}
+                aria-expanded={isExpanded}
                 onClick={() => handleCardClick(reading)}
-                disabled={loading}
-                className="w-full text-left transition-all duration-200"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleCardClick(reading);
+                  }
+                }}
+                className="w-full text-left transition-all duration-200 cursor-pointer"
                 style={{
                   background: isExpanded
                     ? "rgba(201, 139, 176, 0.07)"
@@ -234,6 +244,22 @@ const AdditionalReadings = ({
                       >
                         {reading.subtitle}
                       </p>
+                    )}
+
+                    {/* 새로 열린 loop badge — 생성 완료 후 사용자가 아직 펼치지 않은 상태 */}
+                    {unlocked && newlyUnlocked && !isExpanded && (
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span
+                          className="pulse-dot inline-block w-1.5 h-1.5 rounded-full flex-shrink-0"
+                          style={{ background: "rgba(201, 139, 176, 0.75)" }}
+                        />
+                        <p
+                          className="text-xs"
+                          style={{ color: "rgba(201, 139, 176, 0.80)" }}
+                        >
+                          새로 열렸어
+                        </p>
+                      </div>
                     )}
 
                     {/* 상태 힌트 */}
@@ -342,7 +368,7 @@ const AdditionalReadings = ({
                     </span>
                   )}
                 </div>
-              </button>
+              </div>
 
               {/* ── 아코디언 콘텐츠 (unlock 후에만) ──────────────────── */}
               <div
@@ -431,6 +457,29 @@ const AdditionalReadings = ({
           );
         })}
       </div>
+
+      {/* QA 전용: 전체 순차 생성 테스트 버튼
+          loop_all 결제 흐름(순차 생성 + 배너 + 스크롤 1회)을 결제 없이 재현할 수 있게 */}
+      {isQaMode && lockedCount > 1 && onPurchaseAll && (
+        <button
+          type="button"
+          onClick={onPurchaseAll}
+          className="w-full mt-3"
+          style={{
+            background: "rgba(201, 139, 176, 0.05)",
+            border: "1px dashed rgba(201, 139, 176, 0.22)",
+            borderRadius: "12px",
+            padding: "11px 16px",
+          }}
+        >
+          <span
+            className="text-xs"
+            style={{ color: "rgba(201, 139, 176, 0.60)" }}
+          >
+            [QA] 모든 질문 한번에 읽기
+          </span>
+        </button>
+      )}
 
       {/* ── 바텀시트 백드롭 ────────────────────────────────────────── */}
       <div
