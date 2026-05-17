@@ -31,15 +31,74 @@ const AnalyzePage = ({ params }: PageProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [session_id, setSessionId] = useState<string>("mock-session-001");
+  // params 해석 전 단계: 복원 여부 확인 중 → 기존 UI flash 방지
+  const [isRestoring, setIsRestoring] = useState(true);
 
   useEffect(() => {
     params.then((resolved) => {
-      setSessionId(resolved.session_id);
-      // analyzeData.session_id도 함께 동기화해야 localStorage 키와 결과 URL이 올바르게 설정됨
+      const sid = resolved.session_id;
+      setSessionId(sid);
       setAnalyzeData((prev) => ({
         ...prev,
-        session_id: resolved.session_id,
+        session_id: sid,
       }));
+
+      if (typeof window === "undefined") {
+        setIsRestoring(false);
+        return;
+      }
+
+      // 1순위: 이미 생성 완료 → result로 replace (뒤로가기 루프 방지)
+      const freeScenes = localStorage.getItem(`veil_free_scenes_${sid}`);
+      if (freeScenes) {
+        const sp = new URLSearchParams(window.location.search);
+        const isQa = sp.get("qa") === "1";
+        const hasLoop = sp.get("loop") === "1";
+        const query = isQa ? `?qa=1${hasLoop ? "&loop=1" : ""}` : "";
+        router.replace(`/result/${sid}${query}`);
+        // isRestoring 유지 (navigate 완료 전까지 빈 화면 유지)
+        return;
+      }
+
+      // 2순위: generating 중 이탈 → 데이터 복원 + generateScenes 재호출
+      const savedRaw = localStorage.getItem(`veil_analysis_${sid}`);
+      if (savedRaw) {
+        try {
+          const parsed = JSON.parse(savedRaw) as AnalyzeAnswers;
+          const restoredData: AnalyzeAnswers = { ...parsed, session_id: sid };
+
+          setAnalyzeData((prev) => ({
+            ...prev,
+            session_id: sid,
+            free_input: restoredData.free_input,
+            answers: restoredData.answers,
+          }));
+          setStage("completing");
+          setProgress(0);
+          setIsRestoring(false);
+
+          if (!isGeneratingRef.current) {
+            isGeneratingRef.current = true;
+            const restoreStart = Date.now();
+            console.log("[analyze] 세션 복원 → generateScenes 재호출");
+            generateScenes(restoredData, restoreStart);
+
+            const updateProgress = () => {
+              const elapsed = Date.now() - restoreStart;
+              const calc = 95 * (1 - Math.exp((-4 * elapsed) / 12000));
+              setProgress(calc);
+              progressIntervalRef.current = setTimeout(updateProgress, 100);
+            };
+            updateProgress();
+          }
+          return;
+        } catch {
+          // 파싱 실패 → 신규 진입으로 처리
+        }
+      }
+
+      // 3순위: 신규 진입
+      setIsRestoring(false);
     });
   }, [params]);
 
@@ -68,6 +127,8 @@ const AnalyzePage = ({ params }: PageProps) => {
   const [progress, setProgress] = useState(0);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const fakeProgressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  // generateScenes 중복 호출 방지 (복원 경로 + 일반 경로 모두 적용)
+  const isGeneratingRef = useRef(false);
 
   const config = getInputConfig(analyzeData.content_id);
 
@@ -103,11 +164,25 @@ const AnalyzePage = ({ params }: PageProps) => {
       created_at: new Date().toISOString(),
     };
 
+    // window.location.search 직접 사용: useSearchParams()는 Suspense 경계 영향으로
+    // ?qa=1이 있어도 빈 값을 반환할 수 있음 (generateScenes와 동일한 패턴).
+    const isQaMode =
+      (typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("qa") === "1") ||
+      process.env.NEXT_PUBLIC_QA_MODE === "true";
+
     if (typeof window !== "undefined") {
       localStorage.setItem(
         `veil_analysis_${analyzeData.session_id}`,
         JSON.stringify(finalData),
       );
+      // QA 세션이 일반 사용자 이어하기에 섞이지 않도록 non-QA mode에서만 기록
+      if (!isQaMode) {
+        localStorage.setItem(
+          `veil_last_session_${analyzeData.content_id}`,
+          analyzeData.session_id,
+        );
+      }
     }
 
     setAnalyzeData((prev) => ({
@@ -120,14 +195,6 @@ const AnalyzePage = ({ params }: PageProps) => {
     setProgress(0);
     const loadingStartTime = Date.now();
     console.log("[analyze] Loading 시작", new Date(loadingStartTime).toISOString());
-
-    // ── DB 저장: QA mode에서는 skip ──────────────────────────────────────
-    // window.location.search 직접 사용: useSearchParams()는 Suspense 경계 영향으로
-    // ?qa=1이 있어도 빈 값을 반환할 수 있음 (generateScenes와 동일한 패턴).
-    const isQaMode =
-      (typeof window !== "undefined" &&
-        new URLSearchParams(window.location.search).get("qa") === "1") ||
-      process.env.NEXT_PUBLIC_QA_MODE === "true";
 
     // fire-and-forget: 저장 실패해도 generateScenes 진행
     if (!isQaMode) {
@@ -170,6 +237,9 @@ const AnalyzePage = ({ params }: PageProps) => {
     }
 
     // ── Generate: 즉시 호출 ──────────────────────────────────────────────
+    // 복원 경로에서 이미 호출 중인 경우 중복 방지
+    if (isGeneratingRef.current) return;
+    isGeneratingRef.current = true;
     console.log("[analyze] generateScenes 호출 시작", new Date().toISOString());
     generateScenes(finalData, loadingStartTime);
 
@@ -465,6 +535,11 @@ const AnalyzePage = ({ params }: PageProps) => {
       }, 1000);
     }
   };
+
+  // params 해석 완료 전: 어떤 stage도 flash 없이 대기
+  if (isRestoring) {
+    return <div className="min-h-screen bg-background" />;
+  }
 
   return (
     <div className="min-h-screen bg-background flex justify-center">

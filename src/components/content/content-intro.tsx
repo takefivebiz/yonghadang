@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Content, CATEGORY_LABELS } from "@/lib/types/content";
 
@@ -20,15 +20,42 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  // QA mode에서는 이어하기를 노출하지 않음
+  const isQaMode =
+    searchParams.get("qa") === "1" ||
+    process.env.NEXT_PUBLIC_QA_MODE === "true";
+  const [resumableSessionId, setResumableSessionId] = useState<string | null>(null);
   const config = CATEGORY_CONFIG[content.category];
 
+  // 마운트 시 이어하기 가능한 session 탐색 (non-QA mode에서만)
+  useEffect(() => {
+    if (isQaMode || typeof window === "undefined") return;
+
+    const lastSid = localStorage.getItem(`veil_last_session_${content.id}`);
+    if (!lastSid) return;
+
+    // veil_analysis_ 존재 = 입력 완료 후 generating 진입한 session
+    const hasAnalysis = Boolean(localStorage.getItem(`veil_analysis_${lastSid}`));
+    if (hasAnalysis) {
+      setResumableSessionId(lastSid);
+    }
+  }, [content.id, isQaMode]);
+
+  // 이어하기: 기존 session_id로 analyze 페이지 진입 → 어제 구현한 복원 로직이 처리
+  const handleResume = () => {
+    if (!resumableSessionId) return;
+    router.push(`/analyze/${resumableSessionId}?content_id=${content.id}`);
+  };
+
   const handleStart = async () => {
+    // 새로 시작 시 기존 resumable session 즉시 무효화 → 인트로 복귀 시 이어하기 미노출
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(`veil_last_session_${content.id}`);
+    }
+    setResumableSessionId(null);
     setLoading(true);
 
     // QA mode: DB 세션 생성 없이 local UUID로 진행 (?qa=1 우선, env fallback)
-    const isQaMode =
-      searchParams.get("qa") === "1" ||
-      process.env.NEXT_PUBLIC_QA_MODE === "true";
 
     if (isQaMode) {
       const localSessionId = crypto.randomUUID();
@@ -262,35 +289,71 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
 
             {/* CTA 영역 */}
             <div className="w-[100%] max-w-[320px] mx-auto pb-12">
-              <button
-                onClick={handleStart}
-                disabled={loading}
-                className="w-full py-6 text-base font-medium transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-                style={{
-                  borderRadius: "12px",
-                  background: loading
-                    ? "rgba(255, 255, 255, 0.02)"
-                    : "linear-gradient(135deg, rgba(155, 123, 168, 0.233) 0%, rgba(117, 65, 116, 0.841) 100%)",
-                  borderTop: loading
-                    ? "1.5px dashed rgba(155, 123, 168, 0.15)"
-                    : "1.5px dashed rgba(155, 123, 168, 0.4)",
-                  borderLeft: loading
-                    ? "1.5px solid rgba(155, 123, 168, 0.2)"
-                    : "1.5px solid rgba(155, 123, 168, 0.4)",
-                  borderRight: loading
-                    ? "1.5px solid rgba(155, 123, 168, 0.2)"
-                    : "1.5px solid rgba(155, 123, 168, 0.4)",
-                  borderBottom: loading
-                    ? "1.5px solid rgba(155, 123, 168, 0.2)"
-                    : "1.5px solid rgba(155, 123, 168, 0.4)",
-                  color: "rgba(255, 255, 255, 0.85)",
-                  boxShadow: loading
-                    ? "none"
-                    : "inset 0 1px 2px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(155, 123, 168, 0.08)",
-                }}
-              >
-                {loading ? "준비 중..." : "시작하기"}
-              </button>
+              {resumableSessionId ? (
+                /* 이어하기 가능한 session 존재 → 이어하기 + 새로 시작하기 */
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={handleResume}
+                    className="w-full py-6 text-base font-medium transition-all duration-200 active:scale-[0.98]"
+                    style={{
+                      borderRadius: "12px",
+                      background: "linear-gradient(135deg, rgba(155, 123, 168, 0.233) 0%, rgba(117, 65, 116, 0.841) 100%)",
+                      borderTop: "1.5px dashed rgba(155, 123, 168, 0.4)",
+                      borderLeft: "1.5px solid rgba(155, 123, 168, 0.4)",
+                      borderRight: "1.5px solid rgba(155, 123, 168, 0.4)",
+                      borderBottom: "1.5px solid rgba(155, 123, 168, 0.4)",
+                      color: "rgba(255, 255, 255, 0.85)",
+                      boxShadow: "inset 0 1px 2px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(155, 123, 168, 0.08)",
+                    }}
+                  >
+                    이어하기
+                  </button>
+                  <button
+                    onClick={handleStart}
+                    disabled={loading}
+                    className="w-full py-4 text-sm font-medium transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                    style={{
+                      borderRadius: "12px",
+                      background: "transparent",
+                      border: "1px solid rgba(155, 123, 168, 0.2)",
+                      color: "rgba(255, 255, 255, 0.4)",
+                    }}
+                  >
+                    {loading ? "준비 중..." : "새로 시작하기"}
+                  </button>
+                </div>
+              ) : (
+                /* 신규 진입 → 기존 단일 시작하기 버튼 */
+                <button
+                  onClick={handleStart}
+                  disabled={loading}
+                  className="w-full py-6 text-base font-medium transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  style={{
+                    borderRadius: "12px",
+                    background: loading
+                      ? "rgba(255, 255, 255, 0.02)"
+                      : "linear-gradient(135deg, rgba(155, 123, 168, 0.233) 0%, rgba(117, 65, 116, 0.841) 100%)",
+                    borderTop: loading
+                      ? "1.5px dashed rgba(155, 123, 168, 0.15)"
+                      : "1.5px dashed rgba(155, 123, 168, 0.4)",
+                    borderLeft: loading
+                      ? "1.5px solid rgba(155, 123, 168, 0.2)"
+                      : "1.5px solid rgba(155, 123, 168, 0.4)",
+                    borderRight: loading
+                      ? "1.5px solid rgba(155, 123, 168, 0.2)"
+                      : "1.5px solid rgba(155, 123, 168, 0.4)",
+                    borderBottom: loading
+                      ? "1.5px solid rgba(155, 123, 168, 0.2)"
+                      : "1.5px solid rgba(155, 123, 168, 0.4)",
+                    color: "rgba(255, 255, 255, 0.85)",
+                    boxShadow: loading
+                      ? "none"
+                      : "inset 0 1px 2px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(155, 123, 168, 0.08)",
+                  }}
+                >
+                  {loading ? "준비 중..." : "시작하기"}
+                </button>
+              )}
             </div>
           </div>
         </div>
