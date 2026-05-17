@@ -4,8 +4,8 @@ import TrendingSection from "@/components/home/trending-section";
 import CategoryTabsSticky from "@/components/home/category-tabs-sticky";
 import ContentSection from "@/components/home/content-section";
 import CTASticky from "@/components/home/cta-sticky";
-import { CONTENTS, TRENDING_CONTENTS } from "@/lib/data/contents";
-import { Category } from "@/lib/types/content";
+import { fetchContents } from "@/lib/data/fetch-contents";
+import { Category, Content } from "@/lib/types/content";
 
 export const metadata: Metadata = {
   title: "VEIL — 베일에 가려진 진짜 나",
@@ -25,16 +25,23 @@ const CATEGORY_ORDER: Category[] = [
   "emotion",
 ];
 
-const HomePage = () => {
-  // TODO: [백엔드 연동] CONTENTS를 /api/contents 실제 호출로 교체
-  const contentsByCategory = CATEGORY_ORDER.reduce<
-    Record<Category, typeof CONTENTS>
-  >(
+// 카테고리별 대표 콘텐츠 slug (트렌딩 고정 목록)
+const TRENDING_SLUGS = ["love-1", "rel-1", "career-2", "emotion-3"];
+
+const HomePage = async () => {
+  const allContents: Content[] = await fetchContents();
+
+  const contentsByCategory = CATEGORY_ORDER.reduce<Record<Category, Content[]>>(
     (acc, category) => {
-      acc[category] = CONTENTS.filter((c) => c.category === category);
+      acc[category] = allContents.filter((c) => c.category === category);
       return acc;
     },
-    {} as Record<Category, typeof CONTENTS>,
+    {} as Record<Category, Content[]>,
+  );
+
+  // API slug 기준으로 트렌딩 필터링 (slug가 없는 경우 id로 fallback)
+  const trendingContents = allContents.filter((c) =>
+    TRENDING_SLUGS.includes(c.slug ?? c.id),
   );
 
   return (
@@ -44,7 +51,7 @@ const HomePage = () => {
         <MiniHero />
 
         {/* 트렌딩 섹션 */}
-        <TrendingSection contents={TRENDING_CONTENTS} />
+        <TrendingSection contents={trendingContents} />
 
         {/* 카테고리 탭 — Navbar 바로 아래 고정 (스크롤 감지로 배경 동적 변경) */}
         <CategoryTabsSticky />

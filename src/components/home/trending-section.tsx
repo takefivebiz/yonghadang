@@ -6,6 +6,9 @@ interface TrendingSectionProps {
 }
 
 const TrendingSection = ({ contents }: TrendingSectionProps) => {
+  // API 실패로 빈 배열이 오면 섹션 자체를 숨긴다
+  if (contents.length === 0) return null;
+
   return (
     <section className="mb-10">
       <div className="mx-auto max-w-xl px-4">

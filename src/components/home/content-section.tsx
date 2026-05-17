@@ -41,14 +41,20 @@ const ContentSection = ({ category, contents }: ContentSectionProps) => {
 
         {/* 카드 목록 — 1열 (breathing space 우선) */}
         <div className="mx-auto max-w-2xl space-y-6 lg:space-y-8">
-          {displayedContents.map((content) => (
-            <ContentCard
-              key={content.id}
-              content={content}
-              variant="list"
-              showBadge={false}
-            />
-          ))}
+          {displayedContents.length > 0 ? (
+            displayedContents.map((content) => (
+              <ContentCard
+                key={content.id}
+                content={content}
+                variant="list"
+                showBadge={false}
+              />
+            ))
+          ) : (
+            <p className="py-12 text-center text-sm text-highlight/30">
+              아직 준비된 콘텐츠가 없습니다.
+            </p>
+          )}
         </div>
 
         {/* 더보기 버튼 */}

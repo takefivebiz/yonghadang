@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ContentCard from "@/components/home/content-card";
-import { CONTENTS } from "@/lib/data/contents";
+import { fetchContents } from "@/lib/data/fetch-contents";
 import { Category, CATEGORY_LABELS } from "@/lib/types/content";
 
 // ── 카테고리 메타 정보 ────────────────────────────────────────────
@@ -61,8 +61,8 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
   const cat = category as Category;
   const label = CATEGORY_LABELS[cat];
 
-  // TODO: [백엔드 연동] 더미데이터를 GET /api/contents?category={cat} 실제 호출로 교체
-  const contents = CONTENTS.filter((c) => c.category === cat);
+  const allContents = await fetchContents();
+  const contents = allContents.filter((c) => c.category === cat);
 
   return (
     <div className="mx-auto max-w-3xl px-4 pb-28 pt-8">
