@@ -4,7 +4,7 @@ import TrendingSection from "@/components/home/trending-section";
 import CategoryTabsSticky from "@/components/home/category-tabs-sticky";
 import ContentSection from "@/components/home/content-section";
 import CTASticky from "@/components/home/cta-sticky";
-import { DUMMY_CONTENTS, TRENDING_CONTENTS } from "@/lib/data/dummy-contents";
+import { CONTENTS, TRENDING_CONTENTS } from "@/lib/data/contents";
 import { Category } from "@/lib/types/content";
 
 export const metadata: Metadata = {
@@ -26,15 +26,15 @@ const CATEGORY_ORDER: Category[] = [
 ];
 
 const HomePage = () => {
-  // TODO: [백엔드 연동] DUMMY_CONTENTS를 /api/contents 실제 호출로 교체
+  // TODO: [백엔드 연동] CONTENTS를 /api/contents 실제 호출로 교체
   const contentsByCategory = CATEGORY_ORDER.reduce<
-    Record<Category, typeof DUMMY_CONTENTS>
+    Record<Category, typeof CONTENTS>
   >(
     (acc, category) => {
-      acc[category] = DUMMY_CONTENTS.filter((c) => c.category === category);
+      acc[category] = CONTENTS.filter((c) => c.category === category);
       return acc;
     },
-    {} as Record<Category, typeof DUMMY_CONTENTS>,
+    {} as Record<Category, typeof CONTENTS>,
   );
 
   return (

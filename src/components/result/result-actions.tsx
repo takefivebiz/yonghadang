@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
+import { CONTENTS } from "@/lib/data/contents";
 
 interface ResultActionsProps {
   sessionId: string;
@@ -38,7 +38,7 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
 
   // X 공유
   const handleShareX = () => {
-    const content = DUMMY_CONTENTS.find((c) => c.id === contentId);
+    const content = CONTENTS.find((c) => c.id === contentId);
     const shareText = content
       ? `${content.title.replace(/\n/g, " ")} ${content.subtitle}`
       : "내 에너지를 분석해봤어요";

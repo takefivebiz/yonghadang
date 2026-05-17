@@ -1,9 +1,9 @@
 import { Content, InputConfig, SceneConfig } from "@/lib/types/content";
 
-// TODO: [백엔드 연동] 더미데이터를 /api/contents 실제 호출로 교체
+// TODO: [백엔드 연동] /api/contents 실제 호출로 교체
 
 // 리스팅 페이지에서는 input_config/scene_config를 사용하지 않으므로 공통 stub 사용
-// 실제 값은 dummy-analyze-config.ts에서 관리하며, 백엔드 연동 시 통합됨
+// 실제 input_config는 input-configs.ts에서 관리하며, 백엔드 연동 시 통합됨
 const STUB_INPUT_CONFIG: InputConfig = {
   version: 2,
   steps: [],
@@ -15,7 +15,7 @@ const STUB_SCENE_CONFIG: SceneConfig = {
   scenes: [],
 };
 
-export const DUMMY_CONTENTS: Content[] = [
+export const CONTENTS: Content[] = [
   // ── 연애 ──────────────────────────────────────────────────────
   {
     id: "love-1",
@@ -448,6 +448,6 @@ export const DUMMY_CONTENTS: Content[] = [
 ];
 
 /** 트렌딩: 카테고리별 대표 콘텐츠 4장 */
-export const TRENDING_CONTENTS = DUMMY_CONTENTS.filter((c) =>
+export const TRENDING_CONTENTS = CONTENTS.filter((c) =>
   ["love-1", "rel-1", "career-2", "emotion-3"].includes(c.id),
 );

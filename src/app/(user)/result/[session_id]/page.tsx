@@ -4,11 +4,11 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { generateMockResultScenes } from "@/lib/data/dummy-result-scenes";
-import { DUMMY_INPUT_CONFIGS } from "@/lib/data/dummy-analyze-config";
+import { INPUT_CONFIGS } from "@/lib/data/input-configs";
 import { getSceneConfig } from "@/lib/data/scene-configs";
 import { ResultScene } from "@/lib/types/result";
 import { AnalyzeAnswers, Answer } from "@/lib/types/analyze";
-import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
+import { CONTENTS } from "@/lib/data/contents";
 import { mergeScenes } from "@/lib/utils/merge-scenes";
 import { createPaidScenePlaceholders } from "@/lib/utils/create-paid-scene-placeholders";
 import SceneContent from "@/components/result/scene-content";
@@ -145,14 +145,14 @@ const ResultPage = ({ params }: PageProps) => {
               // ── 실제 Claude generate fallback ────────────────────────
               // analyze page가 이미 생성해서 캐시했으면 여기 오지 않는다.
               // 직접 URL 접근이나 analyze 실패 후 재방문 시의 fallback 경로.
-              const content = DUMMY_CONTENTS.find(
+              const content = CONTENTS.find(
                 (c) => c.id === data.content_id,
               );
               if (!content) {
                 throw new Error(`콘텐츠를 찾을 수 없어: ${data.content_id}`);
               }
 
-              const inputConfig = DUMMY_INPUT_CONFIGS[data.content_id];
+              const inputConfig = INPUT_CONFIGS[data.content_id];
               const sceneConfig = getSceneConfig(data.content_id);
 
               const userAnswers = data.answers
@@ -305,13 +305,13 @@ const ResultPage = ({ params }: PageProps) => {
     try {
       if (!analyzeData) throw new Error("분석 데이터가 없어");
 
-      const content = DUMMY_CONTENTS.find(
+      const content = CONTENTS.find(
         (c) => c.id === analyzeData.content_id,
       );
       if (!content)
         throw new Error(`콘텐츠를 찾을 수 없어: ${analyzeData.content_id}`);
 
-      const inputConfig = DUMMY_INPUT_CONFIGS[analyzeData.content_id];
+      const inputConfig = INPUT_CONFIGS[analyzeData.content_id];
       const sceneConfig = getSceneConfig(analyzeData.content_id);
 
       // Answer → {values, labels} 변환 (V2: step_id 기반)
@@ -866,7 +866,7 @@ const ResultPage = ({ params }: PageProps) => {
           {/* 콘텐츠 헤더 */}
           {analyzeData &&
             (() => {
-              const content = DUMMY_CONTENTS.find(
+              const content = CONTENTS.find(
                 (c) => c.id === analyzeData.content_id,
               );
               return content ? (

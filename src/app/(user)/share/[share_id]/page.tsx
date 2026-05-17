@@ -6,7 +6,7 @@ import Image from "next/image";
 import { generateMockResultScenes } from "@/lib/data/dummy-result-scenes";
 import { ResultScene } from "@/lib/types/result";
 import { AnalyzeAnswers } from "@/lib/types/analyze";
-import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
+import { CONTENTS } from "@/lib/data/contents";
 import SceneContent from "@/components/result/scene-content";
 
 interface PageProps {
@@ -176,7 +176,7 @@ const ShareResultPage = ({ params }: PageProps) => {
           {/* 콘텐츠 헤더 */}
           {analyzeData &&
             (() => {
-              const content = DUMMY_CONTENTS.find(
+              const content = CONTENTS.find(
                 (c) => c.id === analyzeData.content_id,
               );
               return content ? (

@@ -1,7 +1,7 @@
 "use server";
 
 import { AnalyzeAnswers } from "@/lib/types/analyze";
-import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
+import { CONTENTS } from "@/lib/data/contents";
 
 // 공유 ID로부터 분석 데이터 조회
 export async function getShareData(shareId: string) {
@@ -45,7 +45,7 @@ export async function getShareMetadata(shareId: string): Promise<ShareMetadata> 
       };
     }
 
-    const content = DUMMY_CONTENTS.find(
+    const content = CONTENTS.find(
       (c) => c.id === analyzeData.content_id,
     );
 

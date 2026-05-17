@@ -1,7 +1,8 @@
-// 모든 더미 데이터를 한 곳에서 export하기 위한 인덱스 파일
+// production content 데이터 (authoritative source)
+export * from "./contents";
+export * from "./input-configs";
 
-export * from "./dummy-contents";
-export * from "./dummy-analyze-config";
+// 개발 scaffolding (backend 연동 전 임시 fallback)
 export * from "./dummy-result-scenes";
 export * from "./dummy-profiles";
 export * from "./dummy-guest-credentials";

@@ -6,10 +6,10 @@ import TypeAInput from "@/components/analyze/type-a-input";
 import CorrectionQuestions from "@/components/analyze/correction-questions";
 import ReactionBubble from "@/components/analyze/reaction-bubble";
 import GeneratingLoading from "@/components/analyze/generating-loading";
-import { getInputConfig } from "@/lib/data/dummy-analyze-config";
+import { getInputConfig } from "@/lib/data/input-configs";
 import { AnalyzeState, Answer, AnalyzeAnswers } from "@/lib/types/analyze";
-import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
-import { DUMMY_INPUT_CONFIGS } from "@/lib/data/dummy-analyze-config";
+import { CONTENTS } from "@/lib/data/contents";
+import { INPUT_CONFIGS } from "@/lib/data/input-configs";
 import { getSceneConfig } from "@/lib/data/scene-configs";
 import type { ResultScene } from "@/lib/types/result";
 import { getContentPack } from "@/lib/content-packs";
@@ -178,11 +178,11 @@ const AnalyzePage = ({ params }: PageProps) => {
         new Date(generateStartTime).toISOString(),
         `(Loading 시작 후 ${generateStartTime - loadingStartTime}ms)`,
       );
-      const content = DUMMY_CONTENTS.find((c) => c.id === finalData.content_id);
+      const content = CONTENTS.find((c) => c.id === finalData.content_id);
       if (!content)
         throw new Error(`콘텐츠를 찾을 수 없어: ${finalData.content_id}`);
 
-      const inputConfig = DUMMY_INPUT_CONFIGS[finalData.content_id];
+      const inputConfig = INPUT_CONFIGS[finalData.content_id];
       const sceneConfig = getSceneConfig(finalData.content_id);
 
       // Answer → {values, labels} 변환 (V2: step_id 기반으로 step 조회)

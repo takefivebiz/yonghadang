@@ -6,7 +6,7 @@ import {
   getUserSessions,
   DUMMY_SESSION_ANSWERS,
 } from "@/lib/data/dummy-sessions";
-import { DUMMY_CONTENTS } from "@/lib/data/dummy-contents";
+import { CONTENTS } from "@/lib/data/contents";
 import { simulateGuestVerification } from "@/lib/data/dummy-guest-credentials";
 import { formatDate, formatCategoryName } from "@/lib/utils";
 import type { AnalyzeAnswers } from "@/lib/types/analyze";
@@ -102,7 +102,7 @@ export default function GuestPage() {
 
       // 세션 정보 구성
       const sessionInfos: GuestSessionInfo[] = userSessions.map((session) => {
-        const content = DUMMY_CONTENTS.find((c) => c.id === session.content_id);
+        const content = CONTENTS.find((c) => c.id === session.content_id);
         return {
           session_id: session.id,
           content_id: session.content_id,

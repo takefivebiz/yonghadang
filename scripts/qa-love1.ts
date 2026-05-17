@@ -25,8 +25,8 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import love1Pack from "../src/lib/content-packs/love-1";
-import { DUMMY_INPUT_CONFIGS } from "../src/lib/data/dummy-analyze-config";
-import { DUMMY_SCENE_CONFIGS } from "../src/lib/data/scene-configs";
+import { INPUT_CONFIGS } from "../src/lib/data/input-configs";
+import { getSceneConfig } from "../src/lib/data/scene-configs";
 import { accumulateHiddenState } from "../src/lib/quiz/accumulator";
 import { translateStateToSummary } from "../src/lib/quiz/translator";
 import type { SceneConfig } from "../src/lib/types/content";
@@ -119,7 +119,7 @@ const SCENARIOS: Scenario[] = [
 ];
 
 // ── Helper: question_text/labels 매핑 (V2: steps 기반) ─────────────────
-const inputConfig = DUMMY_INPUT_CONFIGS["love-1"];
+const inputConfig = INPUT_CONFIGS["love-1"];
 
 // choiceSteps: freeText step을 제외한 선택형 steps (순서대로 q1~q5)
 const choiceSteps = inputConfig.steps.filter(
@@ -227,7 +227,7 @@ const runScenario = async (scenario: Scenario): Promise<ScenarioResult> => {
   );
 
   // 3) generate 호출용 공통 payload
-  const sceneConfig = DUMMY_SCENE_CONFIGS["love-1"] as SceneConfig;
+  const sceneConfig = getSceneConfig("love-1") as SceneConfig;
   const userInput = {
     text: scenario.freeText,
     answers: buildAnswers(scenario.selections),

@@ -1,10 +1,10 @@
 import { SceneConfig } from "@/lib/types/content";
 
-// TODO: [백엔드 연동] 더미데이터를 GET /api/contents/[id] 응답의 scene_config로 교체
+// TODO: [백엔드 연동] GET /api/contents/[id] 응답의 scene_config로 교체
 // 각 콘텐츠는 고유한 narrative progression을 가진다.
 // Claude는 scene별 role/goal/focus/tone을 참고해 결과를 생성한다.
 
-export const DUMMY_SCENE_CONFIGS: Record<string, SceneConfig> = {
+const SCENE_CONFIGS: Record<string, SceneConfig> = {
   "love-1": {
     free_scene_count: 2,
     paid_scene_count: 4,
@@ -206,5 +206,5 @@ const DEFAULT_SCENE_CONFIG: SceneConfig = {
 
 // TODO: [백엔드 연동] content_id로 GET /api/contents/[id]를 호출해 scene_config 반환
 export const getSceneConfig = (contentId: string): SceneConfig => {
-  return DUMMY_SCENE_CONFIGS[contentId] ?? DEFAULT_SCENE_CONFIG;
+  return SCENE_CONFIGS[contentId] ?? DEFAULT_SCENE_CONFIG;
 };

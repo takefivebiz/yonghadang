@@ -660,7 +660,6 @@ export const parseClaudeResult = (raw: string): ClaudeGeneratedResult => {
 export const mapClaudeToResultScenes = (
   sessionId: string,
   claudeScenes: ClaudeGeneratedScene[],
-  sceneConfig: SceneConfig,
 ): ResultScene[] => {
   return claudeScenes.map((scene) => {
     const messages: SceneMessage[] = scene.messages.map((m) => ({

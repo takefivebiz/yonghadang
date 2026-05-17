@@ -1,9 +1,9 @@
 import { InputConfig } from "@/lib/types/content";
 
-// ── 콘텐츠별 입력 설정 더미 데이터 (V2: steps 기반) ──────────────────
-// TODO: [백엔드 연동] 더미데이터를 GET /api/contents/[id] 응답의 input_config로 교체
+// ── 콘텐츠별 입력 설정 (V2: steps 기반) ──────────────────────────────
+// TODO: [백엔드 연동] GET /api/contents/[id] 응답의 input_config로 교체
 
-export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
+export const INPUT_CONFIGS: Record<string, InputConfig> = {
   "love-1": {
     version: 2,
     steps: [
@@ -29,23 +29,23 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
         question: "지금 네 상황은 어때?",
         options: [
           {
-            label: "막 흔들리기 시작한 것 같아",
+            label: "마음이 흔들리기 시작한 것 같아",
             value: "just_started_shaking",
           },
           {
-            label: "좋아하는지 알고 싶고, 뭔가 결정해야 할 것 같아",
+            label: "좋아하는 마음보다 확인이 더 필요해졌어",
             value: "clarity_and_decide",
           },
           {
-            label: "같은 대화를 계속 다시 보고 있어",
+            label: "상대와 나눈 대화를 계속 다시 보고 있어",
             value: "replaying_conversations",
           },
           {
-            label: "기대는 접고 싶은데, 이미 많이 지쳐 있어",
+            label: "이제는 기대를 줄여야 할 것 같아",
             value: "fading_with_fatigue",
           },
           {
-            label: "끝난 것 같은데 마음이 못 놓아",
+            label: "관계는 끝난 것 같은데 포기가 안돼",
             value: "cant_let_go_after_end",
           },
         ],
@@ -68,11 +68,11 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
             value: "inconsistent_interest",
           },
           {
-            label: "편한 관계처럼 두려고 해",
+            label: "편한 관계로 두려고 해",
             value: "comfortable_without_progress",
           },
           {
-            label: "신호는 있는데 매번 결정적이지 않아",
+            label: "신호는 있는데 딱히 결정적이진 않아",
             value: "signal_without_commitment",
           },
           {
@@ -92,11 +92,11 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
         question: "흔들릴 때\n너는 보통 어떻게 반응해?",
         options: [
           {
-            label: "괜찮은 척하면서 혼자 계속 되짚어",
+            label: "괜찮은 척하면서 혼자 계속 생각해",
             value: "looping_inside",
           },
           {
-            label: "상대 반응 하나에 하루 기분이 좌우돼",
+            label: "작은 반응에도 하루 기분이 달라져",
             value: "mood_swings_by_signal",
           },
           {
@@ -104,7 +104,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
             value: "holding_back_question",
           },
           {
-            label: "한 번만 더 확인하면 결정할 것 같아",
+            label: "한 번만 더 확인하면 어느쪽이든 결론이 날 거 같아",
             value: "one_more_check_then_decide",
           },
           {
@@ -123,7 +123,7 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
         question: "이 관계에서 너를\n가장 지치게 만드는 건 뭐야?",
         options: [
           {
-            label: "나만 진심이라는 게 자꾸 확인되는 것",
+            label: "나만 더 깊게 마음 쓰고 있는 것",
             value: "confirmed_one_sided",
           },
           {
@@ -131,15 +131,15 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
             value: "prolonged_ambiguity",
           },
           {
-            label: "같은 신호를 매번 해석하고 있는 나 자신",
+            label: "상대의 반응을 매번 해석하고 있는 나 자신",
             value: "exhausted_by_my_own_interpretation",
           },
           {
-            label: "곧 결정해야 한다는 압박",
+            label: "언젠가는 답을 내야 할 것 같은 분위기",
             value: "pressure_to_decide_soon",
           },
           {
-            label: "마음을 정리하려는데 자꾸 다시 돌아오는 것",
+            label: "정리하려 해도 다시 마음이 돌아가는 것",
             value: "cant_move_on",
           },
         ],
@@ -162,11 +162,11 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
             value: "want_to_know_their_heart",
           },
           {
-            label: "내가 할 말 하고 결정하고 싶어",
+            label: "더 미루지 않고 뭐든 결론내고 싶어",
             value: "want_to_act_and_decide",
           },
           {
-            label: "천천히 마음을 정리할 시간이 필요해",
+            label: "당분간은 이 관계를 덜 생각하고 싶어",
             value: "want_time_to_fold",
           },
           {
@@ -1456,7 +1456,8 @@ export const DUMMY_INPUT_CONFIGS: Record<string, InputConfig> = {
       {
         id: "q4",
         type: "singleChoice",
-        question: "현재 상황이나 환경이 \n 이 무기력함을 심하게 만들고 있다고 생각해?",
+        question:
+          "현재 상황이나 환경이 \n 이 무기력함을 심하게 만들고 있다고 생각해?",
         options: [
           { label: "매우 그렇다", value: "yes_very" },
           { label: "어느 정도는 그렇다", value: "yes_somewhat" },
@@ -1561,5 +1562,5 @@ const DEFAULT_INPUT_CONFIG: InputConfig = {
 
 // TODO: [백엔드 연동] content_id로 GET /api/contents/[id]를 호출해 input_config 반환
 export const getInputConfig = (content_id: string): InputConfig => {
-  return DUMMY_INPUT_CONFIGS[content_id] ?? DEFAULT_INPUT_CONFIG;
+  return INPUT_CONFIGS[content_id] ?? DEFAULT_INPUT_CONFIG;
 };

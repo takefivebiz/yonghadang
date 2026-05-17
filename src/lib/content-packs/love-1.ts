@@ -27,7 +27,7 @@ export const LOVE_1_DIMENSIONS = [
 export type Love1Dimension = (typeof LOVE_1_DIMENSIONS)[number];
 
 // ── option value → 점수 변화량 ───────────────────────────────────────
-// 각 value는 dummy-analyze-config.ts의 love-1 questions에서 정의된 것과 동일해야 한다.
+// 각 value는 input-configs.ts의 love-1 questions에서 정의된 것과 동일해야 한다.
 // 모든 값은 양수만 사용한다 (음수 진입 봉쇄).
 export const LOVE_1_SCORE_MAP: Record<
   string,

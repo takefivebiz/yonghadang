@@ -22,7 +22,7 @@ import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import love1Pack from "../src/lib/content-packs/love-1";
-import { DUMMY_INPUT_CONFIGS } from "../src/lib/data/dummy-analyze-config";
+
 import { accumulateHiddenState } from "../src/lib/quiz/accumulator";
 import { translateStateToSummary } from "../src/lib/quiz/translator";
 import type { LoopType, LoopAnswer } from "../src/lib/types/quiz";

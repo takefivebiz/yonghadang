@@ -240,7 +240,6 @@ export const POST = async (
     const result_scenes = mapClaudeToResultScenes(
       session_id,
       rawResult.scenes,
-      scene_config
     );
 
     // TODO: [백엔드 연동] result_scenes를 Supabase scenes 테이블에 저장
