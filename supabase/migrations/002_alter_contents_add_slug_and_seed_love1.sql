@@ -47,6 +47,7 @@ VALUES (
   5,
 
   -- ── input_config (V2: steps 기반) ──────────────────────────────────
+  -- source of truth: src/lib/data/input-configs.ts
   jsonb_build_object(
     'version', 2,
     'steps', jsonb_build_array(
@@ -70,11 +71,11 @@ VALUES (
         'type',     'singleChoice',
         'question', '지금 네 상황은 어때?',
         'options',  jsonb_build_array(
-          jsonb_build_object('label', '막 흔들리기 시작한 것 같아',                     'value', 'just_started_shaking'),
-          jsonb_build_object('label', '좋아하는지 알고 싶고, 뭔가 결정해야 할 것 같아', 'value', 'clarity_and_decide'),
-          jsonb_build_object('label', '같은 대화를 계속 다시 보고 있어',                 'value', 'replaying_conversations'),
-          jsonb_build_object('label', '기대는 접고 싶은데, 이미 많이 지쳐 있어',        'value', 'fading_with_fatigue'),
-          jsonb_build_object('label', '끝난 것 같은데 마음이 못 놓아',                   'value', 'cant_let_go_after_end')
+          jsonb_build_object('label', '마음이 흔들리기 시작한 것 같아',         'value', 'just_started_shaking'),
+          jsonb_build_object('label', '좋아하는 마음보다 확인이 더 필요해졌어', 'value', 'clarity_and_decide'),
+          jsonb_build_object('label', '상대와 나눈 대화를 계속 다시 보고 있어', 'value', 'replaying_conversations'),
+          jsonb_build_object('label', '이제는 기대를 줄여야 할 것 같아',        'value', 'fading_with_fatigue'),
+          jsonb_build_object('label', '관계는 끝난 것 같은데 포기가 안돼',      'value', 'cant_let_go_after_end')
         ),
         'required', true
       ),
@@ -87,8 +88,8 @@ VALUES (
         'options',  jsonb_build_array(
           jsonb_build_object('label', '마음은 있는 것 같은데 확실한 표현이 없어', 'value', 'emotion_without_clarity'),
           jsonb_build_object('label', '다가왔다가 다시 거리를 둬',               'value', 'inconsistent_interest'),
-          jsonb_build_object('label', '편한 관계처럼 두려고 해',                 'value', 'comfortable_without_progress'),
-          jsonb_build_object('label', '신호는 있는데 매번 결정적이지 않아',      'value', 'signal_without_commitment'),
+          jsonb_build_object('label', '편한 관계로 두려고 해',                   'value', 'comfortable_without_progress'),
+          jsonb_build_object('label', '신호는 있는데 딱히 결정적이진 않아',      'value', 'signal_without_commitment'),
           jsonb_build_object('label', '이제는 반응 자체가 줄어들고 있어',        'value', 'fading_response')
         ),
         'required', true
@@ -100,11 +101,11 @@ VALUES (
         'type',     'multiChoice',
         'question', '흔들릴 때' || chr(10) || '너는 보통 어떻게 반응해?',
         'options',  jsonb_build_array(
-          jsonb_build_object('label', '괜찮은 척하면서 혼자 계속 되짚어',       'value', 'looping_inside'),
-          jsonb_build_object('label', '상대 반응 하나에 하루 기분이 좌우돼',    'value', 'mood_swings_by_signal'),
-          jsonb_build_object('label', '직접 묻고 싶지만 괜히 참아',             'value', 'holding_back_question'),
-          jsonb_build_object('label', '한 번만 더 확인하면 결정할 것 같아',     'value', 'one_more_check_then_decide'),
-          jsonb_build_object('label', '이제 의미 부여를 줄이려고 노력해',       'value', 'trying_to_detach')
+          jsonb_build_object('label', '괜찮은 척하면서 혼자 계속 생각해',              'value', 'looping_inside'),
+          jsonb_build_object('label', '작은 반응에도 하루 기분이 달라져',              'value', 'mood_swings_by_signal'),
+          jsonb_build_object('label', '직접 묻고 싶지만 괜히 참아',                   'value', 'holding_back_question'),
+          jsonb_build_object('label', '한 번만 더 확인하면 어느쪽이든 결론이 날 거 같아', 'value', 'one_more_check_then_decide'),
+          jsonb_build_object('label', '이제 의미 부여를 줄이려고 노력해',             'value', 'trying_to_detach')
         ),
         'required', true
       ),
@@ -115,11 +116,11 @@ VALUES (
         'type',     'singleChoice',
         'question', '이 관계에서 너를' || chr(10) || '가장 지치게 만드는 건 뭐야?',
         'options',  jsonb_build_array(
-          jsonb_build_object('label', '나만 진심이라는 게 자꾸 확인되는 것',        'value', 'confirmed_one_sided'),
-          jsonb_build_object('label', '이 애매한 상태가 길어지는 것',               'value', 'prolonged_ambiguity'),
-          jsonb_build_object('label', '같은 신호를 매번 해석하고 있는 나 자신',     'value', 'exhausted_by_my_own_interpretation'),
-          jsonb_build_object('label', '곧 결정해야 한다는 압박',                    'value', 'pressure_to_decide_soon'),
-          jsonb_build_object('label', '마음을 정리하려는데 자꾸 다시 돌아오는 것', 'value', 'cant_move_on')
+          jsonb_build_object('label', '나만 더 깊게 마음 쓰고 있는 것',          'value', 'confirmed_one_sided'),
+          jsonb_build_object('label', '이 애매한 상태가 길어지는 것',            'value', 'prolonged_ambiguity'),
+          jsonb_build_object('label', '상대의 반응을 매번 해석하고 있는 나 자신', 'value', 'exhausted_by_my_own_interpretation'),
+          jsonb_build_object('label', '언젠가는 답을 내야 할 것 같은 분위기',    'value', 'pressure_to_decide_soon'),
+          jsonb_build_object('label', '정리하려 해도 다시 마음이 돌아가는 것',   'value', 'cant_move_on')
         ),
         'required', true
       ),
@@ -130,11 +131,11 @@ VALUES (
         'type',     'singleChoice',
         'question', '솔직히 지금' || chr(10) || '가장 원하는 건 뭐야?',
         'options',  jsonb_build_array(
-          jsonb_build_object('label', '상대가 이 관계를 확실히 해줬으면',       'value', 'want_clarity_from_other'),
-          jsonb_build_object('label', '상대 마음이 어떤지 정확히 알고 싶어',   'value', 'want_to_know_their_heart'),
-          jsonb_build_object('label', '내가 할 말 하고 결정하고 싶어',         'value', 'want_to_act_and_decide'),
-          jsonb_build_object('label', '천천히 마음을 정리할 시간이 필요해',    'value', 'want_time_to_fold'),
-          jsonb_build_object('label', '솔직히 아직은 끝난 관계가 아니길',      'value', 'want_possibility')
+          jsonb_build_object('label', '상대가 이 관계를 확실히 해줬으면',     'value', 'want_clarity_from_other'),
+          jsonb_build_object('label', '상대 마음이 어떤지 정확히 알고 싶어', 'value', 'want_to_know_their_heart'),
+          jsonb_build_object('label', '더 미루지 않고 뭐든 결론내고 싶어',   'value', 'want_to_act_and_decide'),
+          jsonb_build_object('label', '당분간은 이 관계를 덜 생각하고 싶어', 'value', 'want_time_to_fold'),
+          jsonb_build_object('label', '솔직히 아직은 끝난 관계가 아니길',    'value', 'want_possibility')
         ),
         'required', true
       )
@@ -143,6 +144,7 @@ VALUES (
   ),
 
   -- ── scene_config ──────────────────────────────────────────────────
+  -- source of truth: src/lib/data/scene-configs.ts
   jsonb_build_object(
     'free_scene_count', 2,
     'paid_scene_count', 4,
