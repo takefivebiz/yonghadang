@@ -43,7 +43,7 @@ VALUES (
   '이 사람, ' || chr(10) || ' 저를 좋아하는 걸까요?',
   '사소한 반응에도 마음이 흔들려요',
   'love',
-  null,
+  '/img/love-1.png',
   5,
 
   -- ── input_config (V2: steps 기반) ──────────────────────────────────
@@ -289,6 +289,7 @@ ON CONFLICT (id) DO UPDATE SET
   slug              = EXCLUDED.slug,
   title             = EXCLUDED.title,
   subtitle          = EXCLUDED.subtitle,
+  thumbnail_url     = EXCLUDED.thumbnail_url,
   estimated_minutes = EXCLUDED.estimated_minutes,
   input_config      = EXCLUDED.input_config,
   scene_config      = EXCLUDED.scene_config,
