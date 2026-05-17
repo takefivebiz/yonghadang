@@ -115,6 +115,12 @@ const AnalyzePage = ({ params }: PageProps) => {
       answers,
     }));
 
+    // ── 로딩 화면 즉시 표시: DB 저장/API 응답 대기 없이 바로 전환 ──────────────
+    setStage("completing");
+    setProgress(0);
+    const loadingStartTime = Date.now();
+    console.log("[analyze] Loading 시작", new Date(loadingStartTime).toISOString());
+
     // ── DB 저장: QA mode에서는 skip ──────────────────────────────────────
     // window.location.search 직접 사용: useSearchParams()는 Suspense 경계 영향으로
     // ?qa=1이 있어도 빈 값을 반환할 수 있음 (generateScenes와 동일한 패턴).
@@ -123,40 +129,34 @@ const AnalyzePage = ({ params }: PageProps) => {
         new URLSearchParams(window.location.search).get("qa") === "1") ||
       process.env.NEXT_PUBLIC_QA_MODE === "true";
 
+    // fire-and-forget: 저장 실패해도 generateScenes 진행
     if (!isQaMode) {
-      try {
-        const res = await fetch(
-          `/api/analyze/${finalData.session_id}/answers`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              free_input: finalData.free_input,
-              answers: finalData.answers,
-            }),
-          },
-        );
-        if (!res.ok) {
-          const errData = (await res.json()) as { error?: string };
-          console.error(
-            "[answers] DB 저장 실패:",
-            errData.error ?? `HTTP ${res.status}`,
-          );
-        } else {
-          console.log("[answers] session_answers DB 저장 완료");
-        }
-      } catch (err) {
-        console.error("[answers] DB 저장 중 예외 발생:", err);
-      }
+      void fetch(`/api/analyze/${finalData.session_id}/answers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          free_input: finalData.free_input,
+          answers: finalData.answers,
+        }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const errData = (await res.json()) as { error?: string };
+            console.error("[answers] DB 저장 실패:", errData.error ?? `HTTP ${res.status}`);
+          } else {
+            console.log("[answers] session_answers DB 저장 완료");
+          }
+        })
+        .catch((err) => {
+          console.error("[answers] DB 저장 중 예외 발생:", err);
+        });
     } else {
       console.log("[answers] QA mode — DB 저장 skip");
     }
 
-    // ── Dev mode: 로딩화면 계속 표시 ──────────────────────────────────────
+    // ── Dev mode: fake progress만 돌리고 return ────────────────────────────
     if (process.env.NEXT_PUBLIC_SHOW_ANALYZE_LOADING === "true") {
       console.log("[DEBUG] NEXT_PUBLIC_SHOW_ANALYZE_LOADING enabled - showing loading screen only");
-      setStage("completing");
-      setProgress(0);
 
       // Fake progress 애니메이션
       let fakeProgress = 0;
@@ -169,14 +169,7 @@ const AnalyzePage = ({ params }: PageProps) => {
       return;
     }
 
-    // ── Generate Progress: 즉시 generating 시작 + progress 병렬 진행 ─────────────
-    const loadingStartTime = Date.now();
-    console.log("[analyze] Loading 시작", new Date(loadingStartTime).toISOString());
-
-    setStage("completing");
-    setProgress(0);
-
-    // ✅ 핵심 1: 생성 즉시 호출 (progress 대기 안 함!)
+    // ── Generate: 즉시 호출 ──────────────────────────────────────────────
     console.log("[analyze] generateScenes 호출 시작", new Date().toISOString());
     generateScenes(finalData, loadingStartTime);
 
@@ -207,6 +200,11 @@ const AnalyzePage = ({ params }: PageProps) => {
       (typeof window !== "undefined" &&
         new URLSearchParams(window.location.search).get("qa") === "1") ||
       process.env.NEXT_PUBLIC_QA_MODE === "true";
+
+    // loop=1: result 페이지에 추가루프 CTA를 표시하는 보조 플래그. qa=1과 함께만 유효.
+    const hasLoopFlag =
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("loop") === "1";
 
     try {
       const generateStartTime = Date.now();
@@ -377,8 +375,9 @@ const AnalyzePage = ({ params }: PageProps) => {
 
         setProgress(100);
         setTimeout(() => {
-          console.log("[QA] result page로 이동 (?qa=1 포함)");
-          router.push(`/result/${finalData.session_id}?qa=1`);
+          const loopSuffix = hasLoopFlag ? "&loop=1" : "";
+          console.log(`[QA] result page로 이동 (?qa=1${loopSuffix} 포함)`);
+          router.push(`/result/${finalData.session_id}?qa=1${loopSuffix}`);
         }, 300);
       } else {
         // ── 일반 mode: 무료 씬만 생성 (결제 전 빠른 로딩) ──────────────────
@@ -459,7 +458,10 @@ const AnalyzePage = ({ params }: PageProps) => {
       // QA mode에서 에러가 나도 ?qa=1 유지 → result page가 QA unlock 상태 유지
       // (free scenes는 저장됐을 수 있으므로 unlock 상태로 보여주는 게 낫다)
       setTimeout(() => {
-        router.push(`/result/${finalData.session_id}${isQaMode ? "?qa=1" : ""}`);
+        const qaQuery = isQaMode
+          ? `?qa=1${hasLoopFlag ? "&loop=1" : ""}`
+          : "";
+        router.push(`/result/${finalData.session_id}${qaQuery}`);
       }, 1000);
     }
   };

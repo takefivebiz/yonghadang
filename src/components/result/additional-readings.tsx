@@ -20,12 +20,21 @@ interface AdditionalReadingsProps {
   activeLoopType?: LoopType | null;
   /** 개별 구매 버튼 클릭 시 호출 (Toss 결제 모달 열기) */
   onPurchaseSingle?: (reading: AdditionalReading) => void;
+  /** 전체 구매 버튼 클릭 시 호출 (잠긴 항목 2개 이상일 때 표시) */
+  onPurchaseAll?: () => void;
   /** 생성 실패 후 재시도 (결제 없이 API 재호출) */
   onRetry?: (reading: AdditionalReading) => void;
-  // TODO: [결제 연동] 전체 구매 핸들러 추가 (현재 미구현)
+  /** loop_all 구매 후 순차 생성 대기 중: true이면 잠긴 카드에 "대기 중" 상태 표시 */
+  loopAllPurchased?: boolean;
+  /** QA mode: true이면 바텀시트 없이 카드 클릭 즉시 onPurchaseSingle 호출 */
+  isQaMode?: boolean;
 }
 
 const PRICE_SINGLE = 900;
+// 3개 전체 번들 가격. 개별 합산(2700원) 대비 500원 할인.
+// lockedCount === 3일 때만 번들 CTA를 표시한다.
+const PRICE_ALL = 2200;
+const PRICE_ALL_SAVING = PRICE_SINGLE * 3 - PRICE_ALL; // 500
 
 const AdditionalReadings = ({
   readings,
@@ -33,8 +42,11 @@ const AdditionalReadings = ({
   loopLoading = null,
   loopError = null,
   activeLoopType = null,
+  loopAllPurchased = false,
   onPurchaseSingle,
+  onPurchaseAll,
   onRetry,
+  isQaMode = false,
 }: AdditionalReadingsProps) => {
   const [selectedReading, setSelectedReading] =
     useState<AdditionalReading | null>(null);
@@ -64,14 +76,24 @@ const AdditionalReadings = ({
   const getMessages = (reading: AdditionalReading): LoopMessage[] =>
     loopAnswers[reading.loopType]?.messages ?? [];
 
+  // 잠긴 항목 수 (전체 구매 버튼 표시 조건 및 "마지막 질문이야" 힌트용)
+  const lockedCount = readings.filter((r) => !isUnlocked(r)).length;
+
   // ── 카드 클릭 ────────────────────────────────────────────────
   const handleCardClick = (reading: AdditionalReading) => {
     if (isLoading(reading)) return; // 생성 중: no-op
+    // loop_all 구매 후 대기 중인 카드: 클릭 무시 (결제 이미 완료)
+    if (loopAllPurchased && !isUnlocked(reading)) return;
     if (isUnlocked(reading)) {
       setExpandedReadingId((prev) => (prev === reading.id ? null : reading.id));
     } else if (!hasError(reading)) {
-      setSelectedReading(reading);
-      setIsBottomSheetOpen(true);
+      if (isQaMode) {
+        // QA mode: 바텀시트 없이 직접 생성 트리거
+        onPurchaseSingle?.(reading);
+      } else {
+        setSelectedReading(reading);
+        setIsBottomSheetOpen(true);
+      }
     }
   };
 
@@ -130,6 +152,21 @@ const AdditionalReadings = ({
         </p>
       </div>
 
+      {/* loop_all 구매 완료 배너 — 순차 생성 중일 때만 표시 */}
+      {loopAllPurchased && (
+        <div
+          className="mb-6 px-4 py-3 rounded-xl text-center"
+          style={{
+            background: "rgba(201, 139, 176, 0.06)",
+            border: "1px solid rgba(201, 139, 176, 0.15)",
+          }}
+        >
+          <p className="text-xs" style={{ color: "rgba(201, 139, 176, 0.70)" }}>
+            전체 질문을 열었어. 답변을 차례로 생성하고 있어.
+          </p>
+        </div>
+      )}
+
       {/* 카드 목록 */}
       <div className="flex flex-col gap-3">
         {readings.map((reading) => {
@@ -152,13 +189,17 @@ const AdditionalReadings = ({
                     ? "rgba(201, 139, 176, 0.07)"
                     : unlocked
                       ? "rgba(209, 109, 172, 0.10)"
-                      : "rgba(255, 255, 255, 0.02)",
+                      : loopAllPurchased
+                        ? "rgba(201, 139, 176, 0.04)"
+                        : "rgba(255, 255, 255, 0.02)",
                   border: `1px solid ${
                     isExpanded
                       ? "rgba(201, 139, 176, 0.20)"
                       : unlocked
                         ? "rgba(201, 139, 176, 0.22)"
-                        : "rgba(255, 255, 255, 0.07)"
+                        : loopAllPurchased
+                          ? "rgba(201, 139, 176, 0.12)"
+                          : "rgba(255, 255, 255, 0.07)"
                   }`,
                   borderRadius: isExpanded ? "14px 14px 0 0" : "14px",
                   padding: "18px 18px 16px",
@@ -196,7 +237,17 @@ const AdditionalReadings = ({
                     )}
 
                     {/* 상태 힌트 */}
-                    {!unlocked && !loading && !error && (
+                    {!unlocked && !loading && !error && loopAllPurchased && (
+                      <div className="flex items-center gap-1.5">
+                        <p
+                          className="text-xs"
+                          style={{ color: "rgba(201, 139, 176, 0.50)" }}
+                        >
+                          구매 완료 · 대기 중
+                        </p>
+                      </div>
+                    )}
+                    {!unlocked && !loading && !error && !loopAllPurchased && (
                       <div className="flex items-center gap-1.5">
                         <svg
                           className="h-3 w-3"
@@ -279,7 +330,7 @@ const AdditionalReadings = ({
                       ↓
                     </span>
                   )}
-                  {!unlocked && !loading && !error && (
+                  {!unlocked && !loading && !error && !loopAllPurchased && (
                     <span
                       className="flex-shrink-0"
                       style={{
@@ -502,7 +553,67 @@ const AdditionalReadings = ({
             </span>
           </button>
 
-          {/* TODO: [결제 연동] 전체 구매 (3개 한번에) - 추후 구현 */}
+          {/* 전체 번들 버튼 — 3개 모두 잠긴 경우에만 표시 */}
+          {lockedCount === 3 && (
+            <button
+              type="button"
+              onClick={() => {
+                onPurchaseAll?.();
+                handleCloseSheet();
+              }}
+              className="flex items-center justify-between"
+              style={{
+                width: "100%",
+                background: "rgba(201, 139, 176, 0.13)",
+                border: "1px solid rgba(201, 139, 176, 0.22)",
+                borderRadius: "12px 12px 12px 0px",
+                padding: "14px 16px",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <div className="flex flex-col items-start gap-0.5">
+                <span
+                  className="text-sm font-medium"
+                  style={{ color: "rgba(249, 249, 229, 0.90)" }}
+                >
+                  전체 질문 깊게 읽기
+                </span>
+                <span
+                  className="text-xs"
+                  style={{ color: "rgba(249, 249, 229, 0.40)" }}
+                >
+                  3개 질문 한번에
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <span
+                  className="text-[10px] px-1.5 py-0.5 rounded"
+                  style={{
+                    background: "rgba(201, 139, 176, 0.15)",
+                    color: "rgba(201, 139, 176, 0.75)",
+                  }}
+                >
+                  {PRICE_ALL_SAVING.toLocaleString()}원 절약
+                </span>
+                <span
+                  className="text-xs"
+                  style={{ color: "rgba(201, 139, 176, 0.65)" }}
+                >
+                  {PRICE_ALL.toLocaleString()}원
+                </span>
+              </div>
+            </button>
+          )}
+
+          {/* 잠긴 항목이 1개뿐일 때 — 번들 불필요, 힌트만 */}
+          {lockedCount === 1 && (
+            <p
+              className="text-center text-xs mt-3"
+              style={{ color: "rgba(249, 249, 229, 0.22)" }}
+            >
+              마지막 질문이야
+            </p>
+          )}
         </div>
       </div>
     </section>

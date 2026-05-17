@@ -11,7 +11,7 @@ import type { LoopType } from "@/lib/types/quiz";
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  paymentType: "single" | "all" | "loop";
+  paymentType: "single" | "all" | "loop" | "loop_all";
   sceneIndex?: number;
   cardTitle?: string;
   /** loop 결제 시 필수. successUrl에 _loop_type으로 포함된다. */
@@ -33,45 +33,70 @@ const PaymentModal = ({
 
   const isSingle = paymentType === "single";
   const isLoop = paymentType === "loop";
-  const amount = isLoop ? 900 : isSingle ? 1900 : 4900;
-  const title = isLoop
-    ? `${cardTitle} 읽기`
-    : isSingle
-      ? `[${cardTitle}] 열기`
-      : "전체 흐름 열기";
+  const isLoopAll = paymentType === "loop_all";
+  const amount = isLoopAll ? 2200 : isLoop ? 900 : isSingle ? 1500 : 4900;
+  const title = isLoopAll
+    ? "전체 질문 깊게 읽기"
+    : isLoop
+      ? `${cardTitle} 읽기`
+      : isSingle
+        ? `[${cardTitle}] 열기`
+        : "전체 흐름 열기";
   const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || "";
 
   // 위젯 초기화 및 결제 수단 선택 UI 렌더링
   useEffect(() => {
     if (!isOpen || !containerRef.current) return;
 
+    // cancelled: 모달 닫힘/deps 변경 시 진행 중인 async 콜백을 무시하기 위한 플래그
+    // → React Strict Mode의 double-invoke 시에도 첫 번째 실행 결과를 버리고 두 번째만 반영
+    let cancelled = false;
+
     const initWidget = async () => {
       try {
-        // clientKey가 설정되지 않았으면 에러
         if (!clientKey) {
           setError("결제 설정이 올바르지 않아요");
           return;
         }
 
-        // 게스트 사용자로 위젯 로드
+        console.log("[Toss] loadPaymentWidget 시작 →", { paymentType, amount, loopType: loopType ?? null });
         const widget = await loadPaymentWidget(clientKey, ANONYMOUS);
+        console.log("[Toss] loadPaymentWidget 완료");
+
+        // cleanup이 먼저 실행됐으면 (모달 닫힘 or Strict Mode 첫 번째 실행) 중단
+        if (cancelled) return;
+
         widgetRef.current = widget;
 
-        // 결제 수단 선택 UI 렌더링 (필수)
+        console.log("[Toss] renderPaymentMethods 시작 →", { amount });
         await widget.renderPaymentMethods(
           "#payment-methods",
           { value: amount },
           { variantKey: "DEFAULT" },
         );
+        console.log("[Toss] renderPaymentMethods 완료");
 
-        setError(null);
+        if (!cancelled) setError(null);
       } catch (err) {
-        console.error("결제 위젯 초기화 실패:", err);
-        setError("결제 위젯 로드에 실패했어요");
+        if (!cancelled) {
+          // 에러 발생 단계와 raw object를 모두 출력: loadPaymentWidget 실패 vs renderPaymentMethods 실패 구분용
+          console.error("[Toss] 위젯 초기화 실패:", JSON.stringify(err, Object.getOwnPropertyNames(err as object)));
+          console.error("[Toss] 위젯 초기화 실패 raw:", err);
+          setError("결제 위젯 로드에 실패했어요");
+        }
       }
     };
 
     initWidget();
+
+    return () => {
+      cancelled = true;
+      // 이전 위젯 인스턴스 참조 해제: 재오픈 시 stale 인스턴스로 requestPayment 방지
+      widgetRef.current = null;
+      // Toss SDK가 DOM에 주입한 콘텐츠 초기화: 재오픈 시 renderPaymentMethods 충돌 방지
+      const methodsEl = document.getElementById("payment-methods");
+      if (methodsEl) methodsEl.innerHTML = "";
+    };
   }, [isOpen, clientKey, amount]);
 
   const handlePayment = async () => {
@@ -85,22 +110,35 @@ const PaymentModal = ({
 
     try {
       const orderId = `order_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-      const orderName = isLoop
-        ? `루프 리딩: ${cardTitle}`
-        : isSingle
-          ? `${cardTitle} 열기`
-          : "전체 흐름 열기";
+      const orderName = isLoopAll
+        ? "전체 질문 깊게 읽기"
+        : isLoop
+          ? (cardTitle ?? "")
+          : isSingle
+            ? `${cardTitle} 열기`
+            : "전체 흐름 열기";
 
       // 현재 페이지 URL (쿼리 제거)
       const baseUrl =
         typeof window !== "undefined" ? window.location.href.split("?")[0] : "";
 
-      // loop 결제: _loop_type 파라미터로 어떤 루프인지 전달
-      // scene 결제: _scene_index로 어떤 씬인지 전달 (기존 로직 유지)
-      const successUrl = isLoop
-        ? `${baseUrl}?_payment_type=loop&_loop_type=${loopType || ""}&_unlock=true`
-        : `${baseUrl}?_payment_type=${paymentType}&_scene_index=${sceneIndex || 0}&_unlock=true`;
+      // loop_all: 전체 루프 결제. loop: 개별 루프. 그 외: scene 결제
+      const successUrl = isLoopAll
+        ? `${baseUrl}?_payment_type=loop_all&_unlock=true`
+        : isLoop
+          ? `${baseUrl}?_payment_type=loop&_loop_type=${loopType || ""}&_unlock=true`
+          : `${baseUrl}?_payment_type=${paymentType}&_scene_index=${sceneIndex || 0}&_unlock=true`;
       const failUrl = `${baseUrl}?_payment_failed=true`;
+
+      // 결제 직전 파라미터 확인 (dev 디버깅용)
+      console.log("[Toss] requestPayment 직전:", {
+        paymentType,
+        amount,
+        orderName,
+        orderId,
+        successUrl,
+        failUrl,
+      });
 
       // 결제 요청 (필수: successUrl, failUrl)
       await widgetRef.current.requestPayment({
@@ -117,6 +155,9 @@ const PaymentModal = ({
     } catch (err) {
       // 결제 취소 또는 실패 (드물게 발생)
       const error = err as { code?: string; message?: string } | Error | null;
+      // raw error 출력: code, message, stack 모두 포함. "no healthy upstream" 원인 추적용.
+      console.error("[Toss] requestPayment 실패 raw:", err);
+      console.error("[Toss] requestPayment 실패 JSON:", JSON.stringify(err, Object.getOwnPropertyNames(err as object)));
       if (error && "code" in error && error.code === "USER_CANCEL") {
         setError("결제가 취소되었어요");
       } else if (error && "code" in error && error.code) {
@@ -125,7 +166,6 @@ const PaymentModal = ({
       } else {
         setError("결제 처리 중 오류가 발생했어요");
       }
-      console.error("결제 오류:", err);
     } finally {
       setIsProcessing(false);
     }
@@ -164,11 +204,13 @@ const PaymentModal = ({
                 {title}
               </h2>
               <p className="mb-8 text-sm text-highlight/50">
-                {isLoop
-                  ? "결과를 더 깊이 읽을 수 있어"
-                  : isSingle
-                    ? "이어서 읽을 수 있어"
-                    : "잠겨있는 모든 흐름을 열 수 있어"}
+                {isLoopAll
+                  ? "3개 질문을 한번에 깊게 읽을 수 있어"
+                  : isLoop
+                    ? "결과를 더 깊이 읽을 수 있어"
+                    : isSingle
+                      ? "이어서 읽을 수 있어"
+                      : "잠겨있는 모든 흐름을 열 수 있어"}
               </p>
 
               {/* 가격 */}

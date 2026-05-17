@@ -32,7 +32,8 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
 
     if (isQaMode) {
       const localSessionId = crypto.randomUUID();
-      router.push(`/analyze/${localSessionId}?content_id=${content.id}&qa=1`);
+      const loopFlag = searchParams.get("loop") === "1" ? "&loop=1" : "";
+      router.push(`/analyze/${localSessionId}?content_id=${content.id}&qa=1${loopFlag}`);
       return;
     }
 

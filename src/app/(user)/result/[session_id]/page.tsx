@@ -41,12 +41,18 @@ const ResultPage = ({ params }: PageProps) => {
   const [additionalReadings, setAdditionalReadings] = useState<AdditionalReading[]>([]);
   // QA mode: ?qa=1 또는 NEXT_PUBLIC_QA_MODE=true → 결제 없이 전체 씬 확인
   const [isQaMode, setIsQaMode] = useState(false);
+  // Loop QA mode: ?qa=1&loop=1 → 추가루프 CTA 표시 및 직접 생성 활성화
+  const [isLoopQaMode, setIsLoopQaMode] = useState(false);
 
   // ── Loop Reading 상태 ──────────────────────────────────────────────────
   const [loopAnswers, setLoopAnswers] = useState<Partial<Record<LoopType, LoopAnswer>>>({});
   const [loopLoading, setLoopLoading] = useState<LoopType | null>(null);
   const [loopError, setLoopError] = useState<LoopType | null>(null);
   const [activeLoopType, setActiveLoopType] = useState<LoopType | null>(null);
+  // loop_all 구매 후 순차 생성 대기 중 상태 (카드에 "구매 완료 · 대기 중" 표시용)
+  const [loopAllPurchased, setLoopAllPurchased] = useState(false);
+  // loop / loop_all 결제 후 AdditionalReadings 섹션 스크롤 트리거
+  const [pendingScrollToLoop, setPendingScrollToLoop] = useState(false);
 
   const sceneRefsMap = useRef<Record<number, HTMLDivElement | null>>({});
   const flowOverviewRef = useRef<HTMLDivElement | null>(null);
@@ -240,15 +246,19 @@ const ResultPage = ({ params }: PageProps) => {
         setScenes(allScenes);
 
         // ── QA mode 감지 ─────────────────────────────────────────
-        // ?qa=1 URL 파라미터 또는 NEXT_PUBLIC_QA_MODE=true 환경변수
-        // localStorage 상태를 건드리지 않고 메모리에서만 모든 씬 unlock
+        // ?qa=1: 전체 씬 unlock (결제 없이 확인)
+        // ?qa=1&loop=1: 추가로 추가루프 CTA 표시 및 직접 생성 활성화
+        const searchQuery = new URLSearchParams(window.location.search);
         const isQa =
-          new URLSearchParams(window.location.search).get("qa") === "1" ||
+          searchQuery.get("qa") === "1" ||
           process.env.NEXT_PUBLIC_QA_MODE === "true";
+        const isLoopQa = isQa && searchQuery.get("loop") === "1";
         setIsQaMode(isQa);
+        setIsLoopQaMode(isLoopQa);
 
         console.log(
           "[result] isQaMode=", isQa,
+          "isLoopQaMode=", isLoopQa,
           "| allScenes:", allScenes.length,
           "| paid scenes:", allScenes.filter(s => !s.is_free).map(s => `${s.scene_index}(msg=${s.messages?.length ?? "null"})`),
         );
@@ -442,7 +452,7 @@ const ResultPage = ({ params }: PageProps) => {
   // ── Loop Reading 생성 ──────────────────────────────────────────────────
   // 결제 성공 후 또는 재시도 시 호출. 결제 검증 없이 API를 직접 호출한다.
   const handleLoopUnlock = useCallback(
-    async (loopType: LoopType, loopTitle: string) => {
+    async (loopType: LoopType, loopTitle: string, skipScroll = false) => {
       if (!analyzeData) return;
       const sessionId = analyzeData.session_id;
 
@@ -453,7 +463,7 @@ const ResultPage = ({ params }: PageProps) => {
           const answer = JSON.parse(cached) as LoopAnswer;
           setLoopAnswers((prev) => ({ ...prev, [loopType]: answer }));
           setActiveLoopType(loopType);
-          window.history.replaceState({}, "", window.location.pathname);
+          // URL cleanup은 Phase 2에서 처리 → 여기서 replaceState 불필요
           return;
         } catch {
           localStorage.removeItem(`veil_loop_${loopType}_${sessionId}`);
@@ -516,16 +526,12 @@ const ResultPage = ({ params }: PageProps) => {
 
         setLoopAnswers((prev) => ({ ...prev, [loopType]: answer }));
         setActiveLoopType(loopType);
-        window.history.replaceState({}, "", window.location.pathname);
+        // URL cleanup은 Phase 2에서 처리 → 여기서 replaceState 불필요 (중복 호출 시 Next.js scroll reset 유발)
 
-        setTimeout(() => {
-          if (loopReadingsRef.current) {
-            loopReadingsRef.current.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-          }
-        }, 300);
+        if (!skipScroll) {
+          // useEffect + double RAF로 스크롤: React 페인트 이후 실행 보장
+          setPendingScrollToLoop(true);
+        }
       } catch (err) {
         console.error("[loop-unlock] 생성 실패:", err);
         setLoopError(loopType);
@@ -537,7 +543,7 @@ const ResultPage = ({ params }: PageProps) => {
     [analyzeData],
   );
 
-  // loop 결제 모달 열기
+  // loop 결제 모달 열기 (비QA mode 전용)
   const handlePurchaseLoop = useCallback((reading: AdditionalReading) => {
     setPaymentModal({
       isOpen: true,
@@ -547,6 +553,38 @@ const ResultPage = ({ params }: PageProps) => {
       loopType: reading.loopType,
     });
   }, []);
+
+  // loop 카드 클릭 핸들러
+  // loop QA mode: 바텀시트 없이 직접 생성 / 비QA mode: 결제 모달 열기
+  const handleLoopCardClick = useCallback(
+    (reading: AdditionalReading) => {
+      if (isLoopQaMode) {
+        void handleLoopUnlock(reading.loopType, reading.title.replace(/\n/g, " "));
+      } else {
+        handlePurchaseLoop(reading);
+      }
+    },
+    [isLoopQaMode, handleLoopUnlock, handlePurchaseLoop],
+  );
+
+  // "전체 질문 깊게 읽기" 클릭 핸들러
+  // loop QA mode: 잠긴 모든 loop reading 직접 생성 / 비QA mode: loop_all 결제 모달 열기
+  const handlePurchaseAllLoops = useCallback(() => {
+    if (isLoopQaMode) {
+      const locked = additionalReadings.filter((r) => !loopAnswers[r.loopType]);
+      for (const reading of locked) {
+        void handleLoopUnlock(reading.loopType, reading.title.replace(/\n/g, " "));
+      }
+    } else {
+      setPaymentModal({
+        isOpen: true,
+        type: "loop_all",
+        sceneIndex: 0,
+        cardTitle: "전체 질문 깊게 읽기",
+        loopType: null,
+      });
+    }
+  }, [isLoopQaMode, additionalReadings, loopAnswers, handleLoopUnlock]);
 
   // loop 생성 재시도 (결제 없이 API 재호출)
   const handleRetryLoopGenerate = useCallback(
@@ -588,7 +626,7 @@ const ResultPage = ({ params }: PageProps) => {
       isProcessingPayment.current = true;
 
       if (paymentType === "loop") {
-        // ── Loop unlock flow ─────────────────────────────────────────
+        // ── Loop unlock flow (개별) ─────────────────────────────────
         const loopTypeParam = searchParams.get("_loop_type") as LoopType | null;
         if (!loopTypeParam) {
           isProcessingPayment.current = false;
@@ -599,9 +637,28 @@ const ResultPage = ({ params }: PageProps) => {
         );
         const loopTitle = reading?.title.replace(/\n/g, " ") ?? loopTypeParam;
 
+        // URL 먼저 정리: replaceState를 handleLoopUnlock 전에 호출해
+        // 내부 replaceState가 같은 URL에서 실행 → Next.js 스크롤 리셋 방지
+        window.history.replaceState({}, "", window.location.pathname);
         handleLoopUnlock(loopTypeParam, loopTitle).finally(() => {
           isProcessingPayment.current = false;
         });
+      } else if (paymentType === "loop_all") {
+        // ── Loop unlock flow (전체) ─────────────────────────────────
+        // URL cleanup: loop_all은 Phase 2에서 한 번만 처리
+        window.history.replaceState({}, "", window.location.pathname);
+        setLoopAllPurchased(true);
+        // "전체 질문을 열었어..." 배너가 렌더된 직후 스크롤 (생성 완료 대기 없음)
+        setPendingScrollToLoop(true);
+        const unlockAll = async () => {
+          for (const r of additionalReadings) {
+            // skipScroll=true: 개별 handleLoopUnlock에서 스크롤 트리거 방지
+            await handleLoopUnlock(r.loopType, r.title.replace(/\n/g, " "), true);
+          }
+          setLoopAllPurchased(false);
+          isProcessingPayment.current = false;
+        };
+        void unlockAll();
       } else {
         // ── Scene unlock flow (기존 로직 유지) ───────────────────────
         const sceneIndex = parseInt(
@@ -696,6 +753,26 @@ const ResultPage = ({ params }: PageProps) => {
     return () => observer.disconnect();
   }, []);
 
+  // loop 결제 후 AdditionalReadings 섹션 스크롤
+  // useEffect + double RAF: React 페인트 이후 실행 → replaceState/scroll restoration보다 나중에 보장
+  useEffect(() => {
+    if (!pendingScrollToLoop) return;
+    let raf2: number | undefined;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        const el =
+          document.getElementById("loop-readings-section") ??
+          loopReadingsRef.current;
+        el?.scrollIntoView({ behavior: "smooth", block: "start" });
+        setPendingScrollToLoop(false);
+      });
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2 !== undefined) cancelAnimationFrame(raf2);
+    };
+  }, [pendingScrollToLoop]);
+
   // Scroll 기반으로 현재 활성 scene 추적 (viewport center 기준)
   useEffect(() => {
     if (scenes.length === 0) return;
@@ -752,7 +829,7 @@ const ResultPage = ({ params }: PageProps) => {
 
   const [paymentModal, setPaymentModal] = useState<{
     isOpen: boolean;
-    type: "single" | "all" | "loop";
+    type: "single" | "all" | "loop" | "loop_all";
     sceneIndex: number;
     cardTitle: string;
     loopType: LoopType | null;
@@ -831,6 +908,12 @@ const ResultPage = ({ params }: PageProps) => {
   }
 
   const paidSceneCount = scenes.filter((s) => !s.is_free).length;
+
+  // 유료씬 전체 구매 완료 여부: AdditionalReadings 노출 gate
+  const paidScenes = scenes.filter((s) => !s.is_free);
+  const allPaidUnlocked =
+    paidScenes.length > 0 &&
+    paidScenes.every((s) => unlockedScenes.includes(s.scene_index));
 
   return (
     <div
@@ -1009,18 +1092,26 @@ const ResultPage = ({ params }: PageProps) => {
             );
           })()}
 
-          {/* 추가 리딩 카드 (loop readings) */}
-          <div ref={loopReadingsRef}>
-            <AdditionalReadings
-              readings={additionalReadings}
-              loopAnswers={loopAnswers}
-              loopLoading={loopLoading}
-              loopError={loopError}
-              activeLoopType={activeLoopType}
-              onPurchaseSingle={handlePurchaseLoop}
-              onRetry={handleRetryLoopGenerate}
-            />
-          </div>
+          {/* 추가 리딩 카드 (loop readings)
+              - 일반 mode: 유료씬 전체 구매 완료 시에만 표시
+              - ?qa=1: 숨김
+              - ?qa=1&loop=1: 표시 (직접 생성) */}
+          {(isLoopQaMode || (!isQaMode && allPaidUnlocked)) && (
+            <div ref={loopReadingsRef} id="loop-readings-section">
+              <AdditionalReadings
+                readings={additionalReadings}
+                loopAnswers={loopAnswers}
+                loopLoading={loopLoading}
+                loopError={loopError}
+                activeLoopType={activeLoopType}
+                loopAllPurchased={loopAllPurchased}
+                onPurchaseSingle={handleLoopCardClick}
+                onPurchaseAll={handlePurchaseAllLoops}
+                onRetry={handleRetryLoopGenerate}
+                isQaMode={isLoopQaMode}
+              />
+            </div>
+          )}
         </div>
 
         {/* 결과 페이지 하단 액션 */}
@@ -1030,9 +1121,12 @@ const ResultPage = ({ params }: PageProps) => {
         />
       </main>
 
-      {/* 결제 모달: QA mode에서는 렌더 자체를 제거 */}
-      {!isQaMode && (
+      {/* 결제 모달: QA mode이거나 닫혀있을 때 완전 언마운트
+          isOpen=false → DOM에서 제거(null 반환이 아님) → Toss SDK 인스턴스 격리
+          key → 결제 타입/대상 전환 시 강제 remount → 이전 위젯 상태 오염 차단 */}
+      {!isQaMode && paymentModal.isOpen && (
         <PaymentModal
+          key={`${paymentModal.type}-${paymentModal.sceneIndex}-${paymentModal.loopType ?? "none"}-${paymentModal.cardTitle ?? ""}`}
           isOpen={paymentModal.isOpen}
           onClose={handleClosePaymentModal}
           paymentType={paymentModal.type}
