@@ -6,6 +6,7 @@ import {
   ANONYMOUS,
   type PaymentWidgetInstance,
 } from "@tosspayments/payment-widget-sdk";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { LoopType } from "@/lib/types/quiz";
 
 interface PaymentModalProps {
@@ -34,8 +35,6 @@ const PaymentModal = ({
   const isSingle = paymentType === "single";
   const isLoop = paymentType === "loop";
   const isLoopAll = paymentType === "loop_all";
-  // single/all은 비회원 정보 입력 단계가 필요 (loop 계열은 생략)
-  const needsGuestInfo = paymentType === "single" || paymentType === "all";
 
   const amount = isLoopAll ? 2200 : isLoop ? 900 : isSingle ? 1500 : 4900;
   const title = isLoopAll
@@ -47,14 +46,42 @@ const PaymentModal = ({
         : "전체 흐름 열기";
   const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || "";
 
-  // single/all: 구매 방식 선택 → (비회원) 전화번호/PIN 입력 → 결제 위젯
-  // loop/loop_all: 바로 결제 위젯
-  const [step, setStep] = useState<"purchase_method" | "guest_info" | "payment">(
-    needsGuestInfo ? "purchase_method" : "payment",
-  );
+  // 로그인 상태 감지: true = 회원, false = 비회원, null = 확인 중
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  // single/all이고 비회원이면: purchase_method → guest_info → payment
+  // single/all이고 회원이면: payment (바로)
+  // loop/loop_all: payment (바로)
+  const [step, setStep] = useState<"purchase_method" | "guest_info" | "payment">("payment");
   const [guestPhone, setGuestPhone] = useState("");
   const [guestPin, setGuestPin] = useState("");
   const [guestInfoError, setGuestInfoError] = useState<string | null>(null);
+
+  // 모달 오픈 시 로그인 상태 확인 → step 초기화
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const checkSession = async () => {
+      try {
+        const supabase = createSupabaseBrowserClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const loggedIn = !!session?.user;
+        setIsLoggedIn(loggedIn);
+
+        const isSingleOrAll = paymentType === "single" || paymentType === "all";
+        // 비회원 + single/all: 구매 방식 선택 step부터 시작
+        setStep(isSingleOrAll && !loggedIn ? "purchase_method" : "payment");
+      } catch {
+        // 확인 실패 시 안전하게 비회원 경로로 fallback
+        setIsLoggedIn(false);
+        if (paymentType === "single" || paymentType === "all") {
+          setStep("purchase_method");
+        }
+      }
+    };
+
+    void checkSession();
+  }, [isOpen, paymentType]);
 
   const formatPhone = (value: string): string => {
     const d = value.replace(/\D/g, "");
@@ -83,8 +110,9 @@ const PaymentModal = ({
 
   // 위젯 초기화: payment 단계에서만 실행
   // step이 "guest_info"일 때는 #payment-methods DOM이 없으므로 초기화 skip
+  // isLoggedIn === null: 세션 확인 중 → 초기화 skip (step이 아직 확정되지 않은 상태)
   useEffect(() => {
-    if (!isOpen || step !== "payment" || !containerRef.current) return;
+    if (!isOpen || step !== "payment" || isLoggedIn === null || !containerRef.current) return;
 
     // cancelled: 모달 닫힘/deps 변경 시 진행 중인 async 콜백을 무시하기 위한 플래그
     let cancelled = false;
@@ -138,7 +166,7 @@ const PaymentModal = ({
       const methodsEl = document.getElementById("payment-methods");
       if (methodsEl) methodsEl.innerHTML = "";
     };
-  }, [isOpen, step, clientKey, amount]);
+  }, [isOpen, step, clientKey, amount, isLoggedIn]);
 
   const handlePayment = async () => {
     if (!widgetRef.current) {
@@ -209,6 +237,17 @@ const PaymentModal = ({
   };
 
   if (!isOpen) return null;
+
+  // 세션 확인 중: 빈 모달 껍데기만 렌더 (step이 확정되기 전에 위젯이 마운트되지 않도록)
+  if (isLoggedIn === null) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+        <div className="w-full max-w-md rounded-2xl bg-background border border-white/10 flex items-center justify-center p-12">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-secondary/30 border-t-secondary" />
+        </div>
+      </div>
+    );
+  }
 
   const isGuestInfoValid =
     /^\d{10,11}$/.test(guestPhone.replace(/\D/g, "")) &&

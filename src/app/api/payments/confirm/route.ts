@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
 import bcrypt from "bcryptjs";
-import { createServiceRoleClient } from "@/lib/supabase/server";
+import { createServiceRoleClient, createSupabaseServerClient } from "@/lib/supabase/server";
 import { getSceneConfig } from "@/lib/data/scene-configs";
 
 const UUID_REGEX =
@@ -15,6 +15,7 @@ interface GuestCredentialRow {
 
 interface SessionRow {
   id: string;
+  user_id: string | null;
   guest_id: string | null;
   contents: { slug: string } | null;
 }
@@ -36,8 +37,9 @@ interface ConfirmBody {
   session_id: string;
   payment_type: "single" | "all";
   scene_index?: number;
-  guest_phone: string;
-  guest_pin: string;
+  // 비회원 경로에서만 전달됨. 회원 경로에서는 생략.
+  guest_phone?: string;
+  guest_pin?: string;
 }
 
 // ── 응답 타입 ─────────────────────────────────────────────────────────────
@@ -50,13 +52,19 @@ const hashSHA256 = (value: string): string =>
 
 /**
  * POST /api/payments/confirm
- * 비회원 결제 성공 확인 및 DB 저장.
+ * 결제 성공 확인 및 DB 저장. 회원/비회원 경로 분기.
  * Toss 실제 서버 검증은 수행하지 않음 (mock phase).
  *
- * - guest_credentials UPSERT (phone_hash 기준, 기존 있으면 PIN 검증)
- * - analysis_sessions.guest_id 연결 (null인 경우에만 UPDATE)
- * - orders INSERT (ON CONFLICT id → 업데이트, 멱등)
- * - scene_unlocks INSERT (ON CONFLICT session_id+scene_index → 무시, 멱등)
+ * [회원 경로] cookie 세션 → user_id 추출
+ *   - guest_credentials skip
+ *   - orders.user_id = user.id
+ * [비회원 경로] guest_phone + guest_pin 필수
+ *   - guest_credentials UPSERT (phone_hash 기준, 기존 있으면 PIN 검증)
+ *   - orders.guest_id = guestId
+ * 공통:
+ *   - analysis_sessions.(user_id|guest_id) 연결 (null인 경우에만 UPDATE)
+ *   - orders INSERT (ON CONFLICT id → 업데이트, 멱등)
+ *   - scene_unlocks INSERT (ON CONFLICT session_id+scene_index → 무시, 멱등)
  */
 export const POST = async (req: NextRequest): Promise<NextResponse> => {
   try {
@@ -73,16 +81,8 @@ export const POST = async (req: NextRequest): Promise<NextResponse> => {
       guest_pin,
     } = body;
 
-    // ── 입력 검증 ──────────────────────────────────────────────────────────
-    if (
-      !payment_key ||
-      !order_id ||
-      !amount ||
-      !session_id ||
-      !payment_type ||
-      !guest_phone ||
-      !guest_pin
-    ) {
+    // ── 공통 필수 파라미터 검증 ────────────────────────────────────────────
+    if (!payment_key || !order_id || !amount || !session_id || !payment_type) {
       return NextResponse.json(
         { error: "필수 파라미터가 없어" },
         { status: 400 },
@@ -110,19 +110,38 @@ export const POST = async (req: NextRequest): Promise<NextResponse> => {
       );
     }
 
-    const phoneDigits = guest_phone.replace(/\D/g, "");
-    if (!/^\d{10,11}$/.test(phoneDigits)) {
+    // ── 회원 여부 확인 (cookie 세션 기반) ─────────────────────────────────
+    // getUser()는 Supabase Auth 서버에 실제 검증 요청 → 토큰 위변조 차단
+    const authClient = await createSupabaseServerClient();
+    const { data: { user } } = await authClient.auth.getUser();
+
+    const isUserPath = !!user?.id;
+    const isGuestPath = !isUserPath && !!guest_phone && !!guest_pin;
+
+    if (!isUserPath && !isGuestPath) {
+      // 비회원인데 phone/pin도 없음 → 인증 수단 없음
       return NextResponse.json(
-        { error: "전화번호 형식이 올바르지 않아" },
-        { status: 400 },
+        { error: "로그인이 필요하거나 전화번호와 비밀번호를 입력해줘" },
+        { status: 401 },
       );
     }
 
-    if (!/^\d{4}$/.test(guest_pin)) {
-      return NextResponse.json(
-        { error: "비밀번호는 4자리 숫자야" },
-        { status: 400 },
-      );
+    // 비회원 경로: phone/pin 형식 검증
+    let phoneDigits = "";
+    if (isGuestPath) {
+      phoneDigits = guest_phone!.replace(/\D/g, "");
+      if (!/^\d{10,11}$/.test(phoneDigits)) {
+        return NextResponse.json(
+          { error: "전화번호 형식이 올바르지 않아" },
+          { status: 400 },
+        );
+      }
+      if (!/^\d{4}$/.test(guest_pin!)) {
+        return NextResponse.json(
+          { error: "비밀번호는 4자리 숫자야" },
+          { status: 400 },
+        );
+      }
     }
 
     const supabase = createServiceRoleClient();
@@ -130,7 +149,7 @@ export const POST = async (req: NextRequest): Promise<NextResponse> => {
     // ── 1. 세션 존재 확인 ──────────────────────────────────────────────────
     const { data: sessionRaw, error: sessionError } = await supabase
       .from("analysis_sessions")
-      .select("id, guest_id, contents(slug)")
+      .select("id, user_id, guest_id, contents(slug)")
       .eq("id", session_id)
       .maybeSingle();
 
@@ -174,67 +193,77 @@ export const POST = async (req: NextRequest): Promise<NextResponse> => {
       );
     }
 
-    // ── 3. guest_credentials UPSERT ──────────────────────────────────────
-    // 기존 credential이 있으면 PIN 검증, 없으면 새로 생성
-    const phoneHash = hashSHA256(phoneDigits);
-
-    const { data: existingCred } = await supabase
-      .from("guest_credentials")
-      .select("id, pin_hash")
-      .eq("phone_hash", phoneHash)
-      .maybeSingle();
-
-    let guestId: string;
-
-    if (existingCred) {
-      const cred = existingCred as GuestCredentialRow;
-      const isPinValid = await bcrypt.compare(guest_pin, cred.pin_hash);
-      if (!isPinValid) {
-        return NextResponse.json(
-          {
-            error:
-              "이 전화번호에 연결된 비밀번호가 달라. 이전에 사용한 비밀번호를 입력해줘",
-          },
-          { status: 401 },
-        );
-      }
-      guestId = cred.id;
-    } else {
-      const pinHash = await bcrypt.hash(guest_pin, 10);
-      const { data: newCred, error: credError } = await supabase
-        .from("guest_credentials")
-        .insert({ phone_hash: phoneHash, pin_hash: pinHash })
-        .select("id")
-        .single();
-
-      if (credError || !newCred) {
-        console.error("[confirm] guest_credentials 생성 실패:", credError);
-        return NextResponse.json(
-          { error: "계정 생성에 실패했어" },
-          { status: 500 },
-        );
-      }
-      guestId = (newCred as { id: string }).id;
-    }
-
-    // ── 4. analysis_sessions.guest_id 연결 (null인 경우에만) ─────────────
-    if (!session.guest_id) {
+    // ── 3-A. [회원 경로] analysis_sessions.user_id 연결 (null인 경우에만) ─
+    if (isUserPath && !session.user_id) {
       const { error: updateError } = await supabase
         .from("analysis_sessions")
-        .update({ guest_id: guestId })
+        .update({ user_id: user!.id })
         .eq("id", session_id)
-        .is("guest_id", null);
+        .is("user_id", null);
 
       if (updateError) {
-        // 비치명적: 계속 진행 (이미 다른 guest_id로 연결됐을 수 있음)
-        console.warn(
-          "[confirm] analysis_sessions.guest_id 업데이트 실패:",
-          updateError,
-        );
+        console.warn("[confirm] analysis_sessions.user_id 업데이트 실패:", updateError);
       }
     }
 
-    // ── 5. unlock 대상 scene_indexes 결정 ───────────────────────────────
+    // ── 3-B. [비회원 경로] guest_credentials UPSERT ───────────────────────
+    let guestId: string | null = null;
+
+    if (isGuestPath) {
+      const phoneHash = hashSHA256(phoneDigits);
+
+      const { data: existingCred } = await supabase
+        .from("guest_credentials")
+        .select("id, pin_hash")
+        .eq("phone_hash", phoneHash)
+        .maybeSingle();
+
+      if (existingCred) {
+        const cred = existingCred as GuestCredentialRow;
+        const isPinValid = await bcrypt.compare(guest_pin!, cred.pin_hash);
+        if (!isPinValid) {
+          return NextResponse.json(
+            {
+              error:
+                "이 전화번호에 연결된 비밀번호가 달라. 이전에 사용한 비밀번호를 입력해줘",
+            },
+            { status: 401 },
+          );
+        }
+        guestId = cred.id;
+      } else {
+        const pinHash = await bcrypt.hash(guest_pin!, 10);
+        const { data: newCred, error: credError } = await supabase
+          .from("guest_credentials")
+          .insert({ phone_hash: phoneHash, pin_hash: pinHash })
+          .select("id")
+          .single();
+
+        if (credError || !newCred) {
+          console.error("[confirm] guest_credentials 생성 실패:", credError);
+          return NextResponse.json(
+            { error: "계정 생성에 실패했어" },
+            { status: 500 },
+          );
+        }
+        guestId = (newCred as { id: string }).id;
+      }
+
+      // analysis_sessions.guest_id 연결 (null인 경우에만)
+      if (!session.guest_id) {
+        const { error: updateError } = await supabase
+          .from("analysis_sessions")
+          .update({ guest_id: guestId })
+          .eq("id", session_id)
+          .is("guest_id", null);
+
+        if (updateError) {
+          console.warn("[confirm] analysis_sessions.guest_id 업데이트 실패:", updateError);
+        }
+      }
+    }
+
+    // ── 4. unlock 대상 scene_indexes 결정 ───────────────────────────────
     let sceneIndexesToUnlock: number[];
 
     if (payment_type === "single") {
@@ -246,13 +275,13 @@ export const POST = async (req: NextRequest): Promise<NextResponse> => {
         .map((s) => s.index);
     }
 
-    // ── 6. orders UPSERT ─────────────────────────────────────────────────
-    // 이미 pending 상태인 row가 있으면 paid로 업데이트, 없으면 새로 생성
+    // ── 5. orders UPSERT ─────────────────────────────────────────────────
     const { error: orderError } = await supabase.from("orders").upsert(
       {
         id: order_id,
         session_id,
-        guest_id: guestId,
+        user_id: isUserPath ? user!.id : null,
+        guest_id: isGuestPath ? guestId : null,
         purchase_type: payment_type,
         target_scene_index: payment_type === "single" ? (scene_index ?? null) : null,
         amount,
@@ -271,7 +300,7 @@ export const POST = async (req: NextRequest): Promise<NextResponse> => {
       );
     }
 
-    // ── 7. scene_unlocks INSERT (멱등) ──────────────────────────────────
+    // ── 6. scene_unlocks INSERT (멱등) ──────────────────────────────────
     const unlockRows = sceneIndexesToUnlock.map((idx) => ({
       session_id,
       scene_index: idx,

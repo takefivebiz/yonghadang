@@ -742,22 +742,14 @@ const ResultPage = ({ params }: PageProps) => {
         setIsPaidGenerationRecovery(isRecovery);
         setPaidGenerationLoading(true);
 
-        // ── 비회원 결제 confirm → DB 저장 후 generatePaidScenes ──────
+        // ── 결제 confirm → DB 저장 후 generatePaidScenes ─────────────
+        // phone/pin 존재: 비회원 경로. 없음: 회원 경로 (cookie 세션으로 처리).
         // confirm 실패 시 unlock 중단. sessionStorage 정보는 성공 시에만 삭제.
         const runConfirmAndUnlock = async () => {
           const phone = sessionStorage.getItem("veil_pending_phone");
           const pin = sessionStorage.getItem("veil_pending_pin");
 
-          if (!phone || !pin) {
-            console.error("[confirm] sessionStorage에 결제 정보 없음");
-            setPaymentConfirmError(
-              "결제 확인 정보가 없어. 전화번호와 비밀번호를 다시 입력하고 결제해줘",
-            );
-            setPaidGenerationLoading(false);
-            localStorage.removeItem(pendingKey);
-            isProcessingPayment.current = false;
-            return;
-          }
+          const isGuestPath = !!phone && !!pin;
 
           try {
             const confirmRes = await fetch("/api/payments/confirm", {
@@ -772,8 +764,9 @@ const ResultPage = ({ params }: PageProps) => {
                 ...(paymentType === "single" && sceneIndex > 0
                   ? { scene_index: sceneIndex }
                   : {}),
-                guest_phone: phone,
-                guest_pin: pin,
+                ...(isGuestPath
+                  ? { guest_phone: phone, guest_pin: pin }
+                  : {}),
               }),
             });
 
@@ -783,8 +776,10 @@ const ResultPage = ({ params }: PageProps) => {
             }
 
             // 성공 시에만 sessionStorage 정리 (실패 시에는 재시도 가능하도록 유지)
-            sessionStorage.removeItem("veil_pending_phone");
-            sessionStorage.removeItem("veil_pending_pin");
+            if (isGuestPath) {
+              sessionStorage.removeItem("veil_pending_phone");
+              sessionStorage.removeItem("veil_pending_pin");
+            }
           } catch (err) {
             const msg =
               err instanceof Error
