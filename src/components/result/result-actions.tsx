@@ -5,13 +5,12 @@ import Link from "next/link";
 import { CONTENTS } from "@/lib/data/contents";
 
 interface ResultActionsProps {
-  sessionId: string;
   contentId: string;
   // share_token 기반 공유 URL. null이면 공유 버튼 비활성 (로딩 중 또는 fetch 실패).
   shareToken: string | null;
 }
 
-const ResultActions = ({ sessionId: _sessionId, contentId, shareToken }: ResultActionsProps) => {
+const ResultActions = ({ contentId, shareToken }: ResultActionsProps) => {
   const [copyToast, setCopyToast] = useState(false);
 
   const baseUrl =

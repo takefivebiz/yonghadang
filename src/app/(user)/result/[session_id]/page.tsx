@@ -1194,7 +1194,6 @@ const ResultPage = ({ params }: PageProps) => {
 
         {/* 결과 페이지 하단 액션 */}
         <ResultActions
-          sessionId={analyzeData.session_id}
           contentId={analyzeData.content_id}
           shareToken={shareToken}
         />
