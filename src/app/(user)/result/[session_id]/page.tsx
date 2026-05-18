@@ -44,6 +44,9 @@ const ResultPage = ({ params }: PageProps) => {
   // Loop QA mode: ?qa=1&loop=1 → 추가루프 CTA 표시 및 직접 생성 활성화
   const [isLoopQaMode, setIsLoopQaMode] = useState(false);
 
+  // share_token: ResultActions 공유 URL 생성용. 비동기 조회, 실패 시 null → 버튼 비활성.
+  const [shareToken, setShareToken] = useState<string | null>(null);
+
   // ── Loop Reading 상태 ──────────────────────────────────────────────────
   const [loopAnswers, setLoopAnswers] = useState<Partial<Record<LoopType, LoopAnswer>>>({});
   const [loopLoading, setLoopLoading] = useState<LoopType | null>(null);
@@ -789,6 +792,25 @@ const ResultPage = ({ params }: PageProps) => {
   ]);
 
   // 네비게이션 메뉴 열림 상태 감지 (Progress Indicator 숨기기)
+  // analyzeData 로드 후 share_token 조회. 실패 시 null 유지 → ResultActions 버튼 비활성.
+  useEffect(() => {
+    if (!analyzeData) return;
+    const fetchShareToken = async () => {
+      try {
+        const res = await fetch(
+          `/api/sessions/${analyzeData.session_id}/share-token`,
+        );
+        if (res.ok) {
+          const data = (await res.json()) as { share_token: string };
+          setShareToken(data.share_token);
+        }
+      } catch {
+        // 공유 버튼 비활성으로 처리 (에러 무시)
+      }
+    };
+    void fetchShareToken();
+  }, [analyzeData]);
+
   useEffect(() => {
     const header = document.querySelector("header");
     if (!header) return;
@@ -1174,6 +1196,7 @@ const ResultPage = ({ params }: PageProps) => {
         <ResultActions
           sessionId={analyzeData.session_id}
           contentId={analyzeData.content_id}
+          shareToken={shareToken}
         />
       </main>
 

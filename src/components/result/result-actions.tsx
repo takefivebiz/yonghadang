@@ -7,37 +7,28 @@ import { CONTENTS } from "@/lib/data/contents";
 interface ResultActionsProps {
   sessionId: string;
   contentId: string;
+  // share_token 기반 공유 URL. null이면 공유 버튼 비활성 (로딩 중 또는 fetch 실패).
+  shareToken: string | null;
 }
 
-const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
+const ResultActions = ({ sessionId: _sessionId, contentId, shareToken }: ResultActionsProps) => {
   const [copyToast, setCopyToast] = useState(false);
 
-  // 공유 URL 생성 (현재: session_id = share_id)
-  const shareId = sessionId;
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL_PRODUCTION || "https://veil.app";
-  const shareUrl = `${baseUrl}/share/${shareId}`;
+  // share_token이 없으면 공유 버튼 비활성
+  const shareUrl = shareToken ? `${baseUrl}/share/${shareToken}` : null;
 
   // 카카오 공유
   const handleShareKakao = () => {
+    if (!shareUrl) return;
     // TODO: [공유 기능] 카카오 SDK 연동
-    // if (window.Kakao) {
-    //   window.Kakao.Share.sendDefault({
-    //     objectType: 'feed',
-    //     content: {
-    //       title: '내 에너지 분석 결과',
-    //       imageUrl: `${baseUrl}/api/og/share/${shareId}`,
-    //       link: { mobileWebUrl: shareUrl, webUrl: shareUrl },
-    //     },
-    //   });
-    // } else {
-    // 현재는 공유 URL로 대체
     window.open(shareUrl, "_blank");
-    // }
   };
 
   // X 공유
   const handleShareX = () => {
+    if (!shareUrl) return;
     const content = CONTENTS.find((c) => c.id === contentId);
     const shareText = content
       ? `${content.title.replace(/\n/g, " ")} ${content.subtitle}`
@@ -48,12 +39,12 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
 
   // 링크 복사
   const handleCopyLink = async () => {
+    if (!shareUrl) return;
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopyToast(true);
       setTimeout(() => setCopyToast(false), 2000);
     } catch {
-      // 클립보드 복사 실패 시 임시 input으로 복사
       const input = document.createElement("input");
       input.value = shareUrl;
       document.body.appendChild(input);
@@ -64,6 +55,10 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
       setTimeout(() => setCopyToast(false), 2000);
     }
   };
+
+  const btnStyle = shareUrl
+    ? "opacity-50 hover:opacity-80"
+    : "opacity-20 cursor-not-allowed";
 
   return (
     <div className="w-full max-w-2xl mx-auto px-6 py-3 space-y-8 mb-10">
@@ -92,7 +87,8 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
         <button
           data-testid="share-btn-kakao"
           onClick={handleShareKakao}
-          className="p-3 transition-opacity duration-200 opacity-50 hover:opacity-80"
+          disabled={!shareUrl}
+          className={`p-3 transition-opacity duration-200 ${btnStyle}`}
         >
           <svg
             className="w-5 h-5"
@@ -108,7 +104,8 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
         <button
           data-testid="share-btn-x"
           onClick={handleShareX}
-          className="p-3 transition-opacity duration-200 opacity-50 hover:opacity-80"
+          disabled={!shareUrl}
+          className={`p-3 transition-opacity duration-200 ${btnStyle}`}
         >
           <svg
             className="w-5 h-5"
@@ -124,7 +121,8 @@ const ResultActions = ({ sessionId, contentId }: ResultActionsProps) => {
         <button
           data-testid="share-btn-copy"
           onClick={handleCopyLink}
-          className="p-3 transition-opacity duration-200 opacity-50 hover:opacity-80"
+          disabled={!shareUrl}
+          className={`p-3 transition-opacity duration-200 ${btnStyle}`}
         >
           <svg
             className="w-5 h-5"

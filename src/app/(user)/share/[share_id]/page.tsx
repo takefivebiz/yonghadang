@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { getSceneConfig } from "@/lib/data/scene-configs";
 import { ResultScene } from "@/lib/types/result";
-import { AnalyzeAnswers } from "@/lib/types/analyze";
 import { CONTENTS } from "@/lib/data/contents";
 import SceneContent from "@/components/result/scene-content";
 
@@ -13,8 +12,15 @@ interface PageProps {
   params: Promise<{ share_id: string }>;
 }
 
+interface ShareApiResponse {
+  session_id: string;
+  content_id: string; // contents.slug (e.g. "love-1")
+  free_scenes: ResultScene[];
+}
+
 const ShareResultPage = ({ params }: PageProps) => {
-  const [analyzeData, setAnalyzeData] = useState<AnalyzeAnswers | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [contentId, setContentId] = useState<string | null>(null);
   // 무료씬만 저장. 유료씬 messages는 절대 state에 넣지 않는다.
   const [freeScenes, setFreeScenes] = useState<ResultScene[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,11 +29,10 @@ const ShareResultPage = ({ params }: PageProps) => {
   const sceneRefsMap = useRef<Record<number, HTMLDivElement | null>>({});
 
   // share는 public teaser이므로 인증 후 돌아올 목적지는 result (canonical viewer).
-  // share_id = session_id 가정 유지. 향후 share_token 분리 시 수정 필요.
   const handleNavigateWithRedirect = (targetPath: string) => {
     if (typeof window !== "undefined") {
-      const redirectTo = analyzeData
-        ? `/result/${analyzeData.session_id}`
+      const redirectTo = sessionId
+        ? `/result/${sessionId}`
         : window.location.href;
       sessionStorage.setItem("redirect_to", redirectTo);
       window.location.href = targetPath;
@@ -37,56 +42,35 @@ const ShareResultPage = ({ params }: PageProps) => {
   useEffect(() => {
     const initData = async () => {
       try {
-        const param = await params;
+        const { share_id } = await params;
 
-        if (typeof window !== "undefined") {
-          // TODO: [백엔드 연동] share_id로 결과 데이터 조회 API 호출
-          // 현재는 share_id = session_id로 가정하고 localStorage에서 조회
-          const stored = localStorage.getItem(
-            `veil_analysis_${param.share_id}`,
-          );
-          if (!stored) {
-            setError("공유된 결과를 찾을 수 없어");
-            setLoading(false);
-            return;
-          }
-          const data = JSON.parse(stored) as AnalyzeAnswers;
-          setAnalyzeData(data);
+        const res = await fetch(`/api/share/${share_id}`);
 
-          // DB 무료씬 조회: is_free === true만 사용. 유료씬 messages는 절대 state에 넣지 않는다.
-          // 공유 페이지는 실제 생성 결과만 보여줘야 하므로 mock fallback 없음.
-          // fetch 실패 / non-ok / 빈 결과이면 에러 표시.
-          let loadedFreeScenes: ResultScene[] = [];
-          try {
-            const dbRes = await fetch(
-              `/api/analyze/${param.share_id}/result-scenes`,
-            );
-            if (dbRes.ok) {
-              const dbData = (await dbRes.json()) as { scenes: ResultScene[] };
-              loadedFreeScenes = dbData.scenes.filter((s) => s.is_free);
-              console.log(`[share] DB 무료씬 로드: ${loadedFreeScenes.length}개`);
-            } else {
-              console.warn(`[share] DB scenes non-ok: HTTP ${dbRes.status}`);
-            }
-          } catch (dbErr) {
-            console.warn("[share] DB scenes fetch 실패:", dbErr);
-          }
-
-          if (loadedFreeScenes.length === 0) {
-            setError("공유된 흐름을 불러오지 못했어");
-            setLoading(false);
-            return;
-          }
-
-          setFreeScenes(loadedFreeScenes);
+        if (!res.ok) {
+          const errData = (await res.json()) as { error?: string };
+          setError(errData.error ?? "공유된 결과를 찾을 수 없어");
+          setLoading(false);
+          return;
         }
+
+        const data = (await res.json()) as ShareApiResponse;
+
+        if (data.free_scenes.length === 0) {
+          setError("공유된 흐름을 불러오지 못했어");
+          setLoading(false);
+          return;
+        }
+
+        setSessionId(data.session_id);
+        setContentId(data.content_id);
+        setFreeScenes(data.free_scenes);
         setLoading(false);
       } catch {
         setError("데이터 로드 중 오류가 발생했어");
         setLoading(false);
       }
     };
-    initData();
+    void initData();
   }, [params]);
 
   useEffect(() => {
@@ -127,7 +111,7 @@ const ShareResultPage = ({ params }: PageProps) => {
   }
 
   // ── 에러 ──────────────────────────────────────────────────────
-  if (error || !analyzeData || freeScenes.length === 0) {
+  if (error || !contentId || freeScenes.length === 0) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-6">
         <p className="mb-8 text-sm" style={{ color: "rgba(249,249,229,0.35)" }}>
@@ -144,11 +128,11 @@ const ShareResultPage = ({ params }: PageProps) => {
     );
   }
 
-  // 유료씬 teaser 제목 목록: sceneConfig가 canonical source.
-  // messages는 포함하지 않는다.
-  const paidSceneConfigs = getSceneConfig(analyzeData.content_id).scenes.filter(
+  // 유료씬 teaser 제목: sceneConfig가 canonical source. messages 없음.
+  const paidSceneConfigs = getSceneConfig(contentId).scenes.filter(
     (s) => !s.is_free,
   );
+  const content = CONTENTS.find((c) => c.id === contentId);
 
   return (
     <div
@@ -172,41 +156,35 @@ const ShareResultPage = ({ params }: PageProps) => {
       <main className="flex-1 overflow-y-auto">
         <div className="w-full max-w-lg mx-auto">
           {/* 콘텐츠 헤더 */}
-          {(() => {
-            const content = CONTENTS.find(
-              (c) => c.id === analyzeData.content_id,
-            );
-            return content ? (
-              <div className="px-6 py-3 space-y-4">
-                {content.thumbnail_url && (
-                  <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-white/[0.04] shadow-2xl shadow-black/40">
-                    <Image
-                      src={content.thumbnail_url}
-                      alt={content.title}
-                      fill
-                      priority
-                      className="object-cover object-center"
-                    />
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <h1
-                    className="text-xl font-medium"
-                    style={{ color: "rgba(249,249,229,0.9)" }}
-                  >
-                    {content.title}
-                  </h1>
-                  <p
-                    className="mb-5 text-sm"
-                    style={{ color: "rgba(249,249,229,0.5)" }}
-                  >
-                    {content.subtitle}
-                  </p>
+          {content && (
+            <div className="px-6 py-3 space-y-4">
+              {content.thumbnail_url && (
+                <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-white/[0.04] shadow-2xl shadow-black/40">
+                  <Image
+                    src={content.thumbnail_url}
+                    alt={content.title}
+                    fill
+                    priority
+                    className="object-cover object-center"
+                  />
                 </div>
+              )}
+              <div className="space-y-2">
+                <h1
+                  className="text-xl font-medium"
+                  style={{ color: "rgba(249,249,229,0.9)" }}
+                >
+                  {content.title}
+                </h1>
+                <p
+                  className="mb-5 text-sm"
+                  style={{ color: "rgba(249,249,229,0.5)" }}
+                >
+                  {content.subtitle}
+                </p>
               </div>
-            ) : null;
-          })()}
+            </div>
+          )}
 
           {/* 씬 시작 구분점 */}
           <div className="px-3 py-3 text-center">
@@ -221,7 +199,7 @@ const ShareResultPage = ({ params }: PageProps) => {
             </span>
           </div>
 
-          {/* 무료씬 렌더링: isCurrent={true}로 result와 opacity 동일하게 */}
+          {/* 무료씬 렌더링: isCurrent={true}로 result와 opacity 동일 */}
           {freeScenes.map((scene, sceneIdx) => (
             <div
               key={scene.id}
