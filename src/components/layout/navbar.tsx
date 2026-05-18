@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 /**
  * 상단 네비게이션 바 (고정, 전체 너비)
@@ -11,15 +12,17 @@ import Link from "next/link";
  * - 모바일: 햄버거 메뉴로 우측 메뉴 통합
  */
 const Navbar = () => {
-  // TODO: [백엔드 연동] Supabase useUser() 훅으로 실제 로그인 상태 교체
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const userId = localStorage.getItem("veil_user_id");
-      setIsLoggedIn(!!userId);
-    }
+    const supabase = createSupabaseBrowserClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsLoggedIn(!!session?.user);
+      }
+    );
+    return () => subscription.unsubscribe();
   }, []);
 
   return (

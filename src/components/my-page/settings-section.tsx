@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 import AccountManagementModal from "./account-management-modal";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const SettingsSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleLogout = () => {
-    // TODO: [백엔드 연동] 실제 로그아웃 로직 구현
-    // Supabase auth.signOut() 호출
-    if (typeof window !== "undefined") {
-      localStorage.clear();
-      window.location.href = "/";
-    }
+  const handleLogout = async () => {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    localStorage.clear();
+    window.location.href = "/";
   };
 
   return (
