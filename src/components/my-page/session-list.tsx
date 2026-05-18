@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AnalysisSession } from "@/lib/types/session";
-import { getContentTitle, getContentCategory } from "@/lib/data/dummy-sessions";
+import { SessionSummary } from "@/lib/types/session";
 
 interface SessionListProps {
-  sessions: AnalysisSession[];
+  sessions: SessionSummary[];
 }
 
 const getCategoryLabel = (category: string): string => {
@@ -89,17 +88,15 @@ const SessionList = ({ sessions }: SessionListProps) => {
         </div>
       </div>
       <div className="space-y-1">
-        {displayedSessions.map((session) => {
-          const contentTitle = getContentTitle(session.content_id);
-          const category = getContentCategory(session.content_id);
-          const categoryLabel = getCategoryLabel(category);
-          const categoryColor = getCategoryColor(category);
-          const formattedDate = formatDate(session.created_at);
+        {displayedSessions.map((summary) => {
+          const categoryLabel = getCategoryLabel(summary.category);
+          const categoryColor = getCategoryColor(summary.category);
+          const formattedDate = formatDate(summary.created_at);
 
           return (
             <Link
-              key={session.id}
-              href={`/result/${session.id}`}
+              key={summary.session_id}
+              href={`/result/${summary.session_id}`}
               className="block rounded-lg border border-surface/20 bg-surface/15 p-3 transition-all hover:border-accent/30 hover:bg-surface/25"
             >
               <div className="flex items-center justify-between gap-4">
@@ -108,7 +105,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
                   <div
                     className={`shrink-0 flex h-10 w-10 items-center justify-center rounded-md ${categoryColor.bg}`}
                   >
-                    {category === "love" && (
+                    {summary.category === "love" && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -124,7 +121,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
                         />
                       </svg>
                     )}
-                    {category === "relationship" && (
+                    {summary.category === "relationship" && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -140,7 +137,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
                         />
                       </svg>
                     )}
-                    {category === "career" && (
+                    {summary.category === "career" && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -156,7 +153,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
                         />
                       </svg>
                     )}
-                    {category === "emotion" && (
+                    {summary.category === "emotion" && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -177,7 +174,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
                   {/* 컨텐츠 정보 */}
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-highlight">
-                      {contentTitle}
+                      {summary.content_title}
                     </p>
                     <div className="mt-1 flex items-center gap-2">
                       <p className="text-xs text-highlight/50">

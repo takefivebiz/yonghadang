@@ -1,14 +1,14 @@
 "use client";
 
 import { UserProfile } from "@/lib/types/user";
-import { AnalysisSession } from "@/lib/types/session";
+import { SessionSummary } from "@/lib/types/session";
 import ProfileSection from "./profile-section";
 import SessionList from "./session-list";
 import SettingsSection from "./settings-section";
 
 interface MyPageContentProps {
   profile: UserProfile;
-  sessions: AnalysisSession[];
+  sessions: SessionSummary[];
 }
 
 const MyPageContent = ({ profile, sessions }: MyPageContentProps) => {
