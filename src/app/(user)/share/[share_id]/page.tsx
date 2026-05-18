@@ -83,8 +83,45 @@ const ShareResultPage = ({ params }: PageProps) => {
           }
           const data = JSON.parse(stored) as AnalyzeAnswers;
           setAnalyzeData(data);
+
+          // DB 무료씬 조회: mock보다 실제 AI 생성 결과 우선.
+          // is_free === true 만 사용한다. 유료씬 messages는 절대 노출하지 않는다.
+          // 실패하거나 결과가 없으면 기존 mock fallback을 유지한다.
+          let freeScenesFromDb: ResultScene[] = [];
+          try {
+            const dbRes = await fetch(
+              `/api/analyze/${param.share_id}/result-scenes`,
+            );
+            if (dbRes.ok) {
+              const dbData = (await dbRes.json()) as { scenes: ResultScene[] };
+              freeScenesFromDb = dbData.scenes.filter((s) => s.is_free);
+              if (freeScenesFromDb.length > 0) {
+                console.log(
+                  `[share] DB 무료씬 로드: ${freeScenesFromDb.length}개`,
+                );
+              } else {
+                console.log("[share] DB 무료씬 없음 → mock fallback");
+              }
+            } else {
+              console.warn(
+                `[share] DB scenes non-ok: HTTP ${dbRes.status} → mock fallback`,
+              );
+            }
+          } catch (dbErr) {
+            console.warn("[share] DB scenes fetch 실패 → mock fallback:", dbErr);
+          }
+
+          // DB 무료씬이 있으면 사용.
+          // 유료씬은 teaser 제목 표시용으로 mock 구조를 유지한다 (messages는 share 페이지에서 렌더되지 않음).
+          // DB 없음/실패 → 전체 mock fallback.
           const mockScenes = generateMockResultScenes(data.content_id);
-          setScenes(mockScenes);
+          const scenesToRender =
+            freeScenesFromDb.length > 0
+              ? [...freeScenesFromDb, ...mockScenes.filter((s) => !s.is_free)].sort(
+                  (a, b) => a.scene_index - b.scene_index,
+                )
+              : mockScenes;
+          setScenes(scenesToRender);
 
         }
         setLoading(false);
