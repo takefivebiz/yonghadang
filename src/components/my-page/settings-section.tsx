@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import AccountManagementModal from "./account-management-modal";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-
 const SettingsSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogout = async () => {
-    const supabase = createSupabaseBrowserClient();
-    await supabase.auth.signOut();
+    // 서버 Route Handler에서 signOut → httpOnly refresh_token 쿠키까지 만료
+    await fetch("/api/auth/logout", { method: "POST" });
     localStorage.clear();
     window.location.href = "/";
   };
