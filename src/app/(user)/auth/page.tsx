@@ -1,9 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
-const AuthPage = () => {
+// useSearchParams()는 Suspense 경계 안에서만 사용 가능 (Next.js 15 요구사항)
+const AuthPageContent = () => {
   const [openModal, setOpenModal] = useState<"terms" | "privacy" | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<
+    "google" | "kakao" | null
+  >(null);
+  const [oauthError, setOauthError] = useState<string | null>(null);
+
+  const searchParams = useSearchParams();
 
   // ESC 키 처리 및 배경 스크롤 차단
   useEffect(() => {
@@ -24,17 +33,37 @@ const AuthPage = () => {
     };
   }, [openModal]);
 
-  const handleSocialLogin = (provider: string) => {
-    // TODO: [백엔드 연동] 실제 OAuth 플로우로 교체
-    if (typeof window !== "undefined") {
-      localStorage.setItem("veil_user_id", "user-1");
-      localStorage.setItem("veil_user_provider", provider);
+  // OAuth callback 실패 시 에러 표시
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) setOauthError("로그인 중 문제가 발생했어요. 다시 시도해 주세요.");
+  }, [searchParams]);
 
-      // sessionStorage의 redirect_to를 읽어서 이동, 없으면 "/"
-      const redirectTo = sessionStorage.getItem("redirect_to");
-      sessionStorage.removeItem("redirect_to");
-      window.location.href = redirectTo || "/";
+  const handleSocialLogin = async (provider: "google" | "kakao") => {
+    setLoadingProvider(provider);
+    setOauthError(null);
+
+    // 로그인 후 돌아갈 경로: sessionStorage(컴포넌트 설정) > URL ?next=(미들웨어) > "/"
+    const next =
+      sessionStorage.getItem("redirect_to") ??
+      searchParams.get("next") ??
+      "/";
+    sessionStorage.removeItem("redirect_to");
+
+    const callbackUrl = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(next)}`;
+
+    const supabase = createSupabaseBrowserClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: callbackUrl },
+    });
+
+    if (error) {
+      console.error(`[auth] ${provider} OAuth 실패:`, error.message);
+      setOauthError("로그인 중 문제가 발생했어요. 다시 시도해 주세요.");
+      setLoadingProvider(null);
     }
+    // 성공 시 브라우저가 OAuth 페이지로 이동 → 여기서 추가 처리 없음
   };
 
   return (
@@ -76,61 +105,75 @@ const AuthPage = () => {
           </p>
           <div className="h-px flex-1 bg-surface/100" />
         </div>
+        {/* OAuth 에러 메시지 */}
+        {oauthError && (
+          <p className="text-center text-xs text-red-400/80">{oauthError}</p>
+        )}
         {/* Google 로그인 */}
         <button
           onClick={() => handleSocialLogin("google")}
-          className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]"
+          disabled={loadingProvider !== null}
+          className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <svg
-            className="h-4 w-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              fill="#4285F4"
-            />
-            <path
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              fill="#34A853"
-            />
-            <path
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              fill="#FBBC05"
-            />
-            <path
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              fill="#EA4335"
-            />
-          </svg>
+          {loadingProvider === "google" ? (
+            <span className="h-4 w-4 animate-spin rounded-full border border-highlight/30 border-t-highlight/80" />
+          ) : (
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
+            </svg>
+          )}
 
           <span className="text-sm font-normal text-highlight/85 transition-colors duration-200 group-hover:text-highlight">
-            Google로 계속하기
+            {loadingProvider === "google" ? "연결 중..." : "Google로 계속하기"}
           </span>
         </button>
 
-        {/* Kakao 로그인 */}
+        {/* Kakao 로그인 — Supabase Dashboard에서 Kakao provider 활성화 후 동작 */}
         <button
           onClick={() => handleSocialLogin("kakao")}
-          className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05]"
+          disabled={loadingProvider !== null}
+          className="group flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4 transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <svg
-            className="h-4 w-4"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M12 1C5.925 1 1 4.82 1 9.5c0 3.12 2.003 5.843 5.03 7.282l-1.207 4.397c-.113.412.268.781.654.56l3.868-2.343c.506.038 1.022.104 1.655.104 6.075 0 11-3.82 11-8.5S18.075 1 12 1z"
-              fill="#FEE500"
-            />
-          </svg>
+          {loadingProvider === "kakao" ? (
+            <span className="h-4 w-4 animate-spin rounded-full border border-highlight/30 border-t-highlight/80" />
+          ) : (
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M12 1C5.925 1 1 4.82 1 9.5c0 3.12 2.003 5.843 5.03 7.282l-1.207 4.397c-.113.412.268.781.654.56l3.868-2.343c.506.038 1.022.104 1.655.104 6.075 0 11-3.82 11-8.5S18.075 1 12 1z"
+                fill="#FEE500"
+              />
+            </svg>
+          )}
 
           <span className="text-sm font-normal text-highlight/85 transition-colors duration-200 group-hover:text-highlight">
-            Kakao로 계속하기
+            {loadingProvider === "kakao" ? "연결 중..." : "Kakao로 계속하기"}
           </span>
         </button>
       </div>
@@ -628,6 +671,12 @@ const PrivacyContent = () => (
       <p>2026년 5월 8일</p>
     </section>
   </div>
+);
+
+const AuthPage = () => (
+  <Suspense>
+    <AuthPageContent />
+  </Suspense>
 );
 
 export default AuthPage;
