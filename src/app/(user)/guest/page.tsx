@@ -1,25 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  getUserSessions,
-  DUMMY_SESSION_ANSWERS,
-} from "@/lib/data/dummy-sessions";
-import { CONTENTS } from "@/lib/data/contents";
-import { simulateGuestVerification } from "@/lib/data/dummy-guest-credentials";
 import { formatDate, formatCategoryName } from "@/lib/utils";
 import type { AnalyzeAnswers } from "@/lib/types/analyze";
+import type { ResultScene } from "@/lib/types/result";
+import type { GuestSessionData, GuestVerifyResponse } from "@/app/api/guest/verify/route";
 
 type Step = 1 | 2;
 
+// Step 2 목록 표시용 (무거운 scenes/answers는 제외)
 interface GuestSessionInfo {
   session_id: string;
-  content_id: string;
   content_title: string;
   category: string;
   created_at: string;
-  view_state: string;
+  unlocked_count: number;
 }
 
 export default function GuestPage() {
@@ -30,24 +26,11 @@ export default function GuestPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessions, setSessions] = useState<GuestSessionInfo[]>([]);
+  // 세션 선택 시 localStorage 채우기 위한 전체 데이터 보관
+  const [apiSessions, setApiSessions] = useState<GuestSessionData[]>([]);
   const [guestId, setGuestId] = useState<string>("");
   const [fadeOut, setFadeOut] = useState(false);
 
-  // 비회원 인증 상태를 sessionStorage에서 복원
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedGuestId = sessionStorage.getItem("guest_id");
-      const savedSessions = sessionStorage.getItem("guest_sessions");
-
-      if (savedGuestId && savedSessions) {
-        setGuestId(savedGuestId);
-        setSessions(JSON.parse(savedSessions));
-        setStep(2);
-      }
-    }
-  }, []);
-
-  // 전화번호 포맷팅 (010-1234-5678)
   const formatPhoneNumber = (value: string) => {
     const digits = value.replace(/\D/g, "");
     if (digits.length === 0) return "";
@@ -67,113 +50,117 @@ export default function GuestPage() {
     setError("");
   };
 
-  const getViewState = (): string => {
-    // TODO: [백엔드 연동] 실제 열람 상태를 서버에서 조회
-    // 현재는 더미: 모든 세션을 "장면 2까지 열람"으로 표시
-    return "장면 2까지 열람";
-  };
-
   const handleVerify = async () => {
     setError("");
     setIsLoading(true);
 
     try {
-      // TODO: [백엔드 연동] 더미 함수를 실제 POST /api/guest/verify 호출로 교체
-      const phoneDigits = phone.replace(/\D/g, "");
-      const result = simulateGuestVerification(phoneDigits, pin);
-
-      if (!result.success) {
-        setError("전화번호 또는 비밀번호가 일치하지 않아.");
-        setIsLoading(false);
-        return;
-      }
-
-      const verifiedGuestId = result.guest_id!;
-      setGuestId(verifiedGuestId);
-
-      // 비회원이 접근 가능한 세션 목록 조회
-      const userSessions = getUserSessions(null, verifiedGuestId);
-
-      if (userSessions.length === 0) {
-        setError("조회 가능한 기록이 없어.");
-        setIsLoading(false);
-        return;
-      }
-
-      // 세션 정보 구성
-      const sessionInfos: GuestSessionInfo[] = userSessions.map((session) => {
-        const content = CONTENTS.find((c) => c.id === session.content_id);
-        return {
-          session_id: session.id,
-          content_id: session.content_id,
-          content_title: content?.title || "제목 없음",
-          category: content?.category || "unknown",
-          created_at: session.created_at,
-          view_state: getViewState(),
-        };
+      const res = await fetch("/api/guest/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phone.replace(/\D/g, ""), pin }),
       });
 
-      setSessions(sessionInfos);
+      const data = (await res.json()) as
+        | GuestVerifyResponse
+        | { error: string };
 
-      // sessionStorage에 비회원 정보 저장
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("guest_id", verifiedGuestId);
-        sessionStorage.setItem("guest_sessions", JSON.stringify(sessionInfos));
+      if (!res.ok) {
+        setError(
+          (data as { error: string }).error ??
+            "전화번호 또는 비밀번호가 일치하지 않아",
+        );
+        return;
       }
 
-      // Step 2로 fade 전환
+      const result = data as GuestVerifyResponse;
+
+      if (result.sessions.length === 0) {
+        setError("조회 가능한 기록이 없어");
+        return;
+      }
+
+      setGuestId(result.guest_id);
+      setApiSessions(result.sessions);
+
+      const sessionInfos: GuestSessionInfo[] = result.sessions.map((s) => ({
+        session_id: s.session_id,
+        content_title: s.content_title,
+        category: s.content_category,
+        created_at: s.created_at,
+        unlocked_count: s.unlocked_scene_indexes.length,
+      }));
+      setSessions(sessionInfos);
+
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("guest_id", result.guest_id);
+      }
+
       setFadeOut(true);
       setTimeout(() => {
         setStep(2);
         setFadeOut(false);
       }, 300);
     } catch {
-      setError("오류가 발생했어. 다시 시도해줘.");
+      setError("오류가 발생했어. 다시 시도해줘");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSelectSession = (sessionId: string) => {
-    // TODO: [백엔드 연동] 실제 세션 데이터를 서버에서 조회해서 localStorage에 저장
-    if (typeof window !== "undefined") {
-      const userSession = getUserSessions(null, guestId).find(
-        (s) => s.id === sessionId,
-      );
-      if (userSession) {
-        const answers = DUMMY_SESSION_ANSWERS[sessionId] || [];
-        const analyzeData: AnalyzeAnswers = {
-          session_id: sessionId,
-          content_id: userSession.content_id,
-          free_input: answers[0]?.answer_text || "",
-          answers,
-          created_at: userSession.created_at,
-        };
-        localStorage.setItem(
-          `veil_analysis_${sessionId}`,
-          JSON.stringify(analyzeData),
-        );
-        sessionStorage.setItem("guest_token", guestId);
+    const sessionData = apiSessions.find((s) => s.session_id === sessionId);
+    if (!sessionData || typeof window === "undefined") return;
 
-        // redirect_to가 있으면 그곳으로, 없으면 /share로 이동
-        // /share에서 권한 검증 후 /result로 리다이렉트됨
-        const redirectTo = sessionStorage.getItem("redirect_to");
-        if (redirectTo) {
-          sessionStorage.removeItem("redirect_to");
-          window.location.href = redirectTo;
-        } else {
-          // redirect_to가 없으면 /share로 이동 (권한 검증을 받기 위해)
-          window.location.href = `/share/${sessionId}`;
-        }
-      }
+    // ── localStorage 채우기 ────────────────────────────────────────────
+    const analyzeData: AnalyzeAnswers = {
+      session_id: sessionData.session_id,
+      content_id: sessionData.content_id,
+      free_input: sessionData.free_input,
+      answers: sessionData.answers,
+      created_at: sessionData.created_at,
+    };
+    localStorage.setItem(
+      `veil_analysis_${sessionId}`,
+      JSON.stringify(analyzeData),
+    );
+
+    // 유료씬 unlock 여부에 따라 캐시 키 분기
+    const hasPaidUnlocked = sessionData.scenes.some(
+      (sc: ResultScene) => !sc.is_free && sc.messages !== null,
+    );
+    if (hasPaidUnlocked) {
+      localStorage.setItem(
+        `veil_all_scenes_${sessionId}`,
+        JSON.stringify(sessionData.scenes),
+      );
+    } else {
+      const freeScenes = sessionData.scenes.filter((sc: ResultScene) => sc.is_free);
+      localStorage.setItem(
+        `veil_free_scenes_${sessionId}`,
+        JSON.stringify(freeScenes),
+      );
+    }
+
+    localStorage.setItem(
+      `veil_unlocked_scenes_${sessionId}`,
+      JSON.stringify(sessionData.unlocked_scene_indexes),
+    );
+
+    sessionStorage.setItem("guest_token", guestId);
+
+    const redirectTo = sessionStorage.getItem("redirect_to");
+    if (redirectTo) {
+      sessionStorage.removeItem("redirect_to");
+      window.location.href = redirectTo;
+    } else {
+      window.location.href = `/result/${sessionId}`;
     }
   };
 
   const handleBack = () => {
-    // sessionStorage에서 비회원 정보 삭제
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("guest_id");
-      sessionStorage.removeItem("guest_sessions");
       sessionStorage.removeItem("guest_token");
     }
 
@@ -182,6 +169,7 @@ export default function GuestPage() {
       setStep(1);
       setFadeOut(false);
       setSessions([]);
+      setApiSessions([]);
       setGuestId("");
       setPhone("");
       setPin("");
@@ -470,7 +458,7 @@ function StepTwo({
               </span>
               <span style={{ color: "rgba(249, 249, 229, 0.2)" }}>•</span>
               <span style={{ color: "rgba(249, 249, 229, 0.3)" }}>
-                {session.view_state}
+                {`장면 ${session.unlocked_count}개 열람`}
               </span>
             </div>
           </div>

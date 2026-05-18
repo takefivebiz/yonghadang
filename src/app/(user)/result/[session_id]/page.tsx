@@ -46,6 +46,8 @@ const ResultPage = ({ params }: PageProps) => {
 
   // share_token: ResultActions 공유 URL 생성용. 비동기 조회, 실패 시 null → 버튼 비활성.
   const [shareToken, setShareToken] = useState<string | null>(null);
+  // 결제 confirm API 실패 시 에러 메시지. unlock은 차단되고 재시도 안내를 표시한다.
+  const [paymentConfirmError, setPaymentConfirmError] = useState<string | null>(null);
 
   // ── Loop Reading 상태 ──────────────────────────────────────────────────
   const [loopAnswers, setLoopAnswers] = useState<Partial<Record<LoopType, LoopAnswer>>>({});
@@ -719,7 +721,7 @@ const ResultPage = ({ params }: PageProps) => {
         };
         void unlockAll();
       } else {
-        // ── Scene unlock flow (기존 로직 유지) ───────────────────────
+        // ── Scene unlock flow ─────────────────────────────────────────
         const sceneIndex = parseInt(
           searchParams.get("_scene_index") || "0",
           10,
@@ -740,43 +742,103 @@ const ResultPage = ({ params }: PageProps) => {
         setIsPaidGenerationRecovery(isRecovery);
         setPaidGenerationLoading(true);
 
-        generatePaidScenes(paidSceneIndexes)
-          .then(() => {
-            const newUnlocked = [
-              ...new Set([...unlockedScenes, ...paidSceneIndexes]),
-            ];
-            setUnlockedScenes(newUnlocked);
+        // ── 비회원 결제 confirm → DB 저장 후 generatePaidScenes ──────
+        // confirm 실패 시 unlock 중단. sessionStorage 정보는 성공 시에만 삭제.
+        const runConfirmAndUnlock = async () => {
+          const phone = sessionStorage.getItem("veil_pending_phone");
+          const pin = sessionStorage.getItem("veil_pending_pin");
 
-            if (typeof window !== "undefined") {
-              localStorage.setItem(
-                `veil_unlocked_scenes_${sessionId}`,
-                JSON.stringify(newUnlocked),
-              );
-              localStorage.removeItem(pendingKey);
-              console.log(
-                "[unlock saved]",
-                `veil_unlocked_scenes_${sessionId}`,
-              );
+          if (!phone || !pin) {
+            console.error("[confirm] sessionStorage에 결제 정보 없음");
+            setPaymentConfirmError(
+              "결제 확인 정보가 없어. 전화번호와 비밀번호를 다시 입력하고 결제해줘",
+            );
+            setPaidGenerationLoading(false);
+            localStorage.removeItem(pendingKey);
+            isProcessingPayment.current = false;
+            return;
+          }
+
+          try {
+            const confirmRes = await fetch("/api/payments/confirm", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                payment_key: searchParams.get("paymentKey") ?? "",
+                order_id: searchParams.get("orderId") ?? "",
+                amount: parseInt(searchParams.get("amount") ?? "0", 10),
+                session_id: sessionId,
+                payment_type: paymentType as "single" | "all",
+                ...(paymentType === "single" && sceneIndex > 0
+                  ? { scene_index: sceneIndex }
+                  : {}),
+                guest_phone: phone,
+                guest_pin: pin,
+              }),
+            });
+
+            if (!confirmRes.ok) {
+              const errData = (await confirmRes.json()) as { error?: string };
+              throw new Error(errData.error ?? "결제 확인에 실패했어");
             }
 
-            window.history.replaceState({}, "", window.location.pathname);
-
-            setTimeout(() => {
-              if (flowOverviewRef.current) {
-                flowOverviewRef.current.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }
-            }, 300);
-          })
-          .catch((err) => {
-            console.error("[paid generation failed]", err);
-          })
-          .finally(() => {
-            isProcessingPayment.current = false;
+            // 성공 시에만 sessionStorage 정리 (실패 시에는 재시도 가능하도록 유지)
+            sessionStorage.removeItem("veil_pending_phone");
+            sessionStorage.removeItem("veil_pending_pin");
+          } catch (err) {
+            const msg =
+              err instanceof Error
+                ? err.message
+                : "결제 확인 중 오류가 발생했어";
+            console.error("[payment confirm 실패]", err);
+            setPaymentConfirmError(msg);
             setPaidGenerationLoading(false);
-          });
+            localStorage.removeItem(pendingKey);
+            isProcessingPayment.current = false;
+            return;
+          }
+
+          // ── confirm 성공 → generatePaidScenes ────────────────────
+          generatePaidScenes(paidSceneIndexes)
+            .then(() => {
+              const newUnlocked = [
+                ...new Set([...unlockedScenes, ...paidSceneIndexes]),
+              ];
+              setUnlockedScenes(newUnlocked);
+
+              if (typeof window !== "undefined") {
+                localStorage.setItem(
+                  `veil_unlocked_scenes_${sessionId}`,
+                  JSON.stringify(newUnlocked),
+                );
+                localStorage.removeItem(pendingKey);
+                console.log(
+                  "[unlock saved]",
+                  `veil_unlocked_scenes_${sessionId}`,
+                );
+              }
+
+              window.history.replaceState({}, "", window.location.pathname);
+
+              setTimeout(() => {
+                if (flowOverviewRef.current) {
+                  flowOverviewRef.current.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }
+              }, 300);
+            })
+            .catch((err) => {
+              console.error("[paid generation failed]", err);
+            })
+            .finally(() => {
+              isProcessingPayment.current = false;
+              setPaidGenerationLoading(false);
+            });
+        };
+
+        void runConfirmAndUnlock();
       }
     } else if (searchParams.get("_payment_failed") === "true") {
       console.log("[payment failed]");
@@ -1198,6 +1260,29 @@ const ResultPage = ({ params }: PageProps) => {
           shareToken={shareToken}
         />
       </main>
+
+      {/* 결제 confirm 실패 에러 배너
+          confirm 실패 시 unlock이 차단되고 재시도 안내를 표시한다.
+          "다시 시도" → 페이지 리로드로 URL 파라미터를 유지한 채 Phase 2 재실행. */}
+      {paymentConfirmError && (
+        <div className="fixed bottom-4 left-0 right-0 z-50 mx-4 max-w-md sm:mx-auto rounded-xl border border-red-500/20 bg-background/95 backdrop-blur-sm p-4 shadow-xl">
+          <p className="mb-3 text-sm text-red-400/90">{paymentConfirmError}</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => window.location.reload()}
+              className="flex-1 rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-white transition-all hover:bg-secondary/90"
+            >
+              다시 시도
+            </button>
+            <button
+              onClick={() => setPaymentConfirmError(null)}
+              className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-highlight/70 transition-all hover:bg-white/10"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 결제 모달: QA mode이거나 닫혀있을 때 완전 언마운트
           isOpen=false → DOM에서 제거(null 반환이 아님) → Toss SDK 인스턴스 격리
