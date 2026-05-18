@@ -1,7 +1,7 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient } from "@supabase/ssr";
+import { type NextRequest, NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export const middleware = async (request: NextRequest) => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -9,11 +9,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  // supabaseResponse는 setAll 내부에서 재할당될 수 있다.
+  // Supabase 공식 패턴: request 쿠키 갱신 → 새 response 생성 → response 쿠키 갱신
+  let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -21,41 +19,65 @@ export async function middleware(request: NextRequest) {
         return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
-        });
+        // 1. request 쿠키 먼저 갱신해야 이후 Server Component에서 새 토큰을 읽을 수 있다.
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value)
+        );
+        // 2. 갱신된 request로 새 response 생성
+        supabaseResponse = NextResponse.next({ request });
+        // 3. 브라우저에 전달할 response 쿠키에도 반영
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options)
+        );
       },
     },
   });
 
-  // 현재 사용자 확인 (getUser()로 인증 상태 확인)
-  const { data: { user } } = await supabase.auth.getUser();
+  // getUser()를 반드시 호출해야 세션 토큰이 갱신된다.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
 
-  // 회원 전용 라우트 (로그인 필수)
-  const memberOnlyRoutes = ['/my-page'];
-  const isMemberOnlyRoute = memberOnlyRoutes.some(route => pathname.startsWith(route));
+  const memberOnlyRoutes = ["/my-page"];
+  const adminRoutes = ["/admin"];
 
-  // 관리자 전용 라우트 (로그인 필수)
-  const adminRoutes = ['/admin'];
-  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
+  const isMemberOnlyRoute = memberOnlyRoutes.some((r) =>
+    pathname.startsWith(r)
+  );
+  const isAdminRoute = adminRoutes.some((r) => pathname.startsWith(r));
 
-  // 회원 전용 경로 보호
   if (isMemberOnlyRoute && !user) {
-    return NextResponse.redirect(new URL(`/auth?next=${encodeURIComponent(pathname)}`, request.url));
+    const redirectUrl = new URL(
+      `/auth?next=${encodeURIComponent(pathname)}`,
+      request.url
+    );
+    const redirectResponse = NextResponse.redirect(redirectUrl);
+    // redirect 시에도 세션 쿠키를 유지해야 토큰이 증발하지 않는다.
+    supabaseResponse.cookies
+      .getAll()
+      .forEach((cookie) =>
+        redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+      );
+    return redirectResponse;
   }
 
-  // 관리자 경로 보호
   if (isAdminRoute && !user) {
-    return NextResponse.redirect(new URL('/auth', request.url));
+    const redirectResponse = NextResponse.redirect(
+      new URL("/auth", request.url)
+    );
+    supabaseResponse.cookies
+      .getAll()
+      .forEach((cookie) =>
+        redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+      );
+    return redirectResponse;
   }
 
-  // /analyze, /report는 비회원도 접근 가능 (로그인 요구 없음)
-
-  return response;
-}
+  return supabaseResponse;
+};
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
