@@ -10,7 +10,7 @@ import {
   FreeSceneContext,
 } from "@/lib/prompts/generate-result";
 import { SceneConfig } from "@/lib/types/content";
-import { ResultScene } from "@/lib/types/result";
+import { ResultScene, SceneMessage } from "@/lib/types/result";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
 // TODO: [백엔드 연동] Supabase service_role 클라이언트로 세션·콘텐츠 조회로 교체
@@ -115,6 +115,82 @@ export const POST = async (
         const scene = scene_config.scenes.find(s => s.index === idx);
         return scene && !scene.is_free;
       });
+    }
+
+    // ── DB 캐시 확인: 요청된 scene_indexes가 이미 result_scenes에 completed 상태로 모두 존재하면
+    // Claude 호출 없이 DB 값을 바로 반환한다. (크레딧 절약)
+    //
+    // all-or-nothing 전략: 일부라도 없으면 전체 재생성.
+    // partial skip 시 씬 간 narrative 흐름이 단절될 수 있기 때문.
+    //
+    // QA mode(is_qa=true)는 항상 Claude를 호출해야 하므로 이 블록 전체를 건너뛴다.
+    // DB 조회 실패 시: warn 로그 후 fall through → 기존 generate 흐름으로 진행.
+    if (!is_qa) {
+      try {
+        const supabaseForCache = createServiceRoleClient();
+
+        const { data: cachedRows, error: cacheError } = await supabaseForCache
+          .from("result_scenes")
+          .select("scene_index, scene_title, messages, preview_messages, is_free")
+          .eq("session_id", session_id)
+          .in("scene_index", sceneIndexesToUse)
+          .eq("status", "completed")
+          .not("messages", "is", null);
+
+        if (cacheError) {
+          console.warn(`[generate] 캐시 조회 실패 — fall through session=${session_id}:`, cacheError);
+        } else if (cachedRows) {
+          const cachedIndexSet = new Set(cachedRows.map((r) => r.scene_index as number));
+          const requestedIndexSet = new Set(sceneIndexesToUse);
+
+          // length 일치 + 양방향 set 동치: 두 조건 모두 충족해야 cache hit
+          const isFullCacheHit =
+            cachedRows.length === sceneIndexesToUse.length &&
+            sceneIndexesToUse.every((idx) => cachedIndexSet.has(idx)) &&
+            [...cachedIndexSet].every((idx) => requestedIndexSet.has(idx));
+
+          if (isFullCacheHit) {
+            const result_scenes: ResultScene[] = cachedRows.map((row) => ({
+              id: `${session_id}-scene-${row.scene_index as number}`,
+              scene_index: row.scene_index as number,
+              scene_title: row.scene_title as string,
+              is_free: row.is_free as boolean,
+              is_unlocked: false,
+              messages:
+                Array.isArray(row.messages) && (row.messages as unknown[]).length > 0
+                  ? (row.messages as SceneMessage[])
+                  : null,
+              preview_messages:
+                Array.isArray(row.preview_messages) &&
+                (row.preview_messages as unknown[]).length > 0
+                  ? (row.preview_messages as SceneMessage[])
+                  : null,
+            }));
+
+            console.log("[generate cache] hit", { session_id, sceneIndexesToUse });
+
+            return NextResponse.json(
+              {
+                session_id,
+                result_scenes,
+                _debug_raw_result: { scenes: [] },
+              } satisfies GenerateResponseBody,
+              { status: 200 },
+            );
+          }
+
+          console.log("[generate cache] miss", {
+            session_id,
+            sceneIndexesToUse,
+            cachedIndexes: cachedRows.map((r) => r.scene_index),
+          });
+        }
+      } catch (cacheCheckError) {
+        console.warn(
+          `[generate] 캐시 확인 중 예외 — fall through session=${session_id}:`,
+          cacheCheckError,
+        );
+      }
     }
 
     // 유료 scene 생성 시 context 검증
