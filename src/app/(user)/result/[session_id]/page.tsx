@@ -129,7 +129,7 @@ const ResultPage = ({ params }: PageProps) => {
           "| session=", param.session_id,
         );
 
-        let resultScenes: ResultScene[];
+        let resultScenes: ResultScene[] = [];
 
         if (cachedAllScenes) {
           // merged all scenes 우선 로드 (결제 후 상태)
@@ -141,94 +141,136 @@ const ResultPage = ({ params }: PageProps) => {
           resultScenes = JSON.parse(cachedFreeScenes) as ResultScene[];
           console.log("[result] veil_free_scenes_ 로드:", resultScenes.length, "scenes");
         } else {
+          // ── DB fallback ────────────────────────────────────────────────
+          // localStorage에 scenes가 없을 때만 시도한다.
+          // QA mode는 커밋 A에서 DB 저장을 intentionally skip했으므로 조회도 skip.
+          // React state isQaMode는 씬 로드 이후에 설정되므로 window.location.search로 직접 판단.
+          const isQaForDbFallback =
+            new URLSearchParams(window.location.search).get("qa") === "1" ||
+            process.env.NEXT_PUBLIC_QA_MODE === "true";
+
+          let dbFallbackSucceeded = false;
+
+          if (!isQaForDbFallback) {
+            try {
+              const dbRes = await fetch(
+                `/api/analyze/${param.session_id}/result-scenes`,
+              );
+              if (dbRes.ok) {
+                const dbData = (await dbRes.json()) as { scenes: ResultScene[] };
+                if (dbData.scenes.length > 0) {
+                  resultScenes = dbData.scenes;
+                  dbFallbackSucceeded = true;
+                  console.log(
+                    `[result] DB fallback 성공: ${resultScenes.length}개 scenes`,
+                  );
+                } else {
+                  console.log(
+                    "[result] DB fallback: 저장된 scenes 없음 → 기존 fallback",
+                  );
+                }
+              } else {
+                console.warn(
+                  `[result] DB fallback non-ok: HTTP ${dbRes.status} → 기존 fallback`,
+                );
+              }
+            } catch (dbErr) {
+              console.warn("[result] DB fallback 실패 → 기존 fallback:", dbErr);
+            }
+          } else {
+            console.log("[result] QA mode — DB fallback skip");
+          }
+
           // ── 캐시 없음: API 시도 → 실패 시 mock fallback ──────────────
           // useMock=true : API key 없이 빠른 개발 확인용. 직접 mock 사용.
           // useMock=false: 실제 API 호출. 실패해도 mock으로 UX 유지 (에러 화면 없음).
           const useMock = process.env.NEXT_PUBLIC_USE_MOCK_RESULT !== "false";
-
-          if (useMock) {
-            resultScenes = generateMockResultScenes(data.content_id);
-          } else {
-            try {
-              // ── 실제 Claude generate fallback ────────────────────────
-              // analyze page가 이미 생성해서 캐시했으면 여기 오지 않는다.
-              // 직접 URL 접근이나 analyze 실패 후 재방문 시의 fallback 경로.
-              const content = CONTENTS.find(
-                (c) => c.id === data.content_id,
-              );
-              if (!content) {
-                throw new Error(`콘텐츠를 찾을 수 없어: ${data.content_id}`);
-              }
-
-              const inputConfig = INPUT_CONFIGS[data.content_id];
-              const sceneConfig = getSceneConfig(data.content_id);
-
-              const userAnswers = data.answers
-                .filter(
-                  (a: Answer) =>
-                    Array.isArray(a.answer_options) &&
-                    a.answer_options.length > 0,
-                )
-                .map((a: Answer) => {
-                  // V2: step_id 기반으로 step 조회 → option label 추출
-                  const step = inputConfig?.steps.find((s) => s.id === a.step_id);
-                  const labels = (a.answer_options ?? []).map((value) => {
-                    if (!step || step.type === "freeText") return value;
-                    const option = step.options.find((o) => o.value === value);
-                    return option?.label ?? value;
-                  });
-                  return {
-                    step_id: a.step_id,
-                    question_text: a.question_text,
-                    values: a.answer_options ?? [],
-                    labels,
-                  };
-                });
-
-              const freeSceneIndexes = sceneConfig.scenes
-                .filter((s) => s.is_free)
-                .map((s) => s.index);
-
-              const stateSummary = pack
-                ? translateStateToSummary(hiddenScores, pack.translationRules)
-                : [];
-
-              const res = await fetch(
-                `/api/analyze/${param.session_id}/generate`,
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    content_title: content.title.replace(/\n/g, " "),
-                    category: content.category,
-                    user_input: {
-                      text: data.free_input,
-                      answers: userAnswers,
-                    },
-                    scene_config: sceneConfig,
-                    scene_indexes: freeSceneIndexes,
-                    state_summary: stateSummary,
-                  }),
-                },
-              );
-
-              if (!res.ok) {
-                const errData = (await res.json()) as { error?: string };
-                throw new Error(
-                  errData.error ?? `결과 생성 실패 (HTTP ${res.status})`,
-                );
-              }
-
-              const resData = (await res.json()) as {
-                session_id: string;
-                result_scenes: ResultScene[];
-              };
-              resultScenes = resData.result_scenes;
-              localStorage.setItem(freeScenesKey, JSON.stringify(resultScenes));
-            } catch (apiErr) {
-              // API 실패 → mock으로 UX 유지. 에러 화면 절대 안 뜸.
-              console.warn("[result] fallback generate 실패, mock 사용:", apiErr);
+          // DB fallback이 scenes를 채운 경우 아래 기존 fallback은 실행하지 않는다.
+          if (!dbFallbackSucceeded) {
+            if (useMock) {
               resultScenes = generateMockResultScenes(data.content_id);
+            } else {
+              try {
+                // ── 실제 Claude generate fallback ────────────────────────
+                // analyze page가 이미 생성해서 캐시했으면 여기 오지 않는다.
+                // 직접 URL 접근이나 analyze 실패 후 재방문 시의 fallback 경로.
+                const content = CONTENTS.find(
+                  (c) => c.id === data.content_id,
+                );
+                if (!content) {
+                  throw new Error(`콘텐츠를 찾을 수 없어: ${data.content_id}`);
+                }
+
+                const inputConfig = INPUT_CONFIGS[data.content_id];
+                const sceneConfig = getSceneConfig(data.content_id);
+
+                const userAnswers = data.answers
+                  .filter(
+                    (a: Answer) =>
+                      Array.isArray(a.answer_options) &&
+                      a.answer_options.length > 0,
+                  )
+                  .map((a: Answer) => {
+                    // V2: step_id 기반으로 step 조회 → option label 추출
+                    const step = inputConfig?.steps.find((s) => s.id === a.step_id);
+                    const labels = (a.answer_options ?? []).map((value) => {
+                      if (!step || step.type === "freeText") return value;
+                      const option = step.options.find((o) => o.value === value);
+                      return option?.label ?? value;
+                    });
+                    return {
+                      step_id: a.step_id,
+                      question_text: a.question_text,
+                      values: a.answer_options ?? [],
+                      labels,
+                    };
+                  });
+
+                const freeSceneIndexes = sceneConfig.scenes
+                  .filter((s) => s.is_free)
+                  .map((s) => s.index);
+
+                const stateSummary = pack
+                  ? translateStateToSummary(hiddenScores, pack.translationRules)
+                  : [];
+
+                const res = await fetch(
+                  `/api/analyze/${param.session_id}/generate`,
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      content_title: content.title.replace(/\n/g, " "),
+                      category: content.category,
+                      user_input: {
+                        text: data.free_input,
+                        answers: userAnswers,
+                      },
+                      scene_config: sceneConfig,
+                      scene_indexes: freeSceneIndexes,
+                      state_summary: stateSummary,
+                    }),
+                  },
+                );
+
+                if (!res.ok) {
+                  const errData = (await res.json()) as { error?: string };
+                  throw new Error(
+                    errData.error ?? `결과 생성 실패 (HTTP ${res.status})`,
+                  );
+                }
+
+                const resData = (await res.json()) as {
+                  session_id: string;
+                  result_scenes: ResultScene[];
+                };
+                resultScenes = resData.result_scenes;
+                localStorage.setItem(freeScenesKey, JSON.stringify(resultScenes));
+              } catch (apiErr) {
+                // API 실패 → mock으로 UX 유지. 에러 화면 절대 안 뜸.
+                console.warn("[result] fallback generate 실패, mock 사용:", apiErr);
+                resultScenes = generateMockResultScenes(data.content_id);
+              }
             }
           }
         }
