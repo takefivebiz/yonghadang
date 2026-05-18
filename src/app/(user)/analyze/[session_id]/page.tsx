@@ -357,6 +357,7 @@ const AnalyzePage = ({ params }: PageProps) => {
               scene_config: sceneConfig,
               scene_indexes: freeSceneIndexes,
               state_summary: stateSummary,
+              is_qa: true,
             }),
           },
         );
@@ -413,6 +414,7 @@ const AnalyzePage = ({ params }: PageProps) => {
                 scene_indexes: paidSceneIndexes,
                 free_scene_context: freeSceneContext,
                 state_summary: stateSummary,
+                is_qa: true,
               }),
             },
           );
@@ -472,6 +474,7 @@ const AnalyzePage = ({ params }: PageProps) => {
               scene_config: sceneConfig,
               scene_indexes: freeSceneIndexes,
               state_summary: stateSummary,
+              is_qa: false,
             }),
           },
         );

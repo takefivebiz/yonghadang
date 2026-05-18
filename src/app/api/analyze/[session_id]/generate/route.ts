@@ -11,6 +11,7 @@ import {
 } from "@/lib/prompts/generate-result";
 import { SceneConfig } from "@/lib/types/content";
 import { ResultScene } from "@/lib/types/result";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 
 // TODO: [백엔드 연동] Supabase service_role 클라이언트로 세션·콘텐츠 조회로 교체
 
@@ -34,6 +35,8 @@ export interface GenerateRequestBody {
   free_scene_context?: FreeSceneContext;  // 유료 scene 생성 시 필요: 무료 scene의 마지막 메시지
   /** 클라이언트에서 hidden state 계산 후 전달하는 사용자 내면 상태 요약문. Claude 프롬프트에 주입된다. */
   state_summary?: string[];
+  /** true이면 DB 저장을 skip한다. QA 모드(?qa=1) 전용. */
+  is_qa?: boolean;
 }
 
 export interface GenerateResponseBody {
@@ -68,7 +71,7 @@ export const POST = async (
 
   try {
     const body = (await req.json()) as GenerateRequestBody;
-    const { content_title, category, user_input, scene_config, scene_indexes, free_scene_context, state_summary } = body;
+    const { content_title, category, user_input, scene_config, scene_indexes, free_scene_context, state_summary, is_qa } = body;
 
     console.log(`[generate] state_summary 수신 (${state_summary?.length ?? 0}개):`, state_summary);
 
@@ -242,7 +245,47 @@ export const POST = async (
       rawResult.scenes,
     );
 
-    // TODO: [백엔드 연동] result_scenes를 Supabase scenes 테이블에 저장
+    // ── DB 저장: 무료씬 generate 완료 시 result_scenes upsert + session status 업데이트 ──
+    // 유료씬 저장 및 loop_answers 저장은 이번 커밋 범위 밖이다 (커밋 C에서 처리).
+    // QA 모드(is_qa=true)는 skip한다. 실패해도 API 응답은 정상 반환한다.
+    if (!is_qa) {
+      try {
+        const supabase = createServiceRoleClient();
+
+        const rows = result_scenes.map((scene) => ({
+          session_id,
+          scene_index: scene.scene_index,
+          scene_title: scene.scene_title,
+          messages: scene.messages ?? [],
+          preview_messages: scene.preview_messages ?? null,
+          is_free: scene.is_free,
+          status: "completed" as const,
+        }));
+
+        const { error: upsertError } = await supabase
+          .from("result_scenes")
+          .upsert(rows, { onConflict: "session_id,scene_index" });
+
+        if (upsertError) {
+          console.error(`[generate] result_scenes upsert 실패 session=${session_id}:`, upsertError);
+        } else {
+          console.log(`[generate] result_scenes DB 저장 완료 session=${session_id} (${rows.length}개)`);
+        }
+
+        const { error: statusError } = await supabase
+          .from("analysis_sessions")
+          .update({ status: "completed" })
+          .eq("id", session_id);
+
+        if (statusError) {
+          console.error(`[generate] analysis_sessions status 업데이트 실패 session=${session_id}:`, statusError);
+        }
+      } catch (dbError) {
+        console.error(`[generate] DB 저장 중 예외 session=${session_id}:`, dbError);
+      }
+    } else {
+      console.log(`[generate] QA mode — DB 저장 skip session=${session_id}`);
+    }
 
     return NextResponse.json(
       {
