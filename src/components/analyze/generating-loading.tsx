@@ -132,12 +132,12 @@ const GeneratingLoading = ({ progress }: GeneratingLoadingProps) => {
               width: "100px",
               height: "55px",
               background: "rgba(255, 255, 255, 0.04)",
-              border: "1px solid rgba(209, 126, 191, 0.27)",
+              border: "1px solid rgba(143, 122, 216, 0.24)",
               borderRadius: "25px 25px 25px 4px",
               padding: "16px",
               overflow: "hidden",
               boxShadow:
-                "0 0 24px rgba(209, 109, 172, 0.12), inset 0 0 12px rgba(209, 109, 172, 0.08)",
+                "0 0 24px rgba(143, 122, 216, 0.11), inset 0 0 12px rgba(143, 122, 216, 0.07)",
             }}
           >
             {/* 채우는 효과 - 아래에서 위로 */}
@@ -146,7 +146,7 @@ const GeneratingLoading = ({ progress }: GeneratingLoadingProps) => {
                 position: "absolute",
                 inset: 0,
                 background:
-                  "linear-gradient(to top, rgba(209, 109, 172, 0.15), transparent)",
+                  "linear-gradient(to top, rgba(143, 122, 216, 0.13), transparent)",
                 clipPath: `inset(${Math.max(0, 100 - progressPercent)}% 0 0 0)`,
                 transition: "clip-path 300ms ease-out",
                 borderRadius: "16px 16px 16px 4px",

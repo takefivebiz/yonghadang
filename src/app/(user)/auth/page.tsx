@@ -86,7 +86,7 @@ const AuthPageContent = () => {
 
           <div className="relative mt-6 w-full">
             <h1 className="font-hero text-[1.7rem] leading-[1.18] tracking-normal text-highlight/95">
-              파일 열람을
+              <span className="text-accent/90">파일 열람</span>을
               <br />
               계속하려면
             </h1>
@@ -126,7 +126,7 @@ const AuthPageContent = () => {
           <button
             onClick={() => handleSocialLogin("google")}
             disabled={loadingProvider !== null}
-            className="group flex h-[60px] w-full items-center justify-center gap-4 rounded-lg border border-white/12 bg-highlight/10 px-4 text-[#ffffffb5] shadow-[0_14px_40px_rgba(0,0,0,0.20)] transition-all duration-200 hover:bg-highlight/90 disabled:cursor-not-allowed disabled:opacity-30"
+            className="group flex h-[60px] w-full items-center justify-center gap-4 rounded-lg border border-accent/20 bg-accent/12 px-4 text-[#ffffffb5] shadow-[0_14px_40px_rgba(0,0,0,0.20)] transition-all duration-200 hover:border-accent/32 hover:bg-accent/18 disabled:cursor-not-allowed disabled:opacity-30"
           >
             {loadingProvider === "google" ? (
               <span className="h-4 w-4 animate-spin rounded-full border border-[#1f1a2d]/25 border-t-[#1f1a2d]/80" />
@@ -167,7 +167,7 @@ const AuthPageContent = () => {
           <button
             onClick={() => handleSocialLogin("kakao")}
             disabled={loadingProvider !== null}
-            className="group flex h-[60px] w-full items-center justify-center gap-4 rounded-lg border border-white/12 bg-highlight/10 px-4 text-[#ffffffb5] shadow-[0_14px_40px_rgba(0,0,0,0.20)] transition-all duration-200 hover:bg-highlight/90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="group flex h-[60px] w-full items-center justify-center gap-4 rounded-lg border border-accent/20 bg-accent/12 px-4 text-[#ffffffb5] shadow-[0_14px_40px_rgba(0,0,0,0.20)] transition-all duration-200 hover:border-accent/32 hover:bg-accent/18 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loadingProvider === "kakao" ? (
               <span className="h-4 w-4 animate-spin rounded-full border border-highlight/30 border-t-highlight/80" />

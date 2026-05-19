@@ -98,8 +98,10 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
               style={{
                 flex: "0 1 auto",
                 height: "38px",
-                background: "rgba(110, 70, 100, 0.35)",
-                border: "1px solid rgba(201, 139, 176, 0.25)",
+                background: "rgba(92, 74, 132, 0.32)",
+                borderTop: "1px solid rgba(143, 122, 216, 0.24)",
+                borderRight: "1px solid rgba(143, 122, 216, 0.24)",
+                borderLeft: "1px solid rgba(143, 122, 216, 0.24)",
                 borderBottom: "none",
                 borderRadius: "14px 14px 0 0",
                 display: "flex",
@@ -133,8 +135,10 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                 flex: "0 1 auto",
                 height: "38px",
                 background: "rgba(60, 45, 65, 0.4)",
-                border: "1px solid rgba(201, 139, 176, 0.35)",
-                borderBottom: "1px solid rgba(201, 139, 176, 0.35)",
+                borderTop: "1px solid rgba(143, 122, 216, 0.28)",
+                borderRight: "1px solid rgba(143, 122, 216, 0.28)",
+                borderLeft: "1px solid rgba(143, 122, 216, 0.28)",
+                borderBottom: "1px solid rgba(143, 122, 216, 0.28)",
                 borderRadius: "14px 14px 0 0",
                 display: "flex",
                 alignItems: "center",
@@ -169,8 +173,10 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                 flex: "0 1 auto",
                 height: "38px",
                 background: "rgba(50, 35, 60, 0.3)",
-                border: "1px solid rgba(201, 139, 176, 0.10)",
-                borderBottom: "1px solid rgba(201, 139, 176, 0.10)",
+                borderTop: "1px solid rgba(143, 122, 216, 0.10)",
+                borderRight: "1px solid rgba(143, 122, 216, 0.10)",
+                borderLeft: "1px solid rgba(143, 122, 216, 0.10)",
+                borderBottom: "1px solid rgba(143, 122, 216, 0.10)",
                 borderRadius: "14px 14px 0 0",
                 display: "flex",
                 alignItems: "center",
@@ -205,7 +211,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
             className="relative"
             style={{
               background: "rgba(60, 45, 65, 0.3)",
-              border: "1px solid rgba(201, 139, 176, 0.25)",
+              border: "1px solid rgba(143, 122, 216, 0.22)",
               borderTopLeftRadius: "0",
               borderTopRightRadius: "18px",
               borderBottomLeftRadius: "18px",
@@ -255,12 +261,12 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                   style={{
                     flex: 1,
                     height: "1px",
-                    background: "rgba(201, 139, 176, 0.15)",
+                    background: "rgba(143, 122, 216, 0.12)",
                   }}
                 />
                 <span
                   className="text-[11px] font-medium tracking-wider whitespace-nowrap"
-                  style={{ color: "rgba(201, 139, 176, 0.4)" }}
+                  style={{ color: "rgba(143, 122, 216, 0.4)" }}
                 >
                   이 파일에 포함된 기록
                 </span>
@@ -268,7 +274,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                   style={{
                     flex: 1,
                     height: "1px",
-                    background: "rgba(201, 139, 176, 0.15)",
+                    background: "rgba(143, 122, 216, 0.12)",
                   }}
                 />
               </div>
@@ -288,7 +294,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="2"
-                            style={{ color: "rgba(201, 139, 176, 0.45)" }}
+                            style={{ color: "rgba(143, 122, 216, 0.45)" }}
                           >
                             <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
                             <polyline points="13 2 13 9 20 9" />
@@ -339,31 +345,31 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                     className="w-full py-4 text-base font-medium transition-all duration-300 flex items-center justify-center gap-2"
                     style={{
                       borderRadius: "12px",
-                      background: "rgba(201, 139, 176, 0.1)",
-                      border: "1px solid rgba(201, 139, 176, 0.2)",
+                      background: "rgba(143, 122, 216, 0.1)",
+                      border: "1px solid rgba(143, 122, 216, 0.2)",
                       color: "rgba(255, 255, 255, 0.85)",
                       boxShadow:
-                        "0 2px 4px rgba(201, 139, 176, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+                        "0 2px 4px rgba(143, 122, 216, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor =
-                        "rgba(201, 139, 176, 0.35)";
+                        "rgba(143, 122, 216, 0.35)";
                       e.currentTarget.style.background =
-                        "rgba(201, 139, 176, 0.13)";
+                        "rgba(143, 122, 216, 0.13)";
                       e.currentTarget.style.boxShadow =
-                        "0 3px 6px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
+                        "0 3px 6px rgba(143, 122, 216, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor =
-                        "rgba(201, 139, 176, 0.2)";
+                        "rgba(143, 122, 216, 0.2)";
                       e.currentTarget.style.background =
-                        "rgba(201, 139, 176, 0.1)";
+                        "rgba(143, 122, 216, 0.1)";
                       e.currentTarget.style.boxShadow =
-                        "0 2px 4px rgba(201, 139, 176, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
+                        "0 2px 4px rgba(143, 122, 216, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
                     }}
                     onMouseDown={(e) => {
                       e.currentTarget.style.boxShadow =
-                        "0 1px 2px rgba(201, 139, 176, 0.08) inset";
+                        "0 1px 2px rgba(143, 122, 216, 0.08) inset";
                     }}
                   >
                     이어하기
@@ -374,35 +380,35 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                     className="w-full py-4 text-base font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center gap-2"
                     style={{
                       borderRadius: "12px",
-                      background: "rgba(201, 139, 176, 0.18)",
-                      border: "1px solid rgba(201, 139, 176, 0.32)",
+                      background: "rgba(143, 122, 216, 0.16)",
+                      border: "1px solid rgba(143, 122, 216, 0.3)",
                       color: "rgba(255, 255, 255, 0.95)",
-                      boxShadow: "0 4px 8px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+                      boxShadow: "0 4px 8px rgba(143, 122, 216, 0.14), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
                     }}
                     onMouseEnter={(e) => {
                       if (!loading) {
                         e.currentTarget.style.borderColor =
-                          "rgba(201, 139, 176, 0.35)";
+                          "rgba(143, 122, 216, 0.35)";
                         e.currentTarget.style.background =
-                          "rgba(201, 139, 176, 0.14)";
+                          "rgba(143, 122, 216, 0.14)";
                         e.currentTarget.style.boxShadow =
-                          "0 3px 6px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
+                          "0 3px 6px rgba(143, 122, 216, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!loading) {
                         e.currentTarget.style.borderColor =
-                          "rgba(201, 139, 176, 0.32)";
+                          "rgba(143, 122, 216, 0.3)";
                         e.currentTarget.style.background =
-                          "rgba(201, 139, 176, 0.18)";
+                          "rgba(143, 122, 216, 0.16)";
                         e.currentTarget.style.boxShadow =
-                          "0 4px 8px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
+                          "0 4px 8px rgba(143, 122, 216, 0.14), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
                       }
                     }}
                     onMouseDown={(e) => {
                       if (!loading) {
                         e.currentTarget.style.boxShadow =
-                          "0 1px 2px rgba(201, 139, 176, 0.08) inset";
+                          "0 1px 2px rgba(143, 122, 216, 0.08) inset";
                       }
                     }}
                   >
@@ -417,35 +423,35 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                   className="w-full py-4 text-base font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
                   style={{
                     borderRadius: "12px",
-                    background: "rgba(201, 139, 176, 0.18)",
-                    border: "1px solid rgba(201, 139, 176, 0.32)",
+                    background: "rgba(143, 122, 216, 0.16)",
+                    border: "1px solid rgba(143, 122, 216, 0.3)",
                     color: "rgba(255, 255, 255, 0.95)",
-                    boxShadow: "0 4px 8px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+                    boxShadow: "0 4px 8px rgba(143, 122, 216, 0.14), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
                   }}
                   onMouseEnter={(e) => {
                     if (!loading) {
                       e.currentTarget.style.borderColor =
-                        "rgba(201, 139, 176, 0.35)";
+                        "rgba(143, 122, 216, 0.35)";
                       e.currentTarget.style.background =
-                        "rgba(201, 139, 176, 0.14)";
+                        "rgba(143, 122, 216, 0.14)";
                       e.currentTarget.style.boxShadow =
-                        "0 3px 6px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
+                        "0 3px 6px rgba(143, 122, 216, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!loading) {
                       e.currentTarget.style.borderColor =
-                        "rgba(201, 139, 176, 0.2)";
+                        "rgba(143, 122, 216, 0.2)";
                       e.currentTarget.style.background =
-                        "rgba(201, 139, 176, 0.12)";
+                        "rgba(143, 122, 216, 0.12)";
                       e.currentTarget.style.boxShadow =
-                        "0 2px 4px rgba(201, 139, 176, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
+                        "0 2px 4px rgba(143, 122, 216, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
                     }
                   }}
                   onMouseDown={(e) => {
                     if (!loading) {
                       e.currentTarget.style.boxShadow =
-                        "0 1px 2px rgba(201, 139, 176, 0.08) inset";
+                        "0 1px 2px rgba(143, 122, 216, 0.08) inset";
                     }
                   }}
                 >

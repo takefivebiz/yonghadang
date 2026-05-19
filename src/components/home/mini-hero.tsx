@@ -74,7 +74,7 @@ const MiniHero = () => {
             >
               무슨 일인지,
               <br />
-              <span style={{ color: "#907ae0" }}>나한테 다 말해봐</span>
+              <span style={{ color: "#9b88df" }}>나한테 다 말해봐</span>
             </h1>
 
             {/* 부제 */}
@@ -92,7 +92,7 @@ const MiniHero = () => {
               내가{" "}
               <span
                 style={{
-                  color: "rgb(230, 131, 192)",
+                  color: "rgba(155, 136, 223, 0.88)",
                 }}
               >
                 정확하게{" "}
@@ -108,7 +108,7 @@ const MiniHero = () => {
                 className="flex-1 px-6 py-2 rounded-lg font-body text-center transition-all duration-200 hover:opacity-90"
                 aria-label="감정 의뢰하기"
                 style={{
-                  background: "#5f4f98",
+                  background: "#7562b0",
                   color: "rgba(249, 249, 229, 0.95)",
                   fontSize: "0.95rem",
                   fontWeight: 500,
@@ -122,8 +122,8 @@ const MiniHero = () => {
                 className="flex-1 px-6 py-2 rounded-lg font-body text-center transition-all duration-200 hover:border-opacity-100"
                 aria-label="파일 열람하기"
                 style={{
-                  border: "1px solid #5f4f989a",
-                  background: "#2c264099",
+                  border: "1px solid rgba(143, 122, 216, 0.42)",
+                  background: "rgba(38, 32, 58, 0.72)",
                   color: "rgba(249, 249, 229, 0.85)",
                   fontSize: "0.95rem",
                   fontWeight: 500,

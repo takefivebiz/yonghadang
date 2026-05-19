@@ -20,26 +20,26 @@ const CATEGORY_CONFIG: Record<
   love: {
     label: "연애·결혼",
     description: "좋아하는 마음이 복잡하다면",
-    accentColor: "text-[rgba(209,109,172,0.6)]",
-    accentBg: "bg-[rgba(209,109,172,0.08)]",
+    accentColor: "text-[rgba(209,109,172,0.42)]",
+    accentBg: "bg-[rgba(209,109,172,0.045)]",
   },
   relationship: {
     label: "인간관계",
     description: "사람 사이에서 지친다면",
-    accentColor: "text-[rgba(105,169,190,0.6)]",
-    accentBg: "bg-[rgba(105,169,190,0.08)]",
+    accentColor: "text-[rgba(105,169,190,0.42)]",
+    accentBg: "bg-[rgba(105,169,190,0.045)]",
   },
   career: {
     label: "직업·진로",
     description: "선택 앞에서 망설이고 있다면",
-    accentColor: "text-[rgba(190,172,145,0.6)]",
-    accentBg: "bg-[rgba(190,172,145,0.08)]",
+    accentColor: "text-[rgba(190,172,145,0.42)]",
+    accentBg: "bg-[rgba(190,172,145,0.045)]",
   },
   emotion: {
     label: "감정",
     description: "설명되지 않는 감정이 있다면",
-    accentColor: "text-[rgba(160,118,210,0.6)]",
-    accentBg: "bg-[rgba(160,118,210,0.08)]",
+    accentColor: "text-[rgba(160,118,210,0.42)]",
+    accentBg: "bg-[rgba(160,118,210,0.045)]",
   },
 };
 
@@ -94,7 +94,7 @@ const CategorySelectSheet = ({ isOpen, onClose }: CategorySelectSheetProps) => {
                   <div key={category} className="flex justify-end">
                     <button
                       onClick={() => handleCategorySelect(category)}
-                      className={`group rounded-2xl rounded-br-none border border-white/5 ${config.accentBg} px-4 py-2.5 text-left transition-all duration-200 hover:border-white/10`}
+                      className={`group rounded-2xl rounded-br-none border border-accent/10 ${config.accentBg} px-4 py-2.5 text-left transition-all duration-200 hover:border-accent/20`}
                     >
                       <div className="flex flex-col gap-1.5">
                         {/* 아이콘 + 카테고리 */}
@@ -107,7 +107,7 @@ const CategorySelectSheet = ({ isOpen, onClose }: CategorySelectSheetProps) => {
                                 viewBox="0 0 24 24"
                                 strokeWidth="1.5"
                                 stroke="currentColor"
-                                className="w-3 h-3 text-pink-400/60"
+                                className="w-3 h-3 text-pink-400/35"
                               >
                                 <path
                                   strokeLinecap="round"
@@ -123,7 +123,7 @@ const CategorySelectSheet = ({ isOpen, onClose }: CategorySelectSheetProps) => {
                                 viewBox="0 0 24 24"
                                 strokeWidth="1.5"
                                 stroke="currentColor"
-                                className="w-4 h-4 text-blue-400/60"
+                                className="w-4 h-4 text-blue-400/35"
                               >
                                 <path
                                   strokeLinecap="round"
@@ -139,7 +139,7 @@ const CategorySelectSheet = ({ isOpen, onClose }: CategorySelectSheetProps) => {
                                 viewBox="0 0 24 24"
                                 strokeWidth="1.5"
                                 stroke="currentColor"
-                                className="w-4 h-4 text-amber-400/60"
+                                className="w-4 h-4 text-amber-400/35"
                               >
                                 <path
                                   strokeLinecap="round"
@@ -155,7 +155,7 @@ const CategorySelectSheet = ({ isOpen, onClose }: CategorySelectSheetProps) => {
                                 viewBox="0 0 24 24"
                                 strokeWidth="1.5"
                                 stroke="currentColor"
-                                className="w-4 h-4 text-purple-400/60"
+                                className="w-4 h-4 text-purple-400/35"
                               >
                                 <path
                                   strokeLinecap="round"

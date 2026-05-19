@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { formatDate, formatCategoryName } from "@/lib/utils";
 import type { AnalyzeAnswers } from "@/lib/types/analyze";
 import type { ResultScene } from "@/lib/types/result";
-import type { GuestSessionData, GuestVerifyResponse } from "@/app/api/guest/verify/route";
+import type {
+  GuestSessionData,
+  GuestVerifyResponse,
+} from "@/app/api/guest/verify/route";
 
 type Step = 1 | 2;
 
@@ -135,7 +138,9 @@ export default function GuestPage() {
         JSON.stringify(sessionData.scenes),
       );
     } else {
-      const freeScenes = sessionData.scenes.filter((sc: ResultScene) => sc.is_free);
+      const freeScenes = sessionData.scenes.filter(
+        (sc: ResultScene) => sc.is_free,
+      );
       localStorage.setItem(
         `veil_free_scenes_${sessionId}`,
         JSON.stringify(freeScenes),
@@ -235,8 +240,8 @@ function StepOne({
           color: rgba(249, 249, 229, 0.2);
         }
         .veil-guest-input:focus {
-          background-color: rgba(209, 109, 172, 0.12);
-          border-color: rgba(209, 109, 172, 0.4);
+          background-color: rgba(143, 122, 216, 0.1);
+          border-color: rgba(143, 122, 216, 0.36);
         }
       `}</style>
       <div className="space-y-12">
@@ -255,12 +260,12 @@ function StepOne({
                 cx="16"
                 cy="10"
                 r="4"
-                stroke="rgba(209, 109, 172, 0.6)"
+                stroke="rgba(143, 122, 216, 0.58)"
                 strokeWidth="1.5"
               />
               <path
                 d="M 8 22 Q 8 18 16 18 Q 24 18 24 22 L 24 26 Q 24 27 23 27 L 9 27 Q 8 27 8 26 Z"
-                stroke="rgba(209, 109, 172, 0.6)"
+                stroke="rgba(143, 122, 216, 0.58)"
                 strokeWidth="1.5"
                 fill="none"
               />
@@ -268,13 +273,13 @@ function StepOne({
           </div>
           <h1
             className="text-2xl sm:text-3xl font-semibold leading-tight"
-            style={{ color: "#d16daccc" }}
+            style={{ color: "rgba(143, 122, 216, 0.82)" }}
           >
             비회원 <span style={{ color: "#f9f9e5d8" }}>조회</span>
             <br />
           </h1>
           <p className="text-sm leading-relaxed" style={{ color: "#f9f9e57a" }}>
-            이전에 입력했던 정보로 확인할 수 있어
+            이전 의뢰 기록을 열람할 수 있어
           </p>
         </div>
 
@@ -296,8 +301,8 @@ function StepOne({
               disabled={isLoading}
               className="veil-guest-input w-full rounded px-4 py-3 text-[16px] transition-colors duration-200 focus:outline-none"
               style={{
-                backgroundColor: "rgba(209, 109, 172, 0.08)",
-                border: "1px solid rgba(209, 109, 172, 0.285)",
+                backgroundColor: "rgba(143, 122, 216, 0.07)",
+                border: "1px solid rgba(143, 122, 216, 0.24)",
                 color: "rgba(249, 249, 229, 0.85)",
                 opacity: isLoading ? 0.5 : 1,
                 cursor: isLoading ? "not-allowed" : "text",
@@ -323,8 +328,8 @@ function StepOne({
               maxLength={4}
               className="veil-guest-input w-full rounded px-4 py-3 text-[16px] transition-colors duration-200 focus:outline-none"
               style={{
-                backgroundColor: "rgba(209, 109, 172, 0.08)",
-                border: "1px solid rgba(209, 109, 172, 0.285)",
+                backgroundColor: "rgba(143, 122, 216, 0.07)",
+                border: "1px solid rgba(143, 122, 216, 0.24)",
                 color: "rgba(249, 249, 229, 0.85)",
                 opacity: isLoading ? 0.5 : 1,
                 cursor: isLoading ? "not-allowed" : "text",
@@ -351,8 +356,8 @@ function StepOne({
           style={{
             backgroundColor:
               isValid && !isLoading
-                ? "rgba(209, 109, 172, 0.422)"
-                : "rgba(209, 109, 172, 0.102)",
+                ? "rgba(143, 122, 216, 0.42)"
+                : "rgba(143, 122, 216, 0.1)",
             color:
               isValid && !isLoading
                 ? "rgba(249, 249, 229, 0.85)"
@@ -395,7 +400,7 @@ function StepTwo({
           >
             <path
               d="M 8 10 L 16 4 L 24 10 L 24 26 Q 24 27 23 27 L 9 27 Q 8 27 8 26 Z"
-              stroke="rgba(209, 109, 172, 0.6)"
+              stroke="rgba(143, 122, 216, 0.58)"
               strokeWidth="1.5"
               fill="none"
             />
@@ -404,14 +409,14 @@ function StepTwo({
               y1="14"
               x2="16"
               y2="22"
-              stroke="rgba(209, 109, 172, 0.6)"
+              stroke="rgba(143, 122, 216, 0.58)"
               strokeWidth="1.5"
             />
           </svg>
         </div>
         <h2
           className="text-2xl sm:text-3xl font-semibold leading-tight"
-          style={{ color: "#d16daccc" }}
+          style={{ color: "rgba(143, 122, 216, 0.82)" }}
         >
           지난 <span style={{ color: "#f9f9e5d8" }}>기록</span>
           <br />
@@ -430,16 +435,16 @@ function StepTwo({
             onClick={() => onSelectSession(session.session_id)}
             className="cursor-pointer transition-all duration-200 rounded-lg px-3 py-4"
             style={{
-              backgroundColor: "rgba(209, 109, 172, 0.06)",
-              border: "1px solid rgba(209, 109, 172, 0.10)",
+              backgroundColor: "rgba(143, 122, 216, 0.055)",
+              border: "1px solid rgba(143, 122, 216, 0.10)",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor =
-                "rgba(209, 109, 172, 0.12)";
+                "rgba(143, 122, 216, 0.1)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor =
-                "rgba(209, 109, 172, 0.06)";
+                "rgba(143, 122, 216, 0.055)";
             }}
           >
             <h3
@@ -472,16 +477,16 @@ function StepTwo({
           className="w-full cursor-pointer transition-all duration-200 rounded-lg px-3 py-3 text-center text-xs font-normal"
           style={{
             backgroundColor: "transparent",
-            border: "1px solid rgba(209, 109, 172, 0.25)",
-            color: "rgba(209, 109, 172, 0.638)",
+            border: "1px solid rgba(143, 122, 216, 0.24)",
+            color: "rgba(143, 122, 216, 0.64)",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "rgba(209, 109, 172, 0.497)";
-            e.currentTarget.style.color = "rgba(209, 109, 172, 0.821)";
+            e.currentTarget.style.borderColor = "rgba(143, 122, 216, 0.42)";
+            e.currentTarget.style.color = "rgba(143, 122, 216, 0.82)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "rgba(209, 109, 172, 0.25)";
-            e.currentTarget.style.color = "rgba(209, 109, 172, 0.6)";
+            e.currentTarget.style.borderColor = "rgba(143, 122, 216, 0.24)";
+            e.currentTarget.style.color = "rgba(143, 122, 216, 0.64)";
           }}
         >
           다른 콘텐츠 보기

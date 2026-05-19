@@ -12,7 +12,7 @@ const placeholderStyles = `
 
   .veil-textarea {
     scrollbar-width: thin;
-    scrollbar-color: rgba(201, 139, 176, 0.2) transparent;
+    scrollbar-color: rgba(143, 122, 216, 0.18) transparent;
   }
 
   .veil-textarea::-webkit-scrollbar {
@@ -24,7 +24,7 @@ const placeholderStyles = `
   }
 
   .veil-textarea::-webkit-scrollbar-thumb {
-    background: rgba(201, 139, 176, 0.2);
+    background: rgba(143, 122, 216, 0.18);
     border-radius: 3px;
   }
 `;
@@ -98,7 +98,7 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
             }}
           >
             먼저, <br />
-            <span style={{ color: "rgba(201, 139, 176, 0.95)" }}>
+            <span style={{ color: "rgba(143, 122, 216, 0.88)" }}>
               지금 네 상황을{" "}
             </span>
             <br />
@@ -143,7 +143,7 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
         style={{
           display: "flex",
           background: "rgba(249, 229, 229, 0.03)",
-          border: "1px solid rgba(201, 139, 176, 0.15)",
+          border: "1px solid rgba(143, 122, 216, 0.14)",
           borderRadius: "6px",
           overflow: "hidden",
           marginBottom: "5px",
@@ -153,8 +153,8 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
         <div
           style={{
             width: "20px",
-            borderRight: "1px solid rgba(201, 139, 176, 0.12)",
-            background: "rgba(201, 139, 176, 0.072)",
+            borderRight: "1px solid rgba(143, 122, 216, 0.11)",
+            background: "rgba(143, 122, 216, 0.06)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -171,7 +171,7 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
                 height: "8px",
                 borderRadius: "50%",
                 background: "rgba(48, 31, 41, 0.15)",
-                border: "1px solid rgba(201, 139, 176, 0.415)",
+                border: "1px solid rgba(143, 122, 216, 0.34)",
               }}
             />
           ))}
@@ -186,8 +186,8 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
               to bottom,
               transparent,
               transparent 23px,
-              rgba(218, 179, 202, 0.038) 23px,
-              rgba(221, 183, 206, 0.052) 24px
+              rgba(143, 122, 216, 0.028) 23px,
+              rgba(143, 122, 216, 0.042) 24px
             )`,
             backgroundSize: "100% 24px",
             backgroundAttachment: "local",
@@ -216,7 +216,7 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
               fontSize: "14px",
               lineHeight: "24px",
               color: "rgba(249, 249, 229, 0.8)",
-              caretColor: "rgba(201, 139, 176, 0.6)",
+              caretColor: "rgba(143, 122, 216, 0.58)",
               fontFamily: "inherit",
               fontWeight: "400",
             }}
@@ -262,41 +262,41 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
         style={{
           borderRadius: "12px",
           background: isSubmitDisabled
-            ? "rgba(201, 139, 176, 0.08)"
-            : "rgba(201, 139, 176, 0.12)",
+            ? "rgba(143, 122, 216, 0.08)"
+            : "rgba(143, 122, 216, 0.12)",
           border: isSubmitDisabled
-            ? "1px solid rgba(201, 139, 176, 0.12)"
-            : "1px solid rgba(201, 139, 176, 0.2)",
+            ? "1px solid rgba(143, 122, 216, 0.12)"
+            : "1px solid rgba(143, 122, 216, 0.2)",
           color: "rgba(255, 255, 255, 0.85)",
           boxShadow: isSubmitDisabled
-            ? "0 1px 2px rgba(201, 139, 176, 0.1) inset"
-            : "0 2px 4px rgba(201, 139, 176, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+            ? "0 1px 2px rgba(143, 122, 216, 0.1) inset"
+            : "0 2px 4px rgba(143, 122, 216, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
           cursor: isSubmitDisabled ? "not-allowed" : "pointer",
         }}
         onMouseEnter={(e) => {
           if (!isSubmitDisabled) {
             (e.currentTarget as HTMLButtonElement).style.borderColor =
-              "rgba(201, 139, 176, 0.35)";
+              "rgba(143, 122, 216, 0.35)";
             (e.currentTarget as HTMLButtonElement).style.background =
-              "rgba(201, 139, 176, 0.14)";
+              "rgba(143, 122, 216, 0.14)";
             (e.currentTarget as HTMLButtonElement).style.boxShadow =
-              "0 3px 6px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
+              "0 3px 6px rgba(143, 122, 216, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
           }
         }}
         onMouseLeave={(e) => {
           if (!isSubmitDisabled) {
             (e.currentTarget as HTMLButtonElement).style.borderColor =
-              "rgba(201, 139, 176, 0.2)";
+              "rgba(143, 122, 216, 0.2)";
             (e.currentTarget as HTMLButtonElement).style.background =
-              "rgba(201, 139, 176, 0.12)";
+              "rgba(143, 122, 216, 0.12)";
             (e.currentTarget as HTMLButtonElement).style.boxShadow =
-              "0 2px 4px rgba(201, 139, 176, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
+              "0 2px 4px rgba(143, 122, 216, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
           }
         }}
         onMouseDown={(e) => {
           if (!isSubmitDisabled) {
             (e.currentTarget as HTMLButtonElement).style.boxShadow =
-              "0 1px 2px rgba(201, 139, 176, 0.08) inset";
+              "0 1px 2px rgba(143, 122, 216, 0.08) inset";
           }
         }}
       >

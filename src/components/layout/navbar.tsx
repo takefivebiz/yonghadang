@@ -51,19 +51,19 @@ const Navbar = () => {
             <span
               className={`absolute h-px w-4 transition-all duration-200 ${
                 isMobileMenuOpen
-                  ? "rotate-45 bg-accent"
+                  ? "rotate-45 bg-accent/80"
                   : "-translate-y-1.5 bg-highlight/70"
               }`}
             />
             <span
               className={`absolute h-px w-4 transition-all duration-200 ${
-                isMobileMenuOpen ? "opacity-0 bg-accent" : "bg-highlight/70"
+                isMobileMenuOpen ? "opacity-0 bg-accent/80" : "bg-highlight/70"
               }`}
             />
             <span
               className={`absolute h-px w-4 transition-all duration-200 ${
                 isMobileMenuOpen
-                  ? "-rotate-45 bg-accent"
+                  ? "-rotate-45 bg-accent/80"
                   : "translate-y-1.5 bg-highlight/70"
               }`}
             />
@@ -89,7 +89,7 @@ const Navbar = () => {
                 <div className="h-3.5 w-px bg-surface" />
                 <Link
                   href="/auth"
-                  className="rounded-full rounded-lg border border-accent/30 bg-accent/8 text-accent px-4 py-1.5 text-sm  text-accent transition-all hover:border-accent/60 hover:bg-accent/15"
+                  className="rounded-full rounded-lg border border-accent/25 bg-accent/8 text-accent/85 px-4 py-1.5 text-sm  text-accent/85 transition-all hover:border-accent/40 hover:bg-accent/12"
                 >
                   로그인
                 </Link>
@@ -108,7 +108,7 @@ const Navbar = () => {
               <Link
                 href="/my-page"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full rounded-lg border border-accent/30 bg-accent/8 py-3 text-center text-sm font-medium text-accent transition-all hover:border-accent/60 hover:bg-accent/15"
+                className="block w-full rounded-lg border border-accent/25 bg-accent/8 py-3 text-center text-sm font-medium text-accent/85 transition-all hover:border-accent/40 hover:bg-accent/12"
               >
                 마이페이지
               </Link>
@@ -117,14 +117,14 @@ const Navbar = () => {
                 <Link
                   href="/auth"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-[80%] rounded-lg border border-accent/30 bg-accent/8 py-4 text-center text-sm font-medium text-accent transition-all hover:border-accent/60 hover:bg-accent/15"
+                  className="block w-[80%] rounded-lg border border-accent/25 bg-accent/8 py-4 text-center text-sm font-medium text-accent/85 transition-all hover:border-accent/40 hover:bg-accent/12"
                 >
                   로그인
                 </Link>
                 <Link
                   href="/guest"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-[80%] rounded-lg border border-surface/70 bg-surface/20 py-4 text-center text-sm font-medium text-highlight/70 transition-all hover:border-surface/70 hover:bg-surface/30 hover:text-highlight"
+                  className="block w-[80%] rounded-lg border border-accent/18 bg-accent/5 py-4 text-center text-sm font-medium text-highlight/70 transition-all hover:border-accent/30 hover:bg-accent/8 hover:text-highlight"
                 >
                   비회원 조회
                 </Link>

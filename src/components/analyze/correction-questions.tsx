@@ -121,8 +121,8 @@ const CorrectionQuestions = ({
                 position: "absolute",
                 right: "-55px",
                 top: "-8px",
-                background: "rgba(198, 172, 187, 0.095)",
-                border: "1px solid rgba(198, 172, 187, 0.15)",
+                background: "rgba(143, 122, 216, 0.08)",
+                border: "1px solid rgba(143, 122, 216, 0.14)",
                 borderRadius: "8px 8px 8px 0px",
                 padding: "5px 9px",
                 fontSize: "10px",
@@ -177,7 +177,7 @@ const CorrectionQuestions = ({
         <div
           style={{
             height: "1px",
-            background: "rgba(201, 139, 176, 0.12)",
+            background: "rgba(143, 122, 216, 0.1)",
             width: "50%",
             margin: "0 auto 30px auto",
           }}
@@ -195,11 +195,11 @@ const CorrectionQuestions = ({
                 className="w-full text-left px-4 py-3 transition-all text-sm"
                 style={{
                   background: isSelected
-                    ? "rgba(209, 109, 172, 0.12)"
+                    ? "rgba(143, 122, 216, 0.12)"
                     : "rgba(255, 255, 255, 0.01)",
                   border: isSelected
-                    ? "1px solid rgba(209, 109, 172, 0.25)"
-                    : "1px solid rgba(201, 139, 176, 0.1)",
+                    ? "1px solid rgba(143, 122, 216, 0.24)"
+                    : "1px solid rgba(143, 122, 216, 0.1)",
                   color: isSelected
                     ? "rgba(249, 249, 229, 0.85)"
                     : "rgba(249, 249, 229, 0.65)",
@@ -220,41 +220,41 @@ const CorrectionQuestions = ({
           style={{
             borderRadius: "12px",
             background: !isAnswered
-              ? "rgba(201, 139, 176, 0.08)"
-              : "rgba(201, 139, 176, 0.18)",
+              ? "rgba(143, 122, 216, 0.08)"
+              : "rgba(143, 122, 216, 0.16)",
             border: !isAnswered
-              ? "1px solid rgba(201, 139, 176, 0.12)"
-              : "1px solid rgba(201, 139, 176, 0.32)",
+              ? "1px solid rgba(143, 122, 216, 0.12)"
+              : "1px solid rgba(143, 122, 216, 0.3)",
             color: isAnswered ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.85)",
             boxShadow: !isAnswered
-              ? "0 1px 2px rgba(201, 139, 176, 0.1) inset"
-              : "0 4px 8px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+              ? "0 1px 2px rgba(143, 122, 216, 0.1) inset"
+              : "0 4px 8px rgba(143, 122, 216, 0.14), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
             cursor: !isAnswered ? "not-allowed" : "pointer",
           }}
           onMouseEnter={(e) => {
             if (isAnswered) {
               (e.currentTarget as HTMLButtonElement).style.borderColor =
-                "rgba(201, 139, 176, 0.35)";
+                "rgba(143, 122, 216, 0.35)";
               (e.currentTarget as HTMLButtonElement).style.background =
-                "rgba(201, 139, 176, 0.14)";
+                "rgba(143, 122, 216, 0.14)";
               (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                "0 3px 6px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
+                "0 3px 6px rgba(143, 122, 216, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
             }
           }}
           onMouseLeave={(e) => {
             if (isAnswered) {
               (e.currentTarget as HTMLButtonElement).style.borderColor =
-                "rgba(201, 139, 176, 0.2)";
+                "rgba(143, 122, 216, 0.2)";
               (e.currentTarget as HTMLButtonElement).style.background =
-                "rgba(201, 139, 176, 0.12)";
+                "rgba(143, 122, 216, 0.12)";
               (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                "0 2px 4px rgba(201, 139, 176, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
+                "0 2px 4px rgba(143, 122, 216, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
             }
           }}
           onMouseDown={(e) => {
             if (isAnswered) {
               (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                "0 1px 2px rgba(201, 139, 176, 0.08) inset";
+                "0 1px 2px rgba(143, 122, 216, 0.08) inset";
             }
           }}
         >

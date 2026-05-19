@@ -6,10 +6,10 @@ import { Category, CATEGORY_LABELS, PublicContent } from "@/lib/types/content";
 
 // ── 카테고리 메타 정보 ────────────────────────────────────────────
 const CATEGORY_META: Record<Category, { description: string }> = {
-  love: { description: "연애·결혼 고민, VEIL이 지금 네 감정을 정확하게 읽어드립니다." },
-  relationship: { description: "인간관계 고민, VEIL이 관계 속 감정과 상대 심리를 해석해드립니다." },
-  career: { description: "직업·진로 고민, VEIL이 지금 너에게 필요한 방향을 찾아줍니다." },
-  emotion: { description: "설명되지 않는 감정, VEIL이 네 마음을 정확하게 해석해드립니다." },
+  love: { description: "마음이 흔들리는 순간이 찾아 온다면" },
+  relationship: { description: "사람 사이의 거리와 감정이 고민이라면" },
+  career: { description: "선택 앞에서 망설여진다면" },
+  emotion: { description: "설명되지 않는 감정을 느낀다면" },
 };
 
 const VALID_CATEGORIES: Category[] = [
