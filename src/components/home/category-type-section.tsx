@@ -130,7 +130,7 @@ const CategoryTypeSection = () => {
           {CATEGORY_TYPES.map((item) => (
             <Link
               key={item.category}
-              href={`#${item.category}`}
+              href={`/category/${item.category}`}
               className="group block"
             >
               <div className="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-white/[0.03] px-2 py-3 transition-all duration-200 group-hover:border-white/15 group-hover:bg-white/[0.06]">
