@@ -70,9 +70,9 @@ const ResultActions = ({ contentId, shareToken }: ResultActionsProps) => {
           <div
             className="px-4 py-2 rounded-lg text-xs font-medium"
             style={{
-              background: "rgba(209,109,172,0.2)",
-              color: "rgba(209,109,172,0.9)",
-              border: "1px solid rgba(209,109,172,0.3)",
+              background: "rgba(143,122,216,0.16)",
+              color: "rgba(249,249,229,0.86)",
+              border: "1px solid rgba(143,122,216,0.26)",
             }}
           >
             링크가 복사되었어요
@@ -137,7 +137,7 @@ const ResultActions = ({ contentId, shareToken }: ResultActionsProps) => {
         </button>
       </div>
 
-      {/* 다른 콘텐츠 보기 */}
+      {/* 다른 케이스 보기 */}
       <div>
         <Link
           data-testid="other-contents-link"
@@ -145,7 +145,7 @@ const ResultActions = ({ contentId, shareToken }: ResultActionsProps) => {
           className="text-center block py-3 text-xs transition-opacity duration-200 opacity-40 hover:opacity-70"
           style={{ color: "rgba(249,249,229,0.6)" }}
         >
-          다른 콘텐츠 보기
+          다른 케이스 보기
         </Link>
       </div>
     </div>

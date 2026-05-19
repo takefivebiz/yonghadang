@@ -6,6 +6,7 @@ import Image from "next/image";
 import { getSceneConfig } from "@/lib/data/scene-configs";
 import { ResultScene } from "@/lib/types/result";
 import { CONTENTS } from "@/lib/data/contents";
+import { CATEGORY_LABELS } from "@/lib/types/content";
 import SceneContent from "@/components/result/scene-content";
 
 interface PageProps {
@@ -100,7 +101,7 @@ const ShareResultPage = ({ params }: PageProps) => {
         <div className="text-center">
           <p
             className="mb-6 text-[11px] tracking-widest"
-            style={{ color: "rgba(209,109,172,0.35)" }}
+            style={{ color: "rgba(143,122,216,0.42)" }}
           >
             공유된 흐름을 불러오고 있어
           </p>
@@ -138,10 +139,10 @@ const ShareResultPage = ({ params }: PageProps) => {
     <div
       className="min-h-screen flex flex-col"
       style={{
-        background: `
-          radial-gradient(circle at 18% 12%, rgba(201, 139, 176, 0.14) 0%, rgba(201, 139, 176, 0.05) 22%, transparent 42%),
+        backgroundImage: `
+          radial-gradient(circle at 18% 12%, rgba(143, 122, 216, 0.12) 0%, rgba(143, 122, 216, 0.045) 22%, transparent 42%),
           radial-gradient(circle at 82% 38%, rgba(158, 138, 201, 0.10) 0%, rgba(158, 138, 201, 0.04) 24%, transparent 46%),
-          radial-gradient(circle at 55% 78%, rgba(201, 139, 176, 0.09) 0%, rgba(201, 139, 176, 0.035) 28%, transparent 52%),
+          radial-gradient(circle at 55% 78%, rgba(143, 122, 216, 0.08) 0%, rgba(143, 122, 216, 0.03) 28%, transparent 52%),
           linear-gradient(180deg, #11111B 0%, #151222 42%, #1A1222 72%, #11111B 100%)
         `,
         backgroundAttachment: "fixed",
@@ -157,31 +158,139 @@ const ShareResultPage = ({ params }: PageProps) => {
         <div className="w-full max-w-lg mx-auto">
           {/* 콘텐츠 헤더 */}
           {content && (
-            <div className="px-6 py-3 space-y-4">
-              {content.thumbnail_url && (
-                <div className="relative aspect-[16/9] overflow-hidden rounded-3xl bg-white/[0.04] shadow-2xl shadow-black/40">
-                  <Image
-                    src={content.thumbnail_url}
-                    alt={content.title}
-                    fill
-                    priority
-                    className="object-cover object-center"
-                  />
+            <div className="px-5 pt-6 pb-2 space-y-4 mt-10">
+              <div
+                style={{
+                  display: "flex",
+                  gap: "2px",
+                  marginBottom: "-1px",
+                }}
+              >
+                <div
+                  style={{
+                    flex: "0 1 auto",
+                    height: "34px",
+                    background: "rgba(60, 45, 65, 0.30)",
+                    borderTop: "1px solid rgba(143, 122, 216, 0.12)",
+                    borderRight: "1px solid rgba(143, 122, 216, 0.12)",
+                    borderLeft: "1px solid rgba(143, 122, 216, 0.12)",
+                    borderBottom: "1px solid rgba(143, 122, 216, 0.12)",
+                    borderRadius: "12px 12px 0 0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingLeft: "14px",
+                    paddingRight: "14px",
+                    opacity: 0.46,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: "400",
+                      color: "rgba(255, 255, 255, 0.48)",
+                      letterSpacing: "0.02em",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {CATEGORY_LABELS[content.category]}
+                  </span>
                 </div>
-              )}
-              <div className="space-y-2">
-                <h1
-                  className="text-xl font-medium"
-                  style={{ color: "rgba(249,249,229,0.9)" }}
+                <div
+                  style={{
+                    flex: "0 1 auto",
+                    height: "34px",
+                    background: "rgba(60, 45, 65, 0.36)",
+                    borderTop: "1px solid rgba(143, 122, 216, 0.18)",
+                    borderRight: "1px solid rgba(143, 122, 216, 0.18)",
+                    borderLeft: "1px solid rgba(143, 122, 216, 0.18)",
+                    borderBottom: "1px solid rgba(143, 122, 216, 0.18)",
+                    borderRadius: "12px 12px 0 0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingLeft: "14px",
+                    paddingRight: "14px",
+                    opacity: 0.58,
+                  }}
                 >
-                  {content.title}
-                </h1>
-                <p
-                  className="mb-5 text-sm"
-                  style={{ color: "rgba(249,249,229,0.5)" }}
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: "400",
+                      color: "rgba(255, 255, 255, 0.55)",
+                      letterSpacing: "0.02em",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    공개 기록
+                  </span>
+                </div>
+                <div
+                  style={{
+                    flex: "0 1 auto",
+                    height: "34px",
+                    background: "rgba(92, 74, 132, 0.34)",
+                    borderTop: "1px solid rgba(143, 122, 216, 0.30)",
+                    borderRight: "1px solid rgba(143, 122, 216, 0.30)",
+                    borderLeft: "1px solid rgba(143, 122, 216, 0.30)",
+                    borderBottom: "none",
+                    borderRadius: "12px 12px 0 0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingLeft: "16px",
+                    paddingRight: "16px",
+                    opacity: 1,
+                  }}
                 >
-                  {content.subtitle}
-                </p>
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "500",
+                      color: "rgba(255, 255, 255, 0.92)",
+                      letterSpacing: "0.02em",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    공유 리포트
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-b-[16px] rounded-tr-[16px] border border-accent/10 bg-white/[0.015] px-4 py-3.5">
+                {content.thumbnail_url && (
+                  <div className="relative h-15 w-15 flex-shrink-0 overflow-hidden rounded-[10px] bg-white/[0.025] opacity-85">
+                    <Image
+                      src={content.thumbnail_url}
+                      alt={content.title}
+                      fill
+                      priority
+                      className="object-cover object-center"
+                    />
+                  </div>
+                )}
+
+                <div className="min-w-0 space-y-1">
+                  <p
+                    className="text-[10px] font-medium tracking-[0.16em]"
+                    style={{ color: "rgba(143, 122, 216, 0.66)" }}
+                  >
+                    SHARED REPORT
+                  </p>
+                  <h1
+                    className="text-base font-medium leading-snug"
+                    style={{ color: "rgba(249,249,229,0.88)" }}
+                  >
+                    {content.title}
+                  </h1>
+                  <p
+                    className="line-clamp-1 text-xs"
+                    style={{ color: "rgba(249,249,229,0.42)" }}
+                  >
+                    공개된 기록 일부
+                  </p>
+                </div>
               </div>
             </div>
           )}
@@ -190,7 +299,7 @@ const ShareResultPage = ({ params }: PageProps) => {
           <div className="px-3 py-3 text-center">
             <span
               style={{
-                color: "rgba(209, 109, 172, 0.25)",
+                color: "rgba(143, 122, 216, 0.28)",
                 fontSize: "16px",
                 letterSpacing: "0.7em",
               }}
@@ -218,47 +327,77 @@ const ShareResultPage = ({ params }: PageProps) => {
             </div>
           ))}
 
-          {/* 유료씬 teaser: 제목만 표시. messages 없음. */}
+          {/* 잠긴 기록: 제목만 표시. messages 없음. */}
           {paidSceneConfigs.length > 0 && (
             <>
-              <div className="px-6 py-6">
+              <div className="px-6 py-5">
                 <div
                   className="h-px"
-                  style={{ background: "rgba(201,139,176,0.15)" }}
+                  style={{ background: "rgba(143,122,216,0.10)" }}
                 />
               </div>
 
-              <div className="px-6 py-5 space-y-4 text-center">
-                {paidSceneConfigs.map((sceneConfig, idx) => {
-                  const total = paidSceneConfigs.length;
-                  const opacity = 0.6 - (idx / total) * 0.45;
-
-                  return (
-                    <p
-                      key={sceneConfig.index}
-                      data-testid="share-paid-teaser-item"
-                      className="text-sm cursor-default"
-                      style={{
-                        color: "rgba(249,249,229,0.6)",
-                        opacity: Math.max(opacity, 0.15),
-                        transition: "opacity 0.3s ease",
-                      }}
-                    >
-                      {sceneConfig.title}
-                    </p>
-                  );
-                })}
+              <div className="px-6 py-3">
+                <div
+                  className="rounded-[14px] px-4 py-4"
+                  style={{
+                    background: "rgba(143, 122, 216, 0.025)",
+                    border: "1px solid rgba(143, 122, 216, 0.08)",
+                  }}
+                >
+                  <p
+                    className="mb-4 text-[10px] font-medium tracking-[0.14em]"
+                    style={{ color: "rgba(143, 122, 216, 0.46)" }}
+                  >
+                    잠긴 기록
+                  </p>
+                  <div className="space-y-3">
+                    {paidSceneConfigs.map((sceneConfig) => (
+                      <div
+                        key={sceneConfig.index}
+                        data-testid="share-paid-teaser-item"
+                        className="flex items-start gap-3"
+                      >
+                        <span
+                          className="mt-0.5 text-[10px] tracking-widest"
+                          style={{ color: "rgba(143, 122, 216, 0.48)" }}
+                        >
+                          {String(sceneConfig.index).padStart(2, "0")}
+                        </span>
+                        <p
+                          className="flex-1 text-sm leading-relaxed"
+                          style={{ color: "rgba(249,249,229,0.42)" }}
+                        >
+                          {sceneConfig.title}
+                        </p>
+                        <svg
+                          className="mt-1 h-3 w-3 flex-shrink-0"
+                          style={{ color: "rgba(143, 122, 216, 0.42)" }}
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M7 10V8a5 5 0 0 1 10 0v2" />
+                          <rect x="5" y="10" width="14" height="10" rx="2" />
+                        </svg>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* CTA 섹션 */}
               <div data-testid="share-cta-section" className="px-6 py-5 mb-15">
-                <div className="space-y-6 max-w-sm mx-auto">
-                  <div className="text-center">
+                <div className="space-y-5 max-w-sm mx-auto">
+                  <div>
                     <p
-                      className="text-sm leading-relaxed"
-                      style={{ color: "rgba(249,249,229,0.6)" }}
+                      className="text-sm leading-relaxed text-center"
+                      style={{ color: "rgba(249,249,229,0.68)" }}
                     >
-                      이어서 보려면
+                      이 기록은 여기서부터 잠겨 있어.
+                      <br />
+                      이어 보려면 로그인이 필요해.
                     </p>
                   </div>
 
@@ -268,20 +407,20 @@ const ShareResultPage = ({ params }: PageProps) => {
                       onClick={() => handleNavigateWithRedirect("/auth")}
                       className="w-full py-3 px-4 rounded-lg text-sm font-medium text-center transition-all duration-200 cursor-pointer"
                       style={{
-                        background: "rgba(201,139,176,0.15)",
-                        color: "rgba(209,109,172,0.9)",
-                        border: "1px solid rgba(201,139,176,0.3)",
+                        background: "rgba(143,122,216,0.18)",
+                        color: "rgba(249,249,229,0.88)",
+                        border: "1px solid rgba(143,122,216,0.28)",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background =
-                          "rgba(201,139,176,0.25)";
+                          "rgba(143,122,216,0.24)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.background =
-                          "rgba(201,139,176,0.15)";
+                          "rgba(143,122,216,0.18)";
                       }}
                     >
-                      로그인 하기
+                      기록 이어보기
                     </button>
 
                     <button
@@ -289,21 +428,38 @@ const ShareResultPage = ({ params }: PageProps) => {
                       onClick={() => handleNavigateWithRedirect("/guest")}
                       className="w-full py-3 px-8 rounded-lg text-sm font-medium text-center transition-all duration-200 cursor-pointer"
                       style={{
-                        background: "rgba(201,139,176,0.08)",
-                        color: "rgba(209,109,172,0.7)",
-                        border: "1px solid rgba(201,139,176,0.2)",
+                        background: "rgba(143,122,216,0.07)",
+                        color: "rgba(249,249,229,0.64)",
+                        border: "1px solid rgba(143,122,216,0.16)",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background =
-                          "rgba(201,139,176,0.15)";
+                          "rgba(143,122,216,0.12)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.background =
-                          "rgba(201,139,176,0.08)";
+                          "rgba(143,122,216,0.07)";
                       }}
                     >
-                      비회원 조회하기
+                      비회원으로 조회하기
                     </button>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-5 pt-2">
+                    <Link
+                      href="/"
+                      className="text-xs transition-opacity duration-200 hover:opacity-80"
+                      style={{ color: "rgba(249,249,229,0.44)" }}
+                    >
+                      나도 의뢰하기
+                    </Link>
+                    <Link
+                      href="/"
+                      className="text-xs transition-opacity duration-200 hover:opacity-80"
+                      style={{ color: "rgba(249,249,229,0.30)" }}
+                    >
+                      다른 케이스 보기
+                    </Link>
                   </div>
                 </div>
               </div>

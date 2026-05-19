@@ -1127,6 +1127,35 @@ const ResultPage = ({ params }: PageProps) => {
     activeSceneUnlocked &&
     currentSceneIndex === scenes.length - 1 &&
     (isLoopQaMode || (!isQaMode && allPaidUnlocked));
+  const showPaidGenerationLoadingOverride =
+    process.env.NEXT_PUBLIC_SHOW_PAID_GENERATION_LOADING === "true";
+  const showLoopLoadingOverride =
+    process.env.NEXT_PUBLIC_SHOW_LOOP_LOADING === "true";
+  const showLoopUnlockedMock =
+    process.env.NEXT_PUBLIC_SHOW_LOOP_UNLOCKED_MOCK === "true";
+  const loopLoadingOverrideType = additionalReadings.slice(0, 3)[0]?.loopType;
+  const loopUnlockedMockReading = additionalReadings.slice(0, 3)[0];
+  const loopAnswersForDisplay =
+    showLoopUnlockedMock && loopUnlockedMockReading
+      ? {
+          ...loopAnswers,
+          [loopUnlockedMockReading.loopType]: {
+            loopType: loopUnlockedMockReading.loopType,
+            title: loopUnlockedMockReading.title,
+            generatedAt: "2026-01-01T00:00:00.000Z",
+            messages: [
+              {
+                type: "punch",
+                text: "아직 끝난 질문은 아니야.",
+              },
+              {
+                type: "ai",
+                text: "이 의뢰는 남은 감정의 방향을 다시 확인하기 위한 기록이야. 지금 바로 결론을 내리기보다, 네가 어디에서 계속 멈춰 서는지 먼저 살펴보면 돼.",
+              },
+            ],
+          } satisfies LoopAnswer,
+        }
+      : loopAnswers;
   const showFlowOverview = false;
   const showProgressIndicator = false;
 
@@ -1401,14 +1430,27 @@ const ResultPage = ({ params }: PageProps) => {
               - 일반 mode: 유료씬 전체 구매 완료 시에만 표시
               - ?qa=1: 숨김
               - ?qa=1&loop=1: 표시 (직접 생성) */}
-          {showAdditionalRequests && (
+          {(showAdditionalRequests ||
+            showLoopLoadingOverride ||
+            showLoopUnlockedMock) && (
             <div ref={loopReadingsRef} id="loop-readings-section">
               <AdditionalReadings
                 readings={additionalReadings.slice(0, 3)}
-                loopAnswers={loopAnswers}
-                loopLoading={loopLoading}
+                loopAnswers={loopAnswersForDisplay}
+                loopLoading={
+                  showLoopLoadingOverride && !showLoopUnlockedMock
+                    ? loopLoadingOverrideType ?? loopLoading
+                    : loopLoading
+                }
                 loopError={loopError}
-                newlyUnlockedLoops={newlyUnlockedLoops}
+                newlyUnlockedLoops={
+                  showLoopUnlockedMock && loopUnlockedMockReading
+                    ? [
+                        ...newlyUnlockedLoops,
+                        loopUnlockedMockReading.loopType,
+                      ]
+                    : newlyUnlockedLoops
+                }
                 loopAllPurchased={loopAllPurchased}
                 onPurchaseSingle={handleLoopCardClick}
                 onPurchaseAll={handlePurchaseAllLoops}
@@ -1629,7 +1671,7 @@ const ResultPage = ({ params }: PageProps) => {
       )}
 
       {/* 유료 씬 생성 로딩 UI */}
-      {paidGenerationLoading && (
+      {(paidGenerationLoading || showPaidGenerationLoadingOverride) && (
         <PaidGenerationLoading isRecovery={isPaidGenerationRecovery} />
       )}
     </div>

@@ -134,13 +134,18 @@ const AdditionalReadings = ({
           50%       { opacity: 0.5; transform: scale(0.75); }
         }
         .pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+        @keyframes warm-loading-dot {
+          0%, 100% { opacity: 0.22; transform: scale(0.96); }
+          50%      { opacity: 0.72; transform: scale(1.04); }
+        }
+        .warm-loading-dot { animation: warm-loading-dot 5.6s ease-in-out infinite; }
       `}</style>
 
       {/* 섹션 구분 */}
       <div className="mb-8 text-center">
         <span
           style={{
-            color: "rgba(209, 109, 172, 0.20)",
+            color: "rgba(143, 122, 216, 0.24)",
             fontSize: "16px",
             letterSpacing: "0.7em",
           }}
@@ -151,7 +156,9 @@ const AdditionalReadings = ({
           className="mt-4 text-xs tracking-wide"
           style={{ color: "rgba(249, 249, 229, 0.30)" }}
         >
-          추가 의뢰 남기기
+          기록은 여기서 끝났어.
+          <br />
+          하고 싶은 질문, 더 있어?
         </p>
       </div>
 
@@ -160,11 +167,11 @@ const AdditionalReadings = ({
         <div
           className="mb-6 px-4 py-3 rounded-xl text-center"
           style={{
-            background: "rgba(201, 139, 176, 0.06)",
-            border: "1px solid rgba(201, 139, 176, 0.15)",
+            background: "rgba(143, 122, 216, 0.055)",
+            border: "1px solid rgba(143, 122, 216, 0.14)",
           }}
         >
-          <p className="text-xs" style={{ color: "rgba(201, 139, 176, 0.70)" }}>
+          <p className="text-xs" style={{ color: "rgba(143, 122, 216, 0.62)" }}>
             선택한 의뢰를 준비하고 있어.
           </p>
         </div>
@@ -198,26 +205,24 @@ const AdditionalReadings = ({
                 className="w-full text-left transition-all duration-200 cursor-pointer"
                 style={{
                   background: isExpanded
-                    ? "rgba(201, 139, 176, 0.07)"
+                    ? "rgba(143, 122, 216, 0.075)"
                     : unlocked
-                      ? "rgba(209, 109, 172, 0.10)"
+                      ? "rgba(143, 122, 216, 0.095)"
                       : loopAllPurchased
-                        ? "rgba(201, 139, 176, 0.04)"
-                        : "rgba(255, 255, 255, 0.02)",
+                        ? "rgba(143, 122, 216, 0.035)"
+                        : "rgba(143, 122, 216, 0.025)",
                   border: `1px solid ${
                     isExpanded
-                      ? "rgba(201, 139, 176, 0.20)"
+                      ? "rgba(143, 122, 216, 0.18)"
                       : unlocked
-                        ? "rgba(201, 139, 176, 0.22)"
+                        ? "rgba(143, 122, 216, 0.20)"
                         : loopAllPurchased
-                          ? "rgba(201, 139, 176, 0.12)"
-                          : "rgba(255, 255, 255, 0.07)"
+                          ? "rgba(143, 122, 216, 0.10)"
+                          : "rgba(143, 122, 216, 0.08)"
                   }`,
                   borderRadius: isExpanded ? "14px 14px 0 0" : "14px",
                   padding: "18px 18px 16px",
-                  boxShadow: unlocked
-                    ? "0 4px 16px rgba(201, 139, 176, 0.10)"
-                    : "none",
+                  boxShadow: "none",
                   transition: "all 0.2s ease",
                 }}
               >
@@ -253,11 +258,11 @@ const AdditionalReadings = ({
                       <div className="flex items-center gap-1.5 mt-1">
                         <span
                           className="pulse-dot inline-block w-1.5 h-1.5 rounded-full flex-shrink-0"
-                          style={{ background: "rgba(201, 139, 176, 0.75)" }}
+                          style={{ background: "rgba(143, 122, 216, 0.68)" }}
                         />
                         <p
                           className="text-xs"
-                          style={{ color: "rgba(201, 139, 176, 0.80)" }}
+                          style={{ color: "rgba(143, 122, 216, 0.72)" }}
                         >
                           새로 열렸어
                         </p>
@@ -269,7 +274,7 @@ const AdditionalReadings = ({
                       <div className="flex items-center gap-1.5">
                         <p
                           className="text-xs"
-                          style={{ color: "rgba(201, 139, 176, 0.50)" }}
+                          style={{ color: "rgba(143, 122, 216, 0.50)" }}
                         >
                           구매 완료 · 대기 중
                         </p>
@@ -279,7 +284,7 @@ const AdditionalReadings = ({
                       <div className="flex items-center gap-1.5">
                         <svg
                           className="h-3 w-3"
-                          style={{ color: "rgba(201, 139, 176, 0.50)" }}
+                          style={{ color: "rgba(143, 122, 216, 0.50)" }}
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="1.5"
@@ -290,9 +295,9 @@ const AdditionalReadings = ({
                         </svg>
                         <p
                           className="text-xs"
-                          style={{ color: "rgba(201, 139, 176, 0.55)" }}
+                          style={{ color: "rgba(143, 122, 216, 0.56)" }}
                         >
-                          의뢰 열기
+                          의뢰하기
                         </p>
                       </div>
                     )}
@@ -301,16 +306,14 @@ const AdditionalReadings = ({
                     {loading && (
                       <div className="flex items-center gap-1.5">
                         <span
-                          className="spin-slow inline-block text-xs"
-                          style={{ color: "rgba(201, 139, 176, 0.60)" }}
-                        >
-                          ◐
-                        </span>
+                          className="warm-loading-dot inline-block h-1.5 w-1.5 rounded-full"
+                          style={{ background: "rgba(214, 150, 84, 0.72)" }}
+                        ></span>
                         <p
                           className="text-xs"
-                          style={{ color: "rgba(201, 139, 176, 0.55)" }}
+                          style={{ color: "rgba(143, 122, 216, 0.58)" }}
                         >
-                          생성 중이야...
+                          추가 의뢰 정리 중
                         </p>
                       </div>
                     )}
@@ -322,7 +325,7 @@ const AdditionalReadings = ({
                           className="text-xs"
                           style={{ color: "rgba(220, 100, 100, 0.70)" }}
                         >
-                          생성에 실패했어
+                          정리에 실패했어
                         </p>
                         {onRetry && (
                           <button
@@ -332,7 +335,7 @@ const AdditionalReadings = ({
                               onRetry(reading);
                             }}
                             className="text-xs underline"
-                            style={{ color: "rgba(201, 139, 176, 0.65)" }}
+                            style={{ color: "rgba(143, 122, 216, 0.64)" }}
                           >
                             다시 시도
                           </button>
@@ -346,7 +349,7 @@ const AdditionalReadings = ({
                     <span
                       className="flex-shrink-0 mt-0.5"
                       style={{
-                        color: "rgba(201, 139, 176, 0.45)",
+                        color: "rgba(143, 122, 216, 0.44)",
                         fontSize: "11px",
                         display: "inline-block",
                         transform: isExpanded
@@ -363,7 +366,7 @@ const AdditionalReadings = ({
                       className="flex-shrink-0"
                       style={{
                         fontSize: "13px",
-                        color: "rgba(201, 139, 176, 0.35)",
+                        color: "rgba(143, 122, 216, 0.38)",
                       }}
                     >
                       →
@@ -379,13 +382,13 @@ const AdditionalReadings = ({
                   display: "grid",
                   gridTemplateRows: isExpanded ? "1fr" : "0fr",
                   borderRight: isExpanded
-                    ? "1px solid rgba(201, 139, 176, 0.12)"
+                    ? "1px solid rgba(143, 122, 216, 0.10)"
                     : "1px solid transparent",
                   borderBottom: isExpanded
-                    ? "1px solid rgba(201, 139, 176, 0.12)"
+                    ? "1px solid rgba(143, 122, 216, 0.10)"
                     : "1px solid transparent",
                   borderLeft: isExpanded
-                    ? "1px solid rgba(201, 139, 176, 0.12)"
+                    ? "1px solid rgba(143, 122, 216, 0.10)"
                     : "1px solid transparent",
                   borderRadius: "0 0 14px 14px",
                   opacity: isExpanded ? 1 : 0,
@@ -398,7 +401,7 @@ const AdditionalReadings = ({
                     className="px-4 pt-6 pb-5 flex flex-col gap-3 items-start"
                     style={{
                       background: isExpanded
-                        ? "rgba(209, 109, 172, 0.05)"
+                        ? "rgba(143, 122, 216, 0.04)"
                         : "transparent",
                       transition: "background 0.5s ease",
                     }}
@@ -414,7 +417,7 @@ const AdditionalReadings = ({
                           <p
                             className="font-punch whitespace-pre-line"
                             style={{
-                              color: "rgba(209, 109, 172, 0.653)",
+                              color: "rgba(143, 122, 216, 0.70)",
                               fontSize: "14px",
                               lineHeight: "1.6",
                               fontWeight: "500",
@@ -430,9 +433,9 @@ const AdditionalReadings = ({
                           key={idx}
                           className={isExpanded ? "bubble-fade" : ""}
                           style={{
-                            background: "rgba(255, 255, 255, 0.05)",
-                            border: "1px solid rgba(255, 255, 255, 0.10)",
-                            borderRadius: "14px 14px 14px 2px",
+                            background: "rgba(143, 122, 216, 0.035)",
+                            border: "1px solid rgba(143, 122, 216, 0.08)",
+                            borderRadius: "12px",
                             padding: "14px 16px",
                             width: "fit-content",
                             maxWidth: "90%",
@@ -468,17 +471,17 @@ const AdditionalReadings = ({
           onClick={onPurchaseAll}
           className="w-full mt-3"
           style={{
-            background: "rgba(201, 139, 176, 0.05)",
-            border: "1px dashed rgba(201, 139, 176, 0.22)",
+            background: "rgba(143, 122, 216, 0.045)",
+            border: "1px dashed rgba(143, 122, 216, 0.18)",
             borderRadius: "12px",
             padding: "11px 16px",
           }}
         >
           <span
             className="text-xs"
-            style={{ color: "rgba(201, 139, 176, 0.60)" }}
+            style={{ color: "rgba(143, 122, 216, 0.58)" }}
           >
-            [QA] 추천 의뢰 한번에 열기
+            [QA] 추천 의뢰 한번에 하기
           </span>
         </button>
       )}
@@ -506,7 +509,7 @@ const AdditionalReadings = ({
           background: "none",
           backdropFilter: "blur(40px)",
           WebkitBackdropFilter: "blur(40px)",
-          borderTop: "1px solid rgba(201, 139, 176, 0.12)",
+          borderTop: "1px solid rgba(143, 122, 216, 0.14)",
           borderRadius: "24px 24px 0 0",
           paddingBottom: "env(safe-area-inset-bottom, 20px)",
         }}
@@ -547,8 +550,8 @@ const AdditionalReadings = ({
             <div className="mb-8 flex justify-end w-full">
               <div
                 style={{
-                  background: "rgba(80, 140, 170, 0.08)",
-                  border: "1px solid rgba(80, 140, 170, 0.12)",
+                  background: "rgba(143, 122, 216, 0.055)",
+                  border: "1px solid rgba(143, 122, 216, 0.14)",
                   borderRadius: "16px 16px 0px 16px",
                   padding: "12px 16px",
                   maxWidth: "75%",
@@ -558,7 +561,7 @@ const AdditionalReadings = ({
                   className="text-sm font-normal leading-snug mb-1"
                   style={{
                     color: "rgba(249, 249, 229, 0.93)",
-                    textShadow: "0 0 20px rgba(201, 139, 176, 0.06)",
+                    textShadow: "none",
                     whiteSpace: "pre-line",
                   }}
                 >
@@ -583,8 +586,8 @@ const AdditionalReadings = ({
             className="flex items-center justify-between mb-3"
             style={{
               width: "100%",
-              background: "rgba(201, 139, 176, 0.05)",
-              border: "1px solid rgba(201, 139, 176, 0.10)",
+              background: "rgba(143, 122, 216, 0.08)",
+              border: "1px solid rgba(143, 122, 216, 0.16)",
               borderRadius: "12px 12px 12px 0px",
               padding: "14px 16px",
               transition: "all 0.15s ease",
@@ -594,11 +597,11 @@ const AdditionalReadings = ({
               className="text-sm font-medium"
               style={{ color: "rgba(249, 249, 229, 0.78)" }}
             >
-              이 의뢰 열기
+              이 의뢰하기
             </span>
             <span
               className="text-xs"
-              style={{ color: "rgba(201, 139, 176, 0.45)" }}
+              style={{ color: "rgba(143, 122, 216, 0.56)" }}
             >
               {PRICE_SINGLE.toLocaleString()}원
             </span>
@@ -615,8 +618,8 @@ const AdditionalReadings = ({
               className="flex items-center justify-between"
               style={{
                 width: "100%",
-                background: "rgba(201, 139, 176, 0.13)",
-                border: "1px solid rgba(201, 139, 176, 0.22)",
+                background: "rgba(143, 122, 216, 0.14)",
+                border: "1px solid rgba(143, 122, 216, 0.24)",
                 borderRadius: "12px 12px 12px 0px",
                 padding: "14px 16px",
                 transition: "all 0.15s ease",
@@ -627,7 +630,7 @@ const AdditionalReadings = ({
                   className="text-sm font-medium"
                   style={{ color: "rgba(249, 249, 229, 0.90)" }}
                 >
-                  의뢰 3개 모두 열기
+                  의뢰 3개 모두 하기
                 </span>
                 <span
                   className="text-xs"
@@ -640,15 +643,15 @@ const AdditionalReadings = ({
                 <span
                   className="text-[10px] px-1.5 py-0.5 rounded"
                   style={{
-                    background: "rgba(201, 139, 176, 0.15)",
-                    color: "rgba(201, 139, 176, 0.75)",
+                    background: "rgba(143, 122, 216, 0.16)",
+                    color: "rgba(249, 249, 229, 0.58)",
                   }}
                 >
                   {PRICE_ALL_SAVING.toLocaleString()}원 절약
                 </span>
                 <span
                   className="text-xs"
-                  style={{ color: "rgba(201, 139, 176, 0.65)" }}
+                  style={{ color: "rgba(143, 122, 216, 0.68)" }}
                 >
                   {PRICE_ALL.toLocaleString()}원
                 </span>

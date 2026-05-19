@@ -489,7 +489,7 @@ function StepTwo({
             e.currentTarget.style.color = "rgba(143, 122, 216, 0.64)";
           }}
         >
-          다른 콘텐츠 보기
+          다른 케이스 보기
         </button>
         <div className="text-center">
           <button

@@ -4,195 +4,99 @@ interface GeneratingLoadingProps {
 
 const GeneratingLoading = ({ progress }: GeneratingLoadingProps) => {
   const progressPercent = Math.round(progress);
+  const statusText =
+    progressPercent < 35
+      ? "네가 남긴 이야기들을 읽고 있어"
+      : progressPercent < 70
+        ? "흩어진 감정 흐름을 모으는 중이야"
+        : "의뢰 기록을 차분히 묶는 중이야";
 
   return (
-    <div className="flex min-h-screen w-full max-w-lg flex-col items-center justify-center px-6 transition-all duration-700">
+    <div className="flex min-h-screen w-full max-w-lg flex-col items-center px-6 pt-[18vh] transition-all duration-700">
       <style>{`
-        @keyframes convergeFragment1 {
-          0% { transform: translate(100px, -90px); opacity: 0.55; }
-          100% { transform: translate(0, 0); opacity: 0; }
+        @keyframes memoFloat1 {
+          0%, 100% { transform: translate(-4px, 0) rotate(-2deg); opacity: 0.28; }
+          50% { transform: translate(2px, -8px) rotate(1deg); opacity: 0.46; }
         }
-        @keyframes convergeFragment2 {
-          0% { transform: translate(-120px, -70px); opacity: 0.4; }
-          100% { transform: translate(0, 0); opacity: 0; }
+        @keyframes memoFloat2 {
+          0%, 100% { transform: translate(3px, 0) rotate(2deg); opacity: 0.22; }
+          50% { transform: translate(-3px, -6px) rotate(-1deg); opacity: 0.40; }
         }
-        @keyframes convergeFragment3 {
-          0% { transform: translate(110px, 100px); opacity: 0.3; }
-          100% { transform: translate(0, 0); opacity: 0; }
+        @keyframes memoFloat3 {
+          0%, 100% { transform: translate(0, 2px) rotate(1deg); opacity: 0.18; }
+          50% { transform: translate(4px, -5px) rotate(-2deg); opacity: 0.34; }
         }
-        @keyframes convergeFragment4 {
-          0% { transform: translate(-100px, 95px); opacity: 0.6; }
-          100% { transform: translate(0, 0); opacity: 0; }
+        @keyframes quietBlink {
+          0%, 100% { opacity: 0.25; }
+          50% { opacity: 0.62; }
         }
-
-        .fragment { position: absolute; }
-        .fragment-1 { animation: convergeFragment1 3s ease-in infinite; }
-        .fragment-2 { animation: convergeFragment2 3s ease-in infinite; }
-        .fragment-3 { animation: convergeFragment3 3s ease-in infinite; }
-        .fragment-4 { animation: convergeFragment4 3s ease-in infinite; }
-
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-
-        @keyframes bouncePattern {
-          0% { transform: translateY(0); }
-          5% { transform: translateY(-6px); }
-          10% { transform: translateY(0); }
-          15% { transform: translateY(-5px); }
-          20% { transform: translateY(0); }
-          50%, 100% { transform: translateY(0); }
-        }
-
-        @keyframes shimmer {
-          0% { background-position: 200% center; }
-          100% { background-position: -200% center; }
-        }
-
-        .status-text {
-          background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.6) 30%, rgba(255, 255, 255, 0.2) 60%, rgba(255, 255, 255, 0.2) 100%);
-          background-size: 200% 100%;
-          background-clip: text;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          color: rgba(249, 249, 229, 0.6);
-          animation: shimmer 5.5s linear infinite;
+        @keyframes warmGlow {
+          0%, 100% { opacity: 0.22; transform: scale(0.96); }
+          50% { opacity: 0.72; transform: scale(1.04); }
         }
       `}</style>
 
-      <div style={{ animation: "fadeIn 600ms ease-out", marginTop: "-400px" }}>
-        {/* 주변 수렴하는 메시지 조각들 */}
-        <div className="relative w-80 h-80 flex items-center justify-center mb-4">
-          {/* Fragment 1 */}
+      <div
+        className="w-full max-w-[320px] text-center"
+        style={{ animation: "fadeIn 600ms ease-out" }}
+      >
+        <div className="relative mx-auto mb-5 flex h-34 w-72 items-end justify-center">
           <div
-            className="fragment fragment-1"
+            className="relative flex h-28 w-28 items-center justify-center rounded-full"
             style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: "12px 12px 3px 12px",
-              fontSize: "11px",
-              color: "rgba(249, 249, 229, 0.3)",
-              padding: "6px 12px",
+              background:
+                "radial-gradient(circle, rgba(214, 150, 84, 0.18) 0%, rgba(214, 150, 84, 0.07) 48%, transparent 72%)",
             }}
           >
-            ...
-          </div>
-
-          {/* Fragment 2 */}
-          <div
-            className="fragment fragment-2"
-            style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: "12px 12px 3px 12px",
-              fontSize: "11px",
-              color: "rgba(249, 249, 229, 0.25)",
-              padding: "6px 12px",
-            }}
-          >
-            ...
-          </div>
-
-          {/* Fragment 3 */}
-          <div
-            className="fragment fragment-3"
-            style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: "12px 12px 3px 12px",
-              fontSize: "14px",
-              color: "rgba(249, 249, 229, 0.28)",
-              padding: "6px 12px",
-            }}
-          >
-            ...
-          </div>
-
-          {/* Fragment 4 */}
-          <div
-            className="fragment fragment-4"
-            style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              borderRadius: "12px 12px 3px 12px",
-              fontSize: "11px",
-              color: "rgba(249, 249, 229, 0.32)",
-              padding: "6px 12px",
-            }}
-          >
-            ...
-          </div>
-
-          {/* 메인 메시지 버블 (VEIL 스타일, progress 채우기) */}
-          <div
-            className="relative flex items-center justify-center"
-            style={{
-              animation: "bouncePattern 4s ease-in-out infinite",
-              width: "100px",
-              height: "55px",
-              background: "rgba(255, 255, 255, 0.04)",
-              border: "1px solid rgba(143, 122, 216, 0.24)",
-              borderRadius: "25px 25px 25px 4px",
-              padding: "16px",
-              overflow: "hidden",
-              boxShadow:
-                "0 0 24px rgba(143, 122, 216, 0.11), inset 0 0 12px rgba(143, 122, 216, 0.07)",
-            }}
-          >
-            {/* 채우는 효과 - 아래에서 위로 */}
             <div
+              className="absolute inset-0 rounded-full"
               style={{
-                position: "absolute",
-                inset: 0,
+                animation: "warmGlow 5.6s ease-in-out infinite",
                 background:
-                  "linear-gradient(to top, rgba(143, 122, 216, 0.13), transparent)",
-                clipPath: `inset(${Math.max(0, 100 - progressPercent)}% 0 0 0)`,
-                transition: "clip-path 300ms ease-out",
-                borderRadius: "16px 16px 16px 4px",
-                pointerEvents: "none",
+                  "radial-gradient(circle, rgba(214, 150, 84, 0.22) 0%, rgba(214, 150, 84, 0.08) 50%, transparent 74%)",
               }}
             />
-
-            {/* 텍스트 */}
-            <div className="relative z-10 text-center">
-              <div
-                style={{
-                  fontSize: "13px",
-                  fontWeight: "300",
-                  color: "rgba(249, 249, 229, 0.746)",
-                  letterSpacing: "-0.02em",
-                  lineHeight: "1",
-                }}
-              >
-                {progressPercent}%
-              </div>
-            </div>
+            <img
+              src="/img/cat2.png"
+              alt=""
+              className="relative z-10 h-20 w-20 object-contain opacity-85"
+            />
           </div>
         </div>
 
-        {/* 하단 상태 문구 - 한 줄만 */}
-        <div className="text-center">
+        <div className="mx-auto w-full max-w-[260px]">
           <p
-            className="status-text"
+            className="text-sm font-medium"
             style={{
-              color: "rgba(249, 249, 229, 0.8)",
-              fontSize: "13px",
-              fontWeight: "300",
-              letterSpacing: "0.04em",
-              marginTop: "-135px",
+              color: "rgba(249, 249, 229, 0.84)",
+              letterSpacing: "-0.01em",
             }}
           >
-            {progressPercent < 20
-              ? "입력한 정보를 정리 중..."
-              : progressPercent < 40
-                ? "흐름을 읽는 중..."
-                : progressPercent < 60
-                  ? "깊이를 더하는 중..."
-                  : progressPercent < 80
-                    ? "결과를 정리하는 중..."
-                    : "거의 다 됐어"}
+            의뢰 기록 정리 중 · {progressPercent}%
           </p>
+          <p
+            className="mt-3 text-xs leading-relaxed"
+            style={{ color: "rgba(249, 249, 229, 0.44)" }}
+          >
+            {statusText}
+          </p>
+          <div
+            className="mt-5 h-px w-full overflow-hidden"
+            style={{ background: "rgba(143, 122, 216, 0.10)" }}
+          >
+            <div
+              className="h-full"
+              style={{
+                width: `${progressPercent}%`,
+                background: "rgba(143, 122, 216, 0.45)",
+                transition: "width 300ms ease-out",
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
