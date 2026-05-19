@@ -1,4 +1,8 @@
 import { Content, InputConfig, SceneConfig } from "@/lib/types/content";
+import {
+  getAllContentDefinitions,
+  getContentDefinition,
+} from "@/lib/content-definitions";
 
 // TODO: [백엔드 연동] /api/contents 실제 호출로 교체
 
@@ -15,30 +19,8 @@ const STUB_SCENE_CONFIG: SceneConfig = {
   scenes: [],
 };
 
-export const CONTENTS: Content[] = [
+const LEGACY_CONTENTS: Content[] = [
   // ── 연애 ──────────────────────────────────────────────────────
-  {
-    id: "love-1",
-    title: "이 사람, \n 저를 좋아하는 걸까요?",
-    subtitle: "사소한 반응에도 마음이 흔들려요",
-    category: "love",
-    thumbnail_url: "/img/love-1.png",
-    estimated_minutes: 5,
-    input_config: STUB_INPUT_CONFIG,
-    scene_config: STUB_SCENE_CONFIG,
-    is_active: true,
-    sort_order: 1,
-    created_at: "2026-05-01T00:00:00Z",
-    updated_at: "2026-05-01T00:00:00Z",
-    insights: [
-      "애매한 관계를 대하는 너의 방식",
-      "상대의 태도에서 알 수 있는 것",
-      "우리의 관계는 지금 어디쯤 있는지",
-      "이 관계가 너에게 미치는 영향",
-      "네가 진짜 확인하고 싶은 것",
-      "이 관계, 어디까지 이어질 수 있을까?",
-    ],
-  },
   {
     id: "love-2",
     title: "나는 진심일까, \n 그냥 외로운 걸까?",
@@ -447,7 +429,12 @@ export const CONTENTS: Content[] = [
   },
 ];
 
-/** 트렌딩: 카테고리별 대표 콘텐츠 4장 */
-export const TRENDING_CONTENTS = CONTENTS.filter((c) =>
-  ["love-1", "rel-1", "career-2", "emotion-3"].includes(c.id),
+export const CONTENTS: Content[] = [
+  ...getAllContentDefinitions().map((definition) => definition.meta),
+  ...LEGACY_CONTENTS.filter((content) => !getContentDefinition(content.id)),
+];
+
+/** 트렌딩: real content definition에 등록된 콘텐츠만 노출 */
+export const TRENDING_CONTENTS = getAllContentDefinitions().map(
+  (definition) => definition.meta,
 );

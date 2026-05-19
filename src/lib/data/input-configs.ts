@@ -1,184 +1,10 @@
 import { InputConfig } from "@/lib/types/content";
+import { getAllContentDefinitions } from "@/lib/content-definitions";
 
 // ── 콘텐츠별 입력 설정 (V2: steps 기반) ──────────────────────────────
 // TODO: [백엔드 연동] GET /api/contents/[id] 응답의 input_config로 교체
 
-export const INPUT_CONFIGS: Record<string, InputConfig> = {
-  "love-1": {
-    version: 2,
-    steps: [
-      // ── step 0: 자유입력 ────────────────────────────────────────────
-      {
-        id: "free_input",
-        type: "freeText",
-        question: "지금 네 상황을 편하게 말해줘",
-        placeholder: "그 사람 이야기를 편하게 적어줘",
-        example_inputs: [
-          "연락은 계속 하는데 이 사람이 나를 좋아하는 건지 잘 모르겠어",
-          "둘이 있으면 분위기는 좋은데, 관계를 확실히 하려는 말은 없어",
-        ],
-        required: true,
-      },
-
-      // ── Q1: 흔들림의 현재 위상 (singleChoice, 5 options) ────────────
-      // 5개로 정리. need_clear_answer+last_check_before_action 병합 → clarity_and_decide
-      // slowly_lowering_expectation+worn_out_from_shaking 병합 → fading_with_fatigue
-      {
-        id: "q1_situation",
-        type: "singleChoice",
-        question: "지금 네 상황은 어때?",
-        options: [
-          {
-            label: "마음이 흔들리기 시작한 것 같아",
-            value: "just_started_shaking",
-          },
-          {
-            label: "좋아하는 마음보다 확인이 더 필요해졌어",
-            value: "clarity_and_decide",
-          },
-          {
-            label: "상대와 나눈 대화를 계속 다시 보고 있어",
-            value: "replaying_conversations",
-          },
-          {
-            label: "이제는 기대를 줄여야 할 것 같아",
-            value: "fading_with_fatigue",
-          },
-          {
-            label: "관계는 끝난 것 같은데 포기가 안돼",
-            value: "cant_let_go_after_end",
-          },
-        ],
-        required: true,
-      },
-
-      // ── Q2: 상대 태도 (singleChoice, 5 options) ─────────────────────
-      // 모두 "애매하거나 결정적이지 않은" 상태 전제. 관망형/우위형 제거.
-      {
-        id: "q2_partner_attitude",
-        type: "singleChoice",
-        question: "상대의 태도는 어때?",
-        options: [
-          {
-            label: "마음은 있는 것 같은데 확실한 표현이 없어",
-            value: "emotion_without_clarity",
-          },
-          {
-            label: "다가왔다가 다시 거리를 둬",
-            value: "inconsistent_interest",
-          },
-          {
-            label: "편한 관계로 두려고 해",
-            value: "comfortable_without_progress",
-          },
-          {
-            label: "신호는 있는데 딱히 결정적이진 않아",
-            value: "signal_without_commitment",
-          },
-          {
-            label: "이제는 반응 자체가 줄어들고 있어",
-            value: "fading_response",
-          },
-        ],
-        required: true,
-      },
-
-      // ── Q3: 흔들릴 때 내 반응 (multiChoice, 5 options) ──────────────
-      // rechecking_signals+silent_overthinking 병합 → looping_inside (점수 동일)
-      // unwanted_recurrence 제거 (Q1 cant_let_go / Q4 cant_move_on과 중복 신호)
-      {
-        id: "q3_reaction",
-        type: "multiChoice",
-        question: "흔들릴 때 너는 보통 어떻게 반응해?",
-        options: [
-          {
-            label: "괜찮은 척하면서 혼자 계속 생각해",
-            value: "looping_inside",
-          },
-          {
-            label: "작은 반응에도 하루 기분이 달라져",
-            value: "mood_swings_by_signal",
-          },
-          {
-            label: "직접 묻고 싶지만 괜히 참아",
-            value: "holding_back_question",
-          },
-          {
-            label: "한 번만 더 확인하면 어느쪽이든 결론이 날 거 같아",
-            value: "one_more_check_then_decide",
-          },
-          {
-            label: "이제 의미 부여를 줄이려고 노력해",
-            value: "trying_to_detach",
-          },
-        ],
-        required: true,
-      },
-
-      // ── Q4: 가장 지치게 만드는 것 (singleChoice, 5 options) ─────────
-      // failing_to_let_go+mind_keeps_returning 병합 → cant_move_on
-      {
-        id: "q4_exhaustion",
-        type: "singleChoice",
-        question: "이 관계에서 너를 가장 지치게 만드는 건 뭐야?",
-        options: [
-          {
-            label: "나만 더 깊게 마음 쓰고 있는 것",
-            value: "confirmed_one_sided",
-          },
-          {
-            label: "이 애매한 상태가 길어지는 것",
-            value: "prolonged_ambiguity",
-          },
-          {
-            label: "상대의 반응을 매번 해석하고 있는 나 자신",
-            value: "exhausted_by_my_own_interpretation",
-          },
-          {
-            label: "언젠가는 답을 내야 할 것 같은 분위기",
-            value: "pressure_to_decide_soon",
-          },
-          {
-            label: "정리하려 해도 다시 마음이 돌아가는 것",
-            value: "cant_move_on",
-          },
-        ],
-        required: true,
-      },
-
-      // ── Q5: 진짜 원하는 것 (singleChoice, 5 options) ────────────────
-      // want_expression+want_direction 병합 → want_clarity_from_other
-      {
-        id: "q5_desire",
-        type: "singleChoice",
-        question: "솔직히 지금\n가장 원하는 건 뭐야?",
-        options: [
-          {
-            label: "상대가 이 관계를 확실히 해줬으면",
-            value: "want_clarity_from_other",
-          },
-          {
-            label: "상대 마음이 어떤지 정확히 알고 싶어",
-            value: "want_to_know_their_heart",
-          },
-          {
-            label: "더 미루지 않고 뭐든 결론내고 싶어",
-            value: "want_to_act_and_decide",
-          },
-          {
-            label: "당분간은 이 관계를 덜 생각하고 싶어",
-            value: "want_time_to_fold",
-          },
-          {
-            label: "솔직히 아직은 끝난 관계가 아니길",
-            value: "want_possibility",
-          },
-        ],
-        required: true,
-      },
-    ],
-  },
-
+const LEGACY_INPUT_CONFIGS: Record<string, InputConfig> = {
   "rel-1": {
     version: 2,
     steps: [
@@ -1558,6 +1384,19 @@ const DEFAULT_INPUT_CONFIG: InputConfig = {
       required: true,
     },
   ],
+};
+
+const CONTENT_DEFINITION_INPUT_CONFIGS: Record<string, InputConfig> =
+  Object.fromEntries(
+    getAllContentDefinitions().map((definition) => [
+      definition.id,
+      definition.inputConfig,
+    ]),
+  );
+
+export const INPUT_CONFIGS: Record<string, InputConfig> = {
+  ...LEGACY_INPUT_CONFIGS,
+  ...CONTENT_DEFINITION_INPUT_CONFIGS,
 };
 
 // TODO: [백엔드 연동] content_id로 GET /api/contents/[id]를 호출해 input_config 반환
