@@ -6,8 +6,8 @@ import type { UserProfile } from "@/lib/types/user";
 import type { SessionSummary } from "@/lib/types/session";
 
 export const metadata: Metadata = {
-  title: "마이페이지 — VEIL",
-  description: "내 프로필과 지난 기록을 확인해요",
+  title: "내 의뢰 보관함 — VEIL",
+  description: "지나간 기록과 다시 열어볼 감정 파일을 확인해요",
 };
 
 // analysis_sessions JOIN contents 결과 행 타입

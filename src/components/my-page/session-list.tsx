@@ -20,10 +20,10 @@ const getCategoryLabel = (category: string): string => {
 
 const getCategoryColor = (category: string): { bg: string; text: string } => {
   const colors: Record<string, { bg: string; text: string }> = {
-    love: { bg: "bg-accent/6", text: "text-accent/60" },
-    relationship: { bg: "bg-secondary/6", text: "text-secondary/60" },
+    love: { bg: "bg-pink-400/6", text: "text-pink-300/45" },
+    relationship: { bg: "bg-blue-400/6", text: "text-blue-300/45" },
     career: { bg: "bg-highlight/4", text: "text-highlight/50" },
-    emotion: { bg: "bg-purple-400/6", text: "text-purple-300/60" },
+    emotion: { bg: "bg-purple-400/6", text: "text-purple-300/45" },
   };
   return colors[category] || { bg: "bg-surface/30", text: "text-highlight/50" };
 };
@@ -59,7 +59,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
   if (sessions.length === 0) {
     return (
       <section className="mb-12">
-        <p className="text-xs text-highlight/50">아직 생성된 결과가 없어요</p>
+        <p className="text-xs text-highlight/50">아직 보관된 의뢰가 없어요</p>
       </section>
     );
   }
@@ -69,7 +69,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
 
   return (
     <section className="mb-12">
-      <div className="mb-3 pt-5 pb-3 border-t border-surface/20">
+      <div className="mb-3 pt-5 pb-3 border-t border-accent/12">
         <div className="flex items-center gap-2">
           <svg
             className="w-5 h-5 text-highlight/60"
@@ -81,10 +81,10 @@ const SessionList = ({ sessions }: SessionListProps) => {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={1.5}
-              d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              d="M3.75 7.5h5.25l1.5 2.25h9.75v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V7.5Z"
             />
           </svg>
-          <p className="text-base font-semibold text-highlight">지난 기록</p>
+          <p className="text-base font-nomal text-highlight">보관된 의뢰</p>
         </div>
       </div>
       <div className="space-y-1">
@@ -97,7 +97,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
             <Link
               key={summary.session_id}
               href={`/result/${summary.session_id}`}
-              className="block rounded-lg border border-surface/20 bg-surface/15 p-3 transition-all hover:border-accent/30 hover:bg-surface/25"
+              className="block rounded-lg border border-accent/12 bg-surface/12 p-3 transition-all hover:border-accent/28 hover:bg-accent/6"
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-start gap-4 flex-1 min-w-0">
@@ -112,7 +112,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
                         viewBox="0 0 24 24"
                         strokeWidth="1.5"
                         stroke="currentColor"
-                        className="w-5 h-5 text-pink-400/60"
+                        className="w-5 h-5 text-pink-400/40"
                       >
                         <path
                           strokeLinecap="round"
@@ -128,7 +128,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
                         viewBox="0 0 24 24"
                         strokeWidth="1.5"
                         stroke="currentColor"
-                        className="w-5 h-5 text-blue-400/60"
+                        className="w-5 h-5 text-blue-400/40"
                       >
                         <path
                           strokeLinecap="round"
@@ -144,7 +144,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
                         viewBox="0 0 24 24"
                         strokeWidth="1.5"
                         stroke="currentColor"
-                        className="w-5 h-5 text-amber-400/60"
+                        className="w-5 h-5 text-amber-400/40"
                       >
                         <path
                           strokeLinecap="round"
@@ -160,7 +160,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
                         viewBox="0 0 24 24"
                         strokeWidth="1.5"
                         stroke="currentColor"
-                        className="w-5 h-5 text-purple-400/60"
+                        className="w-5 h-5 text-purple-400/40"
                       >
                         <path
                           strokeLinecap="round"
@@ -173,7 +173,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
 
                   {/* 컨텐츠 정보 */}
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-highlight">
+                    <p className="text-sm font-nomal text-highlight">
                       {summary.content_title}
                     </p>
                     <div className="mt-1 flex items-center gap-2">
@@ -210,7 +210,7 @@ const SessionList = ({ sessions }: SessionListProps) => {
         })}
       </div>
 
-      <div className="mt-3 pt-3 border-t border-surface/20">
+      <div className="mt-3 pt-3 border-t border-accent/12">
         {hasMore && (
           <div className="flex justify-center">
             <button

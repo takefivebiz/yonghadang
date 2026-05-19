@@ -47,11 +47,14 @@ const ProfileSection = ({ profile }: ProfileSectionProps) => {
 
   return (
     <section className="mb-8">
-      <div className="rounded-lg border border-surface/20 bg-surface/15 p-5">
+      <p className="mb-3 text-xs font-medium tracking-wide text-accent/60">
+        의뢰인 정보
+      </p>
+      <div className="rounded-lg border border-accent/15 bg-surface/12 p-5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4 flex-1">
             {/* 소셜 아이콘 */}
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/25 text-base font-bold text-accent">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/12 text-base font-bold text-accent/75">
               {getSocialProviderIcon(profile.social_provider)}
             </div>
 
@@ -59,10 +62,12 @@ const ProfileSection = ({ profile }: ProfileSectionProps) => {
             <div className="min-w-0 flex-1">
               {!isEditing ? (
                 <>
-                  <p className="text-sm font-semibold text-highlight">
+                  <p className="text-sm font-nomal text-highlight">
                     {nickname}
                   </p>
-                  <p className="mt-0.5 text-xs text-highlight/60">{profile.email}</p>
+                  <p className="mt-0.5 text-xs text-highlight/60">
+                    {profile.email}
+                  </p>
                 </>
               ) : (
                 <div className="space-y-2">
@@ -73,7 +78,7 @@ const ProfileSection = ({ profile }: ProfileSectionProps) => {
                       setNickname(e.target.value);
                       setError("");
                     }}
-                    className="w-full rounded border border-accent/30 bg-accent/5 px-2 py-1 text-sm text-highlight placeholder-highlight/30 focus:border-accent/50 focus:outline-none"
+                    className="w-full rounded border border-accent/25 bg-accent/5 px-2 py-1 text-sm text-highlight placeholder-highlight/30 focus:border-accent/40 focus:outline-none"
                     autoFocus
                   />
                   {error && <p className="text-xs text-accent/80">{error}</p>}
@@ -81,7 +86,7 @@ const ProfileSection = ({ profile }: ProfileSectionProps) => {
                     <button
                       onClick={handleSaveNickname}
                       disabled={isSaving}
-                      className="flex-1 rounded border border-accent/50 bg-accent/20 py-1 text-xs font-medium text-accent transition-all hover:bg-accent/30 disabled:opacity-50"
+                      className="flex-1 rounded border border-accent/35 bg-accent/12 py-1 text-xs font-medium text-accent/80 transition-all hover:bg-accent/18 disabled:opacity-50"
                     >
                       {isSaving ? "저장 중..." : "저장"}
                     </button>
@@ -105,7 +110,7 @@ const ProfileSection = ({ profile }: ProfileSectionProps) => {
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="shrink-0 rounded px-2 py-1 text-xs text-accent/70 border border-accent/30 transition-all hover:bg-accent/10 hover:text-accent"
+              className="shrink-0 rounded px-2 py-1 text-xs text-accent/65 border border-accent/25 transition-all hover:bg-accent/8 hover:text-accent/85"
             >
               수정
             </button>

@@ -44,7 +44,7 @@ const AccountManagementModal = ({
 
       {/* 모달 */}
       <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center px-4 py-8">
-        <div className="w-full max-w-sm max-h-[90vh] overflow-y-auto rounded-lg border border-surface/20 bg-background/80 p-6 pb-8">
+        <div className="w-full max-w-sm max-h-[90vh] overflow-y-auto rounded-lg border border-accent/15 bg-background/80 p-6 pb-8">
           {/* 타이틀 섹션 */}
           <div className="mb-12 space-y-3 text-center">
             {/* 아이콘 */}
@@ -60,12 +60,12 @@ const AccountManagementModal = ({
                   cx="16"
                   cy="10"
                   r="4"
-                  stroke="rgba(209, 109, 172, 0.6)"
+                  stroke="rgba(143, 122, 216, 0.58)"
                   strokeWidth="1.5"
                 />
                 <path
                   d="M 8 22 Q 8 18 16 18 Q 24 18 24 22 L 24 26 Q 24 27 23 27 L 9 27 Q 8 27 8 26 Z"
-                  stroke="rgba(209, 109, 172, 0.6)"
+                  stroke="rgba(143, 122, 216, 0.58)"
                   strokeWidth="1.5"
                   fill="none"
                 />
@@ -73,26 +73,19 @@ const AccountManagementModal = ({
             </div>
             <h2 className="text-2xl font-semibold leading-tight sm:text-3xl">
               계정
-              <span style={{ color: "#D16DAC" }}>삭제</span>
+              <span style={{ color: "rgba(143, 122, 216, 0.85)" }}>삭제</span>
             </h2>
             <p className="text-xs text-highlight/50">
-              계정을 삭제할 수 있어
+              계정을 삭제하면 지난 기록이 영구 삭제돼
             </p>
           </div>
 
           {/* 계정 삭제 섹션 */}
           <div className="mb-12">
-            <label className="mb-2 block text-sm font-medium text-highlight">
-              계정 삭제
-            </label>
-            <p className="mb-4 text-xs text-highlight/50">
-              계정을 삭제하면 지난 기록이 영구 삭제돼
-            </p>
-
             {!showDeleteConfirm ? (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="w-full rounded-md border border-surface/30 px-4 py-3 text-xs font-medium text-highlight/70 transition-colors hover:text-highlight"
+                className="w-full rounded-md border border-accent/15 px-4 py-3 text-xs font-medium text-highlight/70 transition-colors hover:border-accent/28 hover:text-highlight"
               >
                 계정 삭제
               </button>
@@ -104,13 +97,13 @@ const AccountManagementModal = ({
                 <div className="flex gap-2">
                   <button
                     onClick={handleDeleteAccount}
-                    className="flex-1 rounded-md border border-accent/50 bg-accent/20 px-4 py-3 text-xs font-medium text-accent transition-all hover:bg-accent/30"
+                    className="flex-1 rounded-md border border-accent/30 bg-accent/10 px-4 py-3 text-xs font-medium text-accent/80 transition-all hover:bg-accent/16"
                   >
                     삭제
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
-                    className="flex-1 rounded-md border border-surface/30 px-4 py-3 text-xs font-medium text-highlight/70 transition-colors hover:text-highlight"
+                    className="flex-1 rounded-md border border-accent/15 px-4 py-3 text-xs font-medium text-highlight/70 transition-colors hover:border-accent/28 hover:text-highlight"
                   >
                     취소
                   </button>
@@ -120,7 +113,7 @@ const AccountManagementModal = ({
           </div>
 
           {/* 닫기 버튼 */}
-          <div className="border-t border-surface/10 pt-6">
+          <div className="border-t border-accent/10 pt-6">
             <button
               onClick={onClose}
               className="w-full py-2 text-xs font-medium text-highlight/50 transition-colors hover:text-highlight"
