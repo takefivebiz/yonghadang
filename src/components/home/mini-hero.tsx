@@ -1,131 +1,98 @@
-import Image from "next/image";
+"use client";
 
-/**
- * 메인 페이지 상단 히어로 섹션
- * 포스터 스타일 히어로
- */
+import { useState } from "react";
+import Image from "next/image";
+import CategorySelectSheet from "./category-select-sheet";
+
+const BADGE_TEXT = "심리탐정 리포트";
+
 const MiniHero = () => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
   return (
-    <section
-      className="relative w-full"
-      style={{
-        height: "93vh",
-        minHeight: "720px",
-      }}
-    >
-      <div
-        className="relative h-full flex items-center justify-center px-4 sm:px-8"
-        style={{
-          transform: "translateY(-50px)",
-        }}
-      >
-        {/* 히어로 카드 */}
+    <>
+      <section className="relative w-full overflow-hidden">
         <div
-          className="relative w-[88vw] max-w-[520px]"
+          className="relative mx-auto max-w-xl px-7 flex flex-col md:flex-row items-flex-start md:items-center"
           style={{
-            background: "transparent",
+            paddingTop: "clamp(24px, 4vh, 60px)",
+            paddingBottom: "120px",
           }}
         >
-          {/* 이미지 컨테이너 - 아치 모양 */}
+          {/* 왼쪽: 텍스트 */}
+          <div className="flex flex-col flex-1 min-w-0 relative z-10">
+            {/* 배지 */}
+            <span
+              className="inline-flex w-fit items-center px-3 py-1 rounded-full font-body"
+              style={{
+                border: "1px solid rgba(255,255,255,0.12)",
+                color: "rgba(255,255,255,0.38)",
+                background: "rgba(255,255,255,0.03)",
+                fontSize: "13px",
+                letterSpacing: "-0.05em",
+              }}
+            >
+              {BADGE_TEXT}
+            </span>
+
+            {/* 제목 */}
+            <h1
+              className="font-hero mt-5 md:mt-7"
+              style={{
+                fontSize: "clamp(1.75rem, 5.5vw, 2.5rem)",
+                lineHeight: 1.18,
+                letterSpacing: "-0.03em",
+                color: "rgba(249, 249, 229, 0.92)",
+              }}
+            >
+              왜 나는 <span style={{ color: "#b48be0" }}>맨날 이러지..</span>
+              <br />
+              싶었던 적 있어?
+            </h1>
+
+            {/* 부제 */}
+            <p
+              className="font-body mt-4 md:mt-6"
+              style={{
+                fontSize: "clamp(1rem, 4vw, 1rem)",
+                lineHeight: 1.25,
+                letterSpacing: "-0.02em",
+                color: "rgba(249, 249, 229, 0.56)",
+              }}
+            >
+              설명 안 되던 감정,
+              <br />
+              <span style={{ color: "#d16dac" }}>내가 정확히 말해줄게</span>
+            </p>
+          </div>
+
+          {/* 오른쪽 하단: 탐정 고양이 (배경처럼 묻혀있음) */}
           <div
-            className="relative w-full h-[72vh] max-h-[760px] overflow-hidden scale-[0.92]"
+            className="absolute bottom-10 right-3 md:relative md:flex-shrink-0 pointer-events-none"
             style={{
-              borderRadius: "120px 120px 0 0",
+              width: "200px",
+              height: "200px",
             }}
           >
-            {/* 일러스트 */}
             <Image
-              src="/img/hero.png"
-              alt="VEIL 메인 일러스트"
+              src="/img/cat_main.png"
+              alt="감정 파일을 읽는 탐정"
               fill
               priority
-              className="object-cover object-center"
+              className="object-contain object-right-bottom"
               style={{
-                opacity: 0.82,
+                opacity: 0.7,
               }}
             />
-
-            {/* 상단 오버레이 */}
-            <div
-              className="absolute inset-0 flex flex-col items-center text-center px-8"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(59, 54, 82, 0.902) 0%, rgba(0,0,0,0) 60%)",
-                paddingTop: "62px",
-              }}
-            >
-              <h2
-                className="font-hero font-nomal leading-[1.2] text-[2rem] md:text-[2.5rem]"
-                style={{
-                  color: "rgb(228, 217, 229)",
-                  letterSpacing: "-0.03em",
-                  textShadow:
-                    "0 2px 0px rgba(0, 0, 0, 0.4), 0 0 3px rgba(0, 0, 0, 0.2)",
-                }}
-              >
-                다정하게 듣고,
-                <br />
-                정확하게 말해줄게
-              </h2>
-
-              <p
-                className="font-body mt-2"
-                style={{
-                  color: "rgba(255, 255, 255, 0.716)",
-                  fontSize: "clamp(1rem, 1.2vw, 1.1rem)",
-                  fontWeight: 400,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.6,
-                }}
-              >
-                지금 너에게 가장 필요한 말
-              </p>
-            </div>
-          </div>
-
-          {/* 하단 정보 */}
-          <div
-            className="absolute left-0 right-0 flex flex-col items-center gap-8"
-            style={{
-              bottom: "-20px",
-            }}
-          >
-            <p
-              className="tracking-[0.18em]"
-              style={{
-                color: "rgba(255, 255, 255, 0.802)",
-                fontSize: "11px",
-              }}
-            >
-              개인화 해석 · 로직 기반 · 3분 완성
-            </p>
-
-            <div
-              style={{
-                animation: "float 2.5s ease-in-out infinite",
-                color: "rgba(249,249,229,0.28)",
-                fontSize: "22px",
-                lineHeight: 1,
-              }}
-            >
-              ↓
-            </div>
           </div>
         </div>
+      </section>
 
-        {/* 플로팅 애니메이션 */}
-        <style>{`
-          @keyframes float {
-            0%, 100% {
-              transform: translateY(0px);
-            }
-            50% {
-              transform: translateY(8px);
-            }
-          }
-        `}</style>
-      </div>
-    </section>
+      <CategorySelectSheet
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+      />
+    </>
   );
 };
 

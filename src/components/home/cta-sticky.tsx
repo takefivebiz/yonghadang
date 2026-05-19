@@ -12,14 +12,13 @@ const CTASticky = () => {
         <div className="mx-auto max-w-screen-lg px-4 py-4 flex justify-center">
           <button
             onClick={() => setIsSheetOpen(true)}
-            className="group flex w-full max-w-[500px] items-center gap-3 rounded-3xl rounded-bl-none border border-white/10 bg-black/30 backdrop-blur-sm px-5 py-3 text-left transition-all duration-200 hover:border-accent/30 hover:bg-black/30"
+            className="group flex w-full max-w-[500px] items-center gap-2 rounded-3xl rounded-bl-none border border-white/8 bg-black/20 backdrop-blur-sm px-4 py-3 text-left transition-all duration-200 hover:border-white/12 hover:bg-black/25"
           >
-            <span className="text-lg shrink-0">✨</span>
-            <span className="flex-1 text-[13px] font-nomal text-white/90">
-              혼자 고민하고 있었다면, 편하게 말해볼래?
+            <span className="flex-1 text-[13px] font-nomal text-white/60">
+              설명 안 되던 감정이 있어?
             </span>
             <svg
-              className="h-4 w-4 shrink-0 text-white/40 transition-all group-hover:text-white/60"
+              className="h-3.5 w-3.5 shrink-0 text-white/40 transition-all group-hover:text-white/50"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"

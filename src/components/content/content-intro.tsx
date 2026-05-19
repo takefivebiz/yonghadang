@@ -6,10 +6,10 @@ import Image from "next/image";
 import { Content, CATEGORY_LABELS } from "@/lib/types/content";
 
 const CATEGORY_CONFIG: Record<Content["category"], { glow: string }> = {
-  love: { glow: "from-accent/10" },
-  relationship: { glow: "from-secondary/10" },
-  career: { glow: "from-highlight/8" },
-  emotion: { glow: "from-purple-400/10" },
+  love: { glow: "from-pink-400/5" },
+  relationship: { glow: "from-pink-300/5" },
+  career: { glow: "from-pink-400/4" },
+  emotion: { glow: "from-pink-300/5" },
 };
 
 interface ContentIntroProps {
@@ -20,52 +20,50 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
-  // QA mode에서는 이어하기를 노출하지 않음
   const isQaMode =
     searchParams.get("qa") === "1" ||
     process.env.NEXT_PUBLIC_QA_MODE === "true";
-  const [resumableSessionId, setResumableSessionId] = useState<string | null>(null);
+  const [resumableSessionId, setResumableSessionId] = useState<string | null>(
+    null,
+  );
   const config = CATEGORY_CONFIG[content.category];
 
-  // 마운트 시 이어하기 가능한 session 탐색 (non-QA mode에서만)
   useEffect(() => {
     if (isQaMode || typeof window === "undefined") return;
 
     const lastSid = localStorage.getItem(`veil_last_session_${content.id}`);
     if (!lastSid) return;
 
-    // veil_analysis_ 존재 = 입력 완료 후 generating 진입한 session
-    const hasAnalysis = Boolean(localStorage.getItem(`veil_analysis_${lastSid}`));
+    const hasAnalysis = Boolean(
+      localStorage.getItem(`veil_analysis_${lastSid}`),
+    );
     if (hasAnalysis) {
       setResumableSessionId(lastSid);
     }
   }, [content.id, isQaMode]);
 
-  // 이어하기: 기존 session_id로 analyze 페이지 진입 → 어제 구현한 복원 로직이 처리
   const handleResume = () => {
     if (!resumableSessionId) return;
     router.push(`/analyze/${resumableSessionId}?content_id=${content.id}`);
   };
 
   const handleStart = async () => {
-    // 새로 시작 시 기존 resumable session 즉시 무효화 → 인트로 복귀 시 이어하기 미노출
     if (typeof window !== "undefined") {
       localStorage.removeItem(`veil_last_session_${content.id}`);
     }
     setResumableSessionId(null);
     setLoading(true);
 
-    // QA mode: DB 세션 생성 없이 local UUID로 진행 (?qa=1 우선, env fallback)
-
     if (isQaMode) {
       const localSessionId = crypto.randomUUID();
       const loopFlag = searchParams.get("loop") === "1" ? "&loop=1" : "";
-      router.push(`/analyze/${localSessionId}?content_id=${content.id}&qa=1${loopFlag}`);
+      router.push(
+        `/analyze/${localSessionId}?content_id=${content.id}&qa=1${loopFlag}`,
+      );
       return;
     }
 
     try {
-      // analysis_sessions 생성 → DB UUID 취득
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -79,69 +77,152 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
       const data = (await res.json()) as { session_id: string };
       router.push(`/analyze/${data.session_id}?content_id=${content.id}`);
     } catch (err) {
-      // API 실패 시 local UUID fallback → localStorage 기반 흐름으로 계속
       console.error("[handleStart] API 실패, fallback UUID 사용:", err);
       const fallbackSessionId = crypto.randomUUID();
       router.push(`/analyze/${fallbackSessionId}?content_id=${content.id}`);
-      // setLoading(false)를 호출하지 않음: router.push 후 페이지 이동이 되므로 불필요
     }
   };
 
-  // Flow preview: 최대 4개까지만 노출
   const MAX_PREVIEW_FLOWS = 4;
   const previewFlows = content.insights?.slice(0, MAX_PREVIEW_FLOWS) || [];
   const remainingCount = (content.insights?.length || 0) - previewFlows.length;
 
   return (
     <div className="w-full max-w-full relative overflow-x-hidden">
-      {/* 배경 그래디언트 */}
-      <div
-        className={`absolute inset-0 w-full h-full overflow-hidden bg-gradient-to-b ${config.glow} via-background/80 to-background`}
-      />
-
-      <main className="relative z-10 w-full flex flex-col justify-between px-5 py-8 pb-50">
-        {/* 티켓 오브젝트 */}
-        <div className="flex-1 flex items-start pt-8">
-          {/* Ticket Wrapper with Texture Background */}
+      <main className="relative z-10 w-full flex flex-col justify-between px-4 sm:px-5 py-6 pb-50">
+        {/* 폴더 Wrapper */}
+        <div className="w-full mx-auto pt-4" style={{ maxWidth: "540px" }}>
+          {/* 탭 Row */}
           <div
-            className="relative w-[100%] max-w-[320px] mx-auto"
             style={{
-              borderRadius: "12px",
+              display: "flex",
+              gap: "2px",
+              marginBottom: "-1px",
+            }}
+          >
+            {/* 탭 1: 활성 (연애·결혼) */}
+            <div
+              style={{
+                flex: "0 1 auto",
+                height: "38px",
+                background: "rgba(110, 70, 100, 0.35)",
+                border: "1px solid rgba(201, 139, 176, 0.25)",
+                borderBottom: "none",
+                borderRadius: "14px 14px 0 0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingLeft: "20px",
+                paddingRight: "20px",
+                opacity: 1,
+                transition: "all 300ms ease",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "13px",
+                  fontWeight: "400",
+                  color: "rgba(255, 255, 255, 0.90)",
+                  letterSpacing: "0.02em",
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {CATEGORY_LABELS[content.category]}
+              </span>
+            </div>
+
+            {/* 탭 2: 비활성 (기록 작성 중) */}
+            <div
+              style={{
+                flex: "0 1 auto",
+                height: "38px",
+                background: "rgba(60, 45, 65, 0.4)",
+                border: "1px solid rgba(201, 139, 176, 0.35)",
+                borderBottom: "1px solid rgba(201, 139, 176, 0.35)",
+                borderRadius: "14px 14px 0 0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingLeft: "20px",
+                paddingRight: "20px",
+                opacity: 0.55,
+                transition: "all 300ms ease",
+                cursor: "not-allowed",
+                pointerEvents: "none",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "400",
+                  color: "rgba(255, 255, 255, 0.55)",
+                  letterSpacing: "0.02em",
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                기록 작성 중
+              </span>
+            </div>
+
+            {/* 탭 3: 비활성 (결과파일) */}
+            <div
+              style={{
+                flex: "0 1 auto",
+                height: "38px",
+                background: "rgba(50, 35, 60, 0.3)",
+                border: "1px solid rgba(201, 139, 176, 0.10)",
+                borderBottom: "1px solid rgba(201, 139, 176, 0.10)",
+                borderRadius: "14px 14px 0 0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingLeft: "20px",
+                paddingRight: "20px",
+                opacity: 0.45,
+                transition: "all 300ms ease",
+                cursor: "not-allowed",
+                pointerEvents: "none",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "400",
+                  color: "rgba(255, 255, 255, 0.45)",
+                  letterSpacing: "0.02em",
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                결과파일
+              </span>
+            </div>
+          </div>
+
+          {/* 폴더 Body */}
+          <div
+            className="relative"
+            style={{
+              background: "rgba(60, 45, 65, 0.3)",
+              border: "1px solid rgba(201, 139, 176, 0.25)",
+              borderTopLeftRadius: "0",
+              borderTopRightRadius: "18px",
+              borderBottomLeftRadius: "18px",
+              borderBottomRightRadius: "18px",
               overflow: "hidden",
             }}
           >
-            {/* 미묘한 Grain Texture — CSS Gradient */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: `
-                  radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 24%),
-                  radial-gradient(circle at 80% 10%, rgba(209,109,172,0.06), transparent 28%),
-                  linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0))
-                `,
-              }}
-            />
-            {/* 상단 Section */}
-            <div
-              className="relative z-10 px-6 pt-3 pb-6 space-y-4"
-              style={{
-                border: "1.5px solid rgba(155, 123, 168, 0.4)",
-                borderBottom: "none",
-                borderRadius: "12px 12px 0 0",
-              }}
-            >
-              {/* VEIL Logo */}
-              <div className="text-center mb-4">
-                <span
-                  className="text-[9px] font-semibold uppercase tracking-[0.25em]"
-                  style={{ color: "rgba(155, 123, 168, 0.6)" }}
-                >
-                  V E I L
-                </span>
-              </div>
-
-              {/* 상단 Header — 이미지 + 제목/부제 */}
-              <div className="flex gap-3 items-start">
+            {/* 섹션 1: 메인 콘텐츠 — 썸네일 + 제목 + 부제 */}
+            <div style={{ padding: "24px 22px 10px 20px" }}>
+              <div className="flex gap-4 items-center">
                 {/* 썸네일 */}
                 <div className="w-24 shrink-0">
                   <div className="relative aspect-square overflow-hidden rounded-lg">
@@ -150,7 +231,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                         src={content.thumbnail_url}
                         alt={content.title}
                         fill
-                        sizes="112px"
+                        sizes="96px"
                         priority
                         className="object-cover object-center"
                       />
@@ -161,18 +242,12 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                 </div>
 
                 {/* 제목/부제 */}
-                <div className="flex-1 pt-0.5">
-                  {/* 카테고리 배지 */}
-                  <div className="mb-2">
-                    <span className="text-[9px] font-semibold uppercase tracking-widest text-white/40">
-                      {CATEGORY_LABELS[content.category]}
-                    </span>
-                  </div>
-                  <h1 className="text-[16px] lg:text-[16px] font-medium leading-[1.3] text-white/80 mb-1 line-clamp-1">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-[16px] font-medium leading-[1.3] text-white/85 mb-1 line-clamp-1">
                     {content.title}
                   </h1>
                   {content.subtitle && (
-                    <p className="text-[12px] lg:text-[12px] leading-[1.4] text-white/55 line-clamp-2 text-left">
+                    <p className="text-[12px] leading-[1.35] text-white/55 line-clamp-2 text-left">
                       {content.subtitle}
                     </p>
                   )}
@@ -180,130 +255,122 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
               </div>
             </div>
 
-            {/* 절취선 */}
-            <div
-              className="relative"
-              style={{
-                height: "12px",
-                display: "flex",
-                alignItems: "center",
-                paddingLeft: "10px",
-                paddingRight: "10px",
-              }}
-            >
-              {/* 좌측 Diamond */}
-              <div
-                style={{
-                  position: "absolute",
-                  left: "-16px",
-                  width: "20px",
-                  height: "20px",
-                  transform: "rotate(45deg)",
-                  border: "1.5px solid rgba(155, 123, 168, 0.4)",
-                  borderBottom: "2px solid transparent",
-                  borderLeft: "2px solid transparent",
-                  pointerEvents: "none",
-                }}
-              />
-
-              <div
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                }}
-              >
+            {/* 섹션 2: 라벨 */}
+            <div style={{ padding: "14px 24px 10px 24px" }}>
+              <div className="flex items-center gap-3">
                 <div
                   style={{
                     flex: 1,
                     height: "1px",
-                    backgroundImage:
-                      "repeating-linear-gradient(90deg, rgba(155, 123, 168, 0.4) 0px, rgba(155, 123, 168, 0.4) 4px, transparent 4px, transparent 10px)",
+                    background: "rgba(201, 139, 176, 0.15)",
                   }}
                 />
                 <span
-                  className="text-[7px] font-semibold uppercase tracking-[0.2em] whitespace-nowrap"
-                  style={{ color: "rgba(155, 123, 168, 0.6)" }}
+                  className="text-[11px] font-medium tracking-wider whitespace-nowrap"
+                  style={{ color: "rgba(201, 139, 176, 0.4)" }}
                 >
-                  FLOW PREVIEW
+                  이 파일에 포함된 기록
                 </span>
                 <div
                   style={{
                     flex: 1,
                     height: "1px",
-                    backgroundImage:
-                      "repeating-linear-gradient(90deg, rgba(155, 123, 168, 0.4) 0px, rgba(155, 123, 168, 0.4) 4px, transparent 4px, transparent 10px)",
+                    background: "rgba(201, 139, 176, 0.15)",
                   }}
                 />
               </div>
-
-              {/* 우측 Diamond */}
-              <div
-                style={{
-                  position: "absolute",
-                  right: "-16px",
-                  width: "20px",
-                  height: "20px",
-                  transform: "rotate(45deg)",
-                  border: "1.5px solid rgba(155, 123, 168, 0.4)",
-                  borderTop: "2px solid transparent",
-                  borderRight: "2px solid transparent",
-                  pointerEvents: "none",
-                }}
-              />
             </div>
 
-            {/* 하단 Section */}
-            <div
-              className="relative z-10 px-6 pt-4 pb-6"
-              style={{
-                borderLeft: "1.5px solid rgba(155, 123, 168, 0.4)",
-                borderRight: "1.5px solid rgba(155, 123, 168, 0.4)",
-
-                borderRadius: "0 0 12px 20px",
-              }}
-            >
-              {/* Teaser — 티켓 정보 영역 */}
-              {previewFlows && previewFlows.length > 0 && (
-                <div className="space-y-5 pt-4 pb-3">
-                  {previewFlows.map((insight, i) => (
-                    <div key={i} className="flex flex-col gap-2 pl-2">
-                      <span className="text-[9px] font-semibold text-white/30 uppercase tracking-[0.18em]">
-                        FLOW {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <p className="text-[13px] lg:text-[13px] leading-[1] text-white/75">
-                        {insight}
-                      </p>
-                    </div>
-                  ))}
-                  {/* 남은 흐름 표시 */}
-                  {remainingCount > 0 && (
-                    <p className="pl-2 mt-6 text-[12px] text-white/35">
-                      + {remainingCount}개의 흐름이 더 있어
-                    </p>
-                  )}
-                </div>
-              )}
+            {/* 섹션 3: 파일 리스트 */}
+            <div style={{ padding: "8px 24px 24px 24px" }}>
+              <div className="space-y-4">
+                {previewFlows && previewFlows.length > 0 && (
+                  <div className="space-y-4">
+                    {previewFlows.map((insight, i) => (
+                      <div key={i} className="flex flex-col gap-0">
+                        <div className="flex gap-2">
+                          <svg
+                            className="w-3 h-3 shrink-0 self-start mt-2"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            style={{ color: "rgba(201, 139, 176, 0.45)" }}
+                          >
+                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+                            <polyline points="13 2 13 9 20 9" />
+                          </svg>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[10px] font-medium text-white/45 uppercase tracking-widest">
+                              FILE {String(i + 1).padStart(2, "0")}
+                            </span>
+                            <p className="mt-0.5 text-[13px] leading-[1.45] text-white/70">
+                              {insight}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {/* 잠긴 기록 표시 */}
+                    {remainingCount > 0 && (
+                      <div className="pt-2 mt-2 ml-5">
+                        <div className="flex items-center gap-2">
+                          <p
+                            className="text-[12px]"
+                            style={{ color: "rgba(255, 255, 255, 0.35)" }}
+                          >
+                            +
+                          </p>
+                          <span style={{ fontSize: "12px" }}>🔒</span>
+                          <p
+                            className="text-[13px]"
+                            style={{ color: "rgba(255, 255, 255, 0.35)" }}
+                          >
+                            {remainingCount}개의 잠긴 기록
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* CTA 영역 */}
-            <div className="w-[100%] max-w-[320px] mx-auto pb-12">
+            {/* 섹션 4: CTA 버튼 */}
+            <div style={{ padding: "24px 24px 24px 24px" }}>
               {resumableSessionId ? (
                 /* 이어하기 가능한 session 존재 → 이어하기 + 새로 시작하기 */
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2.5">
                   <button
                     onClick={handleResume}
-                    className="w-full py-6 text-base font-medium transition-all duration-200 active:scale-[0.98]"
+                    className="w-full py-4 text-base font-medium transition-all duration-300 flex items-center justify-center gap-2"
                     style={{
                       borderRadius: "12px",
-                      background: "linear-gradient(135deg, rgba(155, 123, 168, 0.233) 0%, rgba(117, 65, 116, 0.841) 100%)",
-                      borderTop: "1.5px dashed rgba(155, 123, 168, 0.4)",
-                      borderLeft: "1.5px solid rgba(155, 123, 168, 0.4)",
-                      borderRight: "1.5px solid rgba(155, 123, 168, 0.4)",
-                      borderBottom: "1.5px solid rgba(155, 123, 168, 0.4)",
+                      background: "rgba(201, 139, 176, 0.1)",
+                      border: "1px solid rgba(201, 139, 176, 0.2)",
                       color: "rgba(255, 255, 255, 0.85)",
-                      boxShadow: "inset 0 1px 2px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(155, 123, 168, 0.08)",
+                      boxShadow:
+                        "0 2px 4px rgba(201, 139, 176, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor =
+                        "rgba(201, 139, 176, 0.35)";
+                      e.currentTarget.style.background =
+                        "rgba(201, 139, 176, 0.13)";
+                      e.currentTarget.style.boxShadow =
+                        "0 3px 6px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor =
+                        "rgba(201, 139, 176, 0.2)";
+                      e.currentTarget.style.background =
+                        "rgba(201, 139, 176, 0.1)";
+                      e.currentTarget.style.boxShadow =
+                        "0 2px 4px rgba(201, 139, 176, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
+                    }}
+                    onMouseDown={(e) => {
+                      e.currentTarget.style.boxShadow =
+                        "0 1px 2px rgba(201, 139, 176, 0.08) inset";
                     }}
                   >
                     이어하기
@@ -311,12 +378,39 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                   <button
                     onClick={handleStart}
                     disabled={loading}
-                    className="w-full py-4 text-sm font-medium transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="w-full py-4 text-base font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center gap-2"
                     style={{
                       borderRadius: "12px",
-                      background: "transparent",
-                      border: "1px solid rgba(155, 123, 168, 0.2)",
-                      color: "rgba(255, 255, 255, 0.4)",
+                      background: "rgba(201, 139, 176, 0.18)",
+                      border: "1px solid rgba(201, 139, 176, 0.32)",
+                      color: "rgba(255, 255, 255, 0.95)",
+                      boxShadow: "0 4px 8px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!loading) {
+                        e.currentTarget.style.borderColor =
+                          "rgba(201, 139, 176, 0.35)";
+                        e.currentTarget.style.background =
+                          "rgba(201, 139, 176, 0.14)";
+                        e.currentTarget.style.boxShadow =
+                          "0 3px 6px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!loading) {
+                        e.currentTarget.style.borderColor =
+                          "rgba(201, 139, 176, 0.32)";
+                        e.currentTarget.style.background =
+                          "rgba(201, 139, 176, 0.18)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 8px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
+                      }
+                    }}
+                    onMouseDown={(e) => {
+                      if (!loading) {
+                        e.currentTarget.style.boxShadow =
+                          "0 1px 2px rgba(201, 139, 176, 0.08) inset";
+                      }
                     }}
                   >
                     {loading ? "준비 중..." : "새로 시작하기"}
@@ -327,31 +421,42 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                 <button
                   onClick={handleStart}
                   disabled={loading}
-                  className="w-full py-6 text-base font-medium transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full py-4 text-base font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
                   style={{
                     borderRadius: "12px",
-                    background: loading
-                      ? "rgba(255, 255, 255, 0.02)"
-                      : "linear-gradient(135deg, rgba(155, 123, 168, 0.233) 0%, rgba(117, 65, 116, 0.841) 100%)",
-                    borderTop: loading
-                      ? "1.5px dashed rgba(155, 123, 168, 0.15)"
-                      : "1.5px dashed rgba(155, 123, 168, 0.4)",
-                    borderLeft: loading
-                      ? "1.5px solid rgba(155, 123, 168, 0.2)"
-                      : "1.5px solid rgba(155, 123, 168, 0.4)",
-                    borderRight: loading
-                      ? "1.5px solid rgba(155, 123, 168, 0.2)"
-                      : "1.5px solid rgba(155, 123, 168, 0.4)",
-                    borderBottom: loading
-                      ? "1.5px solid rgba(155, 123, 168, 0.2)"
-                      : "1.5px solid rgba(155, 123, 168, 0.4)",
-                    color: "rgba(255, 255, 255, 0.85)",
-                    boxShadow: loading
-                      ? "none"
-                      : "inset 0 1px 2px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(155, 123, 168, 0.08)",
+                    background: "rgba(201, 139, 176, 0.18)",
+                    border: "1px solid rgba(201, 139, 176, 0.32)",
+                    color: "rgba(255, 255, 255, 0.95)",
+                    boxShadow: "0 4px 8px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.borderColor =
+                        "rgba(201, 139, 176, 0.35)";
+                      e.currentTarget.style.background =
+                        "rgba(201, 139, 176, 0.14)";
+                      e.currentTarget.style.boxShadow =
+                        "0 3px 6px rgba(201, 139, 176, 0.15), 0 -1px 2px rgba(255, 255, 255, 0.1) inset";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.borderColor =
+                        "rgba(201, 139, 176, 0.2)";
+                      e.currentTarget.style.background =
+                        "rgba(201, 139, 176, 0.12)";
+                      e.currentTarget.style.boxShadow =
+                        "0 2px 4px rgba(201, 139, 176, 0.12), 0 -1px 2px rgba(255, 255, 255, 0.08) inset";
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.boxShadow =
+                        "0 1px 2px rgba(201, 139, 176, 0.08) inset";
+                    }
                   }}
                 >
-                  {loading ? "준비 중..." : "시작하기"}
+                  {loading ? "준비 중..." : "시작하기 →"}
                 </button>
               )}
             </div>

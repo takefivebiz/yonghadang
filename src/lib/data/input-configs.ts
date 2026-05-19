@@ -89,7 +89,7 @@ export const INPUT_CONFIGS: Record<string, InputConfig> = {
       {
         id: "q3_reaction",
         type: "multiChoice",
-        question: "흔들릴 때\n너는 보통 어떻게 반응해?",
+        question: "흔들릴 때 너는 보통 어떻게 반응해?",
         options: [
           {
             label: "괜찮은 척하면서 혼자 계속 생각해",
@@ -120,7 +120,7 @@ export const INPUT_CONFIGS: Record<string, InputConfig> = {
       {
         id: "q4_exhaustion",
         type: "singleChoice",
-        question: "이 관계에서 너를\n가장 지치게 만드는 건 뭐야?",
+        question: "이 관계에서 너를 가장 지치게 만드는 건 뭐야?",
         options: [
           {
             label: "나만 더 깊게 마음 쓰고 있는 것",

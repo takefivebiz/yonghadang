@@ -11,15 +11,15 @@ const TrendingSection = ({ contents }: TrendingSectionProps) => {
 
   return (
     <section className="mb-10">
-      <div className="mx-auto max-w-xl px-4">
-        <div className="mb-5 flex items-center gap-2">
-          <span className="h-4 w-1 rounded-full bg-accent" />
-          <h2 className="text-base font-nomal tracking-wider text-highlight">
-            지금 많이 보는
+      <div className="mx-auto max-w-xl px-5">
+        <div className="mb-3 flex items-center gap-1.5">
+          <span className="h-3 w-1 rounded-full bg-accent" />
+          <h2 className="text-sm font-nomal tracking-wider text-highlight">
+            지금 많이 보는 케이스
           </h2>
         </div>
         <div
-          className="grid grid-cols-2 gap-x-3 gap-y-4 lg:gap-x-4 lg:gap-y-6 lg:max-w-[600px] lg:mx-auto"
+          className="grid grid-cols-2 gap-x-2 gap-y-4 lg:gap-x-2 lg:gap-y-6 lg:max-w-[600px] lg:mx-auto"
           data-testid="trending-grid"
         >
           {contents.map((content, index) => (

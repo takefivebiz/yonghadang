@@ -4,11 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import TypeAInput from "@/components/analyze/type-a-input";
 import CorrectionQuestions from "@/components/analyze/correction-questions";
-import ReactionBubble from "@/components/analyze/reaction-bubble";
 import GeneratingLoading from "@/components/analyze/generating-loading";
 import { getInputConfig } from "@/lib/data/input-configs";
 import { AnalyzeState, Answer, AnalyzeAnswers } from "@/lib/types/analyze";
 import { CONTENTS } from "@/lib/data/contents";
+import { CATEGORY_LABELS } from "@/lib/types/content";
 import { INPUT_CONFIGS } from "@/lib/data/input-configs";
 import { getSceneConfig } from "@/lib/data/scene-configs";
 import type { ResultScene } from "@/lib/types/result";
@@ -23,7 +23,6 @@ interface PageProps {
 
 type Stage =
   | "free_input"
-  | "reaction_after_free"
   | "correction_questions"
   | "completing";
 
@@ -134,23 +133,18 @@ const AnalyzePage = ({ params }: PageProps) => {
 
   // ── Stage 변경 시 최상단으로 스크롤 ──────────────────────────────────────
   useEffect(() => {
-    if (typeof window !== "undefined" && stage === "reaction_after_free") {
+    if (typeof window !== "undefined" && stage === "correction_questions") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [stage]);
 
-  // 자유입력 → reaction_after_free
+  // 자유입력 → correction_questions
   const handleFreeInputSubmit = (input: string) => {
     setAnalyzeData((prev) => ({
       ...prev,
       free_input: input,
       stage: "free_input",
     }));
-    setStage("reaction_after_free");
-  };
-
-  // reaction_after_free → correction_questions
-  const handleReactionAfterFreeComplete = () => {
     setStage("correction_questions");
   };
 
@@ -544,6 +538,8 @@ const AnalyzePage = ({ params }: PageProps) => {
     return <div className="min-h-screen bg-background" />;
   }
 
+  const content = CONTENTS.find((c) => c.id === analyzeData.content_id);
+
   return (
     <div className="min-h-screen bg-background flex justify-center">
       {/* 완료 화면: 단서 수렴 로딩 */}
@@ -551,30 +547,150 @@ const AnalyzePage = ({ params }: PageProps) => {
         <GeneratingLoading progress={progress} />
       )}
 
-      {/* 입력 단계 */}
-      {stage === "free_input" && (
-        <TypeAInput config={config} onSubmit={handleFreeInputSubmit} />
-      )}
+      {/* 입력 단계: 폴더 구조 포함 */}
+      {(stage === "free_input" || stage === "correction_questions") && (
+        <main className="relative z-10 w-full flex flex-col justify-between px-4 sm:px-5 py-6">
+          <div className="w-full mx-auto pt-4" style={{ maxWidth: "540px" }}>
+          {/* 탭 Row */}
+          <div
+            style={{
+              display: "flex",
+              gap: "2px",
+              marginBottom: "-1px",
+            }}
+          >
+            {/* 탭 1: 비활성 (콘텐츠 카테고리) */}
+            <div
+              style={{
+                flex: "0 1 auto",
+                height: "38px",
+                background: "rgba(50, 35, 60, 0.3)",
+                border: "1px solid rgba(201, 139, 176, 0.35)",
+                borderBottom: "1px solid rgba(201, 139, 176, 0.35)",
+                borderRadius: "14px 14px 0 0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingLeft: "20px",
+                paddingRight: "20px",
+                opacity: 0.45,
+                transition: "all 300ms ease",
+                cursor: "not-allowed",
+                pointerEvents: "none",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "400",
+                  color: "rgba(255, 255, 255, 0.45)",
+                  letterSpacing: "0.02em",
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {content ? CATEGORY_LABELS[content.category] : "콘텐츠"}
+              </span>
+            </div>
 
-      {/* 자유입력 후 반응 */}
-      {stage === "reaction_after_free" && (
-        <ReactionBubble
-          messages={[
-            "고마워",
-            "상황을 자세히 이해하기 위해",
-            "몇 가지만 더 볼게.",
-          ]}
-          onComplete={handleReactionAfterFreeComplete}
-          completedSteps={1}
-        />
-      )}
+            {/* 탭 2: 활성 (기록 작성 중) */}
+            <div
+              style={{
+                flex: "0 1 auto",
+                height: "38px",
+                background: "rgba(110, 70, 100, 0.35)",
+                border: "1px solid rgba(201, 139, 176, 0.25)",
+                borderBottom: "none",
+                borderRadius: "14px 14px 0 0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingLeft: "20px",
+                paddingRight: "20px",
+                opacity: 1,
+                transition: "all 300ms ease",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "13px",
+                  fontWeight: "400",
+                  color: "rgba(255, 255, 255, 0.90)",
+                  letterSpacing: "0.02em",
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                기록 작성 중
+              </span>
+            </div>
 
-      {/* 선택형 질문들 (reaction 없음, 빠르게) */}
-      {stage === "correction_questions" && (
-        <CorrectionQuestions
-          config={config}
-          onSubmit={handleCorrectionSubmit}
-        />
+            {/* 탭 3: 비활성 (결과파일) */}
+            <div
+              style={{
+                flex: "0 1 auto",
+                height: "38px",
+                background: "rgba(50, 35, 60, 0.3)",
+                border: "1px solid rgba(201, 139, 176, 0.35)",
+                borderBottom: "1px solid rgba(201, 139, 176, 0.35)",
+                borderRadius: "14px 14px 0 0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingLeft: "20px",
+                paddingRight: "20px",
+                opacity: 0.45,
+                transition: "all 300ms ease",
+                cursor: "not-allowed",
+                pointerEvents: "none",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "400",
+                  color: "rgba(255, 255, 255, 0.45)",
+                  letterSpacing: "0.02em",
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                결과파일
+              </span>
+            </div>
+          </div>
+
+          {/* 폴더 Body */}
+          <div
+            style={{
+              background: "rgba(60, 45, 65, 0.3)",
+              border: "1px solid rgba(201, 139, 176, 0.25)",
+              borderTopLeftRadius: "0",
+              borderTopRightRadius: "18px",
+              borderBottomLeftRadius: "18px",
+              borderBottomRightRadius: "18px",
+              overflow: "hidden",
+            }}
+          >
+            {stage === "free_input" && (
+              <TypeAInput config={config} onSubmit={handleFreeInputSubmit} />
+            )}
+
+            {stage === "correction_questions" && (
+              <CorrectionQuestions
+                config={config}
+                onSubmit={handleCorrectionSubmit}
+              />
+            )}
+          </div>
+        </div>
+        </main>
       )}
     </div>
   );

@@ -22,12 +22,12 @@ const ContentSection = ({ category, contents }: ContentSectionProps) => {
       className="mb-12 scroll-mt-28"
       data-testid="content-section"
     >
-      <div className="mx-auto max-w-xl px-4">
+      <div className="mx-auto max-w-xl px-5">
         {/* 섹션 헤더 */}
         <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="h-4 w-1 rounded-full bg-secondary" />
-            <h2 className="text-base font-nomal tracking-wider text-highlight">
+          <div className="flex items-center gap-1.5">
+            <span className="h-3 w-1 rounded-full bg-secondary" />
+            <h2 className="text-sm font-nomal tracking-wider text-highlight">
               {CATEGORY_LABELS[category]}
             </h2>
           </div>
