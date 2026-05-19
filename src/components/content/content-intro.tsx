@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Content, CATEGORY_LABELS } from "@/lib/types/content";
 
-
 interface ContentIntroProps {
   content: Content;
 }
@@ -167,7 +166,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
               </span>
             </div>
 
-            {/* 탭 3: 비활성 (결과파일) */}
+            {/* 탭 3: 비활성 (결과 리포트) */}
             <div
               style={{
                 flex: "0 1 auto",
@@ -201,7 +200,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                   textOverflow: "ellipsis",
                 }}
               >
-                결과파일
+                결과 리포트
               </span>
             </div>
           </div>
@@ -383,7 +382,8 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                       background: "rgba(143, 122, 216, 0.16)",
                       border: "1px solid rgba(143, 122, 216, 0.3)",
                       color: "rgba(255, 255, 255, 0.95)",
-                      boxShadow: "0 4px 8px rgba(143, 122, 216, 0.14), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+                      boxShadow:
+                        "0 4px 8px rgba(143, 122, 216, 0.14), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
                     }}
                     onMouseEnter={(e) => {
                       if (!loading) {
@@ -426,7 +426,8 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                     background: "rgba(143, 122, 216, 0.16)",
                     border: "1px solid rgba(143, 122, 216, 0.3)",
                     color: "rgba(255, 255, 255, 0.95)",
-                    boxShadow: "0 4px 8px rgba(143, 122, 216, 0.14), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
+                    boxShadow:
+                      "0 4px 8px rgba(143, 122, 216, 0.14), 0 -1px 2px rgba(255, 255, 255, 0.08) inset",
                   }}
                   onMouseEnter={(e) => {
                     if (!loading) {
@@ -455,7 +456,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                     }
                   }}
                 >
-                  {loading ? "준비 중..." : "시작하기 →"}
+                  {loading ? "준비 중..." : "시작하기 ›"}
                 </button>
               )}
             </div>

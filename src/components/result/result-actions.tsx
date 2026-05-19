@@ -56,11 +56,11 @@ const ResultActions = ({ contentId, shareToken }: ResultActionsProps) => {
   };
 
   const btnStyle = shareUrl
-    ? "opacity-50 hover:opacity-80"
+    ? "opacity-35 hover:opacity-65"
     : "opacity-20 cursor-not-allowed";
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-6 py-3 space-y-8 mb-10">
+    <div className="w-full max-w-2xl mx-auto px-6 py-2 space-y-6 mb-10">
       {/* 복사 완료 토스트 */}
       {copyToast && (
         <div
@@ -81,13 +81,13 @@ const ResultActions = ({ contentId, shareToken }: ResultActionsProps) => {
       )}
 
       {/* 공유 버튼들 */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-1.5">
         {/* 카카오 */}
         <button
           data-testid="share-btn-kakao"
           onClick={handleShareKakao}
           disabled={!shareUrl}
-          className={`p-3 transition-opacity duration-200 ${btnStyle}`}
+          className={`p-2.5 transition-opacity duration-200 ${btnStyle}`}
         >
           <svg
             className="w-5 h-5"
@@ -104,7 +104,7 @@ const ResultActions = ({ contentId, shareToken }: ResultActionsProps) => {
           data-testid="share-btn-x"
           onClick={handleShareX}
           disabled={!shareUrl}
-          className={`p-3 transition-opacity duration-200 ${btnStyle}`}
+          className={`p-2.5 transition-opacity duration-200 ${btnStyle}`}
         >
           <svg
             className="w-5 h-5"
@@ -121,7 +121,7 @@ const ResultActions = ({ contentId, shareToken }: ResultActionsProps) => {
           data-testid="share-btn-copy"
           onClick={handleCopyLink}
           disabled={!shareUrl}
-          className={`p-3 transition-opacity duration-200 ${btnStyle}`}
+          className={`p-2.5 transition-opacity duration-200 ${btnStyle}`}
         >
           <svg
             className="w-5 h-5"

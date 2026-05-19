@@ -43,7 +43,7 @@ const PaymentModal = ({
       ? `${cardTitle} 읽기`
       : isSingle
         ? `[${cardTitle}] 열기`
-        : "전체 흐름 열기";
+        : "전체 기록 열기";
   const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || "";
 
   // 로그인 상태 감지: true = 회원, false = 비회원, null = 확인 중
@@ -52,7 +52,9 @@ const PaymentModal = ({
   // single/all이고 비회원이면: purchase_method → guest_info → payment
   // single/all이고 회원이면: payment (바로)
   // loop/loop_all: payment (바로)
-  const [step, setStep] = useState<"purchase_method" | "guest_info" | "payment">("payment");
+  const [step, setStep] = useState<
+    "purchase_method" | "guest_info" | "payment"
+  >("payment");
   const [guestPhone, setGuestPhone] = useState("");
   const [guestPin, setGuestPin] = useState("");
   const [guestInfoError, setGuestInfoError] = useState<string | null>(null);
@@ -64,7 +66,9 @@ const PaymentModal = ({
     const checkSession = async () => {
       try {
         const supabase = createSupabaseBrowserClient();
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         const loggedIn = !!session?.user;
         setIsLoggedIn(loggedIn);
 
@@ -112,7 +116,13 @@ const PaymentModal = ({
   // step이 "guest_info"일 때는 #payment-methods DOM이 없으므로 초기화 skip
   // isLoggedIn === null: 세션 확인 중 → 초기화 skip (step이 아직 확정되지 않은 상태)
   useEffect(() => {
-    if (!isOpen || step !== "payment" || isLoggedIn === null || !containerRef.current) return;
+    if (
+      !isOpen ||
+      step !== "payment" ||
+      isLoggedIn === null ||
+      !containerRef.current
+    )
+      return;
 
     // cancelled: 모달 닫힘/deps 변경 시 진행 중인 async 콜백을 무시하기 위한 플래그
     let cancelled = false;
@@ -185,7 +195,7 @@ const PaymentModal = ({
           ? (cardTitle ?? "")
           : isSingle
             ? `${cardTitle} 열기`
-            : "전체 흐름 열기";
+            : "전체 기록 열기";
 
       const baseUrl =
         typeof window !== "undefined" ? window.location.href.split("?")[0] : "";
@@ -330,7 +340,10 @@ const PaymentModal = ({
                     추천
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(249,249,229,0.45)" }}>
+                <p
+                  className="text-xs leading-relaxed"
+                  style={{ color: "rgba(249,249,229,0.45)" }}
+                >
                   결과와 구매 내역이 계정에 저장돼.
                 </p>
               </button>
@@ -345,10 +358,16 @@ const PaymentModal = ({
                   border: "1px solid rgba(255,255,255,0.08)",
                 }}
               >
-                <p className="text-sm font-medium mb-1" style={{ color: "rgba(249,249,229,0.65)" }}>
+                <p
+                  className="text-sm font-medium mb-1"
+                  style={{ color: "rgba(249,249,229,0.65)" }}
+                >
                   비회원으로 계속하기
                 </p>
-                <p className="text-xs" style={{ color: "rgba(249,249,229,0.3)" }}>
+                <p
+                  className="text-xs"
+                  style={{ color: "rgba(249,249,229,0.3)" }}
+                >
                   전화번호와 비밀번호로 나중에 다시 조회할 수 있어.
                 </p>
               </button>
@@ -406,7 +425,9 @@ const PaymentModal = ({
                     type="password"
                     value={guestPin}
                     onChange={(e) => {
-                      setGuestPin(e.target.value.replace(/\D/g, "").slice(0, 4));
+                      setGuestPin(
+                        e.target.value.replace(/\D/g, "").slice(0, 4),
+                      );
                       setGuestInfoError(null);
                     }}
                     placeholder="••••"
@@ -466,7 +487,7 @@ const PaymentModal = ({
                       ? "결과를 더 깊이 읽을 수 있어"
                       : isSingle
                         ? "이어서 읽을 수 있어"
-                        : "잠겨있는 모든 흐름을 열 수 있어"}
+                        : "잠겨있는 모든 기록을 열 수 있어"}
                 </p>
 
                 <div className="mb-8 rounded-xl border border-secondary/30 bg-secondary/10 p-4">

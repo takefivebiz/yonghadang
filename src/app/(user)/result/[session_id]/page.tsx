@@ -9,6 +9,7 @@ import { getSceneConfig } from "@/lib/data/scene-configs";
 import { ResultScene } from "@/lib/types/result";
 import { AnalyzeAnswers, Answer } from "@/lib/types/analyze";
 import { CONTENTS } from "@/lib/data/contents";
+import { CATEGORY_LABELS } from "@/lib/types/content";
 import { mergeScenes } from "@/lib/utils/merge-scenes";
 import { createPaidScenePlaceholders } from "@/lib/utils/create-paid-scene-placeholders";
 import SceneContent from "@/components/result/scene-content";
@@ -20,8 +21,16 @@ import PaidGenerationLoading from "@/components/result/paid-generation-loading";
 import { getContentPack } from "@/lib/content-packs";
 import { prioritizeAdditionalReadings } from "@/lib/quiz/accumulator";
 import { translateStateToSummary } from "@/lib/quiz/translator";
-import type { AdditionalReading, HiddenState, LoopType, LoopAnswer } from "@/lib/types/quiz";
-import type { ClaudeGeneratedResult, LoopReadingSceneInsight } from "@/lib/prompts/generate-result";
+import type {
+  AdditionalReading,
+  HiddenState,
+  LoopType,
+  LoopAnswer,
+} from "@/lib/types/quiz";
+import type {
+  ClaudeGeneratedResult,
+  LoopReadingSceneInsight,
+} from "@/lib/prompts/generate-result";
 import AdditionalReadings from "@/components/result/additional-readings";
 
 interface PageProps {
@@ -35,10 +44,14 @@ const ResultPage = ({ params }: PageProps) => {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [paidGenerationLoading, setPaidGenerationLoading] = useState(false);
-  const [isPaidGenerationRecovery, setIsPaidGenerationRecovery] = useState(false);
+  const [isPaidGenerationRecovery, setIsPaidGenerationRecovery] =
+    useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [additionalReadings, setAdditionalReadings] = useState<AdditionalReading[]>([]);
+  const [isRecordListOpen, setIsRecordListOpen] = useState(false);
+  const [additionalReadings, setAdditionalReadings] = useState<
+    AdditionalReading[]
+  >([]);
   // QA mode: ?qa=1 또는 NEXT_PUBLIC_QA_MODE=true → 결제 없이 전체 씬 확인
   const [isQaMode, setIsQaMode] = useState(false);
   // Loop QA mode: ?qa=1&loop=1 → 추가루프 CTA 표시 및 직접 생성 활성화
@@ -47,10 +60,14 @@ const ResultPage = ({ params }: PageProps) => {
   // share_token: ResultActions 공유 URL 생성용. 비동기 조회, 실패 시 null → 버튼 비활성.
   const [shareToken, setShareToken] = useState<string | null>(null);
   // 결제 confirm API 실패 시 에러 메시지. unlock은 차단되고 재시도 안내를 표시한다.
-  const [paymentConfirmError, setPaymentConfirmError] = useState<string | null>(null);
+  const [paymentConfirmError, setPaymentConfirmError] = useState<string | null>(
+    null,
+  );
 
   // ── Loop Reading 상태 ──────────────────────────────────────────────────
-  const [loopAnswers, setLoopAnswers] = useState<Partial<Record<LoopType, LoopAnswer>>>({});
+  const [loopAnswers, setLoopAnswers] = useState<
+    Partial<Record<LoopType, LoopAnswer>>
+  >({});
   const [loopLoading, setLoopLoading] = useState<LoopType | null>(null);
   const [loopError, setLoopError] = useState<LoopType | null>(null);
   // 현재 세션에서 새로 생성 완료된 loop 목록 (badge 표시용).
@@ -91,14 +108,19 @@ const ResultPage = ({ params }: PageProps) => {
 
         // ── contentPack + hiddenState 로드 ──────────────────────────
         const pack = getContentPack(data.content_id);
-        const rawHiddenState = localStorage.getItem(`veil_hidden_state_${param.session_id}`);
+        const rawHiddenState = localStorage.getItem(
+          `veil_hidden_state_${param.session_id}`,
+        );
         const hiddenScores: HiddenState = rawHiddenState
           ? (JSON.parse(rawHiddenState) as HiddenState)
           : {};
 
         // additionalReadings: hiddenState 기반 우선순위 정렬 후 상위 5개
         if (pack) {
-          const prioritized = prioritizeAdditionalReadings(hiddenScores, pack.additionalReadings);
+          const prioritized = prioritizeAdditionalReadings(
+            hiddenScores,
+            pack.additionalReadings,
+          );
           setAdditionalReadings(prioritized.slice(0, 5));
         }
 
@@ -106,7 +128,9 @@ const ResultPage = ({ params }: PageProps) => {
         const loopTypes: LoopType[] = ["action", "standard", "evaluate"];
         const savedLoopAnswers: Partial<Record<LoopType, LoopAnswer>> = {};
         for (const lt of loopTypes) {
-          const raw = localStorage.getItem(`veil_loop_${lt}_${param.session_id}`);
+          const raw = localStorage.getItem(
+            `veil_loop_${lt}_${param.session_id}`,
+          );
           if (raw) {
             try {
               savedLoopAnswers[lt] = JSON.parse(raw) as LoopAnswer;
@@ -129,9 +153,12 @@ const ResultPage = ({ params }: PageProps) => {
         const cachedFreeScenes = localStorage.getItem(freeScenesKey);
 
         console.log(
-          "[result] cache 확인: allScenes=", !!cachedAllScenes,
-          "freeScenes=", !!cachedFreeScenes,
-          "| session=", param.session_id,
+          "[result] cache 확인: allScenes=",
+          !!cachedAllScenes,
+          "freeScenes=",
+          !!cachedFreeScenes,
+          "| session=",
+          param.session_id,
         );
 
         let resultScenes: ResultScene[] = [];
@@ -139,12 +166,23 @@ const ResultPage = ({ params }: PageProps) => {
         if (cachedAllScenes) {
           // merged all scenes 우선 로드 (결제 후 상태)
           resultScenes = JSON.parse(cachedAllScenes) as ResultScene[];
-          console.log("[result] veil_all_scenes_ 로드:", resultScenes.length, "scenes,",
-            "indexes:", resultScenes.map((s) => `${s.scene_index}(msg=${s.messages?.length ?? "null"})`));
+          console.log(
+            "[result] veil_all_scenes_ 로드:",
+            resultScenes.length,
+            "scenes,",
+            "indexes:",
+            resultScenes.map(
+              (s) => `${s.scene_index}(msg=${s.messages?.length ?? "null"})`,
+            ),
+          );
         } else if (cachedFreeScenes) {
           // free scenes 로드 (초기 결과)
           resultScenes = JSON.parse(cachedFreeScenes) as ResultScene[];
-          console.log("[result] veil_free_scenes_ 로드:", resultScenes.length, "scenes");
+          console.log(
+            "[result] veil_free_scenes_ 로드:",
+            resultScenes.length,
+            "scenes",
+          );
         } else {
           // ── DB fallback ────────────────────────────────────────────────
           // localStorage에 scenes가 없을 때만 시도한다.
@@ -162,7 +200,9 @@ const ResultPage = ({ params }: PageProps) => {
                 `/api/analyze/${param.session_id}/result-scenes`,
               );
               if (dbRes.ok) {
-                const dbData = (await dbRes.json()) as { scenes: ResultScene[] };
+                const dbData = (await dbRes.json()) as {
+                  scenes: ResultScene[];
+                };
                 if (dbData.scenes.length > 0) {
                   resultScenes = dbData.scenes;
                   dbFallbackSucceeded = true;
@@ -199,9 +239,7 @@ const ResultPage = ({ params }: PageProps) => {
                 // ── 실제 Claude generate fallback ────────────────────────
                 // analyze page가 이미 생성해서 캐시했으면 여기 오지 않는다.
                 // 직접 URL 접근이나 analyze 실패 후 재방문 시의 fallback 경로.
-                const content = CONTENTS.find(
-                  (c) => c.id === data.content_id,
-                );
+                const content = CONTENTS.find((c) => c.id === data.content_id);
                 if (!content) {
                   throw new Error(`콘텐츠를 찾을 수 없어: ${data.content_id}`);
                 }
@@ -217,10 +255,14 @@ const ResultPage = ({ params }: PageProps) => {
                   )
                   .map((a: Answer) => {
                     // V2: step_id 기반으로 step 조회 → option label 추출
-                    const step = inputConfig?.steps.find((s) => s.id === a.step_id);
+                    const step = inputConfig?.steps.find(
+                      (s) => s.id === a.step_id,
+                    );
                     const labels = (a.answer_options ?? []).map((value) => {
                       if (!step || step.type === "freeText") return value;
-                      const option = step.options.find((o) => o.value === value);
+                      const option = step.options.find(
+                        (o) => o.value === value,
+                      );
                       return option?.label ?? value;
                     });
                     return {
@@ -270,10 +312,16 @@ const ResultPage = ({ params }: PageProps) => {
                   result_scenes: ResultScene[];
                 };
                 resultScenes = resData.result_scenes;
-                localStorage.setItem(freeScenesKey, JSON.stringify(resultScenes));
+                localStorage.setItem(
+                  freeScenesKey,
+                  JSON.stringify(resultScenes),
+                );
               } catch (apiErr) {
                 // API 실패 → mock으로 UX 유지. 에러 화면 절대 안 뜸.
-                console.warn("[result] fallback generate 실패, mock 사용:", apiErr);
+                console.warn(
+                  "[result] fallback generate 실패, mock 사용:",
+                  apiErr,
+                );
                 resultScenes = generateMockResultScenes(data.content_id);
               }
             }
@@ -306,16 +354,27 @@ const ResultPage = ({ params }: PageProps) => {
         setIsLoopQaMode(isLoopQa);
 
         console.log(
-          "[result] isQaMode=", isQa,
-          "isLoopQaMode=", isLoopQa,
-          "| allScenes:", allScenes.length,
-          "| paid scenes:", allScenes.filter(s => !s.is_free).map(s => `${s.scene_index}(msg=${s.messages?.length ?? "null"})`),
+          "[result] isQaMode=",
+          isQa,
+          "isLoopQaMode=",
+          isLoopQa,
+          "| allScenes:",
+          allScenes.length,
+          "| paid scenes:",
+          allScenes
+            .filter((s) => !s.is_free)
+            .map(
+              (s) => `${s.scene_index}(msg=${s.messages?.length ?? "null"})`,
+            ),
         );
 
         if (isQa) {
           // QA mode: 결제 없이 전체 씬 확인 (localStorage 기록 없음)
           const allIndexes = allScenes.map((s) => s.scene_index);
-          console.log("[result] QA mode: unlockedScenes 전체 설정 →", allIndexes);
+          console.log(
+            "[result] QA mode: unlockedScenes 전체 설정 →",
+            allIndexes,
+          );
           setUnlockedScenes(allIndexes);
         } else {
           // ── Unlock 상태 복원 ────────────────────────────────────
@@ -360,143 +419,150 @@ const ResultPage = ({ params }: PageProps) => {
   }, [params]);
 
   // ── Paid Scenes Generate 함수 ───────────────────────────────────────
-  const generatePaidScenes = useCallback(async (paidSceneIndexes: number[]) => {
-    try {
-      if (!analyzeData) throw new Error("분석 데이터가 없어");
+  const generatePaidScenes = useCallback(
+    async (paidSceneIndexes: number[]) => {
+      try {
+        if (!analyzeData) throw new Error("분석 데이터가 없어");
 
-      const content = CONTENTS.find(
-        (c) => c.id === analyzeData.content_id,
-      );
-      if (!content)
-        throw new Error(`콘텐츠를 찾을 수 없어: ${analyzeData.content_id}`);
+        const content = CONTENTS.find((c) => c.id === analyzeData.content_id);
+        if (!content)
+          throw new Error(`콘텐츠를 찾을 수 없어: ${analyzeData.content_id}`);
 
-      const inputConfig = INPUT_CONFIGS[analyzeData.content_id];
-      const sceneConfig = getSceneConfig(analyzeData.content_id);
+        const inputConfig = INPUT_CONFIGS[analyzeData.content_id];
+        const sceneConfig = getSceneConfig(analyzeData.content_id);
 
-      // Answer → {values, labels} 변환 (V2: step_id 기반)
-      const userAnswers = analyzeData.answers
-        .filter(
-          (a: Answer) =>
-            Array.isArray(a.answer_options) && a.answer_options.length > 0,
-        )
-        .map((a: Answer) => {
-          const step = inputConfig?.steps.find((s) => s.id === a.step_id);
-          const labels = (a.answer_options ?? []).map((value) => {
-            if (!step || step.type === "freeText") return value;
-            const option = step.options.find((o) => o.value === value);
-            return option?.label ?? value;
+        // Answer → {values, labels} 변환 (V2: step_id 기반)
+        const userAnswers = analyzeData.answers
+          .filter(
+            (a: Answer) =>
+              Array.isArray(a.answer_options) && a.answer_options.length > 0,
+          )
+          .map((a: Answer) => {
+            const step = inputConfig?.steps.find((s) => s.id === a.step_id);
+            const labels = (a.answer_options ?? []).map((value) => {
+              if (!step || step.type === "freeText") return value;
+              const option = step.options.find((o) => o.value === value);
+              return option?.label ?? value;
+            });
+            return {
+              step_id: a.step_id,
+              question_text: a.question_text,
+              values: a.answer_options ?? [],
+              labels,
+            };
           });
-          return {
-            step_id: a.step_id,
-            question_text: a.question_text,
-            values: a.answer_options ?? [],
-            labels,
-          };
-        });
 
-      // 무료 scene context 추출 (유료 prompt에 포함할 정보)
-      const freeScenes = scenes.filter((s) => s.is_free);
-      const lastFreeScene = freeScenes[freeScenes.length - 1];
+        // 무료 scene context 추출 (유료 prompt에 포함할 정보)
+        const freeScenes = scenes.filter((s) => s.is_free);
+        const lastFreeScene = freeScenes[freeScenes.length - 1];
 
-      if (!lastFreeScene?.messages) {
-        throw new Error("무료 scene 메시지를 찾을 수 없어");
-      }
-
-      const freeSceneContext = {
-        sceneTitle: lastFreeScene.scene_title,
-        lastMessages: lastFreeScene.messages.slice(-2), // 마지막 1~2개 메시지
-      };
-
-      // hidden state 기반 stateSummary 계산 (Claude 프롬프트 주입용)
-      const rawHiddenState =
-        typeof window !== "undefined"
-          ? localStorage.getItem(`veil_hidden_state_${analyzeData.session_id}`)
-          : null;
-      const hiddenScores: HiddenState = rawHiddenState
-        ? (JSON.parse(rawHiddenState) as HiddenState)
-        : {};
-      const genPack = getContentPack(analyzeData.content_id);
-      const stateSummary = genPack
-        ? translateStateToSummary(hiddenScores, genPack.translationRules)
-        : [];
-
-      // API 호출: paid scenes만 생성 (무료 context 포함)
-      const res = await fetch(
-        `/api/analyze/${analyzeData.session_id}/generate`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            content_title: content.title.replace(/\n/g, " "),
-            category: content.category,
-            user_input: {
-              text: analyzeData.free_input,
-              answers: userAnswers,
-            },
-            scene_config: sceneConfig,
-            scene_indexes: paidSceneIndexes,
-            free_scene_context: freeSceneContext, // 유료 prompt 생성용
-            state_summary: stateSummary,
-          }),
-        },
-      );
-
-      if (!res.ok) {
-        const errData = (await res.json()) as { error?: string };
-        throw new Error(errData.error ?? `결과 생성 실패 (HTTP ${res.status})`);
-      }
-
-      const resData = (await res.json()) as {
-        session_id: string;
-        result_scenes: ResultScene[];
-        _debug_raw_result?: ClaudeGeneratedResult;
-      };
-
-      // scene carry_over를 loop-reading generate의 sceneInsights로 저장
-      if (resData._debug_raw_result?.scenes) {
-        const newInsights: LoopReadingSceneInsight[] = resData._debug_raw_result.scenes
-          .filter((s) => s.carry_over)
-          .map((s) => ({
-            scene_title: s.scene_title,
-            key_insight: s.carry_over.key_insight,
-            do_not_repeat: s.carry_over.do_not_repeat,
-          }));
-        if (newInsights.length > 0) {
-          const insightKey = `veil_scene_insights_${analyzeData.session_id}`;
-          const existingRaw = localStorage.getItem(insightKey);
-          const existing: LoopReadingSceneInsight[] = existingRaw
-            ? (JSON.parse(existingRaw) as LoopReadingSceneInsight[])
-            : [];
-          const merged = [
-            ...existing.filter(
-              (e) => !newInsights.some((n) => n.scene_title === e.scene_title),
-            ),
-            ...newInsights,
-          ];
-          localStorage.setItem(insightKey, JSON.stringify(merged));
+        if (!lastFreeScene?.messages) {
+          throw new Error("무료 scene 메시지를 찾을 수 없어");
         }
-      }
 
-      // merge: 기존 scenes + 새로운 paid scenes
-      const mergedScenes = mergeScenes(scenes, resData.result_scenes);
-      setScenes(mergedScenes);
+        const freeSceneContext = {
+          sceneTitle: lastFreeScene.scene_title,
+          lastMessages: lastFreeScene.messages.slice(-2), // 마지막 1~2개 메시지
+        };
 
-      // 캐시 저장: merged scenes
-      if (typeof window !== "undefined") {
-        localStorage.setItem(
-          `veil_all_scenes_${analyzeData.session_id}`,
-          JSON.stringify(mergedScenes),
+        // hidden state 기반 stateSummary 계산 (Claude 프롬프트 주입용)
+        const rawHiddenState =
+          typeof window !== "undefined"
+            ? localStorage.getItem(
+                `veil_hidden_state_${analyzeData.session_id}`,
+              )
+            : null;
+        const hiddenScores: HiddenState = rawHiddenState
+          ? (JSON.parse(rawHiddenState) as HiddenState)
+          : {};
+        const genPack = getContentPack(analyzeData.content_id);
+        const stateSummary = genPack
+          ? translateStateToSummary(hiddenScores, genPack.translationRules)
+          : [];
+
+        // API 호출: paid scenes만 생성 (무료 context 포함)
+        const res = await fetch(
+          `/api/analyze/${analyzeData.session_id}/generate`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              content_title: content.title.replace(/\n/g, " "),
+              category: content.category,
+              user_input: {
+                text: analyzeData.free_input,
+                answers: userAnswers,
+              },
+              scene_config: sceneConfig,
+              scene_indexes: paidSceneIndexes,
+              free_scene_context: freeSceneContext, // 유료 prompt 생성용
+              state_summary: stateSummary,
+            }),
+          },
         );
-      }
 
-      console.log("[paid scenes generated]", paidSceneIndexes, mergedScenes);
-    } catch (err) {
-      console.error("Paid scenes 생성 실패:", err);
-      // TODO: 사용자에게 에러 알림
-      // re-throw: 호출 측 .then()이 실행되지 않아야 unlock state가 잘못 저장되지 않음
-      throw err;
-    }
-  }, [analyzeData, scenes]);
+        if (!res.ok) {
+          const errData = (await res.json()) as { error?: string };
+          throw new Error(
+            errData.error ?? `결과 생성 실패 (HTTP ${res.status})`,
+          );
+        }
+
+        const resData = (await res.json()) as {
+          session_id: string;
+          result_scenes: ResultScene[];
+          _debug_raw_result?: ClaudeGeneratedResult;
+        };
+
+        // scene carry_over를 loop-reading generate의 sceneInsights로 저장
+        if (resData._debug_raw_result?.scenes) {
+          const newInsights: LoopReadingSceneInsight[] =
+            resData._debug_raw_result.scenes
+              .filter((s) => s.carry_over)
+              .map((s) => ({
+                scene_title: s.scene_title,
+                key_insight: s.carry_over.key_insight,
+                do_not_repeat: s.carry_over.do_not_repeat,
+              }));
+          if (newInsights.length > 0) {
+            const insightKey = `veil_scene_insights_${analyzeData.session_id}`;
+            const existingRaw = localStorage.getItem(insightKey);
+            const existing: LoopReadingSceneInsight[] = existingRaw
+              ? (JSON.parse(existingRaw) as LoopReadingSceneInsight[])
+              : [];
+            const merged = [
+              ...existing.filter(
+                (e) =>
+                  !newInsights.some((n) => n.scene_title === e.scene_title),
+              ),
+              ...newInsights,
+            ];
+            localStorage.setItem(insightKey, JSON.stringify(merged));
+          }
+        }
+
+        // merge: 기존 scenes + 새로운 paid scenes
+        const mergedScenes = mergeScenes(scenes, resData.result_scenes);
+        setScenes(mergedScenes);
+
+        // 캐시 저장: merged scenes
+        if (typeof window !== "undefined") {
+          localStorage.setItem(
+            `veil_all_scenes_${analyzeData.session_id}`,
+            JSON.stringify(mergedScenes),
+          );
+        }
+
+        console.log("[paid scenes generated]", paidSceneIndexes, mergedScenes);
+      } catch (err) {
+        console.error("Paid scenes 생성 실패:", err);
+        // TODO: 사용자에게 에러 알림
+        // re-throw: 호출 측 .then()이 실행되지 않아야 unlock state가 잘못 저장되지 않음
+        throw err;
+      }
+    },
+    [analyzeData, scenes],
+  );
 
   // ── Loop Reading 생성 ──────────────────────────────────────────────────
   // 결제 성공 후 또는 재시도 시 호출. 결제 검증 없이 API를 직접 호출한다.
@@ -609,7 +675,10 @@ const ResultPage = ({ params }: PageProps) => {
   const handleLoopCardClick = useCallback(
     (reading: AdditionalReading) => {
       if (isLoopQaMode) {
-        void handleLoopUnlock(reading.loopType, reading.title.replace(/\n/g, " "));
+        void handleLoopUnlock(
+          reading.loopType,
+          reading.title.replace(/\n/g, " "),
+        );
       } else {
         handlePurchaseLoop(reading);
       }
@@ -622,7 +691,9 @@ const ResultPage = ({ params }: PageProps) => {
   // 비QA mode: loop_all 결제 모달 열기
   const handlePurchaseAllLoops = useCallback(() => {
     if (isLoopQaMode) {
-      const locked = additionalReadings.filter((r) => !loopAnswers[r.loopType]);
+      const locked = additionalReadings
+        .slice(0, 3)
+        .filter((r) => !loopAnswers[r.loopType]);
       if (locked.length === 0) return;
 
       // 실제 loop_all 결제 후 Phase 2 흐름과 동일하게 재현
@@ -641,7 +712,7 @@ const ResultPage = ({ params }: PageProps) => {
         isOpen: true,
         type: "loop_all",
         sceneIndex: 0,
-        cardTitle: "전체 질문 깊게 읽기",
+        cardTitle: "추천 의뢰 모두 열기",
         loopType: null,
       });
     }
@@ -712,9 +783,13 @@ const ResultPage = ({ params }: PageProps) => {
         // "전체 질문을 열었어..." 배너가 렌더된 직후 스크롤 (생성 완료 대기 없음)
         setPendingScrollToLoop(true);
         const unlockAll = async () => {
-          for (const r of additionalReadings) {
+          for (const r of additionalReadings.slice(0, 3)) {
             // skipScroll=true: 개별 handleLoopUnlock에서 스크롤 트리거 방지
-            await handleLoopUnlock(r.loopType, r.title.replace(/\n/g, " "), true);
+            await handleLoopUnlock(
+              r.loopType,
+              r.title.replace(/\n/g, " "),
+              true,
+            );
           }
           setLoopAllPurchased(false);
           isProcessingPayment.current = false;
@@ -764,9 +839,7 @@ const ResultPage = ({ params }: PageProps) => {
                 ...(paymentType === "single" && sceneIndex > 0
                   ? { scene_index: sceneIndex }
                   : {}),
-                ...(isGuestPath
-                  ? { guest_phone: phone, guest_pin: pin }
-                  : {}),
+                ...(isGuestPath ? { guest_phone: phone, guest_pin: pin } : {}),
               }),
             });
 
@@ -800,6 +873,13 @@ const ResultPage = ({ params }: PageProps) => {
                 ...new Set([...unlockedScenes, ...paidSceneIndexes]),
               ];
               setUnlockedScenes(newUnlocked);
+              const nextSceneIdx = scenes.findIndex(
+                (s) => s.scene_index === paidSceneIndexes[0],
+              );
+              if (nextSceneIdx >= 0) {
+                setCurrentSceneIndex(nextSceneIdx);
+                scrollToSceneTop();
+              }
 
               if (typeof window !== "undefined") {
                 localStorage.setItem(
@@ -908,58 +988,11 @@ const ResultPage = ({ params }: PageProps) => {
     };
   }, [pendingScrollToLoop]);
 
-  // Scroll 기반으로 현재 활성 scene 추적 (viewport center 기준)
+  // Scene progression: currentSceneIndex는 scenes 배열 index로만 사용한다.
   useEffect(() => {
-    if (scenes.length === 0) return;
-
-    let rafId: number | null = null;
-    let lastSceneIdx = currentSceneIndex;
-
-    const handleScroll = () => {
-      // Viewport center 기준 (sticky header 고려)
-      const viewportCenter = window.innerHeight * 0.5;
-      let closestSceneIdx = 0;
-      let closestDistance = Infinity;
-
-      scenes.forEach((_, idx) => {
-        const element = sceneRefsMap.current[idx];
-        if (!element) return;
-
-        const rect = element.getBoundingClientRect();
-        const sceneCenter = rect.top + rect.height / 2;
-        const distance = Math.abs(sceneCenter - viewportCenter);
-
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestSceneIdx = idx;
-        }
-      });
-
-      // State 변경은 실제로 바뀔 때만
-      if (closestSceneIdx !== lastSceneIdx) {
-        setCurrentSceneIndex(closestSceneIdx);
-        lastSceneIdx = closestSceneIdx;
-      }
-    };
-
-    // RequestAnimationFrame으로 throttle
-    const throttledScroll = () => {
-      if (rafId === null) {
-        rafId = requestAnimationFrame(() => {
-          handleScroll();
-          rafId = null;
-        });
-      }
-    };
-
-    window.addEventListener("scroll", throttledScroll);
-
-    return () => {
-      window.removeEventListener("scroll", throttledScroll);
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-      }
-    };
+    if (scenes.length > 0 && currentSceneIndex > scenes.length - 1) {
+      setCurrentSceneIndex(scenes.length - 1);
+    }
   }, [scenes, currentSceneIndex]);
 
   const [paymentModal, setPaymentModal] = useState<{
@@ -996,6 +1029,13 @@ const ResultPage = ({ params }: PageProps) => {
 
   // TODO: [결제 성공] URL 파라미터로 결제 완료 처리 (위의 useEffect 참고)
 
+  const scrollToSceneTop = () => {
+    if (typeof window === "undefined") return;
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  };
+
   const handleUnlockScene = (sceneIndex: number, cardTitle?: string) => {
     const scene = scenes.find((s) => s.scene_index === sceneIndex);
     if (scene) {
@@ -1009,6 +1049,31 @@ const ResultPage = ({ params }: PageProps) => {
 
   const handleUnlockAll = () => {
     handleOpenPaymentModal("all");
+  };
+
+  const handleRecordListSceneClick = (scene: ResultScene) => {
+    const isUnlocked =
+      scene.is_free || unlockedScenes.includes(scene.scene_index);
+
+    if (isUnlocked) {
+      const sceneIdx = scenes.findIndex(
+        (s) => s.scene_index === scene.scene_index,
+      );
+      if (sceneIdx >= 0) {
+        setCurrentSceneIndex(sceneIdx);
+        setIsRecordListOpen(false);
+        scrollToSceneTop();
+      }
+      return;
+    }
+
+    setIsRecordListOpen(false);
+    handleUnlockScene(scene.scene_index, scene.scene_title);
+  };
+
+  const handleUnlockAllFromRecordList = () => {
+    setIsRecordListOpen(false);
+    handleUnlockAll();
   };
 
   // ── 로딩 ──────────────────────────────────────────────────────
@@ -1049,6 +1114,21 @@ const ResultPage = ({ params }: PageProps) => {
   const allPaidUnlocked =
     paidScenes.length > 0 &&
     paidScenes.every((s) => unlockedScenes.includes(s.scene_index));
+  const activeScene = scenes[currentSceneIndex] ?? scenes[0];
+  const activeSceneUnlocked =
+    !!activeScene &&
+    (activeScene.is_free || unlockedScenes.includes(activeScene.scene_index));
+  const canAdvanceScene =
+    !!activeScene &&
+    activeSceneUnlocked &&
+    currentSceneIndex < scenes.length - 1;
+  const showAdditionalRequests =
+    !!activeScene &&
+    activeSceneUnlocked &&
+    currentSceneIndex === scenes.length - 1 &&
+    (isLoopQaMode || (!isQaMode && allPaidUnlocked));
+  const showFlowOverview = false;
+  const showProgressIndicator = false;
 
   return (
     <div
@@ -1066,19 +1146,21 @@ const ResultPage = ({ params }: PageProps) => {
       {/* ── 메인 콘텐츠 영역 ──────────────────────────── */}
       <main className="flex-1 overflow-y-auto">
         {/* ── Progress Indicator (fixed) ──────────────────────── */}
-        <div
-          className="fixed left-0 right-0 top-13 z-40 h-10 flex items-center justify-center"
-          style={{
-            opacity: mobileMenuOpen ? 0 : 1,
-            pointerEvents: mobileMenuOpen ? "none" : "auto",
-          }}
-        >
-          <ProgressIndicator
-            scenes={scenes}
-            unlockedScenes={unlockedScenes}
-            currentSceneIndex={currentSceneIndex}
-          />
-        </div>
+        {showProgressIndicator && (
+          <div
+            className="fixed left-0 right-0 top-13 z-40 h-10 flex items-center justify-center"
+            style={{
+              opacity: mobileMenuOpen ? 0 : 1,
+              pointerEvents: mobileMenuOpen ? "none" : "auto",
+            }}
+          >
+            <ProgressIndicator
+              scenes={scenes}
+              unlockedScenes={unlockedScenes}
+              currentSceneIndex={currentSceneIndex}
+            />
+          </div>
+        )}
 
         <div className="w-full max-w-lg mx-auto">
           {/* 콘텐츠 헤더 */}
@@ -1088,153 +1170,241 @@ const ResultPage = ({ params }: PageProps) => {
                 (c) => c.id === analyzeData.content_id,
               );
               return content ? (
-                <div className="px-6 py-3 space-y-4 mt-10 flex flex-col items-center text-center">
-                  {/* 썸네일 이미지 */}
-                  {content.thumbnail_url && (
-                    <div className="relative w-65 h-65 overflow-hidden rounded-[14px] bg-white/[0.04] shadow-2xl shadow-black/40">
-                      <Image
-                        src={content.thumbnail_url}
-                        alt={content.title}
-                        fill
-                        priority
-                        className="object-cover object-center"
-                      />
+                <div
+                  className={`px-5 pt-6 ${currentSceneIndex === 0 ? "pb-2 space-y-4" : "pb-0"} mt-10`}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "2px",
+                      marginBottom: "-1px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        flex: "0 1 auto",
+                        height: "34px",
+                        background: "rgba(60, 45, 65, 0.30)",
+                        borderTop: "1px solid rgba(143, 122, 216, 0.12)",
+                        borderRight: "1px solid rgba(143, 122, 216, 0.12)",
+                        borderLeft: "1px solid rgba(143, 122, 216, 0.12)",
+                        borderBottom: "1px solid rgba(143, 122, 216, 0.12)",
+                        borderRadius: "12px 12px 0 0",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingLeft: "14px",
+                        paddingRight: "14px",
+                        opacity: 0.46,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: "400",
+                          color: "rgba(255, 255, 255, 0.48)",
+                          letterSpacing: "0.02em",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {CATEGORY_LABELS[content.category]}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        flex: "0 1 auto",
+                        height: "34px",
+                        background: "rgba(60, 45, 65, 0.36)",
+                        borderTop: "1px solid rgba(143, 122, 216, 0.18)",
+                        borderRight: "1px solid rgba(143, 122, 216, 0.18)",
+                        borderLeft: "1px solid rgba(143, 122, 216, 0.18)",
+                        borderBottom: "1px solid rgba(143, 122, 216, 0.18)",
+                        borderRadius: "12px 12px 0 0",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingLeft: "14px",
+                        paddingRight: "14px",
+                        opacity: 0.58,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: "400",
+                          color: "rgba(255, 255, 255, 0.55)",
+                          letterSpacing: "0.02em",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        기록 작성 완료
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        flex: "0 1 auto",
+                        height: "34px",
+                        background: "rgba(92, 74, 132, 0.34)",
+                        borderTop: "1px solid rgba(143, 122, 216, 0.30)",
+                        borderRight: "1px solid rgba(143, 122, 216, 0.30)",
+                        borderLeft: "1px solid rgba(143, 122, 216, 0.30)",
+                        borderBottom: "none",
+                        borderRadius: "12px 12px 0 0",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingLeft: "16px",
+                        paddingRight: "16px",
+                        opacity: 1,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: "500",
+                          color: "rgba(255, 255, 255, 0.92)",
+                          letterSpacing: "0.02em",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        결과 리포트
+                      </span>
+                    </div>
+                  </div>
+
+                  {currentSceneIndex === 0 && (
+                    <div className="flex items-center gap-3 rounded-b-[16px] rounded-tr-[16px] border border-accent/10 bg-white/[0.015] px-4 py-3.5">
+                      {content.thumbnail_url && (
+                        <div className="relative h-15 w-15 flex-shrink-0 overflow-hidden rounded-[10px] bg-white/[0.025] opacity-85">
+                          <Image
+                            src={content.thumbnail_url}
+                            alt={content.title}
+                            fill
+                            priority
+                            className="object-cover object-center"
+                          />
+                        </div>
+                      )}
+
+                      {/* 제목 */}
+                      <div className="min-w-0 space-y-1">
+                        <p
+                          className="text-[10px] font-medium tracking-[0.16em]"
+                          style={{ color: "rgba(143, 122, 216, 0.66)" }}
+                        >
+                          RESULT REPORT
+                        </p>
+                        <h1
+                          className="text-base font-medium leading-snug"
+                          style={{ color: "rgba(249,249,229,0.88)" }}
+                        >
+                          {content.title}
+                        </h1>
+                        <p
+                          className="line-clamp-1 text-xs"
+                          style={{ color: "rgba(249,249,229,0.42)" }}
+                        >
+                          {content.subtitle}
+                        </p>
+                      </div>
                     </div>
                   )}
-
-                  {/* 제목 */}
-                  <div className="space-y-2">
-                    <h1
-                      className="text-xl font-medium"
-                      style={{ color: "rgba(249,249,229,0.9)" }}
-                    >
-                      {content.title}
-                    </h1>
-                    <p
-                      className="mb-5 text-sm"
-                      style={{ color: "rgba(249,249,229,0.5)" }}
-                    >
-                      {content.subtitle}
-                    </p>
-                  </div>
                 </div>
               ) : null;
             })()}
 
           {/* 씬 시작 구분점 */}
-          <div className="px-3 py-3 text-center">
-            <span
-              style={{
-                color: "rgba(209, 109, 172, 0.25)",
-                fontSize: "16px",
-                letterSpacing: "0.7em",
+          {currentSceneIndex === 0 && (
+            <div className="px-3 py-3 text-center">
+              <span
+                style={{
+                  color: "rgba(143, 122, 216, 0.28)",
+                  fontSize: "16px",
+                  letterSpacing: "0.7em",
+                }}
+              >
+                ◇
+              </span>
+            </div>
+          )}
+
+          {activeScene && (
+            <div
+              key={activeScene.id}
+              data-scene-idx={currentSceneIndex}
+              ref={(el) => {
+                if (el) {
+                  sceneRefsMap.current[currentSceneIndex] = el;
+                }
               }}
             >
-              ◇
-            </span>
-          </div>
+              <SceneContent
+                scene={activeScene}
+                isUnlocked={activeSceneUnlocked}
+                onUnlockScene={() =>
+                  handleUnlockScene(
+                    activeScene.scene_index,
+                    activeScene.scene_title,
+                  )
+                }
+                isFirst={currentSceneIndex === 0}
+                isCurrent
+              />
+            </div>
+          )}
 
-          {/* 첫 무료 scene 감지 */}
-          {(() => {
-            const freeScenes = scenes.filter((s) => s.is_free);
-            const firstFreeSceneId =
-              freeScenes.length > 0 ? freeScenes[0].id : null;
-
-            return (
-              <>
-                {/* 무료 Scene 렌더링 */}
-                {/* sceneIdx는 scenes 배열의 실제 index (0, 1, 2, ...)
-                    DOM 순서 = scenes 배열 순서 = data-scene-idx 순서
-                    IntersectionObserver도 같은 sceneIdx로 currentSceneIndex 추적 */}
-                {scenes.map((scene, sceneIdx) => {
-                  if (!scene.is_free) return null;
-                  const isUnlocked = unlockedScenes.includes(scene.scene_index);
-                  const isFirst = scene.id === firstFreeSceneId;
-                  const isCurrent = currentSceneIndex === sceneIdx;
-
-                  return (
-                    <div
-                      key={scene.id}
-                      data-scene-idx={sceneIdx}
-                      ref={(el) => {
-                        if (el) {
-                          sceneRefsMap.current[sceneIdx] = el;
-                        }
-                      }}
-                    >
-                      <SceneContent
-                        scene={scene}
-                        isUnlocked={isUnlocked}
-                        onUnlockScene={() =>
-                          handleUnlockScene(
-                            scene.scene_index,
-                            scene.scene_title,
-                          )
-                        }
-                        isFirst={isFirst}
-                        isCurrent={isCurrent}
-                      />
-                    </div>
+          {canAdvanceScene && (
+            <div className="px-6 pb-10 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentSceneIndex((prev) =>
+                    Math.min(prev + 1, scenes.length - 1),
                   );
-                })}
+                  scrollToSceneTop();
+                }}
+                className="w-full transition-all duration-200 hover:opacity-90 active:opacity-75"
+                style={{
+                  background: "rgba(143, 122, 216, 0.24)",
+                  border: "1px solid rgba(143, 122, 216, 0.32)",
+                  borderRadius: "16px",
+                  padding: "16px 18px",
+                  color: "rgba(249, 249, 229, 0.90)",
+                  boxShadow: "0 10px 28px rgba(20, 16, 32, 0.22)",
+                }}
+              >
+                <span className="text-sm font-semibold tracking-[-0.01em]">
+                  다음 기록 열기
+                </span>
+                <span
+                  className="ml-2 text-sm"
+                  style={{ color: "rgba(249, 249, 229, 0.56)" }}
+                >
+                  ›
+                </span>
+              </button>
+            </div>
+          )}
 
-                {/* 무료 Scene 이후 Flow Overview */}
-                {paidSceneCount > 0 && (
-                  <div ref={flowOverviewRef}>
-                    <FlowOverview
-                      scenes={scenes}
-                      unlockedScenes={unlockedScenes}
-                      onUnlockAll={handleUnlockAll}
-                      onUnlockScene={handleUnlockScene}
-                    />
-                  </div>
-                )}
-
-                {/* 유료 Scene 렌더링 */}
-                {/* sceneIdx는 scenes 배열 index 유지
-                    무료/유료 섞여 있어도 scenes 배열 순서 기반이므로 안전 */}
-                {scenes.map((scene, sceneIdx) => {
-                  if (scene.is_free) return null;
-                  const isUnlocked = unlockedScenes.includes(scene.scene_index);
-                  const isCurrent = currentSceneIndex === sceneIdx;
-
-                  return (
-                    <div
-                      key={scene.id}
-                      data-scene-idx={sceneIdx}
-                      ref={(el) => {
-                        if (el) {
-                          sceneRefsMap.current[sceneIdx] = el;
-                        }
-                      }}
-                    >
-                      <SceneContent
-                        scene={scene}
-                        isUnlocked={isUnlocked}
-                        onUnlockScene={() =>
-                          handleUnlockScene(
-                            scene.scene_index,
-                            scene.scene_title,
-                          )
-                        }
-                        isFirst={false}
-                        isCurrent={isCurrent}
-                      />
-                    </div>
-                  );
-                })}
-              </>
-            );
-          })()}
+          {showFlowOverview && paidSceneCount > 0 && (
+            <div ref={flowOverviewRef}>
+              <FlowOverview
+                scenes={scenes}
+                unlockedScenes={unlockedScenes}
+                onUnlockAll={handleUnlockAll}
+                onUnlockScene={handleUnlockScene}
+              />
+            </div>
+          )}
 
           {/* 추가 리딩 카드 (loop readings)
               - 일반 mode: 유료씬 전체 구매 완료 시에만 표시
               - ?qa=1: 숨김
               - ?qa=1&loop=1: 표시 (직접 생성) */}
-          {(isLoopQaMode || (!isQaMode && allPaidUnlocked)) && (
+          {showAdditionalRequests && (
             <div ref={loopReadingsRef} id="loop-readings-section">
               <AdditionalReadings
-                readings={additionalReadings}
+                readings={additionalReadings.slice(0, 3)}
                 loopAnswers={loopAnswers}
                 loopLoading={loopLoading}
                 loopError={loopError}
@@ -1255,6 +1425,170 @@ const ResultPage = ({ params }: PageProps) => {
           shareToken={shareToken}
         />
       </main>
+
+      {!isRecordListOpen && (
+        <button
+          type="button"
+          onClick={() => setIsRecordListOpen(true)}
+          className="fixed bottom-4 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2.5 text-xs transition-opacity duration-200 hover:opacity-90 active:opacity-75"
+          style={{
+            background: "rgba(20, 16, 32, 0.82)",
+            border: "1px solid rgba(143, 122, 216, 0.18)",
+            color: "rgba(249, 249, 229, 0.72)",
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
+          }}
+        >
+          <span>기록 목록</span>
+          <span style={{ color: "rgba(143, 122, 216, 0.58)" }}>
+            {String(activeScene.scene_index).padStart(2, "0")} /{" "}
+            {String(scenes.length).padStart(2, "0")}
+          </span>
+        </button>
+      )}
+
+      <div
+        className="fixed inset-0 z-50"
+        style={{
+          background: "rgba(6, 5, 14, 0.44)",
+          backdropFilter: "blur(3px)",
+          WebkitBackdropFilter: "blur(3px)",
+          opacity: isRecordListOpen ? 1 : 0,
+          pointerEvents: isRecordListOpen ? "auto" : "none",
+          transition: "opacity 0.24s ease",
+        }}
+        onClick={() => setIsRecordListOpen(false)}
+      />
+
+      <div
+        className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-md"
+        style={{
+          transform: isRecordListOpen ? "translateY(0)" : "translateY(100%)",
+          transition: "transform 0.32s cubic-bezier(0.32, 0.72, 0, 1)",
+          background: "rgba(17, 14, 28, 0.96)",
+          borderTop: "1px solid rgba(143, 122, 216, 0.14)",
+          borderRadius: "22px 22px 0 0",
+          paddingBottom: "env(safe-area-inset-bottom, 18px)",
+        }}
+      >
+        <div className="flex justify-center pb-2 pt-3">
+          <div
+            style={{
+              width: "36px",
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(249, 249, 229, 0.12)",
+            }}
+          />
+        </div>
+
+        <div className="px-5 pb-5 pt-2">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p
+                className="text-[11px] font-medium tracking-[0.14em]"
+                style={{ color: "rgba(143, 122, 216, 0.62)" }}
+              >
+                RESULT FILE
+              </p>
+              <p
+                className="mt-1 text-sm"
+                style={{ color: "rgba(249, 249, 229, 0.82)" }}
+              >
+                기록 목록
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsRecordListOpen(false)}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-xs transition-opacity duration-200 hover:opacity-80"
+              style={{
+                color: "rgba(249, 249, 229, 0.42)",
+                background: "rgba(255, 255, 255, 0.035)",
+              }}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="space-y-1">
+            {scenes.map((scene, sceneIdx) => {
+              const isUnlocked =
+                scene.is_free || unlockedScenes.includes(scene.scene_index);
+              const isCurrent = sceneIdx === currentSceneIndex;
+
+              return (
+                <button
+                  key={scene.id}
+                  type="button"
+                  onClick={() => handleRecordListSceneClick(scene)}
+                  className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition-colors duration-150"
+                  style={{
+                    background: isCurrent
+                      ? "rgba(143, 122, 216, 0.09)"
+                      : "transparent",
+                    border: isCurrent
+                      ? "1px solid rgba(143, 122, 216, 0.12)"
+                      : "1px solid transparent",
+                  }}
+                >
+                  <span
+                    className="w-6 flex-shrink-0 text-[11px]"
+                    style={{
+                      color: isCurrent
+                        ? "rgba(143, 122, 216, 0.72)"
+                        : "rgba(143, 122, 216, 0.42)",
+                    }}
+                  >
+                    {String(scene.scene_index).padStart(2, "0")}
+                  </span>
+                  <span
+                    className="min-w-0 flex-1 truncate text-xs"
+                    style={{
+                      color: isUnlocked
+                        ? "rgba(249, 249, 229, 0.70)"
+                        : "rgba(249, 249, 229, 0.36)",
+                    }}
+                  >
+                    {scene.scene_title}
+                  </span>
+                  {!isUnlocked && (
+                    <span
+                      className="flex-shrink-0 text-[11px]"
+                      style={{ color: "rgba(143, 122, 216, 0.44)" }}
+                    >
+                      잠김
+                    </span>
+                  )}
+                  {isCurrent && (
+                    <span
+                      className="flex-shrink-0 text-[11px]"
+                      style={{ color: "rgba(143, 122, 216, 0.58)" }}
+                    >
+                      열람 중
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {!allPaidUnlocked && (
+            <button
+              type="button"
+              onClick={handleUnlockAllFromRecordList}
+              className="mt-5 w-full rounded-[14px] py-3 text-sm font-medium transition-opacity duration-200 hover:opacity-90 active:opacity-75"
+              style={{
+                background: "rgba(143, 122, 216, 0.20)",
+                border: "1px solid rgba(143, 122, 216, 0.26)",
+                color: "rgba(249, 249, 229, 0.88)",
+              }}
+            >
+              전체 기록 열기
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* 결제 confirm 실패 에러 배너
           confirm 실패 시 unlock이 차단되고 재시도 안내를 표시한다.
@@ -1295,7 +1629,9 @@ const ResultPage = ({ params }: PageProps) => {
       )}
 
       {/* 유료 씬 생성 로딩 UI */}
-      {paidGenerationLoading && <PaidGenerationLoading isRecovery={isPaidGenerationRecovery} />}
+      {paidGenerationLoading && (
+        <PaidGenerationLoading isRecovery={isPaidGenerationRecovery} />
+      )}
     </div>
   );
 };

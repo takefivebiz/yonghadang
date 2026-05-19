@@ -1,13 +1,13 @@
 # VEIL — 개발 진행 상황 로그
 
-> 마지막 업데이트: 2026-05-17  
-> 현재 단계: **커밋 3~5 완료 — DB migration 복구, contents API 공개, 홈/카테고리 실제 데이터 연동**
+> 마지막 업데이트: 2026-05-19  
+> 현재 단계: **프론트엔드 UI/UX 리디자인 진행 — dark purple 기반 VEIL 톤 정리**
 
 ---
 
 ## 지금 어디까지 왔는가
 
-프론트엔드 UX는 대부분 완성됐다. 사용자가 콘텐츠를 선택하고, 자유입력을 쓰고, 보정 질문에 답하고, AI 결과를 읽고, 유료 씬을 구매하고, 결과를 공유하는 전체 흐름이 작동한다. 단, 지금은 localStorage 기반이고 DB는 아직 없다.
+프론트엔드 UX는 대부분 완성됐다. 사용자가 콘텐츠를 선택하고, 자유입력을 쓰고, 보정 질문에 답하고, AI 결과를 읽고, 유료 씬을 구매하고, 결과를 공유하는 전체 흐름이 작동한다. 최근에는 일반 SaaS 톤을 줄이고, VEIL의 weird archive / 심리탐정 / 의뢰 파일 세계관을 프론트 UI 전반에 반영하는 리디자인을 진행 중이다.
 
 최근 변화는 두 가지다. 첫째, analyze page가 real Claude API를 실제로 호출하도록 연결됐다. 둘째, QA mode를 추가해서 결제 없이 전체 씬을 볼 수 있게 됐다. 이 두 가지가 "콘텐츠 품질 QA 사이클"을 처음으로 열어준 변경이다.
 
@@ -17,13 +17,27 @@
 
 ### 프론트엔드 완성된 것
 
-- 홈 랜딩 — 카테고리 탭, 콘텐츠 카드 (`DUMMY_CONTENTS`)
-- 콘텐츠 인트로 페이지 (`/content/[id]`)
-- Analyze 플로우 (`/analyze/[session_id]`) — 자유입력 → 반응 버블 → 보정 질문 → 완료 로딩
+- 홈 랜딩 — hero redesign, CTA restructuring, 카테고리 진입 UI 정리
+- 콘텐츠 인트로 페이지 (`/content/[id]`) — 의뢰 파일/폴더 톤과 muted violet CTA 정리
+- Analyze 플로우 (`/analyze/[session_id]`) — 자유입력 → 반응 버블 → 보정 질문 → 완료 로딩, 입력 UI color hierarchy 정리
 - Result 페이지 (`/result/[session_id]`) — free/paid 씬 분리, 잠금 CTA, FlowOverview, AdditionalReadings
 - 결제 모달 (`PaymentModal`) — Toss Payments 연동 구조 (실제 결제 미완)
-- 마이페이지, 관리자 페이지 — UI 완성, 더미 데이터
+- Auth 페이지 (`/auth`) — 일반 로그인 화면보다 랜딩 흐름을 이어주는 gate 톤으로 리디자인
+- 비회원 조회 페이지 (`/guest`) — guest lookup redesign, 입력/버튼/기록 리스트 색상 정리
+- 마이페이지 — “내 의뢰 보관함” 방향으로 리디자인 진행중
+- 관리자 페이지 — UI 완성, 더미 데이터
 - 공유 페이지 (`/share/[share_id]`) — UI 완성
+
+### Frontend UI/UX 리디자인 진행 상황
+
+- 완료: hero redesign — 메인 랜딩을 심리탐정 리포트 / 의뢰 CTA 톤으로 정리
+- 완료: auth redesign — 로그인 페이지를 빠른 진입용 gate로 정리
+- 완료: guest lookup redesign — 비회원 조회 화면의 pink accent를 soft violet 계열로 통일
+- 완료: category system redesign — 카테고리 진입/선택 UI의 보조색 saturation과 opacity 낮춤
+- 완료: color hierarchy cleanup — dark purple 80%, muted violet 15%, category hint colors 5% 방향으로 1차 정리
+- 완료: CTA restructuring — 의뢰하기, 파일 열람, bottom floating CTA의 primary accent를 soft violet 계열로 통일
+- 진행중: my-page redesign — “마이페이지”를 “내 의뢰 보관함” 톤으로 전환 중
+- TODO: result page redesign — 아직 시작 전
 
 ### 핵심 데이터 흐름 (localStorage 기반)
 

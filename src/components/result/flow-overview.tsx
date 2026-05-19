@@ -19,29 +19,35 @@ const FlowOverview = ({
   const allPaidUnlocked = paidScenes.every((s) =>
     unlockedScenes.includes(s.scene_index),
   );
+  const previewScenes = paidScenes.slice(0, 4);
 
   return (
     <div
       data-testid="flow-overview"
-      className="px-6 py-16 border-t border-b border-white/10"
+      className="px-6 pb-8 pt-1"
       style={{
-        background: "rgba(209, 109, 172, 0.04)",
+        background: "transparent",
       }}
     >
       {/* 헤더 */}
-      <div className="mb-10 text-center">
+      <div className="mb-4">
         <p
-          className="text-xs tracking-wider"
-          style={{ color: "rgba(209, 109, 172, 0.5)" }}
+          className="text-[11px] font-medium tracking-[0.12em]"
+          style={{ color: "rgba(143, 122, 216, 0.58)" }}
         >
-          <span style={{ fontSize: "14px" }}>···</span> 여기까지의 흐름{" "}
-          <span style={{ fontSize: "14px" }}>···</span>
+          여기까지의 흐름
+        </p>
+        <p
+          className="mt-1 text-xs leading-relaxed"
+          style={{ color: "rgba(249, 249, 229, 0.34)" }}
+        >
+          이후 기록은 잠겨 있어.
         </p>
       </div>
 
       {/* Scene 목록 */}
-      <div className="space-y-2 mb-12 max-w-sm mx-auto">
-        {scenes.map((scene) => {
+      <div className="mb-5 space-y-1.5">
+        {previewScenes.map((scene) => {
           const isUnlocked =
             unlockedScenes.includes(scene.scene_index) || scene.is_free;
 
@@ -50,64 +56,38 @@ const FlowOverview = ({
               key={scene.id}
               data-testid="flow-overview-scene-item"
               data-unlocked={isUnlocked}
-              className="flex items-center gap-2.5 p-2.5 rounded-lg text-sm"
+              className="flex items-center gap-3 rounded-md px-1 py-1.5 text-sm"
               style={{
-                background: isUnlocked
-                  ? "rgba(209, 109, 172, 0.1)"
-                  : "rgba(255, 255, 255, 0.02)",
+                background: "transparent",
                 cursor: !isUnlocked && onUnlockScene ? "pointer" : "default",
               }}
               onClick={() => !isUnlocked && onUnlockScene?.(scene.scene_index)}
             >
-              {/* Status icon */}
-              <div className="flex-shrink-0">
-                {isUnlocked ? (
-                  <div
-                    data-testid="flow-overview-unlocked-icon"
-                    className="w-4 h-4 rounded-full flex items-center justify-center"
-                    style={{ background: "rgba(209, 109, 172, 0.4)" }}
-                  >
-                    <svg
-                      className="w-2.5 h-2.5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      style={{ color: "rgba(209, 109, 172, 0.9)" }}
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                ) : (
-                  <div
-                    data-testid="flow-overview-locked-icon"
-                    className="w-4 h-4 rounded-full flex items-center justify-center"
-                    style={{ background: "rgba(255, 255, 255, 0.08)" }}
-                  >
-                    <svg
-                      className="w-2.5 h-2.5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      style={{ color: "rgba(255, 255, 255, 0.25)" }}
-                    >
-                      <path d="M5 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2v-6z" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-
               {/* Scene info */}
+              <span
+                className="w-5 flex-shrink-0 text-[11px]"
+                style={{ color: "rgba(143, 122, 216, 0.48)" }}
+              >
+                {String(scene.scene_index).padStart(2, "0")}
+              </span>
               <p
+                className="min-w-0 flex-1 truncate text-xs"
                 style={{
                   color: isUnlocked
-                    ? "rgba(249, 249, 229, 0.75)"
-                    : "rgba(249, 249, 229, 0.4)",
+                    ? "rgba(249, 249, 229, 0.58)"
+                    : "rgba(249, 249, 229, 0.42)",
                 }}
               >
                 {scene.scene_title}
               </p>
+              {!isUnlocked && onUnlockScene && (
+                <span
+                  className="flex-shrink-0 text-[11px]"
+                  style={{ color: "rgba(143, 122, 216, 0.42)" }}
+                >
+                  열기
+                </span>
+              )}
             </div>
           );
         })}
@@ -115,60 +95,35 @@ const FlowOverview = ({
 
       {/* CTA */}
       {!allPaidUnlocked && (
-        <p
-          className="text-center text-xs leading-relaxed mb-4"
-          style={{ color: "rgba(249, 249, 229, 0.25)" }}
-        >
-          여기서부터는 더 깊어져
-        </p>
-      )}
-      {!allPaidUnlocked && (
-        <div className="max-w-sm mx-auto">
+        <div>
           {/* Primary CTA with badge */}
-          <div className="relative mb-4">
+          <div className="relative">
             <button
               data-testid="flow-overview-unlock-all-btn"
               onClick={onUnlockAll}
-              className="w-full rounded-[14px] py-3 transition-all duration-200 hover:opacity-90 active:opacity-80 flex flex-col items-center justify-center gap-1"
+              className="w-full rounded-[14px] py-3 transition-all duration-200 hover:opacity-90 active:opacity-80"
               style={{
-                background:
-                  "linear-gradient(135deg, rgba(180, 110, 160, 0.75) 0%, rgba(155, 95, 140, 0.75) 100%)",
-                border: "1px solid rgba(220, 150, 200, 0.4)",
-                boxShadow: "0 4px 16px rgba(180, 110, 160, 0.2)",
+                background: "rgba(143, 122, 216, 0.20)",
+                border: "1px solid rgba(143, 122, 216, 0.26)",
               }}
             >
               <span
                 style={{
-                  color: "rgba(255, 245, 250, 0.88)",
-                  fontSize: "16px",
+                  color: "rgba(249, 249, 229, 0.88)",
+                  fontSize: "14px",
                   fontWeight: "600",
                 }}
               >
-                전체 흐름 열기
-              </span>
-              <span
-                style={{
-                  color: "rgba(255, 200, 230, 0.85)",
-                  fontSize: "12px",
-                  fontWeight: "400",
-                }}
-              >
-                4,900원
+                전체 기록 열기
               </span>
             </button>
-            {/* 추천 뱃지
-            <div
-              className="absolute -top-2 right-6 px-2.5 py-1 rounded-full text-[11px] font-medium tracking-wide"
-              style={{
-                background: "rgba(155, 105, 145, 0.9)",
-                color: "rgba(255, 255, 255, 0.95)",
-                border: "1px solid rgba(155, 105, 145, 0.8)",
-                boxShadow: "0 4px 12px rgba(155, 105, 145, 0.35)",
-              }}
-            >
-              ✨ 추천
-            </div> */}
           </div>
+          <p
+            className="mt-3 text-center text-[11px]"
+            style={{ color: "rgba(249, 249, 229, 0.24)" }}
+          >
+            또는 필요한 기록만 열람할 수 있어
+          </p>
         </div>
       )}
 

@@ -21,10 +21,7 @@ interface PageProps {
   params: Promise<{ session_id: string }>;
 }
 
-type Stage =
-  | "free_input"
-  | "correction_questions"
-  | "completing";
+type Stage = "free_input" | "correction_questions" | "completing";
 
 const AnalyzePage = ({ params }: PageProps) => {
   const router = useRouter();
@@ -188,7 +185,10 @@ const AnalyzePage = ({ params }: PageProps) => {
     setStage("completing");
     setProgress(0);
     const loadingStartTime = Date.now();
-    console.log("[analyze] Loading 시작", new Date(loadingStartTime).toISOString());
+    console.log(
+      "[analyze] Loading 시작",
+      new Date(loadingStartTime).toISOString(),
+    );
 
     // fire-and-forget: 저장 실패해도 generateScenes 진행
     if (!isQaMode) {
@@ -203,7 +203,10 @@ const AnalyzePage = ({ params }: PageProps) => {
         .then(async (res) => {
           if (!res.ok) {
             const errData = (await res.json()) as { error?: string };
-            console.error("[answers] DB 저장 실패:", errData.error ?? `HTTP ${res.status}`);
+            console.error(
+              "[answers] DB 저장 실패:",
+              errData.error ?? `HTTP ${res.status}`,
+            );
           } else {
             console.log("[answers] session_answers DB 저장 완료");
           }
@@ -217,7 +220,9 @@ const AnalyzePage = ({ params }: PageProps) => {
 
     // ── Dev mode: fake progress만 돌리고 return ────────────────────────────
     if (process.env.NEXT_PUBLIC_SHOW_ANALYZE_LOADING === "true") {
-      console.log("[DEBUG] NEXT_PUBLIC_SHOW_ANALYZE_LOADING enabled - showing loading screen only");
+      console.log(
+        "[DEBUG] NEXT_PUBLIC_SHOW_ANALYZE_LOADING enabled - showing loading screen only",
+      );
 
       // Fake progress 애니메이션
       let fakeProgress = 0;
@@ -242,7 +247,8 @@ const AnalyzePage = ({ params }: PageProps) => {
     const updateProgress = () => {
       const elapsedTime = Date.now() - loadingStartTime;
       // 12초 기준 지수 감쇠: 초반에 빠르게 올라가고 95% 근처에서 자연히 감속
-      const calculatedProgress = 95 * (1 - Math.exp(-4 * elapsedTime / 12000));
+      const calculatedProgress =
+        95 * (1 - Math.exp((-4 * elapsedTime) / 12000));
       setProgress(calculatedProgress);
 
       // 계속해서 progress 업데이트
@@ -254,7 +260,10 @@ const AnalyzePage = ({ params }: PageProps) => {
   };
 
   // ── Generate API 호출 및 장면 캐싱 ──────────────────────────────────────
-  const generateScenes = async (finalData: AnalyzeAnswers, loadingStartTime: number) => {
+  const generateScenes = async (
+    finalData: AnalyzeAnswers,
+    loadingStartTime: number,
+  ) => {
     // try block 외부에서 선언해야 catch block에서도 참조 가능
     // window.location.search 직접 사용 (result page와 동일한 패턴):
     // useSearchParams() 훅은 Next.js 15 App Router에서 Suspense 경계 / route 전환
@@ -312,7 +321,11 @@ const AnalyzePage = ({ params }: PageProps) => {
         (a) => a.answer_options ?? [],
       );
       const hiddenScores = contentPack
-        ? accumulateHiddenState(selectedValues, contentPack.scoreMap, contentPack.dimensions)
+        ? accumulateHiddenState(
+            selectedValues,
+            contentPack.scoreMap,
+            contentPack.dimensions,
+          )
         : {};
       const stateSummary = contentPack
         ? translateStateToSummary(hiddenScores, contentPack.translationRules)
@@ -355,15 +368,23 @@ const AnalyzePage = ({ params }: PageProps) => {
             }),
           },
         );
-        if (!freeRes.ok) throw new Error(`무료 씬 생성 실패 (HTTP ${freeRes.status})`);
-        const freeData = (await freeRes.json()) as { session_id: string; result_scenes: ResultScene[] };
+        if (!freeRes.ok)
+          throw new Error(`무료 씬 생성 실패 (HTTP ${freeRes.status})`);
+        const freeData = (await freeRes.json()) as {
+          session_id: string;
+          result_scenes: ResultScene[];
+        };
         const freeScenes = freeData.result_scenes;
 
         console.log(
-          "[QA] Call 1 완료. freeScenes:", freeScenes.length,
-          "| scene_indexes:", freeScenes.map((s) => s.scene_index),
-          "| is_free values:", freeScenes.map((s) => `${s.scene_index}:${s.is_free}`),
-          "| messages 존재:", freeScenes.map((s) => `${s.scene_index}:${!!s.messages}`),
+          "[QA] Call 1 완료. freeScenes:",
+          freeScenes.length,
+          "| scene_indexes:",
+          freeScenes.map((s) => s.scene_index),
+          "| is_free values:",
+          freeScenes.map((s) => `${s.scene_index}:${s.is_free}`),
+          "| messages 존재:",
+          freeScenes.map((s) => `${s.scene_index}:${!!s.messages}`),
         );
 
         if (typeof window !== "undefined") {
@@ -388,7 +409,8 @@ const AnalyzePage = ({ params }: PageProps) => {
               ? `scene_index: ${lastFreeScene.scene_index}, messages: ${lastFreeScene.messages?.length ?? "null"}`
               : "없음 (freeScenes 비어있음)",
           );
-          if (!lastFreeScene?.messages) throw new Error("무료 씬 context를 추출할 수 없어");
+          if (!lastFreeScene?.messages)
+            throw new Error("무료 씬 context를 추출할 수 없어");
 
           const freeSceneContext = {
             sceneTitle: lastFreeScene.scene_title,
@@ -403,7 +425,10 @@ const AnalyzePage = ({ params }: PageProps) => {
               body: JSON.stringify({
                 content_title: content.title.replace(/\n/g, " "),
                 category: content.category,
-                user_input: { text: finalData.free_input, answers: userAnswers },
+                user_input: {
+                  text: finalData.free_input,
+                  answers: userAnswers,
+                },
                 scene_config: sceneConfig,
                 scene_indexes: paidSceneIndexes,
                 free_scene_context: freeSceneContext,
@@ -412,22 +437,37 @@ const AnalyzePage = ({ params }: PageProps) => {
               }),
             },
           );
-          if (!paidRes.ok) throw new Error(`유료 씬 생성 실패 (HTTP ${paidRes.status})`);
-          const paidData = (await paidRes.json()) as { session_id: string; result_scenes: ResultScene[] };
+          if (!paidRes.ok)
+            throw new Error(`유료 씬 생성 실패 (HTTP ${paidRes.status})`);
+          const paidData = (await paidRes.json()) as {
+            session_id: string;
+            result_scenes: ResultScene[];
+          };
           const paidScenes = paidData.result_scenes;
 
           console.log(
-            "[QA] Call 2 완료. paidScenes:", paidScenes.length,
-            "| scene_indexes:", paidScenes.map((s) => s.scene_index),
-            "| messages 존재:", paidScenes.map((s) => `${s.scene_index}:${!!s.messages}(${s.messages?.length ?? 0}개)`),
+            "[QA] Call 2 완료. paidScenes:",
+            paidScenes.length,
+            "| scene_indexes:",
+            paidScenes.map((s) => s.scene_index),
+            "| messages 존재:",
+            paidScenes.map(
+              (s) =>
+                `${s.scene_index}:${!!s.messages}(${s.messages?.length ?? 0}개)`,
+            ),
           );
 
           // 무료 + 유료 병합 → veil_all_scenes_ 에 저장
           // result page는 이 키를 먼저 읽고, paid placeholder보다 실제 데이터를 우선 사용한다
           const allScenes = mergeScenes(freeScenes, paidScenes);
           console.log(
-            "[QA] mergeScenes 완료. allScenes:", allScenes.length,
-            "| indexes:", allScenes.map((s) => `${s.scene_index}(${s.is_free ? "free" : "paid"},msg=${s.messages?.length ?? "null"})`),
+            "[QA] mergeScenes 완료. allScenes:",
+            allScenes.length,
+            "| indexes:",
+            allScenes.map(
+              (s) =>
+                `${s.scene_index}(${s.is_free ? "free" : "paid"},msg=${s.messages?.length ?? "null"})`,
+            ),
           );
 
           if (typeof window !== "undefined") {
@@ -435,7 +475,9 @@ const AnalyzePage = ({ params }: PageProps) => {
               `veil_all_scenes_${finalData.session_id}`,
               JSON.stringify(allScenes),
             );
-            console.log(`[QA] veil_all_scenes_${finalData.session_id} 저장 완료`);
+            console.log(
+              `[QA] veil_all_scenes_${finalData.session_id} 저장 완료`,
+            );
           }
         }
 
@@ -525,9 +567,7 @@ const AnalyzePage = ({ params }: PageProps) => {
       // QA mode에서 에러가 나도 ?qa=1 유지 → result page가 QA unlock 상태 유지
       // (free scenes는 저장됐을 수 있으므로 unlock 상태로 보여주는 게 낫다)
       setTimeout(() => {
-        const qaQuery = isQaMode
-          ? `?qa=1${hasLoopFlag ? "&loop=1" : ""}`
-          : "";
+        const qaQuery = isQaMode ? `?qa=1${hasLoopFlag ? "&loop=1" : ""}` : "";
         router.push(`/result/${finalData.session_id}${qaQuery}`);
       }, 1000);
     }
@@ -543,153 +583,151 @@ const AnalyzePage = ({ params }: PageProps) => {
   return (
     <div className="min-h-screen bg-background flex justify-center">
       {/* 완료 화면: 단서 수렴 로딩 */}
-      {stage === "completing" && (
-        <GeneratingLoading progress={progress} />
-      )}
+      {stage === "completing" && <GeneratingLoading progress={progress} />}
 
       {/* 입력 단계: 폴더 구조 포함 */}
       {(stage === "free_input" || stage === "correction_questions") && (
         <main className="relative z-10 w-full flex flex-col justify-between px-4 sm:px-5 py-6">
           <div className="w-full mx-auto pt-4" style={{ maxWidth: "540px" }}>
-          {/* 탭 Row */}
-          <div
-            style={{
-              display: "flex",
-              gap: "2px",
-              marginBottom: "-1px",
-            }}
-          >
-            {/* 탭 1: 비활성 (콘텐츠 카테고리) */}
+            {/* 탭 Row */}
             <div
               style={{
-                flex: "0 1 auto",
-                height: "38px",
-                background: "rgba(50, 35, 60, 0.3)",
-                border: "1px solid rgba(143, 122, 216, 0.28)",
-                borderBottom: "1px solid rgba(143, 122, 216, 0.28)",
-                borderRadius: "14px 14px 0 0",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: "20px",
-                paddingRight: "20px",
-                opacity: 0.45,
-                transition: "all 300ms ease",
-                cursor: "not-allowed",
-                pointerEvents: "none",
+                gap: "2px",
+                marginBottom: "-1px",
               }}
             >
-              <span
+              {/* 탭 1: 비활성 (콘텐츠 카테고리) */}
+              <div
                 style={{
-                  fontSize: "12px",
-                  fontWeight: "400",
-                  color: "rgba(255, 255, 255, 0.45)",
-                  letterSpacing: "0.02em",
-                  textAlign: "center",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
+                  flex: "0 1 auto",
+                  height: "38px",
+                  background: "rgba(50, 35, 60, 0.3)",
+                  border: "1px solid rgba(143, 122, 216, 0.28)",
+                  borderBottom: "1px solid rgba(143, 122, 216, 0.28)",
+                  borderRadius: "14px 14px 0 0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                  opacity: 0.45,
+                  transition: "all 300ms ease",
+                  cursor: "not-allowed",
+                  pointerEvents: "none",
                 }}
               >
-                {content ? CATEGORY_LABELS[content.category] : "콘텐츠"}
-              </span>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: "400",
+                    color: "rgba(255, 255, 255, 0.45)",
+                    letterSpacing: "0.02em",
+                    textAlign: "center",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {content ? CATEGORY_LABELS[content.category] : "콘텐츠"}
+                </span>
+              </div>
+
+              {/* 탭 2: 활성 (기록 작성 중) */}
+              <div
+                style={{
+                  flex: "0 1 auto",
+                  height: "38px",
+                  background: "rgba(92, 74, 132, 0.32)",
+                  border: "1px solid rgba(143, 122, 216, 0.24)",
+                  borderBottom: "none",
+                  borderRadius: "14px 14px 0 0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                  opacity: 1,
+                  transition: "all 300ms ease",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: "400",
+                    color: "rgba(255, 255, 255, 0.90)",
+                    letterSpacing: "0.02em",
+                    textAlign: "center",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  기록 작성 중
+                </span>
+              </div>
+
+              {/* 탭 3: 비활성 (결과 리포트) */}
+              <div
+                style={{
+                  flex: "0 1 auto",
+                  height: "38px",
+                  background: "rgba(50, 35, 60, 0.3)",
+                  border: "1px solid rgba(143, 122, 216, 0.28)",
+                  borderBottom: "1px solid rgba(143, 122, 216, 0.28)",
+                  borderRadius: "14px 14px 0 0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                  opacity: 0.45,
+                  transition: "all 300ms ease",
+                  cursor: "not-allowed",
+                  pointerEvents: "none",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: "400",
+                    color: "rgba(255, 255, 255, 0.45)",
+                    letterSpacing: "0.02em",
+                    textAlign: "center",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  결과 리포트
+                </span>
+              </div>
             </div>
 
-            {/* 탭 2: 활성 (기록 작성 중) */}
+            {/* 폴더 Body */}
             <div
               style={{
-                flex: "0 1 auto",
-                height: "38px",
-                background: "rgba(92, 74, 132, 0.32)",
-                border: "1px solid rgba(143, 122, 216, 0.24)",
-                borderBottom: "none",
-                borderRadius: "14px 14px 0 0",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: "20px",
-                paddingRight: "20px",
-                opacity: 1,
-                transition: "all 300ms ease",
+                background: "rgba(60, 45, 65, 0.3)",
+                border: "1px solid rgba(143, 122, 216, 0.22)",
+                borderTopLeftRadius: "0",
+                borderTopRightRadius: "18px",
+                borderBottomLeftRadius: "18px",
+                borderBottomRightRadius: "18px",
+                overflow: "hidden",
               }}
             >
-              <span
-                style={{
-                  fontSize: "13px",
-                  fontWeight: "400",
-                  color: "rgba(255, 255, 255, 0.90)",
-                  letterSpacing: "0.02em",
-                  textAlign: "center",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                기록 작성 중
-              </span>
-            </div>
+              {stage === "free_input" && (
+                <TypeAInput config={config} onSubmit={handleFreeInputSubmit} />
+              )}
 
-            {/* 탭 3: 비활성 (결과파일) */}
-            <div
-              style={{
-                flex: "0 1 auto",
-                height: "38px",
-                background: "rgba(50, 35, 60, 0.3)",
-                border: "1px solid rgba(143, 122, 216, 0.28)",
-                borderBottom: "1px solid rgba(143, 122, 216, 0.28)",
-                borderRadius: "14px 14px 0 0",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                paddingLeft: "20px",
-                paddingRight: "20px",
-                opacity: 0.45,
-                transition: "all 300ms ease",
-                cursor: "not-allowed",
-                pointerEvents: "none",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "400",
-                  color: "rgba(255, 255, 255, 0.45)",
-                  letterSpacing: "0.02em",
-                  textAlign: "center",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                결과파일
-              </span>
+              {stage === "correction_questions" && (
+                <CorrectionQuestions
+                  config={config}
+                  onSubmit={handleCorrectionSubmit}
+                />
+              )}
             </div>
           </div>
-
-          {/* 폴더 Body */}
-          <div
-            style={{
-              background: "rgba(60, 45, 65, 0.3)",
-              border: "1px solid rgba(143, 122, 216, 0.22)",
-              borderTopLeftRadius: "0",
-              borderTopRightRadius: "18px",
-              borderBottomLeftRadius: "18px",
-              borderBottomRightRadius: "18px",
-              overflow: "hidden",
-            }}
-          >
-            {stage === "free_input" && (
-              <TypeAInput config={config} onSubmit={handleFreeInputSubmit} />
-            )}
-
-            {stage === "correction_questions" && (
-              <CorrectionQuestions
-                config={config}
-                onSubmit={handleCorrectionSubmit}
-              />
-            )}
-          </div>
-        </div>
         </main>
       )}
     </div>

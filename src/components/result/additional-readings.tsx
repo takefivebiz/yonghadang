@@ -72,8 +72,10 @@ const AdditionalReadings = ({
   const getMessages = (reading: AdditionalReading): LoopMessage[] =>
     loopAnswers[reading.loopType]?.messages ?? [];
 
+  const visibleReadings = readings.slice(0, 3);
+
   // 잠긴 항목 수 (전체 구매 버튼 표시 조건 및 "마지막 질문이야" 힌트용)
-  const lockedCount = readings.filter((r) => !isUnlocked(r)).length;
+  const lockedCount = visibleReadings.filter((r) => !isUnlocked(r)).length;
 
   // ── 카드 클릭 ────────────────────────────────────────────────
   const handleCardClick = (reading: AdditionalReading) => {
@@ -106,7 +108,7 @@ const AdditionalReadings = ({
     handleCloseSheet();
   };
 
-  if (readings.length === 0) return null;
+  if (visibleReadings.length === 0) return null;
 
   return (
     <section className="px-5 py-10">
@@ -149,7 +151,7 @@ const AdditionalReadings = ({
           className="mt-4 text-xs tracking-wide"
           style={{ color: "rgba(249, 249, 229, 0.30)" }}
         >
-          이 흐름에서 더 들어갈 수 있어
+          추가 의뢰 남기기
         </p>
       </div>
 
@@ -163,14 +165,14 @@ const AdditionalReadings = ({
           }}
         >
           <p className="text-xs" style={{ color: "rgba(201, 139, 176, 0.70)" }}>
-            전체 질문을 열었어. 답변을 차례로 생성하고 있어.
+            선택한 의뢰를 준비하고 있어.
           </p>
         </div>
       )}
 
       {/* 카드 목록 */}
       <div className="flex flex-col gap-3">
-        {readings.map((reading) => {
+        {visibleReadings.map((reading) => {
           const unlocked = isUnlocked(reading);
           const loading = isLoading(reading);
           const error = hasError(reading);
@@ -290,7 +292,7 @@ const AdditionalReadings = ({
                           className="text-xs"
                           style={{ color: "rgba(201, 139, 176, 0.55)" }}
                         >
-                          더 깊게 읽기
+                          의뢰 열기
                         </p>
                       </div>
                     )}
@@ -476,7 +478,7 @@ const AdditionalReadings = ({
             className="text-xs"
             style={{ color: "rgba(201, 139, 176, 0.60)" }}
           >
-            [QA] 모든 질문 한번에 읽기
+            [QA] 추천 의뢰 한번에 열기
           </span>
         </button>
       )}
@@ -592,7 +594,7 @@ const AdditionalReadings = ({
               className="text-sm font-medium"
               style={{ color: "rgba(249, 249, 229, 0.78)" }}
             >
-              이 질문 깊게 읽기
+              이 의뢰 열기
             </span>
             <span
               className="text-xs"
@@ -625,13 +627,13 @@ const AdditionalReadings = ({
                   className="text-sm font-medium"
                   style={{ color: "rgba(249, 249, 229, 0.90)" }}
                 >
-                  전체 질문 깊게 읽기
+                  의뢰 3개 모두 열기
                 </span>
                 <span
                   className="text-xs"
                   style={{ color: "rgba(249, 249, 229, 0.40)" }}
                 >
-                  3개 질문 한번에
+                  추천 의뢰 한번에
                 </span>
               </div>
               <div className="flex items-center gap-2.5">
@@ -660,7 +662,7 @@ const AdditionalReadings = ({
               className="text-center text-xs mt-3"
               style={{ color: "rgba(249, 249, 229, 0.22)" }}
             >
-              마지막 질문이야
+              마지막 의뢰야
             </p>
           )}
         </div>

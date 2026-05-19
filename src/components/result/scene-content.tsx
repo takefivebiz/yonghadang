@@ -13,44 +13,30 @@ interface SceneContentProps {
 
 // AI 메시지 블록
 const AiBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
-  // 텍스트 길이와 메시지 순서에 따라 리듬 조정
-  const textLength = text.length;
-  const rhythm = index % 3;
-
-  let maxWidth = "max-w-[85%]";
-  let marginBottom = "mb-3";
-
-  if (textLength < 25) {
-    maxWidth = "max-w-[65%]";
-  } else if (textLength < 55) {
-    maxWidth = rhythm === 0 ? "max-w-[75%]" : "max-w-[78%]";
-  } else if (textLength < 90) {
-    maxWidth = "max-w-[85%]";
-  } else {
-    maxWidth = "max-w-[92%]";
-  }
-
-  // 메시지 간 간격 변화
-  if (rhythm === 1) marginBottom = "mb-2.5";
-  else if (rhythm === 2) marginBottom = "mb-3.5";
+  const label =
+    index === 0 ? "관찰 기록" : index === 1 ? "감정 메모" : "분석 조각";
 
   return (
-    <div className={`${marginBottom} flex justify-start`}>
+    <div className="mb-4">
       <div
-        className={`${maxWidth} font-body`}
+        className="w-full font-body"
         style={{
-          /* 배경과 자연스럽게 blend되는 bubble */
-          background: "rgba(255, 255, 255, 0.04)",
-          borderRadius: "15px 15px 15px 0",
-          padding: "10px 15px",
-          /* 아주 약한 border로 정의감 최소화 */
-          border: "1px solid rgba(255, 255, 255, 0.015)",
+          background: "rgba(255, 255, 255, 0.018)",
+          borderRadius: "12px",
+          padding: "13px 15px",
+          border: "1px solid rgba(143, 122, 216, 0.035)",
         }}
       >
         <p
+          className="mb-2 text-[9px] font-medium tracking-[0.14em]"
+          style={{ color: "rgba(143, 122, 216, 0.34)" }}
+        >
+          {label}
+        </p>
+        <p
           className="text-sm leading-[1.75] whitespace-pre-line"
           style={{
-            color: "rgba(249, 249, 229, 0.80)",
+            color: "rgba(249, 249, 229, 0.82)",
             fontSize: "14px",
             letterSpacing: "-0.01em",
           }}
@@ -66,7 +52,8 @@ const AiBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
 const PunchBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
   // index=0: title 바로 아래 subtitle 위치. 상단 margin 없애고 하단만 유지.
   // index>0: 본문 중간 감정 강조 (기존 스타일 유지)
-  const verticalMargin = index === 0 ? "mt-0 mb-7" : (index % 2 === 0 ? "my-11" : "my-12");
+  const verticalMargin =
+    index === 0 ? "mt-0 mb-7" : index % 2 === 0 ? "my-11" : "my-12";
 
   return (
     <div className={`${verticalMargin} px-4 text-left`}>
@@ -74,7 +61,7 @@ const PunchBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
         className="font-punch whitespace-pre-line"
         style={{
           /* 충분한 가독성과 배경과의 조화 */
-          color: "rgba(209, 109, 172, 0.653)",
+          color: "rgba(143, 122, 216, 0.76)",
           fontSize: "15px",
           lineHeight: "1.6",
           fontWeight: "500",
@@ -157,7 +144,7 @@ const SceneContent = ({
         <div
           className="w-px flex-shrink-0 self-start"
           style={{
-            background: "rgba(209, 109, 172, 0.392)",
+            background: "rgba(143, 122, 216, 0.34)",
             minHeight: "80px",
           }}
         />
@@ -170,7 +157,7 @@ const SceneContent = ({
               <p
                 className="text-[10px] font-light tracking-widest"
                 style={{
-                  color: "rgba(209, 109, 172, 0.392)",
+                  color: "rgba(143, 122, 216, 0.52)",
                   letterSpacing: "0.08em",
                 }}
               >
@@ -182,8 +169,8 @@ const SceneContent = ({
               <div
                 className="px-2 py-0.5 rounded-md text-[9px] font-medium tracking-wide uppercase"
                 style={{
-                  background: "rgba(209, 109, 172, 0.08)",
-                  color: "rgba(209, 109, 172, 0.5)",
+                  background: "rgba(143, 122, 216, 0.08)",
+                  color: "rgba(143, 122, 216, 0.55)",
                 }}
               >
                 무료
@@ -206,7 +193,10 @@ const SceneContent = ({
       {/* Scene 콘텐츠 */}
       {!isLocked ? (
         // 무료 또는 unlocked scene
-        <div data-testid="scene-messages" className={`space-y-1 ${hasLeadingPunch ? "mt-3" : "mt-6"}`}>
+        <div
+          data-testid="scene-messages"
+          className={`space-y-1 ${hasLeadingPunch ? "mt-3" : "mt-6"}`}
+        >
           {/* Opening: 항상 visible */}
           {openingMessages.map((msg, idx) => renderMessage(msg, idx))}
 
@@ -228,90 +218,66 @@ const SceneContent = ({
           )}
         </div>
       ) : (
-        // Locked scene: preview 메시지가 자연스럽게 희미해지면서 잠기는 방식
-        <div>
-          {/* Preview messages with gradual fade — lock CTA가 중간에 끼어 있음 */}
+        <div data-testid="scene-preview-messages">
           <div
-            data-testid="scene-preview-messages"
-            className="relative mt-6 space-y-1 pb-16"
+            className="mt-6 rounded-2xl px-5 py-8 text-center"
+            style={{
+              background: "rgba(255, 255, 255, 0.020)",
+              border: "1px solid rgba(143, 122, 216, 0.10)",
+            }}
           >
-            {(scene.preview_messages ?? []).map((msg, idx) => {
-              // 모든 preview message에 동일한 opacity와 blur 적용
-              const opacity = 0.5;
-              const filter = "blur(2.8px)";
-              return (
-                <div
-                  key={idx}
-                  style={{
-                    opacity,
-                    filter,
-                  }}
-                >
-                  {renderMessage(msg, idx)}
-                </div>
-              );
-            })}
-
-            {/* Message Bubble Style Lock CTA — preview 흐름 위에 overlay */}
+            <div
+              className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full"
+              style={{ background: "rgba(143, 122, 216, 0.12)" }}
+            >
+              <svg
+                className="h-6 w-6"
+                style={{ color: "rgba(143, 122, 216, 0.78)" }}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7 10V8a5 5 0 0 1 10 0v2" />
+                <rect x="5" y="10" width="14" height="10" rx="2" />
+              </svg>
+            </div>
+            <p
+              className="text-xs font-medium tracking-wide"
+              style={{ color: "rgba(143, 122, 216, 0.72)" }}
+            >
+              잠긴 기록
+            </p>
+            <p
+              className="mx-auto mt-3 max-w-[260px] text-sm leading-relaxed"
+              style={{ color: "rgba(249, 249, 229, 0.58)" }}
+            >
+              이 기록은 아직 잠겨 있어.
+              <br />더 깊은 분석을 확인하려면 기록을 열어줘
+            </p>
             <button
               data-testid="scene-unlock-btn"
               onClick={onUnlockScene}
-              className="absolute  left-1/2 w-[78%] max-w-[420px] -translate-x-1/2 transition-all duration-200 hover:opacity-85 active:opacity-70"
+              className="mt-7 w-full max-w-[260px] transition-all duration-200 hover:opacity-85 active:opacity-70"
               style={{
-                bottom: "120px",
-                background:
-                  "linear-gradient(180deg, rgba(140, 80, 130, 0.65) 0%, rgba(110, 60, 105, 0.58) 100%)",
-                border: "1.5px solid rgba(200, 120, 180, 0.5)",
-                borderRadius: "14px 14px 14px 0px",
-                padding: "20px 20px",
+                background: "rgba(143, 122, 216, 0.24)",
+                border: "1px solid rgba(143, 122, 216, 0.34)",
+                borderRadius: "14px",
+                padding: "15px 18px",
                 boxShadow:
-                  "0 0 10px rgba(180, 120, 200, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-                pointerEvents: "auto",
+                  "0 8px 24px rgba(20, 16, 32, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08)",
               }}
             >
-              {/* Lock icon - layout에서 제외 */}
-              <div
-                className="absolute left-6 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full"
+              <p
                 style={{
-                  background: "rgba(180, 110, 160, 0.35)",
-                  boxShadow: "inset 0 1px 2px rgba(255, 255, 255, 0.12)",
+                  color: "rgba(249, 249, 229, 0.92)",
+                  fontSize: "14px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
                 }}
               >
-                <svg
-                  className="h-5 w-5"
-                  style={{ color: "rgba(230, 170, 210, 0.8)" }}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M7 10V8a5 5 0 0 1 10 0v2" />
-                  <rect x="5" y="10" width="14" height="10" rx="2" />
-                </svg>
-              </div>
-              {/* Text는 CTA 전체 기준 중앙 */}
-              <div className="flex w-full flex-col items-center justify-center text-center">
-                <p
-                  style={{
-                    color: "rgba(245, 180, 220, 0.92)",
-                    fontSize: "16px",
-                    letterSpacing: "-0.01em",
-                    fontWeight: "600",
-                  }}
-                >
-                  이 흐름만 열기
-                </p>
-                <p
-                  style={{
-                    color: "rgba(255, 200, 230, 0.85)",
-                    fontSize: "12px",
-                    letterSpacing: "-0.01em",
-                    fontWeight: "400",
-                  }}
-                >
-                  1,900원
-                </p>
-              </div>
+                잠긴 기록 열기
+              </p>
             </button>
           </div>
         </div>
