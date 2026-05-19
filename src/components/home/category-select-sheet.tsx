@@ -94,7 +94,7 @@ const CategorySelectSheet = ({ isOpen, onClose }: CategorySelectSheetProps) => {
                   <div key={category} className="flex justify-end">
                     <button
                       onClick={() => handleCategorySelect(category)}
-                      className={`group rounded-3xl rounded-br-none border border-white/5 ${config.accentBg} px-4 py-2.5 text-left transition-all duration-200 hover:border-white/10`}
+                      className={`group rounded-2xl rounded-br-none border border-white/5 ${config.accentBg} px-4 py-2.5 text-left transition-all duration-200 hover:border-white/10`}
                     >
                       <div className="flex flex-col gap-1.5">
                         {/* 아이콘 + 카테고리 */}

@@ -5,12 +5,6 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Content, CATEGORY_LABELS } from "@/lib/types/content";
 
-const CATEGORY_CONFIG: Record<Content["category"], { glow: string }> = {
-  love: { glow: "from-pink-400/5" },
-  relationship: { glow: "from-pink-300/5" },
-  career: { glow: "from-pink-400/4" },
-  emotion: { glow: "from-pink-300/5" },
-};
 
 interface ContentIntroProps {
   content: Content;
@@ -26,7 +20,6 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
   const [resumableSessionId, setResumableSessionId] = useState<string | null>(
     null,
   );
-  const config = CATEGORY_CONFIG[content.category];
 
   useEffect(() => {
     if (isQaMode || typeof window === "undefined") return;
