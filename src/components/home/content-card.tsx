@@ -150,7 +150,10 @@ const ListCard = ({
   const config = CATEGORY_CONFIG[content.category];
 
   return (
-    <Link href={`/content/${content.slug ?? content.id}`} className="group block w-full">
+    <Link
+      href={`/content/${content.slug ?? content.id}`}
+      className="group block w-full"
+    >
       <article className="flex w-full min-h-[120px] lg:min-h-[160px] overflow-hidden rounded-[12px] border border-white/[0.05] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]">
         {/* 썸네일 — 왼쪽 패널 (카드 높이를 꽉 채움) */}
         <div className={`relative w-28 lg:w-32 shrink-0 self-stretch`}>
@@ -227,7 +230,10 @@ const TrendingCard = ({
   const config = CATEGORY_CONFIG[content.category];
 
   return (
-    <Link href={`/content/${content.slug ?? content.id}`} className="group block w-full">
+    <Link
+      href={`/content/${content.slug ?? content.id}`}
+      className="group block w-full"
+    >
       <article className="flex flex-col h-[260px] lg:h-[290px] overflow-hidden rounded-[12px] border border-white/[0.05] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]">
         {/* 이미지 — 상단 (고정 높이) */}
         <div className="relative h-[150px] lg:h-[180px] shrink-0 overflow-hidden">

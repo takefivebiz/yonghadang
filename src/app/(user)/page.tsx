@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import MiniHero from "@/components/home/mini-hero";
 import TrendingSection from "@/components/home/trending-section";
-import CategoryTabsSticky from "@/components/home/category-tabs-sticky";
+import CategoryTypeSection from "@/components/home/category-type-section";
+// import CategoryTabsSticky from "@/components/home/category-tabs-sticky";
 import ContentSection from "@/components/home/content-section";
 import CTASticky from "@/components/home/cta-sticky";
 import { fetchContents } from "@/lib/data/fetch-contents";
@@ -39,7 +40,9 @@ const TRENDING_SLUGS = ["love-1", "rel-1", "career-2", "emotion-3"];
 const HomePage = async () => {
   const allContents: PublicContent[] = await fetchContents();
 
-  const contentsByCategory = CATEGORY_ORDER.reduce<Record<Category, PublicContent[]>>(
+  const contentsByCategory = CATEGORY_ORDER.reduce<
+    Record<Category, PublicContent[]>
+  >(
     (acc, category) => {
       acc[category] = allContents.filter((c) => c.category === category);
       return acc;
@@ -61,10 +64,11 @@ const HomePage = async () => {
         {/* 트렌딩 섹션 */}
         <TrendingSection contents={trendingContents} />
 
-        {/* 카테고리 탭 — Navbar 바로 아래 고정 (스크롤 감지로 배경 동적 변경) */}
-        <CategoryTabsSticky />
+        {/* 카테고리 TYPE 섹션 */}
+        <CategoryTypeSection />
 
-        {/* 카테고리별 콘텐츠 섹션 */}
+        {/* TODO: 카테고리 탭 및 콘텐츠 섹션 — 임시 숨김 */}
+        {/* <CategoryTabsSticky /> */}
         {CATEGORY_ORDER.map((category) => (
           <ContentSection
             key={category}
