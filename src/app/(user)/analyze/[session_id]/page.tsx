@@ -99,6 +99,11 @@ const AnalyzePage = ({ params }: PageProps) => {
       // 3순위: 신규 진입
       setIsRestoring(false);
     });
+    // one-time generation guard:
+    // This restore effect must only react to the resolved route params. Adding
+    // generateScenes would re-run restoration whenever the function identity
+    // changes, risking duplicate generation or result redirects.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
   // ── Cleanup: timeout 정리 ──────────────────────────────────────

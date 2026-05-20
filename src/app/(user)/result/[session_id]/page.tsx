@@ -13,6 +13,7 @@ import { CONTENTS } from "@/lib/data/contents";
 import { CATEGORY_LABELS } from "@/lib/types/content";
 import { mergeScenes } from "@/lib/utils/merge-scenes";
 import { createPaidScenePlaceholders } from "@/lib/utils/create-paid-scene-placeholders";
+import { deriveSceneSignals } from "@/lib/signals/derive-scene-signals";
 import SceneContent from "@/components/result/scene-content";
 import FlowOverview from "@/components/result/flow-overview";
 import ProgressIndicator from "@/components/result/progress-indicator";
@@ -53,6 +54,7 @@ const ResultPage = ({ params }: PageProps) => {
   const [additionalReadings, setAdditionalReadings] = useState<
     AdditionalReading[]
   >([]);
+  const [hiddenState, setHiddenState] = useState<HiddenState>({});
   // QA mode: ?qa=1 또는 NEXT_PUBLIC_QA_MODE=true → 결제 없이 전체 씬 확인
   const [isQaMode, setIsQaMode] = useState(false);
   // Loop QA mode: ?qa=1&loop=1 → 추가루프 CTA 표시 및 직접 생성 활성화
@@ -115,6 +117,7 @@ const ResultPage = ({ params }: PageProps) => {
         const hiddenScores: HiddenState = rawHiddenState
           ? (JSON.parse(rawHiddenState) as HiddenState)
           : {};
+        setHiddenState(hiddenScores);
 
         // additionalReadings: hiddenState 기반 우선순위 정렬 후 상위 5개
         if (pack) {
@@ -1130,6 +1133,14 @@ const ResultPage = ({ params }: PageProps) => {
   const getSceneSubtitle = (sceneIndex: number): string | undefined =>
     displaySceneConfig?.scenes.find((scene) => scene.index === sceneIndex)
       ?.subtitle;
+  const getSceneSignals = (sceneIndex: number) =>
+    analyzeData
+      ? deriveSceneSignals({
+          contentId: analyzeData.content_id,
+          hiddenState,
+          sceneIndex,
+        })
+      : [];
   const activeSceneUnlocked =
     !!activeScene &&
     (activeScene.is_free || unlockedScenes.includes(activeScene.scene_index));
@@ -1389,6 +1400,7 @@ const ResultPage = ({ params }: PageProps) => {
                             sceneSubtitle={getSceneSubtitle(
                               activeScene.scene_index,
                             )}
+                            signals={getSceneSignals(activeScene.scene_index)}
                             isUnlocked={activeSceneUnlocked}
                             onUnlockScene={() =>
                               handleUnlockScene(
@@ -1422,6 +1434,7 @@ const ResultPage = ({ params }: PageProps) => {
                 scene={activeScene}
                 sceneTitle={getSceneDisplayTitle(activeScene)}
                 sceneSubtitle={getSceneSubtitle(activeScene.scene_index)}
+                signals={getSceneSignals(activeScene.scene_index)}
                 isUnlocked={activeSceneUnlocked}
                 onUnlockScene={() =>
                   handleUnlockScene(

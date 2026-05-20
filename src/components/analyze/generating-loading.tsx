@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface GeneratingLoadingProps {
   progress: number;
 }
@@ -60,9 +62,11 @@ const GeneratingLoading = ({ progress }: GeneratingLoadingProps) => {
                   "radial-gradient(circle, rgba(214, 150, 84, 0.22) 0%, rgba(214, 150, 84, 0.08) 50%, transparent 74%)",
               }}
             />
-            <img
+            <Image
               src="/img/cat2.png"
               alt=""
+              width={80}
+              height={80}
               className="relative z-10 h-20 w-20 object-contain opacity-85"
             />
           </div>

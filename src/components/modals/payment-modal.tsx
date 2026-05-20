@@ -176,7 +176,7 @@ const PaymentModal = ({
       const methodsEl = document.getElementById("payment-methods");
       if (methodsEl) methodsEl.innerHTML = "";
     };
-  }, [isOpen, step, clientKey, amount, isLoggedIn]);
+  }, [isOpen, step, clientKey, amount, isLoggedIn, paymentType, loopType]);
 
   const handlePayment = async () => {
     if (!widgetRef.current) {

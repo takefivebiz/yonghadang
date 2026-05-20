@@ -10,6 +10,7 @@ interface SceneContentProps {
   scene: ResultScene;
   sceneTitle?: string;
   sceneSubtitle?: string;
+  signals?: SceneSignal[];
   isUnlocked: boolean;
   onUnlockScene: () => void;
   isFirst?: boolean;
@@ -90,7 +91,7 @@ const renderMessage = (msg: SceneMessage, idx: number) => {
   }
 };
 
-const scene01Signals: SceneSignal[] = [
+const fallbackScene01Signals: SceneSignal[] = [
   {
     id: "scene01-anxiety",
     sceneIndex: 1,
@@ -117,11 +118,14 @@ const scene01Signals: SceneSignal[] = [
   },
 ];
 
-const EmotionEvidenceBlock = () => {
+const EmotionEvidenceBlock = ({ signals }: { signals?: SceneSignal[] }) => {
+  const signalsToRender =
+    signals && signals.length > 0 ? signals : fallbackScene01Signals;
+
   return (
     <SignalVisualization
       title="강하게 관찰된 감정 신호"
-      signals={scene01Signals}
+      signals={signalsToRender}
     />
   );
 };
@@ -129,9 +133,11 @@ const EmotionEvidenceBlock = () => {
 const ReceiptReport = ({
   openingMessages,
   bodyMessages,
+  signals,
 }: {
   openingMessages: SceneMessage[];
   bodyMessages: SceneMessage[];
+  signals?: SceneSignal[];
 }) => {
   const punch = openingMessages.find((msg) => msg.type === "punch");
   const reportMessages = [
@@ -196,7 +202,7 @@ const ReceiptReport = ({
         </div>
       )}
 
-      <EmotionEvidenceBlock />
+      <EmotionEvidenceBlock signals={signals} />
 
           {reportMessages.length > 0 && (
         <div className="space-y-2.5">
@@ -234,6 +240,7 @@ const SceneContent = ({
   scene,
   sceneTitle,
   sceneSubtitle,
+  signals,
   isUnlocked,
   onUnlockScene,
   isFirst,
@@ -389,6 +396,7 @@ const SceneContent = ({
             <ReceiptReport
               openingMessages={openingMessages}
               bodyMessages={bodyMessages}
+              signals={signals}
             />
           ) : (
             <>
