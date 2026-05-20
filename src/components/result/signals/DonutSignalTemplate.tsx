@@ -39,7 +39,7 @@ const DonutSignalTemplate = ({ signals }: DonutSignalTemplateProps) => {
                 {signal.summaryLabel && (
                   <div className="absolute inset-0 flex items-center justify-center px-2 text-center">
                     <span
-                      className="text-[9px] font-medium leading-[1.15]"
+                      className="text-[9px] lg:text-[11px] font-medium leading-[1.15]"
                       style={{ color: "rgba(249, 249, 229, 0.62)" }}
                     >
                       {signal.summaryLabel}
@@ -51,7 +51,7 @@ const DonutSignalTemplate = ({ signals }: DonutSignalTemplateProps) => {
               <div className="mt-2 min-w-0 max-w-full">
                 <div className="flex items-center justify-center gap-1">
                   <p
-                    className="truncate text-[10px]"
+                    className="truncate text-[10px] lg:text-[12px]"
                     style={{ color: "rgba(249, 249, 229, 0.64)" }}
                   >
                     {dominantState.label}
@@ -60,7 +60,7 @@ const DonutSignalTemplate = ({ signals }: DonutSignalTemplateProps) => {
                     ↔
                   </span>
                   <p
-                    className="truncate text-[10px]"
+                    className="truncate text-[10px] lg:text-[12px]"
                     style={{ color: "rgba(249, 249, 229, 0.34)" }}
                   >
                     {recessiveState.label}

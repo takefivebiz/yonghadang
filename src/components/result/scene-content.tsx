@@ -144,7 +144,7 @@ const ReceiptReport = ({
       {punch && (
         <div className="mb-7">
           <p
-            className="mb-2 inline-flex rounded-full px-2 py-0.5 text-[9px] font-medium tracking-[0.12em]"
+            className="mb-2 inline-flex rounded-full px-2 py-0.5 text-[9px] lg:text-[12px] font-medium tracking-[0.12em]"
             style={{
               background: "rgba(143, 122, 216, 0.08)",
               color: "rgba(143, 122, 216, 0.62)",
@@ -160,7 +160,7 @@ const ReceiptReport = ({
             }}
           >
             <p
-              className="mx-auto max-w-[90%] text-center font-punch text-[16px] leading-[1.3]"
+              className="mx-auto max-w-[90%] text-center font-punch text-[16px] lg:text-[19px] leading-[1.3]"
               style={{
                 color: "rgba(143, 122, 216, 0.88)",
                 letterSpacing: "0",
@@ -171,7 +171,7 @@ const ReceiptReport = ({
             </p>
             <div className="mt-3 flex items-center justify-end gap-1.5">
               <span
-                className="text-[9px] tracking-[0.08em]"
+                className="text-[9px] lg:text-[12px] tracking-[0.08em]"
                 style={{ color: "rgba(249, 249, 229, 0.34)" }}
               >
                 - 심리탐정 베일
@@ -198,7 +198,7 @@ const ReceiptReport = ({
 
       <EmotionEvidenceBlock />
 
-      {reportMessages.length > 0 && (
+          {reportMessages.length > 0 && (
         <div className="space-y-2.5">
           {reportMessages.map((msg, index) => {
             const isLongRecord =
@@ -211,7 +211,7 @@ const ReceiptReport = ({
                   style={{ background: "rgba(143, 122, 216, 0.52)" }}
                 />
                 <p
-                  className={`whitespace-pre-line text-[13px] ${
+                  className={`whitespace-pre-line text-[13px] lg:text-[16px] ${
                     isLongRecord ? "leading-[1.68]" : "leading-[1.92]"
                   }`}
                   style={{
@@ -322,9 +322,9 @@ const SceneContent = ({
                     {sceneTitle ?? scene.scene_title}
                   </p>
                 </div>
-              ) : (
+                ) : (
                 <p
-                  className="text-[10px] font-light tracking-widest"
+                  className="text-[10px] lg:text-[12px] font-light tracking-widest"
                   style={{
                     color: "rgba(143, 122, 216, 0.52)",
                     letterSpacing: "0.08em",
@@ -339,7 +339,7 @@ const SceneContent = ({
               <div
                 className={
                   isReceiptVariant
-                    ? "rounded-full px-1.5 py-0.5 text-[9px] font-medium tracking-wide"
+                    ? "rounded-full px-1.5 py-0.5 text-[9px] lg:text-[11px] font-medium tracking-wide"
                     : "px-2 py-0.5 rounded-md text-[9px] font-medium tracking-wide uppercase"
                 }
                 style={{
@@ -355,7 +355,7 @@ const SceneContent = ({
           <h2
             className={
               isReceiptVariant
-                ? "break-keep text-[14px] font-normal leading-[1.28] whitespace-normal"
+                ? "break-keep text-[14px] lg:text-[16px] font-normal leading-[1.28] whitespace-normal"
                 : sceneSubtitle
                   ? "text-xl font-normal leading-relaxed whitespace-pre-line"
                   : "text-lg font-normal leading-relaxed whitespace-pre-line"
@@ -440,13 +440,13 @@ const SceneContent = ({
               </svg>
             </div>
             <p
-              className="text-xs font-medium tracking-wide"
+              className="text-xs lg:text-[15px] font-medium tracking-wide"
               style={{ color: "rgba(143, 122, 216, 0.72)" }}
             >
               잠긴 기록
             </p>
             <p
-              className="mx-auto mt-3 max-w-[260px] text-sm leading-relaxed"
+              className="mx-auto mt-3 max-w-[260px] text-sm lg:text-[16px] leading-relaxed"
               style={{ color: "rgba(249, 249, 229, 0.58)" }}
             >
               이 기록은 아직 잠겨 있어.
@@ -469,9 +469,11 @@ const SceneContent = ({
                 style={{
                   color: "rgba(249, 249, 229, 0.92)",
                   fontSize: "14px",
+                  lineHeight: "1.3",
                   letterSpacing: "-0.01em",
                   fontWeight: "600",
                 }}
+                className="lg:text-[17px]"
               >
                 잠긴 기록 열기
               </p>

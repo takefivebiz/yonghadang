@@ -1313,14 +1313,14 @@ const ResultPage = ({ params }: PageProps) => {
                   {currentSceneIndex === 0 && (
                     <>
                       <div
-                        className="rounded-b-[18px] rounded-tr-[18px] px-3 py-2.5"
+                        className="rounded-b-[18px] rounded-tr-[18px] px-3 py-2.5 lg:px-5 lg:py-4"
                         style={{
                           background: "rgba(60, 45, 65, 0.3)",
                           border: "1px solid rgba(143, 122, 216, 0.22)",
                         }}
                       >
-                        <div className="px-3 py-1.5">
-                          <div className="mb-2 flex items-center justify-between">
+                        <div className="px-3 py-1.5 lg:px-5 lg:py-3">
+                          <div className="mb-2 flex items-center justify-between lg:mb-3">
                             <div className="flex items-center gap-1.5">
                               <span
                                 className="flex h-3.5 w-3.5 items-center justify-center"
@@ -1329,7 +1329,7 @@ const ResultPage = ({ params }: PageProps) => {
                                 <ClipboardList size={11} strokeWidth={1.7} />
                               </span>
                               <p
-                                className="text-[10px] tracking-[0.12em]"
+                                className="text-[10px] lg:text-[13px] tracking-[0.12em]"
                                 style={{ color: "rgba(143, 122, 216, 0.68)" }}
                               >
                                 선택한 의뢰
@@ -1337,9 +1337,9 @@ const ResultPage = ({ params }: PageProps) => {
                             </div>
                           </div>
 
-                          <div className="flex gap-3">
+                          <div className="flex gap-3 lg:gap-5">
                             {content.thumbnail_url && (
-                              <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-[8px] bg-white/[0.025] opacity-85">
+                              <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-[8px] bg-white/[0.025] opacity-85 lg:h-16 lg:w-16">
                                 <Image
                                   src={content.thumbnail_url}
                                   alt={content.title}
@@ -1352,13 +1352,13 @@ const ResultPage = ({ params }: PageProps) => {
 
                             <div className="flex min-w-0 flex-1 flex-col justify-center">
                               <h1
-                                className="text-[13px] font-normal leading-snug"
+                                className="text-[13px] lg:text-[16px] font-normal leading-snug"
                                 style={{ color: "rgba(249,249,229,0.76)" }}
                               >
                                 {content.title}
                               </h1>
                               <p
-                                className="mt-0.5 text-[11px] leading-snug"
+                                className="mt-0.5 text-[11px] lg:text-[14px] leading-snug"
                                 style={{ color: "rgba(249,249,229,0.36)" }}
                               >
                                 {content.subtitle}
