@@ -1410,7 +1410,7 @@ const ResultPage = ({ params }: PageProps) => {
                             }
                             isFirst
                             isCurrent
-                            variant="receipt"
+                            variant="report"
                           />
                         </div>
                       )}
@@ -1429,6 +1429,11 @@ const ResultPage = ({ params }: PageProps) => {
                   sceneRefsMap.current[currentSceneIndex] = el;
                 }
               }}
+              className="mx-5 mb-2 rounded-b-[18px] rounded-tr-[18px]"
+              style={{
+                background: "rgba(60, 45, 65, 0.3)",
+                border: "1px solid rgba(143, 122, 216, 0.22)",
+              }}
             >
               <SceneContent
                 scene={activeScene}
@@ -1444,7 +1449,7 @@ const ResultPage = ({ params }: PageProps) => {
                 }
                 isFirst={currentSceneIndex === 0}
                 isCurrent
-                variant={currentSceneIndex === 0 ? "receipt" : "default"}
+                variant={activeScene.scene_index <= 2 ? "report" : "default"}
               />
             </div>
           )}

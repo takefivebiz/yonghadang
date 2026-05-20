@@ -15,7 +15,7 @@ interface SceneContentProps {
   onUnlockScene: () => void;
   isFirst?: boolean;
   isCurrent?: boolean;
-  variant?: "default" | "receipt";
+  variant?: "default" | "report";
 }
 
 // AI 메시지 블록
@@ -118,23 +118,129 @@ const fallbackScene01Signals: SceneSignal[] = [
   },
 ];
 
-const EmotionEvidenceBlock = ({ signals }: { signals?: SceneSignal[] }) => {
+const SceneSignalSection = ({
+  sceneIndex,
+  signals,
+}: {
+  sceneIndex: number;
+  signals?: SceneSignal[];
+}) => {
   const signalsToRender =
-    signals && signals.length > 0 ? signals : fallbackScene01Signals;
+    signals && signals.length > 0
+      ? signals
+      : sceneIndex === 1
+        ? fallbackScene01Signals
+        : [];
+  const title = signalsToRender[0]?.title ?? "강하게 관찰된 감정 신호";
+
+  if (signalsToRender.length === 0) return null;
 
   return (
     <SignalVisualization
-      title="강하게 관찰된 감정 신호"
+      title={title}
       signals={signalsToRender}
     />
   );
 };
 
-const ReceiptReport = ({
+const ScenePunchBlock = ({ punch }: { punch?: SceneMessage }) => {
+  if (!punch) return null;
+
+  return (
+    <div className="mb-7">
+      <p
+        className="mb-2 inline-flex rounded-full px-2 py-0.5 text-[9px] lg:text-[12px] font-medium tracking-[0.12em]"
+        style={{
+          background: "rgba(143, 122, 216, 0.08)",
+          color: "rgba(143, 122, 216, 0.62)",
+        }}
+      >
+        핵심 징후
+      </p>
+      <div
+        className="overflow-hidden rounded-[12px] px-3.5 py-3.5"
+        style={{
+          background: "rgba(255, 255, 255, 0.012)",
+          border: "1px solid rgba(143, 122, 216, 0.065)",
+        }}
+      >
+        <p
+          className="mx-auto max-w-[90%] text-center font-punch text-[16px] lg:text-[19px] leading-[1.3]"
+          style={{
+            color: "rgba(143, 122, 216, 0.88)",
+            letterSpacing: "0",
+            fontWeight: 500,
+          }}
+        >
+          “{punch.text}”
+        </p>
+        <div className="mt-3 flex items-center justify-end gap-1.5">
+          <span
+            className="text-[9px] lg:text-[12px] tracking-[0.08em]"
+            style={{ color: "rgba(249, 249, 229, 0.34)" }}
+          >
+            - 심리탐정 베일
+          </span>
+          <div
+            className="relative h-6 w-6 overflow-hidden rounded-full"
+            style={{
+              background: "rgba(143, 122, 216, 0.08)",
+              border: "1px solid rgba(143, 122, 216, 0.10)",
+            }}
+          >
+            <Image
+              src="/img/cat_face.png"
+              alt=""
+              fill
+              sizes="24px"
+              className="object-cover object-center opacity-75"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SceneLogList = ({ messages }: { messages: SceneMessage[] }) => {
+  if (messages.length === 0) return null;
+
+  return (
+    <div className="space-y-4">
+      {messages.map((msg, index) => {
+        const isLongRecord = msg.text.length > 42 || msg.text.includes("\n");
+
+        return (
+          <div key={index} className="flex gap-2">
+            <span
+              className="mt-[0.62em] h-1 w-1 flex-shrink-0 rounded-full"
+              style={{ background: "rgba(143, 122, 216, 0.52)" }}
+            />
+            <p
+              className={`whitespace-pre-line text-[14px] lg:text-[17px] ${
+                isLongRecord ? "leading-[1.68]" : "leading-[1.92]"
+              }`}
+              style={{
+                color: "rgba(249, 249, 229, 0.76)",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {msg.text}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const SceneReportLayout = ({
+  sceneIndex,
   openingMessages,
   bodyMessages,
   signals,
 }: {
+  sceneIndex: number;
   openingMessages: SceneMessage[];
   bodyMessages: SceneMessage[];
   signals?: SceneSignal[];
@@ -146,92 +252,108 @@ const ReceiptReport = ({
   ];
 
   return (
-    <div data-testid="scene-receipt-report" className="px-0 py-0">
-      {punch && (
-        <div className="mb-7">
-          <p
-            className="mb-2 inline-flex rounded-full px-2 py-0.5 text-[9px] lg:text-[12px] font-medium tracking-[0.12em]"
-            style={{
-              background: "rgba(143, 122, 216, 0.08)",
-              color: "rgba(143, 122, 216, 0.62)",
-            }}
-          >
-            핵심 징후
-          </p>
-          <div
-            className="overflow-hidden rounded-[12px] px-3.5 py-3.5"
-            style={{
-              background: "rgba(255, 255, 255, 0.012)",
-              border: "1px solid rgba(143, 122, 216, 0.065)",
-            }}
-          >
-            <p
-              className="mx-auto max-w-[90%] text-center font-punch text-[16px] lg:text-[19px] leading-[1.3]"
-              style={{
-                color: "rgba(143, 122, 216, 0.88)",
-                letterSpacing: "0",
-                fontWeight: 500,
-              }}
-            >
-              “{punch.text}”
-            </p>
-            <div className="mt-3 flex items-center justify-end gap-1.5">
-              <span
-                className="text-[9px] lg:text-[12px] tracking-[0.08em]"
-                style={{ color: "rgba(249, 249, 229, 0.34)" }}
-              >
-                - 심리탐정 베일
-              </span>
-              <div
-                className="relative h-6 w-6 overflow-hidden rounded-full"
-                style={{
-                  background: "rgba(143, 122, 216, 0.08)",
-                  border: "1px solid rgba(143, 122, 216, 0.10)",
-                }}
-              >
-                <Image
-                  src="/img/cat_face.png"
-                  alt=""
-                  fill
-                  sizes="24px"
-                  className="object-cover object-center opacity-75"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+    <div data-testid="scene-report-layout" className="px-0 py-0">
+      <ScenePunchBlock punch={punch} />
+      <SceneSignalSection sceneIndex={sceneIndex} signals={signals} />
+      <SceneLogList messages={reportMessages} />
+    </div>
+  );
+};
+
+const SceneHeader = ({
+  scene,
+  sceneTitle,
+  sceneSubtitle,
+  isFirst,
+  isReportVariant,
+}: {
+  scene: ResultScene;
+  sceneTitle?: string;
+  sceneSubtitle?: string;
+  isFirst?: boolean;
+  isReportVariant: boolean;
+}) => {
+  return (
+    <div className={`${isReportVariant ? "mb-5" : "mb-8"} flex gap-3`}>
+      {!isReportVariant && (
+        <div
+          className="w-px flex-shrink-0 self-start"
+          style={{
+            background: "rgba(143, 122, 216, 0.34)",
+            minHeight: "80px",
+          }}
+        />
       )}
 
-      <EmotionEvidenceBlock signals={signals} />
-
-          {reportMessages.length > 0 && (
-        <div className="space-y-2.5">
-          {reportMessages.map((msg, index) => {
-            const isLongRecord =
-              msg.text.length > 42 || msg.text.includes("\n");
-
-            return (
-              <div key={index} className="flex gap-2">
-                <span
-                  className="mt-[0.62em] h-1 w-1 flex-shrink-0 rounded-full"
-                  style={{ background: "rgba(143, 122, 216, 0.52)" }}
-                />
+      <div className={isReportVariant ? "flex-1 text-center" : "flex-1"}>
+        <div
+          className={
+            isReportVariant
+              ? "mb-2 flex items-center justify-center gap-2"
+              : "flex items-center gap-2 mb-2"
+          }
+        >
+          {(!isFirst || scene.is_free) &&
+            (isReportVariant ? (
+              <div>
                 <p
-                  className={`whitespace-pre-line text-[13px] lg:text-[16px] ${
-                    isLongRecord ? "leading-[1.68]" : "leading-[1.92]"
-                  }`}
-                  style={{
-                    color: "rgba(249, 249, 229, 0.76)",
-                    letterSpacing: "-0.01em",
-                  }}
+                  className="mt-1 text-[11px] font-medium tracking-[0.12em]"
+                  style={{ color: "rgba(143, 122, 216, 0.62)" }}
                 >
-                  {msg.text}
+                  FILE {String(scene.scene_index).padStart(2, "0")} •{" "}
+                  {sceneTitle ?? scene.scene_title}
                 </p>
               </div>
-            );
-          })}
+            ) : (
+              <p
+                className="text-[10px] lg:text-[12px] font-light tracking-widest"
+                style={{
+                  color: "rgba(143, 122, 216, 0.52)",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                {String(scene.scene_index).padStart(2, "0")}
+                {sceneSubtitle && ` ${sceneTitle ?? scene.scene_title}`}
+              </p>
+            ))}
+
+          {scene.is_free && scene.scene_index !== 2 && (
+            <div
+              className={
+                isReportVariant
+                  ? "rounded-full px-1.5 py-0.5 text-[9px] lg:text-[11px] font-medium tracking-wide"
+                  : "px-2 py-0.5 rounded-md text-[9px] font-medium tracking-wide uppercase"
+              }
+              style={{
+                background: "rgba(143, 122, 216, 0.08)",
+                color: "rgba(143, 122, 216, 0.55)",
+              }}
+            >
+              무료
+            </div>
+          )}
         </div>
-      )}
+
+        <h2
+          className={
+            isReportVariant
+              ? "break-keep text-[14px] lg:text-[16px] font-normal leading-[1.28] whitespace-normal"
+              : sceneSubtitle
+                ? "text-xl font-normal leading-relaxed whitespace-pre-line"
+                : "text-lg font-normal leading-relaxed whitespace-pre-line"
+          }
+          style={{
+            color: isReportVariant
+              ? "rgba(249, 249, 229, 0.58)"
+              : sceneSubtitle
+                ? "rgba(249, 249, 229, 0.84)"
+                : "rgba(249, 249, 229, 0.80)",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {sceneSubtitle ?? sceneTitle ?? scene.scene_title}
+        </h2>
+      </div>
     </div>
   );
 };
@@ -284,102 +406,27 @@ const SceneContent = ({
   const bodyMessages = messages.slice(1);
   // punch가 첫 메시지(subtitle 위치)면 title과의 간격을 좁힘
   const hasLeadingPunch = openingMessages[0]?.type === "punch";
-  const isReceiptVariant = variant === "receipt" && scene.scene_index === 1;
+  const isReportVariant = variant === "report";
 
   return (
     <div
-      className={`${isReceiptVariant ? "px-2.5 py-3" : "px-6 py-8"} transition-opacity duration-500`}
+      className={`${isReportVariant ? "px-2.5 pb-6 pt-5" : "px-6 py-8"} transition-opacity duration-500`}
       style={{
-        borderTop: isFirst ? "none" : "1px solid rgba(255, 255, 255, 0.03)",
+        borderTop:
+          isFirst || isReportVariant
+            ? "none"
+            : "1px solid rgba(255, 255, 255, 0.03)",
         opacity: isCurrent ? 1 : 0.5, // Scene dim 처리
         transitionTimingFunction: "ease-out",
       }}
     >
-      {/* Scene 제목 및 상태 */}
-      <div className={`${isReceiptVariant ? "mb-5" : "mb-8"} flex gap-3`}>
-        {/* Subtle vertical marker */}
-        {!isReceiptVariant && (
-          <div
-            className="w-px flex-shrink-0 self-start"
-            style={{
-              background: "rgba(143, 122, 216, 0.34)",
-              minHeight: "80px",
-            }}
-          />
-        )}
-
-        {/* Scene header content */}
-        <div className={isReceiptVariant ? "flex-1 text-center" : "flex-1"}>
-          {/* Scene marker + 무료 배지 (같은 라인) */}
-          <div
-            className={
-              isReceiptVariant
-                ? "mb-2 flex items-center justify-center gap-2"
-                : "flex items-center gap-2 mb-2"
-            }
-          >
-            {(!isFirst || scene.is_free) &&
-              (isReceiptVariant ? (
-                <div>
-                  <p
-                    className="mt-1 text-[11px] font-medium tracking-[0.12em]"
-                    style={{ color: "rgba(143, 122, 216, 0.62)" }}
-                  >
-                    FILE {String(scene.scene_index).padStart(2, "0")} •{" "}
-                    {sceneTitle ?? scene.scene_title}
-                  </p>
-                </div>
-                ) : (
-                <p
-                  className="text-[10px] lg:text-[12px] font-light tracking-widest"
-                  style={{
-                    color: "rgba(143, 122, 216, 0.52)",
-                    letterSpacing: "0.08em",
-                  }}
-                >
-                  {String(scene.scene_index).padStart(2, "0")}
-                  {sceneSubtitle && ` ${sceneTitle ?? scene.scene_title}`}
-                </p>
-              ))}
-
-            {scene.is_free && scene.scene_index !== 2 && (
-              <div
-                className={
-                  isReceiptVariant
-                    ? "rounded-full px-1.5 py-0.5 text-[9px] lg:text-[11px] font-medium tracking-wide"
-                    : "px-2 py-0.5 rounded-md text-[9px] font-medium tracking-wide uppercase"
-                }
-                style={{
-                  background: "rgba(143, 122, 216, 0.08)",
-                  color: "rgba(143, 122, 216, 0.55)",
-                }}
-              >
-                무료
-              </div>
-            )}
-          </div>
-
-          <h2
-            className={
-              isReceiptVariant
-                ? "break-keep text-[14px] lg:text-[16px] font-normal leading-[1.28] whitespace-normal"
-                : sceneSubtitle
-                  ? "text-xl font-normal leading-relaxed whitespace-pre-line"
-                  : "text-lg font-normal leading-relaxed whitespace-pre-line"
-            }
-            style={{
-              color: isReceiptVariant
-                ? "rgba(249, 249, 229, 0.58)"
-                : sceneSubtitle
-                  ? "rgba(249, 249, 229, 0.84)"
-                  : "rgba(249, 249, 229, 0.80)",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            {sceneSubtitle ?? sceneTitle ?? scene.scene_title}
-          </h2>
-        </div>
-      </div>
+      <SceneHeader
+        scene={scene}
+        sceneTitle={sceneTitle}
+        sceneSubtitle={sceneSubtitle}
+        isFirst={isFirst}
+        isReportVariant={isReportVariant}
+      />
 
       {/* Scene 콘텐츠 */}
       {!isLocked ? (
@@ -387,13 +434,14 @@ const SceneContent = ({
         <div
           data-testid="scene-messages"
           className={
-            isReceiptVariant
+            isReportVariant
               ? "space-y-1"
               : `space-y-1 ${hasLeadingPunch ? "mt-3" : "mt-6"}`
           }
         >
-          {isReceiptVariant ? (
-            <ReceiptReport
+          {isReportVariant ? (
+            <SceneReportLayout
+              sceneIndex={scene.scene_index}
               openingMessages={openingMessages}
               bodyMessages={bodyMessages}
               signals={signals}

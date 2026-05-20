@@ -1,6 +1,7 @@
 export type SignalTemplateType =
   | "donut"
   | "pulse_timeline"
+  | "editorial_infographic"
   | "balance_meter"
   | "stacked_accumulation"
   | "threshold_gauge"

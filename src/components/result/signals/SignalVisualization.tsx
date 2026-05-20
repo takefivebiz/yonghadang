@@ -1,5 +1,7 @@
 import type { SceneSignal } from "@/lib/types/scene-signal";
 import DonutSignalTemplate from "./DonutSignalTemplate";
+import EditorialInfographicSignalTemplate from "./EditorialInfographicSignalTemplate";
+import PulseTimelineSignalTemplate from "./PulseTimelineSignalTemplate";
 
 type SignalVisualizationProps = {
   title: string;
@@ -8,8 +10,20 @@ type SignalVisualizationProps = {
 
 const SignalVisualization = ({ title, signals }: SignalVisualizationProps) => {
   const donutSignals = signals.filter((signal) => signal.template === "donut");
+  const pulseTimelineSignals = signals.filter(
+    (signal) => signal.template === "pulse_timeline",
+  );
+  const editorialInfographicSignals = signals.filter(
+    (signal) => signal.template === "editorial_infographic",
+  );
 
-  if (donutSignals.length === 0) return null;
+  if (
+    donutSignals.length === 0 &&
+    pulseTimelineSignals.length === 0 &&
+    editorialInfographicSignals.length === 0
+  ) {
+    return null;
+  }
 
   return (
     <div className="mb-7">
@@ -23,7 +37,19 @@ const SignalVisualization = ({ title, signals }: SignalVisualizationProps) => {
         {title}
       </p>
 
-      <DonutSignalTemplate signals={donutSignals} />
+      <div className="space-y-3">
+        {donutSignals.length > 0 && (
+          <DonutSignalTemplate signals={donutSignals} />
+        )}
+        {pulseTimelineSignals.length > 0 && (
+          <PulseTimelineSignalTemplate signals={pulseTimelineSignals} />
+        )}
+        {editorialInfographicSignals.length > 0 && (
+          <EditorialInfographicSignalTemplate
+            signals={editorialInfographicSignals}
+          />
+        )}
+      </div>
     </div>
   );
 };
