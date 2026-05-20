@@ -59,6 +59,8 @@ export interface SceneConfigItem {
   index: number;
   /** 프론트에 노출되는 scene 제목 */
   title: string;
+  /** scene 제목을 보조하는 짧은 설명 */
+  subtitle?: string;
   /** Claude가 이해할 내부 역할 (예: "state_definition", "pattern_recognition") */
   role: string;
   /** 이 scene이 반드시 밝혀야 하는 목적 */

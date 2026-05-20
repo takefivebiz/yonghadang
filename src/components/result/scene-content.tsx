@@ -1,14 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import { ResultScene, SceneMessage } from "@/lib/types/result";
 import { useEffect, useRef, useState } from "react";
+import type { SceneSignal } from "@/lib/types/scene-signal";
+import SignalVisualization from "@/components/result/signals/SignalVisualization";
 
 interface SceneContentProps {
   scene: ResultScene;
+  sceneTitle?: string;
+  sceneSubtitle?: string;
   isUnlocked: boolean;
   onUnlockScene: () => void;
   isFirst?: boolean;
   isCurrent?: boolean;
+  variant?: "default" | "receipt";
 }
 
 // AI 메시지 블록
@@ -58,7 +64,7 @@ const PunchBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
   return (
     <div className={`${verticalMargin} px-4 text-left`}>
       <p
-        className="font-punch whitespace-pre-line"
+        className="font-punch"
         style={{
           /* 충분한 가독성과 배경과의 조화 */
           color: "rgba(143, 122, 216, 0.76)",
@@ -69,7 +75,7 @@ const PunchBlock = ({ text, index = 0 }: { text: string; index?: number }) => {
           fontStyle: "italic",
         }}
       >
-        {text}
+        “{text}”
       </p>
     </div>
   );
@@ -84,12 +90,155 @@ const renderMessage = (msg: SceneMessage, idx: number) => {
   }
 };
 
+const scene01Signals: SceneSignal[] = [
+  {
+    id: "scene01-anxiety",
+    sceneIndex: 1,
+    title: "강하게 관찰된 감정 신호",
+    template: "donut",
+    archetype: "anxiety_vs_stability",
+    states: [
+      { label: "불안 반응", intensity: 0.82 },
+      { label: "안정감 기대", intensity: 0.18 },
+    ],
+    summaryLabel: "불안 우세",
+  },
+  {
+    id: "scene01-expression",
+    sceneIndex: 1,
+    title: "강하게 관찰된 감정 신호",
+    template: "donut",
+    archetype: "urge_vs_suppression",
+    states: [
+      { label: "질문 충동", intensity: 0.88 },
+      { label: "실제 표현", intensity: 0.12 },
+    ],
+    summaryLabel: "표현 억제",
+  },
+];
+
+const EmotionEvidenceBlock = () => {
+  return (
+    <SignalVisualization
+      title="강하게 관찰된 감정 신호"
+      signals={scene01Signals}
+    />
+  );
+};
+
+const ReceiptReport = ({
+  openingMessages,
+  bodyMessages,
+}: {
+  openingMessages: SceneMessage[];
+  bodyMessages: SceneMessage[];
+}) => {
+  const punch = openingMessages.find((msg) => msg.type === "punch");
+  const reportMessages = [
+    ...openingMessages.filter((msg) => msg.type === "ai"),
+    ...bodyMessages.filter((msg) => msg.type === "ai"),
+  ];
+
+  return (
+    <div data-testid="scene-receipt-report" className="px-0 py-0">
+      {punch && (
+        <div className="mb-7">
+          <p
+            className="mb-2 inline-flex rounded-full px-2 py-0.5 text-[9px] font-medium tracking-[0.12em]"
+            style={{
+              background: "rgba(143, 122, 216, 0.08)",
+              color: "rgba(143, 122, 216, 0.62)",
+            }}
+          >
+            핵심 징후
+          </p>
+          <div
+            className="overflow-hidden rounded-[12px] px-3.5 py-3.5"
+            style={{
+              background: "rgba(255, 255, 255, 0.012)",
+              border: "1px solid rgba(143, 122, 216, 0.065)",
+            }}
+          >
+            <p
+              className="mx-auto max-w-[90%] text-center font-punch text-[16px] leading-[1.3]"
+              style={{
+                color: "rgba(143, 122, 216, 0.88)",
+                letterSpacing: "0",
+                fontWeight: 500,
+              }}
+            >
+              “{punch.text}”
+            </p>
+            <div className="mt-3 flex items-center justify-end gap-1.5">
+              <span
+                className="text-[9px] tracking-[0.08em]"
+                style={{ color: "rgba(249, 249, 229, 0.34)" }}
+              >
+                - 심리탐정 베일
+              </span>
+              <div
+                className="relative h-6 w-6 overflow-hidden rounded-full"
+                style={{
+                  background: "rgba(143, 122, 216, 0.08)",
+                  border: "1px solid rgba(143, 122, 216, 0.10)",
+                }}
+              >
+                <Image
+                  src="/img/cat_face.png"
+                  alt=""
+                  fill
+                  sizes="24px"
+                  className="object-cover object-center opacity-75"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <EmotionEvidenceBlock />
+
+      {reportMessages.length > 0 && (
+        <div className="space-y-2.5">
+          {reportMessages.map((msg, index) => {
+            const isLongRecord =
+              msg.text.length > 42 || msg.text.includes("\n");
+
+            return (
+              <div key={index} className="flex gap-2">
+                <span
+                  className="mt-[0.62em] h-1 w-1 flex-shrink-0 rounded-full"
+                  style={{ background: "rgba(143, 122, 216, 0.52)" }}
+                />
+                <p
+                  className={`whitespace-pre-line text-[13px] ${
+                    isLongRecord ? "leading-[1.68]" : "leading-[1.92]"
+                  }`}
+                  style={{
+                    color: "rgba(249, 249, 229, 0.76)",
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  {msg.text}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const SceneContent = ({
   scene,
+  sceneTitle,
+  sceneSubtitle,
   isUnlocked,
   onUnlockScene,
   isFirst,
   isCurrent = false,
+  variant = "default",
 }: SceneContentProps) => {
   const isLocked = !scene.is_free && !isUnlocked;
 
@@ -128,10 +277,11 @@ const SceneContent = ({
   const bodyMessages = messages.slice(1);
   // punch가 첫 메시지(subtitle 위치)면 title과의 간격을 좁힘
   const hasLeadingPunch = openingMessages[0]?.type === "punch";
+  const isReceiptVariant = variant === "receipt" && scene.scene_index === 1;
 
   return (
     <div
-      className="px-6 py-8 transition-opacity duration-500"
+      className={`${isReceiptVariant ? "px-2.5 py-3" : "px-6 py-8"} transition-opacity duration-500`}
       style={{
         borderTop: isFirst ? "none" : "1px solid rgba(255, 255, 255, 0.03)",
         opacity: isCurrent ? 1 : 0.5, // Scene dim 처리
@@ -139,35 +289,59 @@ const SceneContent = ({
       }}
     >
       {/* Scene 제목 및 상태 */}
-      <div className="mb-8 flex gap-3">
+      <div className={`${isReceiptVariant ? "mb-5" : "mb-8"} flex gap-3`}>
         {/* Subtle vertical marker */}
-        <div
-          className="w-px flex-shrink-0 self-start"
-          style={{
-            background: "rgba(143, 122, 216, 0.34)",
-            minHeight: "80px",
-          }}
-        />
+        {!isReceiptVariant && (
+          <div
+            className="w-px flex-shrink-0 self-start"
+            style={{
+              background: "rgba(143, 122, 216, 0.34)",
+              minHeight: "80px",
+            }}
+          />
+        )}
 
         {/* Scene header content */}
-        <div className="flex-1">
+        <div className={isReceiptVariant ? "flex-1 text-center" : "flex-1"}>
           {/* Scene marker + 무료 배지 (같은 라인) */}
-          <div className="flex items-center gap-2 mb-2">
-            {(!isFirst || scene.is_free) && (
-              <p
-                className="text-[10px] font-light tracking-widest"
-                style={{
-                  color: "rgba(143, 122, 216, 0.52)",
-                  letterSpacing: "0.08em",
-                }}
-              >
-                {String(scene.scene_index).padStart(2, "0")}
-              </p>
-            )}
+          <div
+            className={
+              isReceiptVariant
+                ? "mb-2 flex items-center justify-center gap-2"
+                : "flex items-center gap-2 mb-2"
+            }
+          >
+            {(!isFirst || scene.is_free) &&
+              (isReceiptVariant ? (
+                <div>
+                  <p
+                    className="mt-1 text-[11px] font-medium tracking-[0.12em]"
+                    style={{ color: "rgba(143, 122, 216, 0.62)" }}
+                  >
+                    FILE {String(scene.scene_index).padStart(2, "0")} •{" "}
+                    {sceneTitle ?? scene.scene_title}
+                  </p>
+                </div>
+              ) : (
+                <p
+                  className="text-[10px] font-light tracking-widest"
+                  style={{
+                    color: "rgba(143, 122, 216, 0.52)",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  {String(scene.scene_index).padStart(2, "0")}
+                  {sceneSubtitle && ` ${sceneTitle ?? scene.scene_title}`}
+                </p>
+              ))}
 
             {scene.is_free && scene.scene_index !== 2 && (
               <div
-                className="px-2 py-0.5 rounded-md text-[9px] font-medium tracking-wide uppercase"
+                className={
+                  isReceiptVariant
+                    ? "rounded-full px-1.5 py-0.5 text-[9px] font-medium tracking-wide"
+                    : "px-2 py-0.5 rounded-md text-[9px] font-medium tracking-wide uppercase"
+                }
                 style={{
                   background: "rgba(143, 122, 216, 0.08)",
                   color: "rgba(143, 122, 216, 0.55)",
@@ -179,13 +353,23 @@ const SceneContent = ({
           </div>
 
           <h2
-            className="text-lg font-normal leading-relaxed whitespace-pre-line"
+            className={
+              isReceiptVariant
+                ? "break-keep text-[14px] font-normal leading-[1.28] whitespace-normal"
+                : sceneSubtitle
+                  ? "text-xl font-normal leading-relaxed whitespace-pre-line"
+                  : "text-lg font-normal leading-relaxed whitespace-pre-line"
+            }
             style={{
-              color: "rgba(249, 249, 229, 0.80)",
+              color: isReceiptVariant
+                ? "rgba(249, 249, 229, 0.58)"
+                : sceneSubtitle
+                  ? "rgba(249, 249, 229, 0.84)"
+                  : "rgba(249, 249, 229, 0.80)",
               letterSpacing: "-0.01em",
             }}
           >
-            {scene.scene_title}
+            {sceneSubtitle ?? sceneTitle ?? scene.scene_title}
           </h2>
         </div>
       </div>
@@ -195,26 +379,39 @@ const SceneContent = ({
         // 무료 또는 unlocked scene
         <div
           data-testid="scene-messages"
-          className={`space-y-1 ${hasLeadingPunch ? "mt-3" : "mt-6"}`}
+          className={
+            isReceiptVariant
+              ? "space-y-1"
+              : `space-y-1 ${hasLeadingPunch ? "mt-3" : "mt-6"}`
+          }
         >
-          {/* Opening: 항상 visible */}
-          {openingMessages.map((msg, idx) => renderMessage(msg, idx))}
+          {isReceiptVariant ? (
+            <ReceiptReport
+              openingMessages={openingMessages}
+              bodyMessages={bodyMessages}
+            />
+          ) : (
+            <>
+              {/* Opening: 항상 visible */}
+              {openingMessages.map((msg, idx) => renderMessage(msg, idx))}
 
-          {/* Body sections: scroll-driven fade-in (MVP 실험) */}
-          {bodyMessages.length > 0 && (
-            <div
-              ref={bodyRef}
-              data-body-section="true"
-              data-visible={isBodyVisible ? "true" : "false"}
-              className="transition-opacity duration-[600ms]"
-              style={{
-                opacity: isBodyVisible ? 1 : 0,
-              }}
-            >
-              {bodyMessages.map((msg, idx) =>
-                renderMessage(msg, idx + openingMessages.length),
+              {/* Body sections: scroll-driven fade-in (MVP 실험) */}
+              {bodyMessages.length > 0 && (
+                <div
+                  ref={bodyRef}
+                  data-body-section="true"
+                  data-visible={isBodyVisible ? "true" : "false"}
+                  className="transition-opacity duration-[600ms]"
+                  style={{
+                    opacity: isBodyVisible ? 1 : 0,
+                  }}
+                >
+                  {bodyMessages.map((msg, idx) =>
+                    renderMessage(msg, idx + openingMessages.length),
+                  )}
+                </div>
               )}
-            </div>
+            </>
           )}
         </div>
       ) : (

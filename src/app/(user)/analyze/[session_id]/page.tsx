@@ -49,8 +49,11 @@ const AnalyzePage = ({ params }: PageProps) => {
       if (freeScenes) {
         const sp = new URLSearchParams(window.location.search);
         const isQa = sp.get("qa") === "1";
+        const hasPaid = sp.get("paid") === "1";
         const hasLoop = sp.get("loop") === "1";
-        const query = isQa ? `?qa=1${hasLoop ? "&loop=1" : ""}` : "";
+        const query = isQa
+          ? `?qa=1${hasPaid ? "&paid=1" : ""}${hasLoop ? "&loop=1" : ""}`
+          : "";
         router.replace(`/result/${sid}${query}`);
         // isRestoring 유지 (navigate 완료 전까지 빈 화면 유지)
         return;
@@ -278,6 +281,9 @@ const AnalyzePage = ({ params }: PageProps) => {
     const hasLoopFlag =
       typeof window !== "undefined" &&
       new URLSearchParams(window.location.search).get("loop") === "1";
+    const hasPaidQaFlag =
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("paid") === "1";
 
     try {
       const generateStartTime = Date.now();
@@ -344,9 +350,9 @@ const AnalyzePage = ({ params }: PageProps) => {
       }
 
       if (isQaMode) {
-        // ── QA mode: 무료 씬 → 유료 씬 순서로 2-call 생성 ───────────────────
+        // ── QA mode: 기본은 무료 씬만 생성, paid=1일 때만 유료 씬까지 생성 ─────
         // 실서비스 흐름(무료 씬만 생성)은 절대 변경하지 않는다.
-        console.log("[QA] 2-call generate 시작");
+        console.log("[QA] generate 시작", { paid: hasPaidQaFlag });
         const freeSceneIndexes = sceneConfig.scenes
           .filter((s) => s.is_free)
           .map((s) => s.index);
@@ -392,6 +398,9 @@ const AnalyzePage = ({ params }: PageProps) => {
             `veil_free_scenes_${finalData.session_id}`,
             JSON.stringify(freeScenes),
           );
+          if (!hasPaidQaFlag) {
+            localStorage.removeItem(`veil_all_scenes_${finalData.session_id}`);
+          }
         }
 
         // Call 2: 유료 씬 생성 (무료 씬 context 포함)
@@ -399,7 +408,7 @@ const AnalyzePage = ({ params }: PageProps) => {
           .filter((s) => !s.is_free)
           .map((s) => s.index);
 
-        if (paidSceneIndexes.length > 0) {
+        if (hasPaidQaFlag && paidSceneIndexes.length > 0) {
           // s.is_free는 Claude 응답값이라 undefined일 수 있다.
           // freeScenes 배열은 무료 씬만 생성한 결과이므로 마지막 원소가 마지막 무료 씬이다.
           const lastFreeScene = freeScenes.slice(-1)[0];
@@ -484,8 +493,13 @@ const AnalyzePage = ({ params }: PageProps) => {
         setProgress(100);
         setTimeout(() => {
           const loopSuffix = hasLoopFlag ? "&loop=1" : "";
-          console.log(`[QA] result page로 이동 (?qa=1${loopSuffix} 포함)`);
-          router.push(`/result/${finalData.session_id}?qa=1${loopSuffix}`);
+          const paidSuffix = hasPaidQaFlag ? "&paid=1" : "";
+          console.log(
+            `[QA] result page로 이동 (?qa=1${paidSuffix}${loopSuffix} 포함)`,
+          );
+          router.push(
+            `/result/${finalData.session_id}?qa=1${paidSuffix}${loopSuffix}`,
+          );
         }, 300);
       } else {
         // ── 일반 mode: 무료 씬만 생성 (결제 전 빠른 로딩) ──────────────────
@@ -567,7 +581,9 @@ const AnalyzePage = ({ params }: PageProps) => {
       // QA mode에서 에러가 나도 ?qa=1 유지 → result page가 QA unlock 상태 유지
       // (free scenes는 저장됐을 수 있으므로 unlock 상태로 보여주는 게 낫다)
       setTimeout(() => {
-        const qaQuery = isQaMode ? `?qa=1${hasLoopFlag ? "&loop=1" : ""}` : "";
+        const qaQuery = isQaMode
+          ? `?qa=1${hasPaidQaFlag ? "&paid=1" : ""}${hasLoopFlag ? "&loop=1" : ""}`
+          : "";
         router.push(`/result/${finalData.session_id}${qaQuery}`);
       }, 1000);
     }

@@ -130,7 +130,14 @@ const ShareResultPage = ({ params }: PageProps) => {
   }
 
   // 유료씬 teaser 제목: sceneConfig가 canonical source. messages 없음.
-  const paidSceneConfigs = getSceneConfig(contentId).scenes.filter(
+  const sceneConfig = getSceneConfig(contentId);
+  const getSceneDisplayTitle = (scene: ResultScene): string =>
+    sceneConfig.scenes.find(
+      (configScene) => configScene.index === scene.scene_index,
+    )?.title ?? scene.scene_title;
+  const getSceneSubtitle = (sceneIndex: number): string | undefined =>
+    sceneConfig.scenes.find((scene) => scene.index === sceneIndex)?.subtitle;
+  const paidSceneConfigs = sceneConfig.scenes.filter(
     (s) => !s.is_free,
   );
   const content = CONTENTS.find((c) => c.id === contentId);
@@ -319,6 +326,8 @@ const ShareResultPage = ({ params }: PageProps) => {
             >
               <SceneContent
                 scene={scene}
+                sceneTitle={getSceneDisplayTitle(scene)}
+                sceneSubtitle={getSceneSubtitle(scene.scene_index)}
                 isUnlocked={true}
                 onUnlockScene={() => {}}
                 isFirst={sceneIdx === 0}
@@ -364,12 +373,20 @@ const ShareResultPage = ({ params }: PageProps) => {
                         >
                           {String(sceneConfig.index).padStart(2, "0")}
                         </span>
-                        <p
-                          className="flex-1 text-sm leading-relaxed"
-                          style={{ color: "rgba(249,249,229,0.42)" }}
-                        >
-                          {sceneConfig.title}
-                        </p>
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className="truncate text-[10px] leading-relaxed"
+                            style={{ color: "rgba(143, 122, 216, 0.40)" }}
+                          >
+                            {sceneConfig.title}
+                          </p>
+                          <p
+                            className="mt-0.5 truncate text-xs leading-snug"
+                            style={{ color: "rgba(249,249,229,0.34)" }}
+                          >
+                            {sceneConfig.subtitle ?? sceneConfig.title}
+                          </p>
+                        </div>
                         <svg
                           className="mt-1 h-3 w-3 flex-shrink-0"
                           style={{ color: "rgba(143, 122, 216, 0.42)" }}

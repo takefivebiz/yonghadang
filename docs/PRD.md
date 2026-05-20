@@ -739,15 +739,22 @@ narrative experience 형태로 제공한다.
 
 #### 5.2.4 결과 페이지 (`/result/[session_id]`)
 
-결과 페이지는 “AI 리포트”가 아니라,
-사용자의 감정과 관계 흐름을 따라가는
-narrative experience 형태로 구성된다.
+결과 페이지는 “AI 상담/분석 결과”가 아니라,
+사용자의 감정 구조와 관계 흐름을 추적하는
+psychological case file 형태로 구성된다.
 
-사용자는 위에서 아래로 스크롤하며
-하나의 감정 흐름을 따라가게 된다.
+현재 결과 리포트 방향은 아래와 같다.
 
-사용자는 결과를 “읽는다”보다,
-누군가가 조용히 정리해준 감정 흐름을 따라가는 느낌을 받아야 한다.
+- weird emotional archive
+- psychological case file
+- 감정 구조 추적 리포트
+- 감정 신호 시각화가 삽입된 기록물
+
+VEIL은 감정을 설명하는 것이 아니라,
+감정 간 긴장 구조와 반복 신호를 추적한다.
+
+사용자는 결과를 “AI가 답해준다”보다,
+자신이 남긴 감정 사건 파일을 한 장면씩 열람하는 느낌을 받아야 한다.
 
 ---
 
@@ -761,11 +768,124 @@ narrative experience 형태로 구성된다.
 - 관계 구조의 일부
 - 핵심 감정 인식
 - 다음 흐름으로 이어지는 감정 포인트
+- 감정 구조를 보여주는 시각 신호
 
 를 담당한다.
 
 scene은 독립적이면서도,
-전체적으로 하나의 대화처럼 이어져야 한다.
+전체적으로 하나의 감정 사건 파일처럼 이어져야 한다.
+
+---
+
+### Signal Visualization System
+
+감정 신호 시각화는 일반 analytics chart가 아니다.
+사용자의 입력에서 추출된 감정 구조를
+“기록물 안의 증거 조각”처럼 보여주는 시스템이다.
+
+시각화는 감정 상태를 설명하기보다,
+감정 간 충돌, 압력, 비대칭, 반복 신호를 구조화해서 보여준다.
+
+기본 구조:
+
+```txt
+Scene Role
+→ Emotional Archetype
+→ Visualization Template
+→ Scene Signal Data
+```
+
+#### Scene별 Visualization Role
+
+| Scene | 역할 | Visualization Grammar |
+| --- | --- | --- |
+| Scene 01 의뢰 접수 | 현재 감정 압력 | donut / proportion |
+| Scene 02 현장 기록 | 반복 반응 기록 | pulse / timeline |
+| Scene 03 단서 분석 | 감정 충돌 구조 | split comparison / balance meter |
+| Scene 04 상황 추리 | 누적된 감정 압력 | stacked accumulation |
+| Scene 05 핵심 추리 | 임계점 상태 | threshold / collapse meter |
+| Scene 06 최종 보고 | 전체 감정 구조 요약 | constellation / emotional map |
+
+#### Emotional Archetype
+
+VEIL은 감정을 단일 상태로 보지 않는다.
+감정은 서로 충돌하거나 한쪽으로 기울거나, 표현되지 못한 압력으로 남는다.
+
+대표 archetype:
+
+- `anxiety_vs_stability`
+- `urge_vs_suppression`
+- `attachment_vs_detachment`
+- `hope_vs_exhaustion`
+- `certainty_vs_confusion`
+- `expectation_vs_resignation`
+
+각 archetype은 다음 정보를 가진다.
+
+- state labels
+- 감정 간 우세/약세 관계
+- scene role에 맞는 visualization template
+- 내부 intensity logic
+
+#### Visualization Template
+
+각 template은 재사용 가능한 렌더링 문법이다.
+콘텐츠마다 chart를 새로 디자인하지 않고,
+archetype + template + signal data 조합으로 생성한다.
+
+현재 기준 template:
+
+- `donut`: 감정 간 점유율/우세 상태
+- `pulse_timeline`: 반복 반응의 간격과 빈도
+- `balance_meter`: 두 감정의 힘겨루기
+- `stacked_accumulation`: 시간에 따라 쌓인 감정 압력
+- `threshold_gauge`: 임계점 또는 붕괴 직전 상태
+- `constellation_map`: 전체 감정 구조 요약
+
+#### Scene Signal Data
+
+Signal data는 화면에 직접 숫자를 노출하지 않는다.
+intensity는 내부 렌더링용 값이며, UI에서는 비율, 조각, 밀도, 흐름으로만 표현한다.
+
+예시:
+
+```ts
+sceneSignal: {
+  type: "donut",
+  archetype: "anxiety_vs_stability",
+  title: "강하게 관찰된 감정 신호",
+  stateA: {
+    label: "불안 반응",
+    intensity: 0.82
+  },
+  stateB: {
+    label: "안정감 기대",
+    intensity: 0.18
+  },
+  summary: "불안 우세"
+}
+```
+
+#### Scene 01 현재 적용 상태
+
+Scene 01은 현재 감정 압력을 보여주는 장면이다.
+
+현재 구조:
+
+- `핵심 징후`: scene의 핵심 해석을 punch로 표시
+- `강하게 관찰된 감정 신호`: 감정 압력 구조를 donut 기반 imbalance visualization으로 표시
+- bullet report: 세부 기록 로그
+
+현재 archetype:
+
+- `anxiety_vs_stability`: 불안 반응 ↔ 안정감 기대
+- `urge_vs_suppression`: 질문 충동 ↔ 실제 표현
+
+규칙:
+
+- punch는 핵심 해석이다.
+- signal은 핵심 해석을 반복하지 않고, 그 해석을 만든 감정 압력 구조를 보여준다.
+- bullet은 signal과 punch를 설명하는 세부 기록 로그다.
 
 ---
 

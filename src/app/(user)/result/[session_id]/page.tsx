@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ClipboardList } from "lucide-react";
 import { generateMockResultScenes } from "@/lib/data/dummy-result-scenes";
 import { INPUT_CONFIGS } from "@/lib/data/input-configs";
 import { getSceneConfig } from "@/lib/data/scene-configs";
@@ -343,12 +344,13 @@ const ResultPage = ({ params }: PageProps) => {
         setScenes(allScenes);
 
         // ── QA mode 감지 ─────────────────────────────────────────
-        // ?qa=1: 전체 씬 unlock (결제 없이 확인)
+        // ?qa=1: 무료 씬만 unlock / ?qa=1&paid=1: 전체 씬 unlock
         // ?qa=1&loop=1: 추가로 추가루프 CTA 표시 및 직접 생성 활성화
         const searchQuery = new URLSearchParams(window.location.search);
         const isQa =
           searchQuery.get("qa") === "1" ||
           process.env.NEXT_PUBLIC_QA_MODE === "true";
+        const isPaidQa = isQa && searchQuery.get("paid") === "1";
         const isLoopQa = isQa && searchQuery.get("loop") === "1";
         setIsQaMode(isQa);
         setIsLoopQaMode(isLoopQa);
@@ -356,6 +358,8 @@ const ResultPage = ({ params }: PageProps) => {
         console.log(
           "[result] isQaMode=",
           isQa,
+          "isPaidQaMode=",
+          isPaidQa,
           "isLoopQaMode=",
           isLoopQa,
           "| allScenes:",
@@ -369,13 +373,14 @@ const ResultPage = ({ params }: PageProps) => {
         );
 
         if (isQa) {
-          // QA mode: 결제 없이 전체 씬 확인 (localStorage 기록 없음)
-          const allIndexes = allScenes.map((s) => s.scene_index);
+          const qaUnlockedIndexes = isPaidQa
+            ? allScenes.map((s) => s.scene_index)
+            : allScenes.filter((s) => s.is_free).map((s) => s.scene_index);
           console.log(
-            "[result] QA mode: unlockedScenes 전체 설정 →",
-            allIndexes,
+            "[result] QA mode: unlockedScenes 설정 →",
+            qaUnlockedIndexes,
           );
-          setUnlockedScenes(allIndexes);
+          setUnlockedScenes(qaUnlockedIndexes);
         } else {
           // ── Unlock 상태 복원 ────────────────────────────────────
           // 1. localStorage에서 저장된 unlock 상태 확인
@@ -1042,7 +1047,7 @@ const ResultPage = ({ params }: PageProps) => {
       handleOpenPaymentModal(
         "single",
         sceneIndex,
-        cardTitle || scene.scene_title,
+        cardTitle || getSceneDisplayTitle(scene),
       );
     }
   };
@@ -1068,7 +1073,7 @@ const ResultPage = ({ params }: PageProps) => {
     }
 
     setIsRecordListOpen(false);
-    handleUnlockScene(scene.scene_index, scene.scene_title);
+    handleUnlockScene(scene.scene_index, getSceneDisplayTitle(scene));
   };
 
   const handleUnlockAllFromRecordList = () => {
@@ -1115,6 +1120,16 @@ const ResultPage = ({ params }: PageProps) => {
     paidScenes.length > 0 &&
     paidScenes.every((s) => unlockedScenes.includes(s.scene_index));
   const activeScene = scenes[currentSceneIndex] ?? scenes[0];
+  const displaySceneConfig = analyzeData
+    ? getSceneConfig(analyzeData.content_id)
+    : null;
+  const getSceneDisplayTitle = (scene: ResultScene): string =>
+    displaySceneConfig?.scenes.find(
+      (configScene) => configScene.index === scene.scene_index,
+    )?.title ?? scene.scene_title;
+  const getSceneSubtitle = (sceneIndex: number): string | undefined =>
+    displaySceneConfig?.scenes.find((scene) => scene.index === sceneIndex)
+      ?.subtitle;
   const activeSceneUnlocked =
     !!activeScene &&
     (activeScene.is_free || unlockedScenes.includes(activeScene.scene_index));
@@ -1163,13 +1178,7 @@ const ResultPage = ({ params }: PageProps) => {
     <div
       className="min-h-screen flex flex-col"
       style={{
-        background: `
-          radial-gradient(circle at 18% 12%, rgba(201, 139, 176, 0.14) 0%, rgba(201, 139, 176, 0.05) 22%, transparent 42%),
-          radial-gradient(circle at 82% 38%, rgba(158, 138, 201, 0.10) 0%, rgba(158, 138, 201, 0.04) 24%, transparent 46%),
-          radial-gradient(circle at 55% 78%, rgba(201, 139, 176, 0.09) 0%, rgba(201, 139, 176, 0.035) 28%, transparent 52%),
-          linear-gradient(180deg, #11111B 0%, #151222 42%, #1A1222 72%, #11111B 100%)
-        `,
-        backgroundAttachment: "fixed",
+        backgroundColor: "#1d192b",
       }}
     >
       {/* ── 메인 콘텐츠 영역 ──────────────────────────── */}
@@ -1200,7 +1209,7 @@ const ResultPage = ({ params }: PageProps) => {
               );
               return content ? (
                 <div
-                  className={`px-5 pt-6 ${currentSceneIndex === 0 ? "pb-2 space-y-4" : "pb-0"} mt-10`}
+                  className={`px-5 pt-10 ${currentSceneIndex === 0 ? "pb-2 space-y-4" : "pb-0"}`}
                 >
                   <div
                     style={{
@@ -1212,24 +1221,24 @@ const ResultPage = ({ params }: PageProps) => {
                     <div
                       style={{
                         flex: "0 1 auto",
-                        height: "34px",
+                        height: "38px",
                         background: "rgba(60, 45, 65, 0.30)",
                         borderTop: "1px solid rgba(143, 122, 216, 0.12)",
                         borderRight: "1px solid rgba(143, 122, 216, 0.12)",
                         borderLeft: "1px solid rgba(143, 122, 216, 0.12)",
                         borderBottom: "1px solid rgba(143, 122, 216, 0.12)",
-                        borderRadius: "12px 12px 0 0",
+                        borderRadius: "14px 14px 0 0",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        paddingLeft: "14px",
-                        paddingRight: "14px",
+                        paddingLeft: "20px",
+                        paddingRight: "20px",
                         opacity: 0.46,
                       }}
                     >
                       <span
                         style={{
-                          fontSize: "11px",
+                          fontSize: "12px",
                           fontWeight: "400",
                           color: "rgba(255, 255, 255, 0.48)",
                           letterSpacing: "0.02em",
@@ -1242,24 +1251,24 @@ const ResultPage = ({ params }: PageProps) => {
                     <div
                       style={{
                         flex: "0 1 auto",
-                        height: "34px",
+                        height: "38px",
                         background: "rgba(60, 45, 65, 0.36)",
                         borderTop: "1px solid rgba(143, 122, 216, 0.18)",
                         borderRight: "1px solid rgba(143, 122, 216, 0.18)",
                         borderLeft: "1px solid rgba(143, 122, 216, 0.18)",
                         borderBottom: "1px solid rgba(143, 122, 216, 0.18)",
-                        borderRadius: "12px 12px 0 0",
+                        borderRadius: "14px 14px 0 0",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        paddingLeft: "14px",
-                        paddingRight: "14px",
+                        paddingLeft: "20px",
+                        paddingRight: "20px",
                         opacity: 0.58,
                       }}
                     >
                       <span
                         style={{
-                          fontSize: "11px",
+                          fontSize: "12px",
                           fontWeight: "400",
                           color: "rgba(255, 255, 255, 0.55)",
                           letterSpacing: "0.02em",
@@ -1272,25 +1281,25 @@ const ResultPage = ({ params }: PageProps) => {
                     <div
                       style={{
                         flex: "0 1 auto",
-                        height: "34px",
+                        height: "38px",
                         background: "rgba(92, 74, 132, 0.34)",
                         borderTop: "1px solid rgba(143, 122, 216, 0.30)",
                         borderRight: "1px solid rgba(143, 122, 216, 0.30)",
                         borderLeft: "1px solid rgba(143, 122, 216, 0.30)",
                         borderBottom: "none",
-                        borderRadius: "12px 12px 0 0",
+                        borderRadius: "14px 14px 0 0",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        paddingLeft: "16px",
-                        paddingRight: "16px",
+                        paddingLeft: "20px",
+                        paddingRight: "20px",
                         opacity: 1,
                       }}
                     >
                       <span
                         style={{
-                          fontSize: "12px",
-                          fontWeight: "500",
+                          fontSize: "13px",
+                          fontWeight: "400",
                           color: "rgba(255, 255, 255, 0.92)",
                           letterSpacing: "0.02em",
                           whiteSpace: "nowrap",
@@ -1302,62 +1311,104 @@ const ResultPage = ({ params }: PageProps) => {
                   </div>
 
                   {currentSceneIndex === 0 && (
-                    <div className="flex items-center gap-3 rounded-b-[16px] rounded-tr-[16px] border border-accent/10 bg-white/[0.015] px-4 py-3.5">
-                      {content.thumbnail_url && (
-                        <div className="relative h-15 w-15 flex-shrink-0 overflow-hidden rounded-[10px] bg-white/[0.025] opacity-85">
-                          <Image
-                            src={content.thumbnail_url}
-                            alt={content.title}
-                            fill
-                            priority
-                            className="object-cover object-center"
+                    <>
+                      <div
+                        className="rounded-b-[18px] rounded-tr-[18px] px-3 py-2.5"
+                        style={{
+                          background: "rgba(60, 45, 65, 0.3)",
+                          border: "1px solid rgba(143, 122, 216, 0.22)",
+                        }}
+                      >
+                        <div className="px-3 py-1.5">
+                          <div className="mb-2 flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className="flex h-3.5 w-3.5 items-center justify-center"
+                                style={{ color: "rgba(143, 122, 216, 0.52)" }}
+                              >
+                                <ClipboardList size={11} strokeWidth={1.7} />
+                              </span>
+                              <p
+                                className="text-[10px] tracking-[0.12em]"
+                                style={{ color: "rgba(143, 122, 216, 0.68)" }}
+                              >
+                                선택한 의뢰
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-3">
+                            {content.thumbnail_url && (
+                              <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-[8px] bg-white/[0.025] opacity-85">
+                                <Image
+                                  src={content.thumbnail_url}
+                                  alt={content.title}
+                                  fill
+                                  priority
+                                  className="object-cover object-center"
+                                />
+                              </div>
+                            )}
+
+                            <div className="flex min-w-0 flex-1 flex-col justify-center">
+                              <h1
+                                className="text-[13px] font-normal leading-snug"
+                                style={{ color: "rgba(249,249,229,0.76)" }}
+                              >
+                                {content.title}
+                              </h1>
+                              <p
+                                className="mt-0.5 text-[11px] leading-snug"
+                                style={{ color: "rgba(249,249,229,0.36)" }}
+                              >
+                                {content.subtitle}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {activeScene && (
+                        <div
+                          key={activeScene.id}
+                          data-scene-idx={currentSceneIndex}
+                          ref={(el) => {
+                            if (el) {
+                              sceneRefsMap.current[currentSceneIndex] = el;
+                            }
+                          }}
+                          className="mt-3 rounded-[12px]"
+                          style={{
+                            background: "rgba(60, 45, 65, 0.3)",
+                            border: "1px solid rgba(143, 122, 216, 0.10)",
+                          }}
+                        >
+                          <SceneContent
+                            scene={activeScene}
+                            sceneTitle={getSceneDisplayTitle(activeScene)}
+                            sceneSubtitle={getSceneSubtitle(
+                              activeScene.scene_index,
+                            )}
+                            isUnlocked={activeSceneUnlocked}
+                            onUnlockScene={() =>
+                              handleUnlockScene(
+                                activeScene.scene_index,
+                                getSceneDisplayTitle(activeScene),
+                              )
+                            }
+                            isFirst
+                            isCurrent
+                            variant="receipt"
                           />
                         </div>
                       )}
-
-                      {/* 제목 */}
-                      <div className="min-w-0 space-y-1">
-                        <p
-                          className="text-[10px] font-medium tracking-[0.16em]"
-                          style={{ color: "rgba(143, 122, 216, 0.66)" }}
-                        >
-                          RESULT REPORT
-                        </p>
-                        <h1
-                          className="text-base font-medium leading-snug"
-                          style={{ color: "rgba(249,249,229,0.88)" }}
-                        >
-                          {content.title}
-                        </h1>
-                        <p
-                          className="line-clamp-1 text-xs"
-                          style={{ color: "rgba(249,249,229,0.42)" }}
-                        >
-                          {content.subtitle}
-                        </p>
-                      </div>
-                    </div>
+                    </>
                   )}
                 </div>
               ) : null;
             })()}
 
-          {/* 씬 시작 구분점 */}
-          {currentSceneIndex === 0 && (
-            <div className="px-3 py-3 text-center">
-              <span
-                style={{
-                  color: "rgba(143, 122, 216, 0.28)",
-                  fontSize: "16px",
-                  letterSpacing: "0.7em",
-                }}
-              >
-                ◇
-              </span>
-            </div>
-          )}
-
-          {activeScene && (
+          {activeScene && currentSceneIndex !== 0 && (
             <div
               key={activeScene.id}
               data-scene-idx={currentSceneIndex}
@@ -1369,15 +1420,18 @@ const ResultPage = ({ params }: PageProps) => {
             >
               <SceneContent
                 scene={activeScene}
+                sceneTitle={getSceneDisplayTitle(activeScene)}
+                sceneSubtitle={getSceneSubtitle(activeScene.scene_index)}
                 isUnlocked={activeSceneUnlocked}
                 onUnlockScene={() =>
                   handleUnlockScene(
                     activeScene.scene_index,
-                    activeScene.scene_title,
+                    getSceneDisplayTitle(activeScene),
                   )
                 }
                 isFirst={currentSceneIndex === 0}
                 isCurrent
+                variant={currentSceneIndex === 0 ? "receipt" : "default"}
               />
             </div>
           )}
@@ -1439,16 +1493,13 @@ const ResultPage = ({ params }: PageProps) => {
                 loopAnswers={loopAnswersForDisplay}
                 loopLoading={
                   showLoopLoadingOverride && !showLoopUnlockedMock
-                    ? loopLoadingOverrideType ?? loopLoading
+                    ? (loopLoadingOverrideType ?? loopLoading)
                     : loopLoading
                 }
                 loopError={loopError}
                 newlyUnlockedLoops={
                   showLoopUnlockedMock && loopUnlockedMockReading
-                    ? [
-                        ...newlyUnlockedLoops,
-                        loopUnlockedMockReading.loopType,
-                      ]
+                    ? [...newlyUnlockedLoops, loopUnlockedMockReading.loopType]
                     : newlyUnlockedLoops
                 }
                 loopAllPurchased={loopAllPurchased}
@@ -1531,7 +1582,7 @@ const ResultPage = ({ params }: PageProps) => {
                 className="text-[11px] font-medium tracking-[0.14em]"
                 style={{ color: "rgba(143, 122, 216, 0.62)" }}
               >
-                RESULT FILE
+                RESULT REPORT
               </p>
               <p
                 className="mt-1 text-sm"
@@ -1558,6 +1609,7 @@ const ResultPage = ({ params }: PageProps) => {
               const isUnlocked =
                 scene.is_free || unlockedScenes.includes(scene.scene_index);
               const isCurrent = sceneIdx === currentSceneIndex;
+              const sceneSubtitle = getSceneSubtitle(scene.scene_index);
 
               return (
                 <button
@@ -1584,15 +1636,27 @@ const ResultPage = ({ params }: PageProps) => {
                   >
                     {String(scene.scene_index).padStart(2, "0")}
                   </span>
-                  <span
-                    className="min-w-0 flex-1 truncate text-xs"
-                    style={{
-                      color: isUnlocked
-                        ? "rgba(249, 249, 229, 0.70)"
-                        : "rgba(249, 249, 229, 0.36)",
-                    }}
-                  >
-                    {scene.scene_title}
+                  <span className="min-w-0 flex-1">
+                    <span
+                      className="block truncate text-[10px]"
+                      style={{
+                        color: isUnlocked
+                          ? "rgba(143, 122, 216, 0.54)"
+                          : "rgba(143, 122, 216, 0.32)",
+                      }}
+                    >
+                      {getSceneDisplayTitle(scene)}
+                    </span>
+                    <span
+                      className="mt-0.5 block truncate text-xs"
+                      style={{
+                        color: isUnlocked
+                          ? "rgba(249, 249, 229, 0.72)"
+                          : "rgba(249, 249, 229, 0.34)",
+                      }}
+                    >
+                      {sceneSubtitle ?? getSceneDisplayTitle(scene)}
+                    </span>
                   </span>
                   {!isUnlocked && (
                     <span

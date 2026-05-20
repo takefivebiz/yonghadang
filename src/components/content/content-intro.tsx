@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Content, CATEGORY_LABELS } from "@/lib/types/content";
+import { getSceneConfig } from "@/lib/data/scene-configs";
 
 interface ContentIntroProps {
   content: Content;
@@ -76,8 +77,9 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
   };
 
   const MAX_PREVIEW_FLOWS = 4;
-  const previewFlows = content.insights?.slice(0, MAX_PREVIEW_FLOWS) || [];
-  const remainingCount = (content.insights?.length || 0) - previewFlows.length;
+  const sceneConfig = getSceneConfig(content.id);
+  const previewScenes = sceneConfig.scenes.slice(0, MAX_PREVIEW_FLOWS);
+  const remainingCount = sceneConfig.scenes.length - previewScenes.length;
 
   return (
     <div className="w-full max-w-full relative overflow-x-hidden">
@@ -267,7 +269,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                   className="text-[11px] font-medium tracking-wider whitespace-nowrap"
                   style={{ color: "rgba(143, 122, 216, 0.4)" }}
                 >
-                  이 파일에 포함된 기록
+                  이 리포트에 포함된 기록
                 </span>
                 <div
                   style={{
@@ -282,10 +284,10 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
             {/* 섹션 3: 파일 리스트 */}
             <div style={{ padding: "8px 24px 24px 24px" }}>
               <div className="space-y-4">
-                {previewFlows && previewFlows.length > 0 && (
+                {previewScenes.length > 0 && (
                   <div className="space-y-4">
-                    {previewFlows.map((insight, i) => (
-                      <div key={i} className="flex flex-col gap-0">
+                    {previewScenes.map((scene) => (
+                      <div key={scene.index} className="flex flex-col gap-0">
                         <div className="flex gap-2">
                           <svg
                             className="w-3 h-3 shrink-0 self-start mt-2"
@@ -300,10 +302,11 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                           </svg>
                           <div className="flex-1 min-w-0">
                             <span className="text-[10px] font-medium text-white/45 uppercase tracking-widest">
-                              FILE {String(i + 1).padStart(2, "0")}
+                              FILE {String(scene.index).padStart(2, "0")}
+                              {scene.subtitle && ` ${scene.title}`}
                             </span>
                             <p className="mt-0.5 text-[13px] leading-[1.45] text-white/70">
-                              {insight}
+                              {scene.subtitle ?? scene.title}
                             </p>
                           </div>
                         </div>
