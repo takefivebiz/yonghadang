@@ -70,7 +70,7 @@ const GeneratingLoading = ({ progress }: GeneratingLoadingProps) => {
 
         <div className="mx-auto w-full max-w-[260px]">
           <p
-            className="text-sm font-medium"
+            className="text-sm lg:text-[16px] font-medium"
             style={{
               color: "rgba(249, 249, 229, 0.84)",
               letterSpacing: "-0.01em",
@@ -79,7 +79,7 @@ const GeneratingLoading = ({ progress }: GeneratingLoadingProps) => {
             의뢰 기록 정리 중 · {progressPercent}%
           </p>
           <p
-            className="mt-3 text-xs leading-relaxed"
+            className="mt-3 text-xs lg:text-[15px] leading-relaxed"
             style={{ color: "rgba(249, 249, 229, 0.44)" }}
           >
             {statusText}

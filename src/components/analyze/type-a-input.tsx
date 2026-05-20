@@ -67,7 +67,7 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
 
   return (
     <div
-      className="w-full flex flex-col"
+      className="w-full max-w-none lg:max-w-[480px] lg:mx-auto flex flex-col"
       style={{
         padding: "32px 24px 40px 24px",
         background: "transparent",
@@ -88,8 +88,8 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
         {/* 왼쪽: Editorial 텍스트 */}
         <div style={{ flex: 1 }}>
           <h2
+            className="text-[22px] lg:text-[23px]"
             style={{
-              fontSize: "22px",
               fontWeight: "500",
               color: "rgba(249, 249, 229, 0.88)",
               lineHeight: "1.3",
@@ -105,8 +105,8 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
             편하게 말해줘.
           </h2>
           <p
+            className="text-[13px] lg:text-[16px]"
             style={{
-              fontSize: "13px",
               color: "rgba(249, 249, 229, 0.45)",
               lineHeight: "1.6",
               margin: "0",
@@ -196,7 +196,7 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
           }}
         >
           <textarea
-            className="veil-textarea"
+            className="veil-textarea text-[14px] lg:text-[16px]"
             value={input}
             onChange={(e) => {
               if (e.target.value.length <= maxChars) {
@@ -213,7 +213,6 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
               border: "none",
               outline: "none",
               resize: "none",
-              fontSize: "14px",
               lineHeight: "24px",
               color: "rgba(249, 249, 229, 0.8)",
               caretColor: "rgba(143, 122, 216, 0.58)",
@@ -224,11 +223,11 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
 
           {/* 글자수 카운터 */}
           <div
+            className="text-[11px] lg:text-[14px]"
             style={{
               position: "absolute",
               bottom: "12px",
               right: "16px",
-              fontSize: "11px",
               color: "rgba(255, 255, 255, 0.2)",
               pointerEvents: "none",
             }}
@@ -240,8 +239,8 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
 
       {/* 안내 문구 */}
       <div
+        className="text-[11px] lg:text-[14px]"
         style={{
-          fontSize: "11px",
           color: "rgba(255, 255, 255, 0.2)",
           margin: "6px 0 40px 0",
           letterSpacing: "0.01em",
@@ -258,7 +257,7 @@ const TypeAInput = ({ config, onSubmit }: TypeAInputProps) => {
       <button
         onClick={handleSubmit}
         disabled={isSubmitDisabled}
-        className="w-full py-4 text-base font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full py-4 text-base lg:text-[17px] font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
         style={{
           borderRadius: "12px",
           background: isSubmitDisabled

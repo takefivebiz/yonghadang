@@ -115,8 +115,8 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
               }}
             >
               <span
+                className="text-[13px] lg:text-[15px]"
                 style={{
-                  fontSize: "13px",
                   fontWeight: "400",
                   color: "rgba(255, 255, 255, 0.90)",
                   letterSpacing: "0.02em",
@@ -153,8 +153,8 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
               }}
             >
               <span
+                className="text-[12px] lg:text-[14px]"
                 style={{
-                  fontSize: "12px",
                   fontWeight: "400",
                   color: "rgba(255, 255, 255, 0.55)",
                   letterSpacing: "0.02em",
@@ -191,8 +191,8 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
               }}
             >
               <span
+                className="text-[12px] lg:text-[14px]"
                 style={{
-                  fontSize: "12px",
                   fontWeight: "400",
                   color: "rgba(255, 255, 255, 0.45)",
                   letterSpacing: "0.02em",
@@ -243,11 +243,11 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
 
                 {/* 제목/부제 */}
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-[16px] font-medium leading-[1.3] text-white/85 mb-1 line-clamp-1">
+                  <h1 className="text-[16px] lg:text-[20px] font-medium leading-[1.26] text-white/85 mb-1 line-clamp-1">
                     {content.title}
                   </h1>
                   {content.subtitle && (
-                    <p className="text-[12px] leading-[1.35] text-white/55 line-clamp-2 text-left">
+                    <p className="text-[12px] lg:text-[15px] leading-[1.38] text-white/55 line-clamp-2 text-left">
                       {content.subtitle}
                     </p>
                   )}
@@ -301,11 +301,11 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                             <polyline points="13 2 13 9 20 9" />
                           </svg>
                           <div className="flex-1 min-w-0">
-                            <span className="text-[10px] font-medium text-white/45 uppercase tracking-widest">
+                            <span className="text-[10px] lg:text-[12px] font-medium text-white/45 uppercase tracking-widest">
                               FILE {String(scene.index).padStart(2, "0")}
                               {scene.subtitle && ` ${scene.title}`}
                             </span>
-                            <p className="mt-0.5 text-[13px] leading-[1.45] text-white/70">
+                            <p className="mt-0.5 text-[13px] lg:text-[15px] leading-[1.45] text-white/70">
                               {scene.subtitle ?? scene.title}
                             </p>
                           </div>
@@ -317,14 +317,14 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                       <div className="pt-2 mt-2 ml-5">
                         <div className="flex items-center gap-2">
                           <p
-                            className="text-[12px]"
+                            className="text-[12px] lg:text-[14px]"
                             style={{ color: "rgba(255, 255, 255, 0.35)" }}
                           >
                             +
                           </p>
-                          <span style={{ fontSize: "12px" }}>🔒</span>
+                          <span className="text-[12px] lg:text-[14px]">🔒</span>
                           <p
-                            className="text-[13px]"
+                            className="text-[13px] lg:text-[15px]"
                             style={{ color: "rgba(255, 255, 255, 0.35)" }}
                           >
                             {remainingCount}개의 잠긴 기록
@@ -344,7 +344,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                 <div className="flex flex-col gap-2.5">
                   <button
                     onClick={handleResume}
-                    className="w-full py-4 text-base font-medium transition-all duration-300 flex items-center justify-center gap-2"
+                    className="w-full py-4 text-base lg:text-[18px] font-medium transition-all duration-300 flex items-center justify-center gap-2"
                     style={{
                       borderRadius: "12px",
                       background: "rgba(143, 122, 216, 0.1)",
@@ -379,7 +379,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                   <button
                     onClick={handleStart}
                     disabled={loading}
-                    className="w-full py-4 text-base font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center gap-2"
+                    className="w-full py-4 text-base lg:text-[18px] font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center gap-2"
                     style={{
                       borderRadius: "12px",
                       background: "rgba(143, 122, 216, 0.16)",
@@ -423,7 +423,7 @@ const ContentIntro = ({ content }: ContentIntroProps) => {
                 <button
                   onClick={handleStart}
                   disabled={loading}
-                  className="w-full py-4 text-base font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full py-4 text-base lg:text-[18px] font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
                   style={{
                     borderRadius: "12px",
                     background: "rgba(143, 122, 216, 0.16)",

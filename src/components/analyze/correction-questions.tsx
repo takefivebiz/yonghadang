@@ -117,6 +117,7 @@ const CorrectionQuestions = ({
 
             {/* 진행률 말풍선 - 오른쪽 상단 겹침 */}
             <div
+              className="text-[10px] lg:text-[13px] lg:translate-x-4"
               style={{
                 position: "absolute",
                 right: "-55px",
@@ -125,7 +126,6 @@ const CorrectionQuestions = ({
                 border: "1px solid rgba(143, 122, 216, 0.14)",
                 borderRadius: "8px 8px 8px 0px",
                 padding: "5px 9px",
-                fontSize: "10px",
                 color: "rgba(249, 249, 229, 0.55)",
                 letterSpacing: "0.01em",
                 whiteSpace: "nowrap",
@@ -138,13 +138,14 @@ const CorrectionQuestions = ({
 
         {/* 질문 영역 */}
         <div
+          className="mb-12 mt-4 space-y-3 flex flex-col items-center w-full"
           style={{
             marginBottom: "25px",
           }}
         >
           <h2
+            className="w-full text-[17px] lg:text-[21px]"
             style={{
-              fontSize: "20px",
               fontWeight: "500",
               color: "rgba(249, 249, 229, 0.88)",
               lineHeight: "1.4",
@@ -157,8 +158,8 @@ const CorrectionQuestions = ({
             {currentStep.question}
           </h2>
           <p
+            className="w-full text-[12px] lg:text-[15px]"
             style={{
-              fontSize: "12px",
               color: "rgba(249, 249, 229, 0.4)",
               lineHeight: "1.5",
               margin: "0",
@@ -192,7 +193,7 @@ const CorrectionQuestions = ({
               <button
                 key={option.value}
                 onClick={() => handleSelectOption(option.value)}
-                className="w-full text-left px-4 py-3 transition-all text-sm"
+                className="w-full lg:w-[92%] lg:max-w-[520px] lg:mx-auto text-left px-4 py-3 transition-all text-sm lg:text-[16px]"
                 style={{
                   background: isSelected
                     ? "rgba(143, 122, 216, 0.12)"
@@ -216,7 +217,7 @@ const CorrectionQuestions = ({
         <button
           onClick={handleNext}
           disabled={!isAnswered}
-          className="w-full py-4 text-base font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full py-4 text-base lg:text-[17px] font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60"
           style={{
             borderRadius: "12px",
             background: !isAnswered

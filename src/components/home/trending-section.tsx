@@ -19,7 +19,7 @@ const TrendingSection = ({ contents }: TrendingSectionProps) => {
       </div>
       <div className="px-2">
         <div
-          className="grid grid-cols-2 gap-x-2 gap-y-4 lg:gap-x-3 lg:gap-y-6"
+          className="grid grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] gap-x-2 gap-y-4 lg:w-[88%] lg:gap-x-3 lg:gap-y-6"
           data-testid="trending-grid"
         >
           {contents.map((content, index) => (

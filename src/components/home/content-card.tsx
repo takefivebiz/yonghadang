@@ -156,13 +156,13 @@ const ListCard = ({
     >
       <article className="flex w-full min-h-[120px] lg:min-h-[160px] overflow-hidden rounded-[12px] border border-white/[0.05] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]">
         {/* 썸네일 — 왼쪽 패널 (카드 높이를 꽉 채움) */}
-        <div className={`relative w-28 lg:w-32 shrink-0 self-stretch`}>
+        <div className={`relative w-28 sm:w-32 lg:w-44 shrink-0 self-stretch`}>
           {content.thumbnail_url ? (
             <Image
               src={content.thumbnail_url}
               alt={content.title}
               fill
-              sizes="(max-width: 640px) 112px, 128px"
+              sizes="(max-width: 640px) 112px, (max-width: 1024px) 128px, 176px"
               priority={priority}
               className="object-cover object-center transition-opacity duration-300 group-hover:opacity-70"
             />
@@ -234,9 +234,9 @@ const TrendingCard = ({
       href={`/content/${content.slug ?? content.id}`}
       className="group block w-full"
     >
-      <article className="flex flex-col h-[260px] lg:h-[290px] overflow-hidden rounded-[12px] border border-white/[0.05] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]">
+      <article className="flex flex-col h-[248px] lg:h-[284px] overflow-hidden rounded-[12px] border border-white/[0.05] bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]">
         {/* 이미지 — 상단 (고정 높이) */}
-        <div className="relative h-[150px] lg:h-[180px] shrink-0 overflow-hidden">
+        <div className="relative h-[148px] lg:h-[176px] shrink-0 overflow-hidden">
           {content.thumbnail_url ? (
             <Image
               src={content.thumbnail_url}
@@ -267,19 +267,24 @@ const TrendingCard = ({
           )}
         </div>
 
-        {/* 텍스트 영역 — 하단 */}
-        <div className="flex-1 px-4 py-3.5 lg:px-5 lg:py-4 flex flex-col">
-          {/* 제목 */}
-          <h2 className="line-clamp-2 whitespace-pre-line font-nomal leading-[1.45] text-[14px] lg:text-[16px] text-white/85 mb-1.5">
-            {content.title}
-          </h2>
+        {/* 텍스트 영역 — 카드마다 동일한 기준선 유지 */}
+        <div className="flex h-[100px] flex-col justify-center px-4 py-2.5 lg:h-[108px] lg:px-5 lg:py-3">
+          <div className="grid gap-1">
+            {/* 제목 */}
+            <h2 className="h-[2.8em] line-clamp-2 whitespace-pre-line font-nomal leading-[1.4] text-[14px] text-white/85 lg:text-[16px]">
+              {content.title}
+            </h2>
 
-          {/* 부제 */}
-          {content.subtitle && (
-            <p className="whitespace-pre-line leading-[1.5] text-[11px] lg:text-[12px] text-highlight/35">
-              {content.subtitle}
+            {/* 부제 */}
+            <p
+              className={`h-[2.4em] line-clamp-2 whitespace-pre-line leading-[1.45] text-[11px] text-highlight/35 lg:text-[12px] ${
+                content.subtitle ? "" : "opacity-0"
+              }`}
+              aria-hidden={!content.subtitle}
+            >
+              {content.subtitle ?? "\u00A0"}
             </p>
-          )}
+          </div>
         </div>
       </article>
     </Link>
